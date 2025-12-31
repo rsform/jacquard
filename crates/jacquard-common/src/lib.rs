@@ -192,7 +192,26 @@
 //! be happy to debug, and if it's using a method from one of the jacquard crates and seems like
 //! it *should* just work, that is a bug in jacquard, and you should [file an issue](https://tangled.org/@nonbinary.computer/jacquard/).
 
+#![no_std]
 #![warn(missing_docs)]
+
+#[macro_use]
+extern crate alloc;
+
+#[cfg(feature = "std")]
+extern crate std;
+
+/// Lazy initialization type for static values.
+///
+/// Uses `std::sync::LazyLock` when the `std` feature is enabled, or `spin::Lazy`
+/// for no_std environments. Exported so downstream crates can use it without
+/// their own conditional compilation.
+#[cfg(feature = "std")]
+pub type Lazy<T> = std::sync::LazyLock<T>;
+
+#[cfg(not(feature = "std"))]
+pub use spin::Lazy;
+
 pub use bytes;
 pub use chrono;
 pub use cowstr::CowStr;

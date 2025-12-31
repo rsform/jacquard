@@ -42,9 +42,11 @@
 //! # }
 //! ```
 
-use std::error::Error;
-use std::fmt;
-use std::pin::Pin;
+use alloc::boxed::Box;
+use alloc::string::String;
+use core::error::Error;
+use core::fmt;
+use core::pin::Pin;
 
 /// Boxed error type for streaming operations
 pub type BoxError = Box<dyn Error + Send + Sync + 'static>;

@@ -3,6 +3,12 @@ use crate::types::nsid::Nsid;
 use crate::types::recordkey::{RecordKey, Rkey};
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
+use alloc::string::String;
+use alloc::string::ToString;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::ops::Deref;
+use core::str::FromStr;
 #[cfg(not(target_arch = "wasm32"))]
 use regex::Regex;
 #[cfg(target_arch = "wasm32")]
@@ -10,10 +16,8 @@ use regex_lite::Regex;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::sync::LazyLock;
-use std::{ops::Deref, str::FromStr};
+
+use super::Lazy;
 
 /// AT Protocol URI (`at://`) for referencing records in repositories
 ///
@@ -131,7 +135,7 @@ impl IntoStatic for RepoPath<'_> {
 pub type UriPathBuf = RepoPath<'static>;
 
 /// Regex for AT URI validation per AT Protocol spec
-pub static ATURI_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+pub static ATURI_REGEX: Lazy<Regex> = Lazy::new(|| {
     // Fragment allows: / and \ and other special chars. In raw string, backslashes are literal.
     Regex::new(r##"^at://(?<authority>[a-zA-Z0-9._:%-]+)(/(?<collection>[a-zA-Z0-9-.]+)(/(?<rkey>[a-zA-Z0-9._~:@!$&%')(*+,;=-]+))?)?(#(?<fragment>/[a-zA-Z0-9._~:@!$&%')(*+,;=\-\[\]/\\]*))?$"##).unwrap()
 });

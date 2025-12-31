@@ -7,9 +7,12 @@ use regex::Regex;
 use regex_lite::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::sync::LazyLock;
-use std::{ops::Deref, str::FromStr};
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::ops::Deref;
+use core::str::FromStr;
+
+use super::Lazy;
 
 /// AT Protocol handle (human-readable account identifier)
 ///
@@ -34,7 +37,7 @@ use std::{ops::Deref, str::FromStr};
 pub struct Handle<'h>(pub(crate) CowStr<'h>);
 
 /// Regex for handle validation per AT Protocol spec
-pub static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+pub static HANDLE_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$").unwrap()
 });
 impl<'h> Handle<'h> {

@@ -3,14 +3,18 @@
 //! This module defines traits and types for typed WebSocket subscriptions,
 //! mirroring the request/response pattern used for HTTP XRPC endpoints.
 
+use alloc::borrow::ToOwned;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+use core::error::Error;
+use core::future::Future;
+use core::marker::PhantomData;
 #[cfg(not(target_arch = "wasm32"))]
 use n0_future::stream::Boxed;
 #[cfg(target_arch = "wasm32")]
 use n0_future::stream::BoxedLocal as Boxed;
 use serde::{Deserialize, Serialize};
-use std::error::Error;
-use std::future::Future;
-use std::marker::PhantomData;
 use url::Url;
 
 use crate::cowstr::ToCowStr;

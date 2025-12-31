@@ -1,7 +1,9 @@
 use miette::SourceSpan;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
-use std::{str::FromStr, sync::Arc};
+use alloc::string::{String, ToString};
+use alloc::sync::Arc;
+use core::str::FromStr;
 
 pub use crate::{
     CowStr,

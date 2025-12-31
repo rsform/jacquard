@@ -2,10 +2,11 @@ use crate::types::crypto::{CryptoError, PublicKey};
 use crate::types::string::{Did, Handle};
 use crate::types::value::Data;
 use crate::{CowStr, IntoStatic};
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use bon::Builder;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
-use std::collections::BTreeMap;
 use url::Url;
 
 /// DID Document representation with borrowed data where possible.
@@ -54,17 +55,17 @@ pub struct DidDocument<'a> {
 
     /// Alternate identifiers for the subject, such as at://\<handle\>
     #[serde(borrow)]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub also_known_as: Option<Vec<CowStr<'a>>>,
 
     /// Verification methods (keys) for this DID
     #[serde(borrow)]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub verification_method: Option<Vec<VerificationMethod<'a>>>,
 
     /// Services associated with this DID (e.g., AtprotoPersonalDataServer)
     #[serde(borrow)]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub service: Option<Vec<Service<'a>>>,
 
     /// Forward‑compatible capture of unmodeled fields
@@ -174,11 +175,11 @@ pub struct VerificationMethod<'a> {
     pub r#type: CowStr<'a>,
     /// Optional controller DID
     #[serde(borrow)]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub controller: Option<CowStr<'a>>,
     /// Multikey `publicKeyMultibase` (base58btc)
     #[serde(borrow)]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key_multibase: Option<CowStr<'a>>,
 
     /// Forward‑compatible capture of unmodeled fields
@@ -212,7 +213,7 @@ pub struct Service<'a> {
     pub r#type: CowStr<'a>,
     /// String or object; we preserve as Data
     #[serde(borrow)]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub service_endpoint: Option<Data<'a>>,
 
     /// Forward‑compatible capture of unmodeled fields
@@ -235,6 +236,7 @@ impl crate::IntoStatic for Service<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::String;
     use serde_json::json;
 
     fn encode_uvarint(mut x: u64) -> Vec<u8> {

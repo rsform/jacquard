@@ -1,11 +1,13 @@
 //! Error types for XRPC client operations
 
 use crate::xrpc::EncodeError;
+use alloc::boxed::Box;
+use alloc::string::ToString;
 use bytes::Bytes;
 use smol_str::SmolStr;
 
 /// Boxed error type for wrapping arbitrary errors
-pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
+pub type BoxError = Box<dyn core::error::Error + Send + Sync + 'static>;
 
 /// Client error type for all XRPC client operations
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]

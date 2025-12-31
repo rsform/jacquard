@@ -1,5 +1,6 @@
 use jacquard_derive::lexicon;
 use serde::{Deserialize, Serialize};
+extern crate alloc;
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

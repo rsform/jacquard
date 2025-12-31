@@ -1,8 +1,9 @@
 //! Lexicon integer types with minimum or maximum acceptable values.
 //! Copied from [atrium](https://github.com/atrium-rs/atrium/blob/main/atrium-api/src/types/integer.rs), because this they got right
 
-use std::num::{NonZeroU8, NonZeroU16, NonZeroU32, NonZeroU64};
-use std::str::FromStr;
+use alloc::string::{String, ToString};
+use core::num::{NonZeroU8, NonZeroU16, NonZeroU32, NonZeroU64};
+use core::str::FromStr;
 
 use serde::{Deserialize, de::Error};
 

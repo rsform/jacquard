@@ -1,10 +1,14 @@
+use alloc::string::{String, ToString};
+use core::cmp;
+use core::fmt;
+use core::str::FromStr;
+
 use chrono::DurationRound;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::sync::LazyLock;
-use std::{cmp, str::FromStr};
+
+use super::Lazy;
 
 use crate::{CowStr, IntoStatic};
 #[cfg(not(target_arch = "wasm32"))]
@@ -13,7 +17,7 @@ use regex::Regex;
 use regex_lite::Regex;
 
 /// Regex for ISO 8601 datetime validation per AT Protocol spec
-pub static ISO8601_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+pub static ISO8601_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|(\+[0-9]{2}|\-[0-9][1-9]):[0-9]{2})$").unwrap()
 });
 

@@ -1,14 +1,16 @@
 //! Minimal HTTP client abstraction shared across crates.
 
-use std::fmt::Display;
-use std::future::Future;
-use std::sync::Arc;
+use alloc::string::ToString;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+use core::fmt::Display;
+use core::future::Future;
 
 /// HTTP client trait for sending raw HTTP requests.
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait HttpClient {
     /// Error type returned by the HTTP client
-    type Error: std::error::Error + Display + Send + Sync + 'static;
+    type Error: core::error::Error + Display + Send + Sync + 'static;
 
     /// Send an HTTP request and return the response.
     fn send_http(
@@ -60,6 +62,7 @@ impl HttpClient for reqwest::Client {
         request: http::Request<Vec<u8>>,
     ) -> core::result::Result<http::Response<Vec<u8>>, Self::Error> {
         // Convert http::Request to reqwest::Request
+
         let (parts, body) = request.into_parts();
 
         let mut req = self.request(parts.method, parts.uri.to_string()).body(body);

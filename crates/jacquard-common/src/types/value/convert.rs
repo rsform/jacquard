@@ -6,10 +6,15 @@ use crate::types::{
     string::AtprotoStr,
     value::{Array, Data, Object, RawData, parsing},
 };
+use alloc::borrow::ToOwned;
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use bytes::Bytes;
 use core::any::TypeId;
 use smol_str::SmolStr;
-use std::{borrow::ToOwned, boxed::Box, collections::BTreeMap, vec::Vec};
 
 /// Error used for converting from and into [`crate::types::value::Data`].
 #[derive(Clone, Debug, thiserror::Error, miette::Diagnostic)]

@@ -1,8 +1,9 @@
 use crate::types::handle::Handle;
 use crate::types::string::AtStrError;
 use crate::{IntoStatic, types::did::Did};
-use std::fmt;
-use std::str::FromStr;
+use alloc::string::String;
+use core::fmt;
+use core::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 

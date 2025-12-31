@@ -1,32 +1,44 @@
 //! Generic session storage traits and utilities.
 
+use alloc::boxed::Box;
+use alloc::string::ToString;
+use alloc::sync::Arc;
+use core::error::Error as StdError;
+use core::fmt::Display;
+use core::future::Future;
+use core::hash::Hash;
+use hashbrown::HashMap;
+#[cfg(feature = "std")]
 use miette::Diagnostic;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
-use std::collections::HashMap;
-use std::error::Error as StdError;
-use std::fmt::Display;
-use std::future::Future;
-use std::hash::Hash;
+
+#[cfg(feature = "std")]
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
+
+// Use tokio's RwLock with std, maitake-sync's async RwLock for no_std
+#[cfg(not(feature = "std"))]
+use maitake_sync::RwLock;
+#[cfg(feature = "std")]
 use tokio::sync::RwLock;
 
 /// Errors emitted by session stores.
-#[derive(Debug, thiserror::Error, Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 pub enum SessionStoreError {
     /// Filesystem or I/O error
+    #[cfg(feature = "std")]
     #[error("I/O error: {0}")]
-    #[diagnostic(code(jacquard::session_store::io))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::session_store::io)))]
     Io(#[from] std::io::Error),
     /// Serialization error (e.g., JSON)
     #[error("serialization error: {0}")]
-    #[diagnostic(code(jacquard::session_store::serde))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::session_store::serde)))]
     Serde(#[from] serde_json::Error),
     /// Any other error from a backend implementation
     #[error(transparent)]
-    #[diagnostic(code(jacquard::session_store::other))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::session_store::other)))]
     Other(#[from] Box<dyn StdError + Send + Sync>),
 }
 
@@ -84,12 +96,14 @@ where
 /// let store = FileTokenStore::new("/tmp/jacquard-session.json");
 /// let client = AtClient::new(reqwest::Client::new(), base, store);
 /// ```
+#[cfg(feature = "std")]
 #[derive(Clone, Debug)]
 pub struct FileTokenStore {
     /// Path to the JSON file.
     pub path: PathBuf,
 }
 
+#[cfg(feature = "std")]
 impl FileTokenStore {
     /// Create a new file token store at the given path.
     pub fn new(path: impl AsRef<Path>) -> Self {
@@ -104,6 +118,7 @@ impl FileTokenStore {
     }
 }
 
+#[cfg(feature = "std")]
 impl<K: Eq + Hash + Display + Send + Sync, T: Clone + Serialize + DeserializeOwned + Send + Sync>
     SessionStore<K, T> for FileTokenStore
 {

@@ -7,10 +7,13 @@ use regex::Regex;
 use regex_lite::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::marker::PhantomData;
-use std::sync::LazyLock;
-use std::{ops::Deref, str::FromStr};
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::marker::PhantomData;
+use core::ops::Deref;
+use core::str::FromStr;
+
+use super::Lazy;
 
 /// Trait for typed record key implementations
 ///
@@ -115,8 +118,8 @@ unsafe impl<'r> RecordKeyType for Rkey<'r> {
 }
 
 /// Regex for record key validation per AT Protocol spec
-pub static RKEY_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9.\-_:~]{1,512}$").unwrap());
+pub static RKEY_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^[a-zA-Z0-9.\-_:~]{1,512}$").unwrap());
 
 impl<'r> Rkey<'r> {
     /// Fallible constructor, validates, borrows from input

@@ -1,11 +1,12 @@
+use alloc::borrow::Cow;
+use alloc::boxed::Box;
+use alloc::string::String;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::ops::Deref;
+
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
-use std::{
-    borrow::Cow,
-    fmt,
-    hash::{Hash, Hasher},
-    ops::Deref,
-};
 
 use crate::IntoStatic;
 
@@ -40,14 +41,14 @@ impl CowStr<'static> {
 impl<'s> CowStr<'s> {
     #[inline]
     /// Borrow and decode a byte slice as utf8 into a CowStr
-    pub fn from_utf8(s: &'s [u8]) -> Result<Self, std::str::Utf8Error> {
-        Ok(Self::Borrowed(std::str::from_utf8(s)?))
+    pub fn from_utf8(s: &'s [u8]) -> Result<Self, core::str::Utf8Error> {
+        Ok(Self::Borrowed(core::str::from_utf8(s)?))
     }
 
     #[inline]
     /// Take bytes and decode them as utf8 into an owned CowStr. Might allocate.
-    pub fn from_utf8_owned(s: impl AsRef<[u8]>) -> Result<Self, std::str::Utf8Error> {
-        Ok(Self::Owned(SmolStr::new(std::str::from_utf8(&s.as_ref())?)))
+    pub fn from_utf8_owned(s: impl AsRef<[u8]>) -> Result<Self, core::str::Utf8Error> {
+        Ok(Self::Owned(SmolStr::new(core::str::from_utf8(s.as_ref())?)))
     }
 
     #[inline]
@@ -62,7 +63,7 @@ impl<'s> CowStr<'s> {
     /// This function is unsafe because it does not check that the bytes are valid UTF-8.
     #[inline]
     pub unsafe fn from_utf8_unchecked(s: &'s [u8]) -> Self {
-        unsafe { Self::Owned(SmolStr::new(std::str::from_utf8_unchecked(s))) }
+        unsafe { Self::Owned(SmolStr::new(core::str::from_utf8_unchecked(s))) }
     }
 
     /// Returns a reference to the underlying string slice.
@@ -218,7 +219,7 @@ impl PartialEq<CowStr<'_>> for String {
 }
 
 impl PartialOrd for CowStr<'_> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         Some(match (self, other) {
             (CowStr::Borrowed(s1), CowStr::Borrowed(s2)) => s1.cmp(s2),
             (CowStr::Borrowed(s1), CowStr::Owned(s2)) => s1.cmp(&s2.as_ref()),
@@ -229,7 +230,7 @@ impl PartialOrd for CowStr<'_> {
 }
 
 impl Ord for CowStr<'_> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         match (self, other) {
             (CowStr::Borrowed(s1), CowStr::Borrowed(s2)) => s1.cmp(s2),
             (CowStr::Borrowed(s1), CowStr::Owned(s2)) => s1.cmp(&s2.as_ref()),

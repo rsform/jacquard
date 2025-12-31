@@ -2,10 +2,14 @@ use crate::{
     IntoStatic,
     types::{DataModelType, LexiconStringType, UriType, blob::Blob, string::*},
 };
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use bytes::Bytes;
+use core::convert::Infallible;
 use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
-use std::{collections::BTreeMap, convert::Infallible};
 
 /// Conversion utilities for Data types
 pub mod convert;

@@ -1,5 +1,5 @@
 use super::*;
-use std::str::FromStr;
+use core::str::FromStr;
 
 /// Canonicalize JSON by sorting object keys recursively
 fn canonicalize_json(value: &serde_json::Value) -> serde_json::Value {
@@ -896,14 +896,21 @@ fn test_data_to_dag_cbor() {
     // Test complex types
     let mut map = BTreeMap::new();
     map.insert(SmolStr::new_static("num"), Data::Integer(42));
-    map.insert(SmolStr::new_static("text"), Data::String(AtprotoStr::String("test".into())));
+    map.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String("test".into())),
+    );
     let obj_data = Data::Object(Object(map));
     let cbor_result = obj_data.to_dag_cbor();
     assert!(cbor_result.is_ok());
     assert!(!cbor_result.unwrap().is_empty());
 
     // Test array
-    let arr_data = Data::Array(Array(vec![Data::Integer(1), Data::Integer(2), Data::Integer(3)]));
+    let arr_data = Data::Array(Array(vec![
+        Data::Integer(1),
+        Data::Integer(2),
+        Data::Integer(3),
+    ]));
     let arr_cbor = arr_data.to_dag_cbor();
     assert!(arr_cbor.is_ok());
     assert!(!arr_cbor.unwrap().is_empty());
@@ -935,7 +942,10 @@ fn test_rawdata_to_dag_cbor() {
 fn test_object_methods() {
     let mut map = BTreeMap::new();
     map.insert(SmolStr::new_static("num"), Data::Integer(42));
-    map.insert(SmolStr::new_static("text"), Data::String(AtprotoStr::String("hello".into())));
+    map.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String("hello".into())),
+    );
     let obj = Object(map);
 
     // Test get
@@ -992,7 +1002,10 @@ fn test_array_methods() {
 fn test_get_at_path_simple() {
     // Build nested structure: {"embed": {"alt": "test"}}
     let mut inner = BTreeMap::new();
-    inner.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("test".into())));
+    inner.insert(
+        SmolStr::new_static("alt"),
+        Data::String(AtprotoStr::String("test".into())),
+    );
 
     let mut outer = BTreeMap::new();
     outer.insert(SmolStr::new_static("embed"), Data::Object(Object(inner)));
@@ -1018,10 +1031,16 @@ fn test_get_at_path_simple() {
 fn test_get_at_path_arrays() {
     // Build: {"items": [{"name": "first"}, {"name": "second"}]}
     let mut item1 = BTreeMap::new();
-    item1.insert(SmolStr::new_static("name"), Data::String(AtprotoStr::String("first".into())));
+    item1.insert(
+        SmolStr::new_static("name"),
+        Data::String(AtprotoStr::String("first".into())),
+    );
 
     let mut item2 = BTreeMap::new();
-    item2.insert(SmolStr::new_static("name"), Data::String(AtprotoStr::String("second".into())));
+    item2.insert(
+        SmolStr::new_static("name"),
+        Data::String(AtprotoStr::String("second".into())),
+    );
 
     let items = Data::Array(Array(vec![
         Data::Object(Object(item1)),
@@ -1049,10 +1068,16 @@ fn test_get_at_path_arrays() {
 fn test_get_at_path_complex() {
     // Build: {"post": {"embed": {"images": [{"alt": "img1"}, {"alt": "img2"}]}}}
     let mut img1 = BTreeMap::new();
-    img1.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("img1".into())));
+    img1.insert(
+        SmolStr::new_static("alt"),
+        Data::String(AtprotoStr::String("img1".into())),
+    );
 
     let mut img2 = BTreeMap::new();
-    img2.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("img2".into())));
+    img2.insert(
+        SmolStr::new_static("alt"),
+        Data::String(AtprotoStr::String("img2".into())),
+    );
 
     let images = Data::Array(Array(vec![
         Data::Object(Object(img1)),
@@ -1063,7 +1088,10 @@ fn test_get_at_path_complex() {
     embed_map.insert(SmolStr::new_static("images"), images);
 
     let mut post_map = BTreeMap::new();
-    post_map.insert(SmolStr::new_static("embed"), Data::Object(Object(embed_map)));
+    post_map.insert(
+        SmolStr::new_static("embed"),
+        Data::Object(Object(embed_map)),
+    );
 
     let mut root = BTreeMap::new();
     root.insert(SmolStr::new_static("post"), Data::Object(Object(post_map)));
@@ -1100,7 +1128,10 @@ fn test_rawdata_get_at_path() {
 #[test]
 fn test_query_exact_path() {
     let mut inner = BTreeMap::new();
-    inner.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice.bsky.social".into())));
+    inner.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::String("alice.bsky.social".into())),
+    );
 
     let mut outer = BTreeMap::new();
     outer.insert(SmolStr::new_static("author"), Data::Object(Object(inner)));
@@ -1117,13 +1148,22 @@ fn test_query_exact_path() {
 fn test_query_wildcard_array() {
     // Build: {"actors": [{"handle": "alice"}, {"handle": "bob"}, {"name": "carol"}]}
     let mut actor1 = BTreeMap::new();
-    actor1.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice".into())));
+    actor1.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::String("alice".into())),
+    );
 
     let mut actor2 = BTreeMap::new();
-    actor2.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("bob".into())));
+    actor2.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::String("bob".into())),
+    );
 
     let mut actor3 = BTreeMap::new();
-    actor3.insert(SmolStr::new_static("name"), Data::String(AtprotoStr::String("carol".into())));
+    actor3.insert(
+        SmolStr::new_static("name"),
+        Data::String(AtprotoStr::String("carol".into())),
+    );
 
     let actors = Data::Array(Array(vec![
         Data::Object(Object(actor1)),
@@ -1149,10 +1189,16 @@ fn test_query_wildcard_array() {
 fn test_query_wildcard_object() {
     // Build: {"embed": {"images": {...}, "video": {...}}}
     let mut images = BTreeMap::new();
-    images.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("img".into())));
+    images.insert(
+        SmolStr::new_static("alt"),
+        Data::String(AtprotoStr::String("img".into())),
+    );
 
     let mut video = BTreeMap::new();
-    video.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("vid".into())));
+    video.insert(
+        SmolStr::new_static("alt"),
+        Data::String(AtprotoStr::String("vid".into())),
+    );
 
     let mut embed = BTreeMap::new();
     embed.insert(SmolStr::new_static("images"), Data::Object(Object(images)));
@@ -1173,16 +1219,28 @@ fn test_query_wildcard_object() {
 fn test_query_scoped_recursion() {
     // Build: {"post": {"author": {"profile": {"handle": "alice"}}}}
     let mut handle_map = BTreeMap::new();
-    handle_map.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice".into())));
+    handle_map.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::String("alice".into())),
+    );
 
     let mut profile_map = BTreeMap::new();
-    profile_map.insert(SmolStr::new_static("profile"), Data::Object(Object(handle_map)));
+    profile_map.insert(
+        SmolStr::new_static("profile"),
+        Data::Object(Object(handle_map)),
+    );
 
     let mut author_map = BTreeMap::new();
-    author_map.insert(SmolStr::new_static("author"), Data::Object(Object(profile_map)));
+    author_map.insert(
+        SmolStr::new_static("author"),
+        Data::Object(Object(profile_map)),
+    );
 
     let mut post_map = BTreeMap::new();
-    post_map.insert(SmolStr::new_static("post"), Data::Object(Object(author_map)));
+    post_map.insert(
+        SmolStr::new_static("post"),
+        Data::Object(Object(author_map)),
+    );
 
     let data = Data::Object(Object(post_map));
 
@@ -1197,10 +1255,16 @@ fn test_query_scoped_recursion() {
 fn test_query_global_recursion() {
     // Build structure with multiple 'cid' fields at different depths
     let mut inner1 = BTreeMap::new();
-    inner1.insert(SmolStr::new_static("cid"), Data::String(AtprotoStr::String("cid1".into())));
+    inner1.insert(
+        SmolStr::new_static("cid"),
+        Data::String(AtprotoStr::String("cid1".into())),
+    );
 
     let mut inner2 = BTreeMap::new();
-    inner2.insert(SmolStr::new_static("cid"), Data::String(AtprotoStr::String("cid2".into())));
+    inner2.insert(
+        SmolStr::new_static("cid"),
+        Data::String(AtprotoStr::String("cid2".into())),
+    );
 
     let mut middle = BTreeMap::new();
     middle.insert(SmolStr::new_static("post"), Data::Object(Object(inner1)));
@@ -1208,7 +1272,10 @@ fn test_query_global_recursion() {
 
     let mut root = BTreeMap::new();
     root.insert(SmolStr::new_static("thread"), Data::Object(Object(middle)));
-    root.insert(SmolStr::new_static("cid"), Data::String(AtprotoStr::String("cid3".into())));
+    root.insert(
+        SmolStr::new_static("cid"),
+        Data::String(AtprotoStr::String("cid3".into())),
+    );
 
     let data = Data::Object(Object(root));
 
@@ -1229,10 +1296,16 @@ fn test_query_global_recursion() {
 fn test_query_combined_wildcard_field() {
     // Build: {"actors": [{"handle": "alice"}, {"handle": "bob"}]}
     let mut actor1 = BTreeMap::new();
-    actor1.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice".into())));
+    actor1.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::String("alice".into())),
+    );
 
     let mut actor2 = BTreeMap::new();
-    actor2.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("bob".into())));
+    actor2.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::String("bob".into())),
+    );
 
     let actors = Data::Array(Array(vec![
         Data::Object(Object(actor1)),
@@ -1291,7 +1364,10 @@ fn test_type_discriminator() {
         SmolStr::new_static("$type"),
         Data::String(AtprotoStr::String(CowStr::new_static("app.bsky.feed.post"))),
     );
-    map.insert(SmolStr::new_static("text"), Data::String(AtprotoStr::String(CowStr::new_static("hello"))));
+    map.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String(CowStr::new_static("hello"))),
+    );
     let obj = Object(map);
 
     assert_eq!(obj.type_discriminator(), Some("app.bsky.feed.post"));

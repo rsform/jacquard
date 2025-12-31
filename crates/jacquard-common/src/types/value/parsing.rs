@@ -14,7 +14,9 @@ use base64::{
 use bytes::Bytes;
 use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
-use std::{collections::BTreeMap, str::FromStr};
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use core::str::FromStr;
 use url::Url;
 
 /// Insert a string into an at:// `Data<'_>` map, inferring its type.

@@ -7,9 +7,12 @@ use regex::Regex;
 use regex_lite::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::sync::LazyLock;
-use std::{ops::Deref, str::FromStr};
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::ops::Deref;
+use core::str::FromStr;
+
+use super::Lazy;
 
 /// Namespaced Identifier (NSID) for Lexicon schemas and XRPC endpoints
 ///
@@ -33,7 +36,7 @@ use std::{ops::Deref, str::FromStr};
 pub struct Nsid<'n>(pub(crate) CowStr<'n>);
 
 /// Regex for NSID validation per AT Protocol spec
-pub static NSID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+pub static NSID_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z][a-zA-Z0-9]{0,62})$").unwrap()
 });
 

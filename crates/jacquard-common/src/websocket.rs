@@ -2,13 +2,17 @@
 
 use crate::CowStr;
 use crate::stream::StreamError;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use bytes::Bytes;
+use core::borrow::Borrow;
+use core::fmt::{self, Display};
+use core::future::Future;
+use core::ops::Deref;
+use core::pin::Pin;
 use n0_future::Stream;
-use std::borrow::Borrow;
-use std::fmt::{self, Display};
-use std::future::Future;
-use std::ops::Deref;
-use std::pin::Pin;
 use url::Url;
 
 /// UTF-8 validated bytes for WebSocket text messages
@@ -24,7 +28,7 @@ impl WsText {
 
     /// Get as string slice
     pub fn as_str(&self) -> &str {
-        unsafe { std::str::from_utf8_unchecked(&self.0) }
+        unsafe { core::str::from_utf8_unchecked(&self.0) }
     }
 
     /// Create from bytes without validation (caller must ensure UTF-8)

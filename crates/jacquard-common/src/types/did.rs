@@ -6,9 +6,12 @@ use regex::Regex;
 use regex_lite::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::sync::LazyLock;
-use std::{ops::Deref, str::FromStr};
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::ops::Deref;
+use core::str::FromStr;
+
+use super::Lazy;
 
 /// Decentralized Identifier (DID) for AT Protocol accounts
 ///
@@ -37,8 +40,8 @@ pub struct Did<'d>(pub(crate) CowStr<'d>);
 /// enforce percent-encoding validity at validation time. While the spec states "percent sign
 /// must be followed by two hex characters," this is treated as a best practice rather than
 /// a hard validation requirement.
-pub static DID_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$").unwrap());
+pub static DID_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$").unwrap());
 
 impl<'d> Did<'d> {
     /// Fallible constructor, validates, borrows from input

@@ -17,8 +17,11 @@
 //! assert!(matches!(pk.codec, KeyCodec::Ed25519));
 //! assert_eq!(pk.bytes.as_ref(), &key);
 
+use alloc::borrow::Cow;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 use crate::IntoStatic;
-use std::borrow::Cow;
 
 /// Multicodec code for SHA2-256 hash
 pub const SHA2_256: u64 = 0x12;

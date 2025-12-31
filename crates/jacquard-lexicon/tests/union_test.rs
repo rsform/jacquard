@@ -1,5 +1,5 @@
 // Minimal test for union attribute
-
+extern crate alloc;
 use jacquard_common::CowStr;
 use serde::{Deserialize, Serialize};
 

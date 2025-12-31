@@ -1,10 +1,16 @@
 use crate::types::cid::IpldCid;
+use alloc::borrow::ToOwned;
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use base64::{Engine, prelude::BASE64_STANDARD};
 use bytes::Bytes;
 use core::fmt;
+use core::str::FromStr;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::VariantAccess};
 use smol_str::{SmolStr, ToSmolStr};
-use std::{collections::BTreeMap, str::FromStr};
 
 use crate::{
     IntoStatic,

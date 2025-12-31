@@ -19,6 +19,9 @@
 use crate::CowStr;
 use crate::IntoStatic;
 use crate::types::string::{Did, Nsid};
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use ouroboros::self_referencing;

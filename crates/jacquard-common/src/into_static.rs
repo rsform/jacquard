@@ -1,11 +1,16 @@
-use std::borrow::Cow;
-use std::collections::BTreeMap;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
-use std::hash::BuildHasher;
-use std::hash::Hash;
-use std::sync::Arc;
+use alloc::borrow::Cow;
+use alloc::borrow::ToOwned;
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::collections::VecDeque;
+use alloc::string::String;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+use core::hash::BuildHasher;
+use core::hash::Hash;
+
+use hashbrown::HashMap;
+use hashbrown::HashSet;
 
 /// Allow turning a value into an "owned" variant, which can then be
 /// returned, moved, etc.

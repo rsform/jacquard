@@ -2,8 +2,10 @@
 use langtag::InvalidLangTag;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
-use std::fmt;
-use std::{ops::Deref, str::FromStr};
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::ops::Deref;
+use core::str::FromStr;
 
 use crate::CowStr;
 

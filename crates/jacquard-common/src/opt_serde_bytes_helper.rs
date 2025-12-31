@@ -1,5 +1,7 @@
 //! Custom serde helpers for bytes::Bytes using serde_bytes
 
+use alloc::string::String;
+use alloc::vec::Vec;
 use base64::{
     Engine,
     prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD, BASE64_URL_SAFE, BASE64_URL_SAFE_NO_PAD},

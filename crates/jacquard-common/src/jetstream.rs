@@ -8,6 +8,7 @@ use crate::types::nsid::Nsid;
 use crate::types::string::{Datetime, Did, Handle, Rkey};
 use crate::xrpc::{MessageEncoding, SubscriptionResp, XrpcSubscription};
 use crate::{CowStr, Data, IntoStatic, RawData};
+use alloc::vec::Vec;
 use serde::{Deserialize, Serialize};
 
 /// Parameters for subscribing to Jetstream

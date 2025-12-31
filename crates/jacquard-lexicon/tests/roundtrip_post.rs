@@ -2,7 +2,7 @@
 //
 // This test verifies that the derive macro generates lexicon documents that match
 // the original JSON schemas.
-
+extern crate alloc;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Datetime, Language};
 use jacquard_lexicon::lexicon::LexiconDoc;

@@ -3,6 +3,7 @@ use jacquard_common::types::string::Datetime;
 use jacquard_derive::{LexiconSchema, open_union};
 use jacquard_lexicon::schema::LexiconSchema as LexiconSchemaTrait;
 use serde::{Deserialize, Serialize};
+extern crate alloc;
 
 #[test]
 fn test_simple_struct() {

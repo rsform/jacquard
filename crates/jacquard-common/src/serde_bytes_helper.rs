@@ -1,5 +1,7 @@
 //! Custom serde helpers for bytes::Bytes using serde_bytes
 
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::fmt;
 
 use base64::{

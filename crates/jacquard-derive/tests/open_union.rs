@@ -1,5 +1,6 @@
 use jacquard_derive::open_union;
 use serde::{Deserialize, Serialize};
+extern crate alloc;
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

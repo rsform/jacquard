@@ -6,7 +6,7 @@ use crate::{
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::ToSmolStr;
-use std::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
+use core::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
 use url::Url;
 
 /// Generic URI with type-specific parsing

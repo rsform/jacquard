@@ -1,8 +1,13 @@
+use alloc::borrow::ToOwned;
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::ops::Deref;
+use core::str::FromStr;
+
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, SmolStrBuilder};
-use std::fmt;
-use std::sync::LazyLock;
-use std::{ops::Deref, str::FromStr};
+
+use super::Lazy;
 
 use crate::CowStr;
 use crate::types::integer::LimitedU32;
@@ -31,7 +36,7 @@ fn s32_encode(mut i: u64) -> SmolStr {
 }
 
 /// Regex for TID validation per AT Protocol spec
-static TID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+static TID_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$").unwrap()
 });
 

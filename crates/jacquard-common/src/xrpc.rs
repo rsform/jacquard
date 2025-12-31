@@ -13,6 +13,12 @@
 #[cfg(feature = "streaming")]
 pub mod streaming;
 
+use alloc::borrow::ToOwned;
+use alloc::boxed::Box;
+use alloc::string::String;
+#[cfg(feature = "streaming")]
+use alloc::string::ToString;
+use alloc::vec::Vec;
 use ipld_core::ipld::Ipld;
 #[cfg(feature = "streaming")]
 pub use streaming::{
@@ -33,14 +39,15 @@ use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};
 use crate::{IntoStatic, types::value::RawData};
 use bytes::Bytes;
+use core::error::Error;
+use core::fmt::{self, Debug};
+use core::marker::PhantomData;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,
     header::{AUTHORIZATION, CONTENT_TYPE},
 };
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
-use std::fmt::{self, Debug};
-use std::{error::Error, marker::PhantomData};
 #[cfg(feature = "websocket")]
 pub use subscription::{
     BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
