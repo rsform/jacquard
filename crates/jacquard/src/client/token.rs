@@ -243,6 +243,20 @@ pub struct FileAuthStore(FileTokenStore);
 
 impl FileAuthStore {
     /// Create a new file-backed auth store wrapping `FileTokenStore`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if parent directories cannot be created or the file cannot be written.
+    pub fn try_new(path: impl AsRef<std::path::Path>) -> Result<Self, SessionStoreError> {
+        Ok(Self(FileTokenStore::try_new(path)?))
+    }
+
+    /// Create a new file-backed auth store wrapping `FileTokenStore`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if parent directories cannot be created or the file cannot be written.
+    /// Prefer [`try_new`](Self::try_new) for fallible construction.
     pub fn new(path: impl AsRef<std::path::Path>) -> Self {
         Self(FileTokenStore::new(path))
     }

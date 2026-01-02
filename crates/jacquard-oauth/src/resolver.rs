@@ -74,6 +74,7 @@ pub struct ResolverError {
 
 /// Error categories for OAuth resolver operations
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum ResolverErrorKind {
     /// Resource not found
     #[error("resource not found")]

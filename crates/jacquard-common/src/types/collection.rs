@@ -65,6 +65,7 @@ pub trait Collection: fmt::Debug + Serialize {
     Debug, Clone, PartialEq, Eq, Serialize, Deserialize, thiserror::Error, miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
+#[non_exhaustive]
 pub enum RecordError<'a> {
     /// The requested record was not found
     #[error("RecordNotFound")]

@@ -1262,7 +1262,23 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
                 entries = self.get_entries().await?
             }
             let data = util::serialize_node_data(entries.as_slice()).await?;
-            let bytes = serde_ipld_dagcbor::to_vec(&data).map_err(|e| RepoError::car(e))?;
+            let bytes = serde_ipld_dagcbor::to_vec(&data).map_err(|e| {
+                // Provide best available context for debugging serialization failures
+                let context = if let Some(left_cid) = &data.left {
+                    format!("serializing MST node (left pointer: {})", left_cid)
+                } else {
+                    // No left pointer - use last leaf key as identifier
+                    let last_key = entries.iter().rev().find_map(|e| match e {
+                        NodeEntry::Leaf { key, .. } => Some(key.as_str()),
+                        _ => None,
+                    });
+                    match last_key {
+                        Some(k) => format!("serializing MST node (last key: {})", k),
+                        None => "serializing MST node (empty or tree-only)".to_string(),
+                    }
+                };
+                RepoError::serialization(e).with_context(context)
+            })?;
             let cid = util::compute_cid(&bytes)?;
 
             Ok((cid, Bytes::from_owner(bytes)))
@@ -1336,7 +1352,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
                 writer
                     .write(*cid, &data)
                     .await
-                    .map_err(|e| RepoError::car(e))?;
+                    .map_err(|e| RepoError::car_write(cid, e))?;
             }
         }
 
@@ -1364,7 +1380,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             writer
                 .write(pointer, &node_bytes)
                 .await
-                .map_err(|e| RepoError::car(e))?;
+                .map_err(|e| RepoError::car_write(&pointer, e))?;
 
             // Parse to get entries
             let entries = self.get_entries().await?;
@@ -1411,9 +1427,7 @@ fn collect_node_cids_parallel<S: BlockStore + Sync + Send + 'static>(
             .collect();
 
         // Await all tasks concurrently
-        let results = try_join_all(tasks)
-            .await
-            .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+        let results = try_join_all(tasks).await.map_err(RepoError::task_failed)?;
 
         // Flatten results
         let mut cids = vec![pointer];
@@ -1455,9 +1469,7 @@ fn collect_leaves_parallel<S: BlockStore + Sync + Send + 'static>(
 
         // Await all tasks concurrently
         if !tasks.is_empty() {
-            let subtree_results = try_join_all(tasks)
-                .await
-                .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+            let subtree_results = try_join_all(tasks).await.map_err(RepoError::task_failed)?;
 
             for (pos, leaves) in task_positions.into_iter().zip(subtree_results) {
                 result.push((pos, leaves?));
@@ -1518,9 +1530,7 @@ fn collect_blocks_parallel<S: BlockStore + Sync + Send + 'static>(
 
         // Await all tasks concurrently
         if !tasks.is_empty() {
-            let results = try_join_all(tasks)
-                .await
-                .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+            let results = try_join_all(tasks).await.map_err(RepoError::task_failed)?;
 
             for subtree_result in results {
                 let (_, subtree_blocks) = subtree_result?;

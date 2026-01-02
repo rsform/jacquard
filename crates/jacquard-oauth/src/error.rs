@@ -6,6 +6,7 @@ use crate::resolver::ResolverError;
 
 /// High-level errors emitted by OAuth helpers.
 #[derive(Debug, thiserror::Error, Diagnostic)]
+#[non_exhaustive]
 pub enum OAuthError {
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::resolver))]
@@ -21,7 +22,7 @@ pub enum OAuthError {
 
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::dpop))]
-    Dpop(#[from] crate::dpop::Error),
+    Dpop(#[from] crate::dpop::DpopError),
 
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::keyset))]
@@ -54,6 +55,7 @@ pub enum OAuthError {
 
 /// Typed callback validation errors (redirect handling).
 #[derive(Debug, thiserror::Error, Diagnostic)]
+#[non_exhaustive]
 pub enum CallbackError {
     #[error("missing state parameter in callback")]
     #[diagnostic(code(jacquard_oauth::callback::missing_state))]

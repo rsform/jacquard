@@ -113,6 +113,7 @@ impl fmt::Display for ValidationPath {
 ///
 /// These errors indicate that the data structure doesn't match the schema's type expectations.
 #[derive(Debug, Clone, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum StructuralError {
     #[error("Type mismatch at {path}: expected {expected}, got {actual}")]
     TypeMismatch {
@@ -159,6 +160,7 @@ pub enum StructuralError {
 /// These errors indicate that the data violates lexicon constraints like max_length,
 /// max_graphemes, ranges, etc. The structure is correct but values are out of bounds.
 #[derive(Debug, Clone, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum ConstraintError {
     #[error("{path} exceeds max length: {actual} > {max}")]
     MaxLength {
@@ -205,6 +207,7 @@ pub enum ConstraintError {
 
 /// Unified validation error type
 #[derive(Debug, Clone, thiserror::Error)]
+#[non_exhaustive]
 pub enum ValidationError {
     #[error(transparent)]
     Structural(#[from] StructuralError),
@@ -239,6 +242,7 @@ impl ValidationCacheKey {
 
 /// Errors that can occur when computing CIDs
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum CidComputationError {
     #[error("Failed to serialize data to DAG-CBOR: {0}")]
     DagCborEncode(#[from] serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>),

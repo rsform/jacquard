@@ -287,6 +287,7 @@ impl<'s> ClientSession<'s> {
 }
 
 #[derive(thiserror::Error, Debug, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum Error {
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::session::request))]

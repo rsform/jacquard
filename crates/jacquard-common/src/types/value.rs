@@ -54,6 +54,7 @@ pub enum Data<'s> {
 
 /// Errors that can occur when working with AT Protocol data
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum AtDataError {
     /// Floating point numbers are not allowed in AT Protocol
     #[error("floating point numbers not allowed in AT protocol data")]

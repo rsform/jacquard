@@ -43,6 +43,7 @@ pub enum Cid<'c> {
 
 /// Errors that can occur when working with CIDs
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum Error {
     /// Invalid IPLD CID structure
     #[error("Invalid IPLD CID {:?}", 0)]

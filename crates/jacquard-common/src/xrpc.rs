@@ -59,6 +59,7 @@ use url::Url;
 /// Error type for encoding XRPC requests
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(miette::Diagnostic))]
+#[non_exhaustive]
 pub enum EncodeError {
     /// Failed to serialize query parameters
     #[error("Failed to serialize query: {0}")]
@@ -469,7 +470,7 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
             .client
             .send_http(http_request)
             .await
-            .map_err(|e| crate::error::ClientError::transport(e))?;
+            .map_err(|e| crate::error::ClientError::transport(e).for_nsid(R::NSID))?;
 
         process_response(http_response)
     }
@@ -491,17 +492,18 @@ where
         if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
             return Err(crate::error::ClientError::auth(
                 crate::error::AuthError::Other(hv.clone()),
-            ));
+            )
+            .for_nsid(Resp::NSID));
         }
     }
     let buffer = Bytes::from(http_response.into_body());
 
     if !status.is_success() && !matches!(status.as_u16(), 400 | 401) {
-        return Err(crate::error::HttpError {
+        return Err(crate::error::ClientError::from(crate::error::HttpError {
             status,
             body: Some(buffer),
-        }
-        .into());
+        })
+        .for_nsid(Resp::NSID));
     }
 
     Ok(Response::new(buffer, status))
@@ -971,6 +973,7 @@ impl core::error::Error for GenericXrpcError {}
 /// Type parameter `E` is the endpoint's specific error enum type.
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(miette::Diagnostic))]
+#[non_exhaustive]
 pub enum XrpcError<E: core::error::Error + IntoStatic> {
     /// Typed XRPC error from the endpoint's specific error enum
     #[error("XRPC error: {0}")]
@@ -1040,6 +1043,12 @@ where
                         "AuthenticationRequired",
                         Some("Request requires authentication but none was provided"),
                     ),
+                    AuthError::DpopProofFailed => {
+                        ("DpopProofFailed", Some("DPoP proof construction failed"))
+                    }
+                    AuthError::DpopNonceFailed => {
+                        ("DpopNonceFailed", Some("DPoP nonce negotiation failed"))
+                    }
                     AuthError::Other(hv) => {
                         let msg = hv.to_str().unwrap_or("[non-utf8 header]");
                         ("AuthenticationError", Some(msg))

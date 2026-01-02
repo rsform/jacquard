@@ -61,6 +61,7 @@ pub struct StreamError {
 
 /// Categories of streaming errors
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum StreamErrorKind {
     /// Network or I/O error
     Transport,

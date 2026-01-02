@@ -1023,6 +1023,7 @@ fn parse_query_string(query: &str) -> BTreeMap<SmolStr, Vec<CowStr<'static>>> {
 
 /// Error type for scope parsing
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum ParseError {
     /// Unknown scope prefix
     UnknownPrefix(String),

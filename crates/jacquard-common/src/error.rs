@@ -32,6 +32,7 @@ pub struct ClientError {
 /// Error categories for client operations
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(Diagnostic))]
+#[non_exhaustive]
 pub enum ClientErrorKind {
     /// HTTP transport error (connection, timeout, etc.)
     #[error("transport error")]
@@ -166,6 +167,32 @@ impl ClientError {
         self
     }
 
+    /// Append additional context to existing context string.
+    ///
+    /// If context already exists, appends with ": " separator.
+    /// If no context exists, sets it directly.
+    pub fn append_context(mut self, additional: impl AsRef<str>) -> Self {
+        self.context = Some(match self.context.take() {
+            Some(existing) => smol_str::format_smolstr!("{}: {}", existing, additional.as_ref()),
+            None => additional.as_ref().into(),
+        });
+        self
+    }
+
+    /// Add NSID context for XRPC operations.
+    ///
+    /// Appends the NSID in brackets to existing context, e.g. `"network timeout: [com.atproto.repo.getRecord]"`.
+    pub fn for_nsid(self, nsid: &str) -> Self {
+        self.append_context(smol_str::format_smolstr!("[{}]", nsid))
+    }
+
+    /// Add collection context for record operations.
+    ///
+    /// Use this when a record operation fails to indicate the target collection.
+    pub fn for_collection(self, operation: &str, collection_nsid: &str) -> Self {
+        self.append_context(smol_str::format_smolstr!("{} [{}]", operation, collection_nsid))
+    }
+
     // Constructors for each kind
 
     /// Create a transport error
@@ -223,6 +250,7 @@ pub type XrpcResult<T> = Result<T, ClientError>;
 /// Can be converted to string for serialization while maintaining the full error context.
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(Diagnostic))]
+#[non_exhaustive]
 pub enum DecodeError {
     /// JSON deserialization failed
     #[error("Failed to deserialize JSON: {0}")]
@@ -302,6 +330,7 @@ impl core::fmt::Display for HttpError {
 /// Authentication and authorization errors
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(Diagnostic))]
+#[non_exhaustive]
 pub enum AuthError {
     /// Access token has expired (use refresh token to get a new one)
     #[error("Access token expired")]
@@ -319,6 +348,14 @@ pub enum AuthError {
     #[error("No authentication provided, but endpoint requires auth")]
     NotAuthenticated,
 
+    /// DPoP proof construction failed (key or signing issue)
+    #[error("DPoP proof construction failed")]
+    DpopProofFailed,
+
+    /// DPoP nonce retry failed (server rejected proof even after nonce update)
+    #[error("DPoP nonce negotiation failed")]
+    DpopNonceFailed,
+
     /// Other authentication error
     #[error("Authentication error: {0:?}")]
     Other(http::HeaderValue),
@@ -333,6 +370,8 @@ impl crate::IntoStatic for AuthError {
             AuthError::InvalidToken => AuthError::InvalidToken,
             AuthError::RefreshFailed => AuthError::RefreshFailed,
             AuthError::NotAuthenticated => AuthError::NotAuthenticated,
+            AuthError::DpopProofFailed => AuthError::DpopProofFailed,
+            AuthError::DpopNonceFailed => AuthError::DpopNonceFailed,
             AuthError::Other(header) => AuthError::Other(header),
         }
     }

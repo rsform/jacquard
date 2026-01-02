@@ -10,6 +10,7 @@ use thiserror::Error;
 use url::Url;
 
 #[derive(Error, Debug)]
+#[non_exhaustive]
 pub enum Error {
     #[error("`client_id` must be a valid URL")]
     InvalidClientId,
@@ -32,6 +33,7 @@ pub enum Error {
 }
 
 #[derive(Error, Debug)]
+#[non_exhaustive]
 pub enum LocalhostClientError {
     #[error("invalid redirect_uri: {0}")]
     Invalid(#[from] url::ParseError),

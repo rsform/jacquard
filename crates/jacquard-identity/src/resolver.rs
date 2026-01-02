@@ -104,10 +104,21 @@ impl DidDocResponse {
                     extra_data: BTreeMap::new(),
                 })
             } else {
-                Err(IdentityError::missing_pds_endpoint())
+                let did_str = self
+                    .requested
+                    .as_ref()
+                    .map(|d| d.as_str())
+                    .unwrap_or("unknown");
+                Err(IdentityError::missing_pds_endpoint(did_str))
             }
         } else {
-            Err(IdentityError::http_status(self.status))
+            let did_str = self
+                .requested
+                .as_ref()
+                .map(|d| d.as_str())
+                .unwrap_or("unknown");
+            Err(IdentityError::http_status(self.status)
+                .with_context(format!("fetching DID document for {}", did_str)))
         }
     }
 
@@ -129,6 +140,12 @@ impl DidDocResponse {
 
     /// Parse as owned DidDocument<'static>
     pub fn into_owned(self) -> Result<DidDocument<'static>> {
+        let did_str = self
+            .requested
+            .as_ref()
+            .map(|d| SmolStr::from(d.as_str()))
+            .unwrap_or_else(|| SmolStr::new_static("unknown"));
+
         if self.status.is_success() {
             if let Ok(doc) = serde_json::from_slice::<DidDocument<'_>>(&self.buffer) {
                 Ok(doc.into_static())
@@ -150,10 +167,11 @@ impl DidDocResponse {
                 }
                 .into_static())
             } else {
-                Err(IdentityError::missing_pds_endpoint())
+                Err(IdentityError::missing_pds_endpoint(did_str))
             }
         } else {
-            Err(IdentityError::http_status(self.status))
+            Err(IdentityError::http_status(self.status)
+                .with_context(format!("fetching DID document for {}", did_str)))
         }
     }
 }
@@ -408,7 +426,7 @@ pub trait IdentityResolver {
                 }
             }
             doc.pds_endpoint()
-                .ok_or_else(|| IdentityError::missing_pds_endpoint())
+                .ok_or_else(|| IdentityError::missing_pds_endpoint(did.as_str()))
         }
     }
 
@@ -428,7 +446,7 @@ pub trait IdentityResolver {
                 }
             }
             doc.pds_endpoint()
-                .ok_or_else(|| IdentityError::missing_pds_endpoint())
+                .ok_or_else(|| IdentityError::missing_pds_endpoint(did.as_str()))
         }
     }
 
@@ -511,6 +529,7 @@ pub struct IdentityError {
 
 /// Error categories for identity resolution
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum IdentityErrorKind {
     /// Unsupported DID method
     #[error("unsupported DID method: {0}")]
@@ -521,20 +540,44 @@ pub enum IdentityErrorKind {
     UnsupportedDidMethod(SmolStr),
 
     /// Invalid well-known atproto-did content
-    #[error("invalid well-known atproto-did content")]
+    #[error("invalid well-known atproto-did content for {0}")]
     #[diagnostic(
         code(jacquard::identity::invalid_well_known),
         help("expected first non-empty line to be a DID")
     )]
-    InvalidWellKnown,
+    InvalidWellKnown(SmolStr),
+
+    /// DNS-over-HTTPS response malformed
+    #[error("DNS-over-HTTPS response malformed")]
+    #[diagnostic(
+        code(jacquard::identity::doh_parse_failed),
+        help("DoH response missing expected JSON structure")
+    )]
+    DohParseFailed,
+
+    /// PDS fallback required but not configured
+    #[error("PDS fallback required but not configured")]
+    #[diagnostic(
+        code(jacquard::identity::no_pds_fallback),
+        help("configure pds_fallback in ResolverOptions to use PDS resolution methods")
+    )]
+    NoPdsFallback,
+
+    /// All handle resolution methods exhausted
+    #[error("handle resolution exhausted all configured methods")]
+    #[diagnostic(
+        code(jacquard::identity::handle_resolution_exhausted),
+        help("handle may not exist, or DNS/HTTPS/PDS endpoints may be unavailable")
+    )]
+    HandleResolutionExhausted,
 
     /// Missing PDS endpoint in DID document
-    #[error("missing PDS endpoint in DID document")]
+    #[error("missing PDS endpoint in DID document for {0}")]
     #[diagnostic(
         code(jacquard::identity::missing_pds),
         help("ensure DID document contains AtprotoPersonalDataServer service")
     )]
-    MissingPdsEndpoint,
+    MissingPdsEndpoint(SmolStr),
 
     /// Transport-level error
     #[error("transport error")]
@@ -653,13 +696,39 @@ impl IdentityError {
     }
 
     /// Create an invalid well-known error
-    pub fn invalid_well_known() -> Self {
-        Self::new(IdentityErrorKind::InvalidWellKnown, None)
+    pub fn invalid_well_known(identifier: impl Into<SmolStr>) -> Self {
+        Self::new(IdentityErrorKind::InvalidWellKnown(identifier.into()), None)
+    }
+
+    /// Create an invalid well-known error with source
+    pub fn invalid_well_known_with_source(
+        identifier: impl Into<SmolStr>,
+        source: impl std::error::Error + Send + Sync + 'static,
+    ) -> Self {
+        Self::new(
+            IdentityErrorKind::InvalidWellKnown(identifier.into()),
+            Some(Box::new(source)),
+        )
+    }
+
+    /// Create a DNS-over-HTTPS parse failed error
+    pub fn doh_parse_failed() -> Self {
+        Self::new(IdentityErrorKind::DohParseFailed, None)
+    }
+
+    /// Create a no PDS fallback configured error
+    pub fn no_pds_fallback() -> Self {
+        Self::new(IdentityErrorKind::NoPdsFallback, None)
+    }
+
+    /// Create a handle resolution exhausted error
+    pub fn handle_resolution_exhausted() -> Self {
+        Self::new(IdentityErrorKind::HandleResolutionExhausted, None)
     }
 
     /// Create a missing PDS endpoint error
-    pub fn missing_pds_endpoint() -> Self {
-        Self::new(IdentityErrorKind::MissingPdsEndpoint, None)
+    pub fn missing_pds_endpoint(did: impl Into<SmolStr>) -> Self {
+        Self::new(IdentityErrorKind::MissingPdsEndpoint(did.into()), None)
     }
 
     /// Create a transport error
@@ -767,7 +836,20 @@ impl From<AtDataError> for IdentityError {
 
 impl From<reqwest::Error> for IdentityError {
     fn from(e: reqwest::Error) -> Self {
-        Self::transport("".into(), e).with_context("HTTP request failed during identity resolution")
+        let url = e
+            .url()
+            .map(|u| smol_str::SmolStr::new(u.as_str()))
+            .unwrap_or_default();
+        Self::transport(url, e).with_context("HTTP request failed during identity resolution")
+    }
+}
+
+impl From<jacquard_common::error::ClientError> for IdentityError {
+    fn from(e: jacquard_common::error::ClientError) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e.kind());
+        let mut err = Self::new(IdentityErrorKind::Xrpc(msg), Some(Box::new(e)));
+        err = err.with_context("XRPC call failed during identity resolution");
+        err
     }
 }
 

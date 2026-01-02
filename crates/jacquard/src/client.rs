@@ -674,7 +674,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let (did, _) = self
                 .session_info()
                 .await
-                .ok_or_else(AgentError::no_session)?;
+                .ok_or_else(|| AgentError::no_session().for_collection("create record", R::NSID))?;
 
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("create_record", collection = %R::nsid()).entered();
@@ -692,11 +692,14 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             #[cfg(feature = "tracing")]
             _span.exit();
 
-            let response = self.send(request).await?;
+            let response = self
+                .send(request)
+                .await
+                .map_err(|e| e.for_collection("create record", R::NSID))?;
             response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
                 XrpcError::Xrpc(typed) => AgentError::sub_operation("create record", typed),
+                e => AgentError::xrpc(e),
             })
         }
     }
@@ -790,10 +793,11 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 let http_response = self
                     .send_http(http_request)
                     .await
-                    .map_err(|e| ClientError::transport(e))?;
+                    .map_err(|e| ClientError::transport(e).for_collection("get record", R::NSID))?;
 
                 xrpc::process_response(http_response)
-            }?;
+                    .map_err(|e| e.for_collection("get record", R::NSID))?
+            };
             Ok(response.transmute())
         }
     }
@@ -837,23 +841,17 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                     &self.opts().await,
                 )?;
 
-                let http_response = self
-                    .send_http(http_request)
-                    .await
-                    .map_err(|e| ClientError::transport(e))?;
+                let http_response = self.send_http(http_request).await.map_err(|e| {
+                    ClientError::transport(e).for_collection("fetch record", collection.as_str())
+                })?;
 
                 xrpc::process_response(http_response)
-            }?;
+                    .map_err(|e| e.for_collection("fetch record", collection.as_str()))?
+            };
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
-                XrpcError::Xrpc(typed) => AgentError::new(
-                    AgentErrorKind::SubOperation {
-                        step: "fetch record",
-                    },
-                    None,
-                )
-                .with_details(typed.to_string()),
+                XrpcError::Xrpc(typed) => AgentError::sub_operation("parse record", typed),
+                e => AgentError::xrpc(e),
             })?;
             Ok(output)
         }
@@ -874,15 +872,21 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     {
         let uri = uri.as_uri();
         async move {
+            use smol_str::format_smolstr;
+
             let response = self.get_record::<R>(uri).await?;
             let response: Response<R::Record> = response.transmute();
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
-                XrpcError::Xrpc(typed) => {
-                    AgentError::new(AgentErrorKind::SubOperation { step: "get record" }, None)
-                        .with_details(typed.to_string())
-                }
+                XrpcError::Xrpc(typed) => AgentError::new(
+                    AgentErrorKind::SubOperation {
+                        step: "parse record",
+                    },
+                    None,
+                )
+                .with_details(format_smolstr!("{:?}", typed)),
+                // Note for future orual: the above was done this way due to GAT lifetime inference constraints..
+                e => AgentError::xrpc(e),
             })?;
             Ok(output)
         }
@@ -937,11 +941,10 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             // Parse to get R<'_> borrowing from response buffer
             let record = response.parse().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
                 XrpcError::Xrpc(typed) => {
-                    AgentError::new(AgentErrorKind::SubOperation { step: "get record" }, None)
-                        .with_details(typed.to_string())
+                    AgentError::sub_operation("parse record", typed.into_static())
                 }
+                e => AgentError::xrpc(e),
             })?;
 
             // Convert to owned
@@ -954,9 +957,10 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let rkey = uri
                 .rkey()
                 .ok_or_else(|| {
+                    use jacquard_common::types::string::AtStrError;
                     AgentError::sub_operation(
                         "extract rkey",
-                        std::io::Error::new(std::io::ErrorKind::InvalidInput, "AtUri missing rkey"),
+                        AtStrError::missing("at-uri-scheme", &uri, "rkey"),
                     )
                 })?
                 .clone()
@@ -983,7 +987,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let (did, _) = self
                 .session_info()
                 .await
-                .ok_or_else(AgentError::no_session)?;
+                .ok_or_else(|| AgentError::no_session().for_collection("delete record", R::NSID))?;
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("delete_record", collection = %R::nsid()).entered();
 
@@ -999,11 +1003,14 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             #[cfg(feature = "tracing")]
             _span.exit();
 
-            let response = self.send(request).await?;
+            let response = self
+                .send(request)
+                .await
+                .map_err(|e| e.for_collection("delete record", R::NSID))?;
             response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
                 XrpcError::Xrpc(typed) => AgentError::sub_operation("delete record", typed),
+                e => AgentError::xrpc(e),
             })
         }
     }
@@ -1031,7 +1038,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let (did, _) = self
                 .session_info()
                 .await
-                .ok_or_else(AgentError::no_session)?;
+                .ok_or_else(|| AgentError::no_session().for_collection("put record", R::NSID))?;
 
             let data =
                 to_data(&record).map_err(|e| AgentError::sub_operation("serialize record", e))?;
@@ -1046,11 +1053,14 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             #[cfg(feature = "tracing")]
             _span.exit();
 
-            let response = self.send(request).await?;
+            let response = self
+                .send(request)
+                .await
+                .map_err(|e| e.for_collection("put record", R::NSID))?;
             response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
                 XrpcError::Xrpc(typed) => AgentError::sub_operation("put record", typed),
+                e => AgentError::xrpc(e),
             })
         }
     }
@@ -1105,8 +1115,8 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let response = self.send_with_opts(request, opts).await?;
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
                 XrpcError::Xrpc(typed) => AgentError::sub_operation("upload blob", typed),
+                e => AgentError::xrpc(e),
             })?;
             Ok(output.blob.blob().clone().into_static())
         }
@@ -1148,10 +1158,10 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let response = self.send(get_request).await?;
             let output = response.parse().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
-                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
                 XrpcError::Xrpc(typed) => {
                     AgentError::sub_operation("update vec", typed.into_static())
                 }
+                e => AgentError::xrpc(e),
             })?;
 
             // Extract vec (converts to owned via IntoStatic)

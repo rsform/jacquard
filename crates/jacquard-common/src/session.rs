@@ -28,6 +28,7 @@ use tokio::sync::RwLock;
 /// Errors emitted by session stores.
 #[derive(Debug, thiserror::Error)]
 #[cfg_attr(feature = "std", derive(Diagnostic))]
+#[non_exhaustive]
 pub enum SessionStoreError {
     /// Filesystem or I/O error
     #[cfg(feature = "std")]
@@ -108,15 +109,42 @@ pub struct FileTokenStore {
 #[cfg(feature = "std")]
 impl FileTokenStore {
     /// Create a new file token store at the given path.
-    pub fn new(path: impl AsRef<Path>) -> Self {
-        std::fs::create_dir_all(path.as_ref().parent().unwrap()).unwrap();
-        if !path.as_ref().exists() {
-            std::fs::write(path.as_ref(), b"{}").unwrap();
+    ///
+    /// Creates parent directories and initializes an empty JSON object if the file doesn't exist.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Parent directories cannot be created
+    /// - The file cannot be written
+    pub fn try_new(path: impl AsRef<Path>) -> Result<Self, SessionStoreError> {
+        let path = path.as_ref();
+
+        // Create parent directories if they exist and don't already exist
+        if let Some(parent) = path.parent() {
+            if !parent.as_os_str().is_empty() && !parent.exists() {
+                std::fs::create_dir_all(parent)?;
+            }
         }
 
-        Self {
-            path: path.as_ref().to_path_buf(),
+        // Initialize empty JSON object if file doesn't exist
+        if !path.exists() {
+            std::fs::write(path, b"{}")?;
         }
+
+        Ok(Self {
+            path: path.to_path_buf(),
+        })
+    }
+
+    /// Create a new file token store at the given path.
+    ///
+    /// # Panics
+    ///
+    /// Panics if parent directories cannot be created or the file cannot be written.
+    /// Prefer [`try_new`](Self::try_new) for fallible construction.
+    pub fn new(path: impl AsRef<Path>) -> Self {
+        Self::try_new(path).expect("failed to initialize FileTokenStore")
     }
 }
 

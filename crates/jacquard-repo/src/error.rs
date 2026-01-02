@@ -22,6 +22,7 @@ pub struct RepoError {
 
 /// Error categories for repository operations
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum RepoErrorKind {
     /// Storage operation failed
     Storage,
@@ -145,6 +146,12 @@ impl RepoError {
         Self::new(RepoErrorKind::Car, Some(Box::new(source)))
     }
 
+    /// Create a CAR write error with CID context
+    pub fn car_write(cid: impl fmt::Display, source: impl Error + Send + Sync + 'static) -> Self {
+        Self::new(RepoErrorKind::Car, Some(Box::new(source)))
+            .with_context(format!("failed to write block {}", cid))
+    }
+
     /// Create a CAR parse error (alias for car)
     pub fn car_parse(source: impl Error + Send + Sync + 'static) -> Self {
         Self::car(source).with_context("Failed to parse CAR file".to_string())
@@ -207,6 +214,7 @@ impl fmt::Display for RepoError {
 
 /// MST-specific errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum MstError {
     /// Empty key not allowed
     #[error("Empty key not allowed")]
@@ -253,6 +261,7 @@ impl From<MstError> for RepoError {
 
 /// Commit-specific errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum CommitError {
     /// Invalid commit version
     #[error("Invalid commit version: {0}")]
@@ -302,6 +311,7 @@ impl From<CommitError> for RepoError {
 
 /// Diff-specific errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum DiffError {
     /// Too many operations
     #[error("Too many operations: {count} (max {max})")]
@@ -335,6 +345,7 @@ impl From<DiffError> for RepoError {
 
 /// Proof verification errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum ProofError {
     /// CAR file has no root CID
     #[error("CAR file has no root CID")]

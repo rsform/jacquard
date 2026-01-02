@@ -50,6 +50,7 @@ impl std::fmt::Display for AgentError {
 
 /// Error categories for Agent operations
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum AgentErrorKind {
     /// Transport/network layer failure
     #[error("client error (see context for details)")]
@@ -172,6 +173,32 @@ impl AgentError {
         self
     }
 
+    /// Append additional context to existing context string.
+    ///
+    /// If context already exists, appends with ": " separator.
+    /// If no context exists, sets it directly.
+    pub fn append_context(mut self, additional: impl AsRef<str>) -> Self {
+        self.context = Some(match self.context.take() {
+            Some(existing) => smol_str::format_smolstr!("{}: {}", existing, additional.as_ref()),
+            None => additional.as_ref().into(),
+        });
+        self
+    }
+
+    /// Add NSID context for XRPC operations.
+    ///
+    /// Appends the NSID in brackets to existing context, e.g. `"network timeout: [com.atproto.repo.getRecord]"`.
+    pub fn for_nsid(self, nsid: &str) -> Self {
+        self.append_context(smol_str::format_smolstr!("[{}]", nsid))
+    }
+
+    /// Add collection context for record operations.
+    ///
+    /// Use this when a record operation fails to indicate the target collection.
+    pub fn for_collection(self, operation: &str, collection_nsid: &str) -> Self {
+        self.append_context(smol_str::format_smolstr!("{} [{}]", operation, collection_nsid))
+    }
+
     /// Add XRPC error data to this error for observability
     pub fn with_xrpc<E>(mut self, xrpc: XrpcError<E>) -> Self
     where
@@ -253,10 +280,12 @@ impl From<ClientError> for AgentError {
     fn from(e: ClientError) -> Self {
         use smol_str::ToSmolStr;
 
-        let context_msg: SmolStr;
+        let mut context_msg: SmolStr;
         let help_msg: SmolStr;
         let url = e.url().map(|s| s.to_smolstr());
         let details = e.details().map(|s| s.to_smolstr());
+        // Preserve original context from ClientError to append later
+        let original_context = e.context().map(|s| s.to_smolstr());
 
         // Build context and help based on the error kind
         match e.kind() {
@@ -297,6 +326,15 @@ impl From<ClientError> for AgentError {
                 help_msg = "verify storage backend is accessible".to_smolstr();
                 context_msg = "storage operation failed".to_smolstr();
             }
+            _ => {
+                help_msg = "see source error for details".to_smolstr();
+                context_msg = "client error".to_smolstr();
+            }
+        }
+
+        // Append original context from ClientError if present
+        if let Some(original) = original_context {
+            context_msg = smol_str::format_smolstr!("{}: {}", context_msg, original);
         }
 
         let mut error = Self::new(AgentErrorKind::Client, Some(Box::new(e)));

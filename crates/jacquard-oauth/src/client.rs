@@ -625,7 +625,7 @@ where
             .dpop_call(&mut dpop)
             .send(build_http_request(&base_uri, &request, &opts)?)
             .await
-            .map_err(|e| ClientError::transport(e))?;
+            .map_err(|e| ClientError::from(e).for_nsid(R::NSID))?;
         let resp = process_response(http_response);
 
         // Write back updated nonce to session data (dpop_call may have updated it)
@@ -655,7 +655,11 @@ where
                 .dpop_call(&mut dpop)
                 .send(build_http_request(&base_uri, &request, &opts)?)
                 .await
-                .map_err(|e| ClientError::transport(e))?;
+                .map_err(|e| {
+                    ClientError::from(e)
+                        .for_nsid(R::NSID)
+                        .append_context("after token refresh")
+                })?;
             let resp = process_response(http_response);
 
             // Write back updated nonce after retry

@@ -34,6 +34,7 @@ pub async fn fetch_labeler_defs(
         XrpcError::Generic(g) => ClientError::decode(g.to_string()),
         XrpcError::Decode(e) => ClientError::decode(format!("{:?}", e)),
         XrpcError::Xrpc(typed) => ClientError::decode(format!("{:?}", typed)),
+        _ => ClientError::decode("unknown XRPC error"),
     })?;
 
     let mut defs = LabelerDefs::new();
@@ -132,8 +133,8 @@ pub async fn fetch_labels(
         .into_output()
         .map_err(|e| match e {
             XrpcError::Auth(auth) => AgentError::from(auth),
-            e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
             XrpcError::Xrpc(typed) => AgentError::xrpc(XrpcError::Xrpc(typed)),
+            e => AgentError::xrpc(e),
         })?;
     Ok((labels.labels, labels.cursor))
 }

@@ -61,6 +61,7 @@ pub struct RequestError {
 
 /// Error categories for OAuth request operations
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum RequestErrorKind {
     /// No endpoint available
     #[error("no {0} endpoint available")]
@@ -331,8 +332,8 @@ impl From<AtStrError> for RequestError {
     }
 }
 
-impl From<crate::dpop::Error> for RequestError {
-    fn from(e: crate::dpop::Error) -> Self {
+impl From<crate::dpop::DpopError> for RequestError {
+    fn from(e: crate::dpop::DpopError) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);
         Self::new(RequestErrorKind::Dpop, Some(Box::new(e)))
             .with_context(msg)

@@ -119,7 +119,7 @@ where
                             StatusCode::BAD_REQUEST,
                             Json(json!({
                                 "error": "InvalidRequest",
-                                "message": "wrong path"
+                                "message": "malformed request URI: missing path component"
                             })),
                         )
                             .into_response())
@@ -228,6 +228,13 @@ where
                 json!({
                     "error": "InvalidRequest",
                     "message": format!("failed to decode request: {error}", )
+                }),
+            ),
+            _ => (
+                self.status,
+                json!({
+                    "error": "InternalError",
+                    "message": "unknown error"
                 }),
             ),
         };

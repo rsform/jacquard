@@ -121,7 +121,7 @@ impl IdentityResolver for MockResolver {
         &self,
         _handle: &jacquard_common::types::string::Handle<'_>,
     ) -> impl Future<Output = Result<Did<'static>, IdentityError>> + Send {
-        async { Err(IdentityError::invalid_well_known()) }
+        async { Err(IdentityError::handle_resolution_exhausted()) }
     }
 
     fn resolve_did_doc(

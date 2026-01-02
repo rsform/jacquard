@@ -61,6 +61,7 @@ pub struct LexiconResolutionError {
     kind: LexiconResolutionErrorKind,
     #[source]
     source: Option<Box<dyn std::error::Error + Send + Sync>>,
+    context: Option<SmolStr>,
 }
 
 impl LexiconResolutionError {
@@ -68,11 +69,26 @@ impl LexiconResolutionError {
         kind: LexiconResolutionErrorKind,
         source: Option<Box<dyn std::error::Error + Send + Sync>>,
     ) -> Self {
-        Self { kind, source }
+        Self {
+            kind,
+            source,
+            context: None,
+        }
     }
 
     pub fn kind(&self) -> &LexiconResolutionErrorKind {
         &self.kind
+    }
+
+    /// Add context to this error
+    pub fn with_context(mut self, context: impl Into<SmolStr>) -> Self {
+        self.context = Some(context.into());
+        self
+    }
+
+    /// Get the context if present
+    pub fn context(&self) -> Option<&str> {
+        self.context.as_deref()
     }
 
     pub fn dns_lookup_failed(
@@ -140,6 +156,26 @@ impl LexiconResolutionError {
         )
     }
 
+    pub fn http_error(nsid: impl Into<SmolStr>, status: u16) -> Self {
+        Self::new(
+            LexiconResolutionErrorKind::HttpError {
+                nsid: nsid.into(),
+                status,
+            },
+            None,
+        )
+    }
+
+    pub fn missing_response_field(nsid: impl Into<SmolStr>, field: &'static str) -> Self {
+        Self::new(
+            LexiconResolutionErrorKind::MissingResponseField {
+                nsid: nsid.into(),
+                field,
+            },
+            None,
+        )
+    }
+
     pub fn invalid_collection() -> Self {
         Self::new(LexiconResolutionErrorKind::InvalidCollection, None)
     }
@@ -160,6 +196,7 @@ impl From<IdentityError> for LexiconResolutionError {
 
 /// Error categories for lexicon resolution
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum LexiconResolutionErrorKind {
     #[error("DNS lookup failed for authority {authority}")]
     #[diagnostic(code(jacquard::lexicon::dns_lookup_failed))]
@@ -194,6 +231,19 @@ pub enum LexiconResolutionErrorKind {
     #[error("failed to parse lexicon schema for {nsid}")]
     #[diagnostic(code(jacquard::lexicon::resolution_failed))]
     ResolutionFailed { nsid: SmolStr, message: SmolStr },
+
+    /// HTTP non-success status from lexicon fetch
+    #[error("HTTP {status} fetching lexicon {nsid}")]
+    #[diagnostic(code(jacquard::lexicon::http_error))]
+    HttpError { nsid: SmolStr, status: u16 },
+
+    /// Required field missing in XRPC response
+    #[error("missing '{field}' field in response for {nsid}")]
+    #[diagnostic(
+        code(jacquard::lexicon::missing_response_field),
+        help("the XRPC response is missing a required field")
+    )]
+    MissingResponseField { nsid: SmolStr, field: &'static str },
 
     #[error("invalid collection NSID")]
     #[diagnostic(code(jacquard::lexicon::invalid_collection))]
@@ -244,7 +294,10 @@ impl crate::JacquardResolver {
 
                     return Did::new_owned(did_str)
                         .map(|d| d.into_static())
-                        .map_err(|_| LexiconResolutionError::invalid_did(authority, did_str));
+                        .map_err(|_| {
+                            LexiconResolutionError::invalid_did(authority, did_str)
+                                .with_context(format!("resolving NSID {}", nsid))
+                        });
                 }
             }
         }
@@ -286,9 +339,9 @@ impl crate::JacquardResolver {
         tracing::debug!("got response with status: {}", status);
 
         if !status.is_success() {
-            return Err(LexiconResolutionError::resolution_failed(
+            return Err(LexiconResolutionError::http_error(
                 nsid.as_str(),
-                format!("HTTP {}", status.as_u16()),
+                status.as_u16(),
             ));
         }
 
@@ -309,7 +362,7 @@ impl crate::JacquardResolver {
                 obj.keys().collect::<Vec<_>>()
             );
 
-            LexiconResolutionError::resolution_failed(nsid.as_str(), "missing 'schema' field")
+            LexiconResolutionError::missing_response_field(nsid.as_str(), "schema")
         })?;
 
         #[cfg(feature = "tracing")]
@@ -318,19 +371,15 @@ impl crate::JacquardResolver {
         let schema = from_json_value::<LexiconDoc>(schema_val.clone())
             .map_err(|e| LexiconResolutionError::parse_failed(nsid.as_str(), e))?;
 
-        let uri_str = obj.get("uri").and_then(|v| v.as_str()).ok_or_else(|| {
-            LexiconResolutionError::resolution_failed(
-                nsid.as_str(),
-                "missing or invalid 'uri' field",
-            )
-        })?;
+        let uri_str = obj
+            .get("uri")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| LexiconResolutionError::missing_response_field(nsid.as_str(), "uri"))?;
 
-        let cid_str = obj.get("cid").and_then(|v| v.as_str()).ok_or_else(|| {
-            LexiconResolutionError::resolution_failed(
-                nsid.as_str(),
-                "missing or invalid 'cid' field",
-            )
-        })?;
+        let cid_str = obj
+            .get("cid")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| LexiconResolutionError::missing_response_field(nsid.as_str(), "cid"))?;
 
         let uri = AtUri::new_owned(uri_str)
             .map_err(|e| LexiconResolutionError::parse_failed(nsid.as_str(), e))?;
@@ -441,7 +490,10 @@ impl crate::JacquardResolver {
                 if let Some(did_str) = txt_data.strip_prefix("did=") {
                     let result = Did::new_owned(did_str)
                         .map(|d| d.into_static())
-                        .map_err(|_| LexiconResolutionError::invalid_did(authority, did_str));
+                        .map_err(|_| {
+                            LexiconResolutionError::invalid_did(authority, did_str)
+                                .with_context(format!("resolving NSID {}", nsid))
+                        });
 
                     // Cache on success
                     #[cfg(feature = "cache")]
@@ -500,7 +552,7 @@ impl LexiconSchemaResolver for crate::JacquardResolver {
             let did_doc = did_doc_resp.parse()?;
             let pds = did_doc
                 .pds_endpoint()
-                .ok_or_else(|| IdentityError::missing_pds_endpoint())?;
+                .ok_or_else(|| IdentityError::missing_pds_endpoint(authority_did.as_str()))?;
 
             #[cfg(feature = "tracing")]
             tracing::trace!("fetching lexicon {} from PDS {}", nsid, pds);

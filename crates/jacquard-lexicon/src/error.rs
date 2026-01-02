@@ -5,6 +5,7 @@ use thiserror::Error;
 
 /// Errors that can occur during lexicon code generation
 #[derive(Debug, Error, Diagnostic)]
+#[non_exhaustive]
 pub enum CodegenError {
     /// IO error when reading lexicon files
     #[error("IO error: {0}")]
@@ -27,63 +28,6 @@ pub enum CodegenError {
         /// Location of the error in the source
         #[label("parse error here")]
         span: Option<SourceSpan>,
-    },
-
-    /// Reference to non-existent lexicon or def
-    #[error("Reference to unknown type: {ref_string}")]
-    #[diagnostic(
-        code(lexicon::unknown_ref),
-        help("Add the referenced lexicon to your corpus or use Data<'a> as a fallback type")
-    )]
-    UnknownRef {
-        /// The ref string that couldn't be resolved
-        ref_string: String,
-        /// NSID of lexicon containing the ref
-        lexicon_nsid: String,
-        /// Def name containing the ref
-        def_name: String,
-        /// Field path containing the ref
-        field_path: String,
-    },
-
-    /// Circular reference detected in type definitions
-    #[error("Circular reference detected")]
-    #[diagnostic(
-        code(lexicon::circular_ref),
-        help("The code generator uses Box<T> for union variants to handle circular references")
-    )]
-    CircularRef {
-        /// The ref string that forms a cycle
-        ref_string: String,
-        /// The cycle path
-        cycle: Vec<String>,
-    },
-
-    /// Invalid lexicon structure
-    #[error("Invalid lexicon: {message}")]
-    #[diagnostic(code(lexicon::invalid))]
-    InvalidLexicon {
-        message: String,
-        /// NSID of the invalid lexicon
-        lexicon_nsid: String,
-    },
-
-    /// Unsupported lexicon feature
-    #[error("Unsupported feature: {feature}")]
-    #[diagnostic(
-        code(lexicon::unsupported),
-        help("This lexicon feature is not yet supported by the code generator")
-    )]
-    Unsupported {
-        /// Description of the unsupported feature
-        #[allow(unused)]
-        feature: String,
-        /// NSID of lexicon containing the feature
-        #[allow(unused)]
-        lexicon_nsid: String,
-        /// Optional suggestion for workaround
-        #[allow(unused)]
-        suggestion: Option<String>,
     },
 
     /// Name collision
@@ -119,8 +63,23 @@ pub enum CodegenError {
         tokens: String,
     },
 
-    /// Failed to parse module path string
-    #[error("Failed to parse module path: {path_str}")]
+    /// Unsupported lexicon feature
+    #[error("Unsupported: {message}")]
+    #[diagnostic(
+        code(lexicon::unsupported),
+        help("This lexicon feature is not yet supported by code generation")
+    )]
+    Unsupported {
+        /// Description of the unsupported feature
+        message: String,
+        /// NSID of the lexicon containing the unsupported feature
+        nsid: Option<String>,
+        /// Definition name if applicable
+        def_name: Option<String>,
+    },
+
+    /// Failed to parse generated path string
+    #[error("Failed to parse path '{path_str}'")]
     #[diagnostic(code(lexicon::path_parse_error))]
     PathParseError {
         path_str: String,
@@ -163,39 +122,16 @@ impl CodegenError {
         }
     }
 
-    /// Create an unknown ref error
-    pub fn unknown_ref(
-        ref_string: impl Into<String>,
-        lexicon_nsid: impl Into<String>,
-        def_name: impl Into<String>,
-        field_path: impl Into<String>,
-    ) -> Self {
-        Self::UnknownRef {
-            ref_string: ref_string.into(),
-            lexicon_nsid: lexicon_nsid.into(),
-            def_name: def_name.into(),
-            field_path: field_path.into(),
-        }
-    }
-
-    /// Create an invalid lexicon error
-    pub fn invalid_lexicon(message: impl Into<String>, lexicon_nsid: impl Into<String>) -> Self {
-        Self::InvalidLexicon {
-            message: message.into(),
-            lexicon_nsid: lexicon_nsid.into(),
-        }
-    }
-
     /// Create an unsupported feature error
     pub fn unsupported(
-        feature: impl Into<String>,
-        lexicon_nsid: impl Into<String>,
-        suggestion: Option<impl Into<String>>,
+        message: impl Into<String>,
+        nsid: impl Into<String>,
+        def_name: Option<impl Into<String>>,
     ) -> Self {
         Self::Unsupported {
-            feature: feature.into(),
-            lexicon_nsid: lexicon_nsid.into(),
-            suggestion: suggestion.map(|s| s.into()),
+            message: message.into(),
+            nsid: Some(nsid.into()),
+            def_name: def_name.map(|s| s.into()),
         }
     }
 }

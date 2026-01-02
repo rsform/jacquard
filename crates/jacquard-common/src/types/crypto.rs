@@ -64,6 +64,7 @@ fn code_of(codec: KeyCodec) -> u64 {
 
 /// Errors from decoding or converting Multikey values
 #[derive(Debug, Clone, thiserror::Error, miette::Diagnostic, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum CryptoError {
     #[error("failed to decode multibase")]
     /// Multibase decode errror

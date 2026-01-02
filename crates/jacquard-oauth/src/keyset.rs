@@ -9,13 +9,14 @@ use std::collections::HashSet;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
+#[non_exhaustive]
 pub enum Error {
     #[error("duplicate kid: {0}")]
     DuplicateKid(String),
     #[error("keys must not be empty")]
     EmptyKeys,
-    #[error("key must have a `kid`")]
-    EmptyKid,
+    #[error("key at index {0} must have a `kid`")]
+    EmptyKid(usize),
     #[error("no signing key found for algorithms: {0:?}")]
     NotFound(Vec<CowStr<'static>>),
     #[error("key for signing must be a secret key")]
@@ -103,7 +104,7 @@ impl TryFrom<Vec<Jwk>> for Keyset {
         }
         let mut v = Vec::with_capacity(keys.len());
         let mut hs = HashSet::with_capacity(keys.len());
-        for key in keys {
+        for (i, key) in keys.into_iter().enumerate() {
             if let Some(kid) = key.prm.kid.clone() {
                 if hs.contains(&kid) {
                     return Err(Error::DuplicateKid(kid));
@@ -119,7 +120,7 @@ impl TryFrom<Vec<Jwk>> for Keyset {
                 }
                 v.push(key);
             } else {
-                return Err(Error::EmptyKid);
+                return Err(Error::EmptyKid(i));
             }
         }
         Ok(Self(v))

@@ -1007,6 +1007,7 @@ impl<'de> serde::Deserializer<'de> for RawData<'static> {
 
 /// Error type for Data/RawData deserializer
 #[derive(Debug, Clone, thiserror::Error)]
+#[non_exhaustive]
 pub enum DataDeserializerError {
     /// Custom error message
     #[error("{0}")]
@@ -1474,6 +1475,7 @@ impl<'de> serde::de::MapAccess<'de> for RawOwnedObjectDeserializer<'de> {
 
 /// Error type for RawData serialization
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum RawDataSerializerError {
     /// Error message
     Message(String),

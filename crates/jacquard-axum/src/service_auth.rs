@@ -293,6 +293,7 @@ pub struct ExtractOptionalServiceAuth(pub Option<VerifiedServiceAuth<'static>>);
 
 /// Errors that can occur during service auth verification.
 #[derive(Debug, Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum ServiceAuthError {
     /// Authorization header is missing
     #[error("missing Authorization header")]

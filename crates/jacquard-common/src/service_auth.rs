@@ -39,6 +39,7 @@ use k256::ecdsa::{Signature as K256Signature, VerifyingKey as K256VerifyingKey};
 
 /// Errors that can occur during JWT parsing and verification.
 #[derive(Debug, Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum ServiceAuthError {
     /// JWT format is invalid (not three base64-encoded parts separated by dots)
     #[error("malformed JWT: {0}")]

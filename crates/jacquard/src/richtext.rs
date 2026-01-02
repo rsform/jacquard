@@ -699,6 +699,7 @@ pub fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUr
 
 /// Errors that can occur during richtext building
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum RichTextError {
     /// Handle found that needs resolution but no resolver provided
     #[error("Handle '{0}' requires resolution - use build_async() with an IdentityResolver")]

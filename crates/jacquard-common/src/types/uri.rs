@@ -33,6 +33,7 @@ pub enum Uri<'u> {
 
 /// Errors that can occur when parsing URIs
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 pub enum UriParseError {
     /// AT Protocol string parsing error
     #[error("Invalid atproto string: {0}")]
@@ -57,9 +58,10 @@ impl<'u> Uri<'u> {
         } else if uri.starts_with("wss://") {
             Ok(Uri::Https(Url::parse(uri)?))
         } else if uri.starts_with("ipld://") {
-            Ok(Uri::Cid(
-                Cid::from_str(uri.strip_prefix("ipld://").unwrap_or(uri.as_ref())).unwrap(),
-            ))
+            match Cid::from_str(&uri[7..]) {
+                Ok(cid) => Ok(Uri::Cid(cid)),
+                Err(_) => Ok(Uri::Any(CowStr::Borrowed(uri))),
+            }
         } else {
             Ok(Uri::Any(CowStr::Borrowed(uri)))
         }
@@ -77,9 +79,10 @@ impl<'u> Uri<'u> {
         } else if uri.starts_with("wss://") {
             Ok(Uri::Https(Url::parse(uri)?))
         } else if uri.starts_with("ipld://") {
-            Ok(Uri::Cid(
-                Cid::from_str(uri.strip_prefix("ipld://").unwrap_or(uri.as_ref())).unwrap(),
-            ))
+            match Cid::from_str(&uri[7..]) {
+                Ok(cid) => Ok(Uri::Cid(cid)),
+                Err(_) => Ok(Uri::Any(CowStr::Owned(uri.to_smolstr()))),
+            }
         } else {
             Ok(Uri::Any(CowStr::Owned(uri.to_smolstr())))
         }
@@ -96,9 +99,10 @@ impl<'u> Uri<'u> {
         } else if uri.starts_with("wss://") {
             Ok(Uri::Https(Url::parse(uri.as_ref())?))
         } else if uri.starts_with("ipld://") {
-            Ok(Uri::Cid(
-                Cid::from_str(uri.strip_prefix("ipld://").unwrap_or(uri.as_str())).unwrap(),
-            ))
+            match Cid::from_str(&uri.as_str()[7..]) {
+                Ok(cid) => Ok(Uri::Cid(cid)),
+                Err(_) => Ok(Uri::Any(uri)),
+            }
         } else {
             Ok(Uri::Any(uri))
         }
@@ -220,6 +224,7 @@ impl<'a, R: Collection> Deref for RecordUri<'a, R> {
 }
 
 #[derive(Debug, Clone, PartialEq, thiserror::Error, miette::Diagnostic)]
+#[non_exhaustive]
 /// Errors that can occur when parsing or validating collection type-annotated URIs
 pub enum UriError {
     /// Given at-uri didn't have the matching collection for the record

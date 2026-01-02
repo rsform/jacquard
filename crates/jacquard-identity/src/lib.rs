@@ -81,7 +81,7 @@ use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
 use jacquard_common::http_client::HttpClient;
-use jacquard_common::smol_str::ToSmolStr;
+use jacquard_common::smol_str::{SmolStr, ToSmolStr};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
@@ -100,7 +100,7 @@ use {
 #[cfg(feature = "cache")]
 use {
     crate::lexicon_resolver::ResolvedLexiconSchema,
-    jacquard_common::{smol_str::SmolStr, types::string::Nsid},
+    jacquard_common::types::string::Nsid,
     mini_moka::time::Duration,
 };
 
@@ -512,7 +512,10 @@ impl JacquardResolver {
 
         let status = response.status();
         if !status.is_success() {
-            return Err(IdentityError::http_status(status));
+            return Err(IdentityError::http_status(status).with_context(format!(
+                "DNS-over-HTTPS query for {} ({})",
+                name, record_type
+            )));
         }
 
         let json: serde_json::Value = response.json().await?;
@@ -532,9 +535,8 @@ impl JacquardResolver {
             .get("Answer")
             .and_then(|a| a.as_array())
             .ok_or_else(|| {
-                IdentityError::invalid_well_known().with_context(format!(
-                    "couldn't parse cloudflare DoH answers looking for {name}"
-                ))
+                IdentityError::doh_parse_failed()
+                    .with_context(format!("DoH response missing 'Answer' array for {name}"))
             })?;
 
         let mut results: Vec<String> = Vec::new();
@@ -547,12 +549,13 @@ impl JacquardResolver {
         Ok(results)
     }
 
-    fn parse_atproto_did_body(body: &str) -> resolver::Result<Did<'static>> {
+    fn parse_atproto_did_body(body: &str, identifier: &str) -> resolver::Result<Did<'static>> {
         let line = body
             .lines()
             .find(|l| !l.trim().is_empty())
-            .ok_or_else(|| IdentityError::invalid_well_known())?;
-        let did = Did::new(line.trim()).map_err(|_| IdentityError::invalid_well_known())?;
+            .ok_or_else(|| IdentityError::invalid_well_known(identifier))?;
+        let did = Did::new(line.trim())
+            .map_err(|e| IdentityError::invalid_well_known_with_source(identifier, e))?;
         Ok(did.into_static())
     }
 }
@@ -565,7 +568,7 @@ impl JacquardResolver {
     ) -> resolver::Result<Did<'static>> {
         let pds = match &self.opts.pds_fallback {
             Some(u) => u.clone(),
-            None => return Err(IdentityError::invalid_well_known()),
+            None => return Err(IdentityError::no_pds_fallback()),
         };
         let req = ResolveHandle::new()
             .handle(handle.clone().into_static())
@@ -575,13 +578,21 @@ impl JacquardResolver {
             .xrpc(pds)
             .send(&req)
             .await
-            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
-        let out = resp
-            .parse()
-            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
+            .map_err(|e| IdentityError::from(e).with_context(format!("resolving handle {}", handle)))?;
+        // Note: XrpcError<E> has GAT lifetimes that prevent boxing; use debug format
+        let out = resp.parse().map_err(|e| {
+            IdentityError::xrpc(jacquard_common::smol_str::format_smolstr!("{:?}", e))
+                .with_context(format!("parsing response for handle {}", handle))
+        })?;
         Did::new_owned(out.did.as_str())
             .map(|d| d.into_static())
-            .map_err(|_| IdentityError::invalid_well_known())
+            .map_err(|e| {
+                IdentityError::invalid_doc(jacquard_common::smol_str::format_smolstr!(
+                    "PDS returned invalid DID '{}': {}",
+                    out.did,
+                    e
+                ))
+            })
     }
 
     /// Fetch DID document via PDS resolveDid (returns owned DidDocument)
@@ -591,7 +602,7 @@ impl JacquardResolver {
     ) -> resolver::Result<DidDocument<'static>> {
         let pds = match &self.opts.pds_fallback {
             Some(u) => u.clone(),
-            None => return Err(IdentityError::invalid_well_known()),
+            None => return Err(IdentityError::no_pds_fallback()),
         };
         let req = resolve_did::ResolveDid::new().did(did.clone()).build();
         let resp = self
@@ -599,10 +610,12 @@ impl JacquardResolver {
             .xrpc(pds)
             .send(&req)
             .await
-            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
-        let out = resp
-            .parse()
-            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
+            .map_err(|e| IdentityError::from(e).with_context(format!("fetching DID doc for {}", did)))?;
+        // Note: XrpcError<E> has GAT lifetimes that prevent boxing; use debug format
+        let out = resp.parse().map_err(|e| {
+            IdentityError::xrpc(jacquard_common::smol_str::format_smolstr!("{:?}", e))
+                .with_context(format!("parsing DID doc response for {}", did))
+        })?;
         let doc_json = serde_json::to_value(&out.did_doc)?;
         let s = serde_json::to_string(&doc_json)?;
         let doc_borrowed: DidDocument<'_> = serde_json::from_str(&s)?;
@@ -620,7 +633,8 @@ impl JacquardResolver {
             _ => {
                 return Err(IdentityError::unsupported_did_method(
                     "mini-doc requires Slingshot source",
-                ));
+                )
+                .with_context(format!("resolving {}", did)));
             }
         };
         let mut url = base;
@@ -676,7 +690,7 @@ impl IdentityResolver for JacquardResolver {
                 HandleStep::HttpsWellKnown => {
                     let url = Url::parse(&format!("https://{host}/.well-known/atproto-did"))?;
                     if let Ok(text) = self.get_text(url).await {
-                        if let Ok(did) = Self::parse_atproto_did_body(&text) {
+                        if let Ok(did) = Self::parse_atproto_did_body(&text, handle.as_str()) {
                             resolved_did = Some(did);
                             break 'outer;
                         }
@@ -761,7 +775,8 @@ impl IdentityResolver for JacquardResolver {
             // Invalidate on error
             #[cfg(feature = "cache")]
             self.invalidate_handle_chain(handle).await;
-            Err(IdentityError::invalid_well_known())
+            Err(IdentityError::handle_resolution_exhausted()
+                .with_context(format!("failed to resolve handle: {}", handle)))
         }
     }
 
@@ -1078,7 +1093,8 @@ impl JacquardResolver {
             _ => {
                 return Err(IdentityError::unsupported_did_method(
                     "mini-doc requires Slingshot source",
-                ));
+                )
+                .with_context(format!("resolving {}", identifier)));
             }
         };
         let url = self.slingshot_mini_doc_url(&base, identifier.as_str())?;
@@ -1086,6 +1102,7 @@ impl JacquardResolver {
         Ok(MiniDocResponse {
             buffer: buf,
             status,
+            identifier: SmolStr::from(identifier.as_str()),
         })
     }
 }
@@ -1095,6 +1112,8 @@ impl JacquardResolver {
 pub struct MiniDocResponse {
     buffer: Bytes,
     status: StatusCode,
+    /// Identifier that was being resolved
+    identifier: SmolStr,
 }
 
 impl MiniDocResponse {
@@ -1103,7 +1122,8 @@ impl MiniDocResponse {
         if self.status.is_success() {
             serde_json::from_slice::<MiniDoc<'b>>(&self.buffer).map_err(IdentityError::from)
         } else {
-            Err(IdentityError::http_status(self.status))
+            Err(IdentityError::http_status(self.status)
+                .with_context(format!("fetching mini-doc for {}", self.identifier)))
         }
     }
 }
@@ -1189,6 +1209,7 @@ mod tests {
         let resp = MiniDocResponse {
             buffer: buf,
             status: StatusCode::OK,
+            identifier: SmolStr::new_static("bad-example.com"),
         };
         let doc = resp.parse().expect("parse mini-doc");
         assert_eq!(doc.did.as_str(), "did:plc:hdhoaan3xa3jiuq4fg4mefid");
@@ -1211,6 +1232,7 @@ mod tests {
         let resp = MiniDocResponse {
             buffer: buf,
             status: StatusCode::BAD_REQUEST,
+            identifier: SmolStr::new_static("bad-example.com"),
         };
         match resp.parse() {
             Err(e) => match e.kind() {
