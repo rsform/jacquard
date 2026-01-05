@@ -27,6 +27,7 @@ prettyplease = { workspace = true, optional = true }
 proc-macro2 = { workspace = true, optional = true }
 quote = { workspace = true, optional = true }
 serde.workspace = true
+serde_path_to_error = "0.1"
 serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 serde_repr.workspace = true

@@ -3,6 +3,15 @@ use std::io;
 use std::path::PathBuf;
 use thiserror::Error;
 
+fn format_parse_error(path: &PathBuf, json_path: Option<&str>, message: &str) -> String {
+    match json_path {
+        Some(jp) if !jp.is_empty() => {
+            format!("failed to parse lexicon {}: at {}: {}", path.display(), jp, message)
+        }
+        _ => format!("failed to parse lexicon {}: {}", path.display(), message),
+    }
+}
+
 /// Errors that can occur during lexicon code generation
 #[derive(Debug, Error, Diagnostic)]
 #[non_exhaustive]
@@ -12,16 +21,18 @@ pub enum CodegenError {
     Io(#[from] io::Error),
 
     /// Failed to parse lexicon JSON
-    #[error("Failed to parse lexicon JSON in {}", path.display())]
+    #[error("{}", format_parse_error(path, json_path.as_deref(), message))]
     #[diagnostic(
         code(lexicon::parse_error),
         help("Check that the lexicon file is valid JSON and follows the lexicon schema")
     )]
     ParseError {
-        #[source]
-        source: serde_json::Error,
         /// Path to the file that failed to parse
         path: PathBuf,
+        /// JSON path where the error occurred (from serde_path_to_error)
+        json_path: Option<String>,
+        /// The underlying error message
+        message: String,
         /// Source text that failed to parse
         #[source_code]
         src: Option<String>,
@@ -90,35 +101,29 @@ pub enum CodegenError {
 
 impl CodegenError {
     /// Create a parse error with context
-    pub fn parse_error(source: serde_json::Error, path: impl Into<PathBuf>) -> Self {
+    pub fn parse_error(message: impl Into<String>, path: impl Into<PathBuf>) -> Self {
         Self::ParseError {
-            source,
             path: path.into(),
+            json_path: None,
+            message: message.into(),
             src: None,
             span: None,
         }
     }
 
-    /// Create a parse error with source text
-    pub fn parse_error_with_source(
-        source: serde_json::Error,
+    /// Create a parse error with source text and JSON path
+    pub fn parse_error_with_context(
+        message: impl Into<String>,
         path: impl Into<PathBuf>,
+        json_path: Option<String>,
         src: String,
     ) -> Self {
-        // Try to extract error location from serde_json error
-        let span = if let Some(line) = source.line().checked_sub(1) {
-            let col = source.column().saturating_sub(1);
-            // Approximate byte offset (not perfect but good enough for display)
-            Some((line * 80 + col, 1).into())
-        } else {
-            None
-        };
-
         Self::ParseError {
-            source,
             path: path.into(),
+            json_path,
+            message: message.into(),
             src: Some(src),
-            span,
+            span: None,
         }
     }
 
