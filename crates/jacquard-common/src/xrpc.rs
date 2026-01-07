@@ -48,6 +48,7 @@ use http::{
 };
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
+
 #[cfg(feature = "websocket")]
 pub use subscription::{
     BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
@@ -485,15 +486,16 @@ where
     Resp: XrpcResp,
 {
     let status = http_response.status();
+
     // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
     // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
     #[allow(deprecated)]
     if status.as_u16() == 401 {
         if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
-            return Err(crate::error::ClientError::auth(
-                crate::error::AuthError::Other(hv.clone()),
-            )
-            .for_nsid(Resp::NSID));
+            return Err(
+                crate::error::ClientError::auth(crate::error::AuthError::Other(hv.clone()))
+                    .for_nsid(Resp::NSID),
+            );
         }
     }
     let buffer = Bytes::from(http_response.into_body());
@@ -670,8 +672,17 @@ where
             }
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
-            match serde_json::from_slice::<_>(&self.buffer) {
-                Ok(error) => Err(XrpcError::Xrpc(error)),
+            match serde_json::from_slice::<R::Err<'_>>(&self.buffer) {
+                Ok(error) => {
+                    use alloc::string::ToString;
+                    if error.to_string().contains("InvalidToken") {
+                        Err(XrpcError::Auth(AuthError::InvalidToken))
+                    } else if error.to_string().contains("ExpiredToken") {
+                        Err(XrpcError::Auth(AuthError::TokenExpired))
+                    } else {
+                        Err(XrpcError::Xrpc(error))
+                    }
+                }
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
@@ -730,8 +741,17 @@ where
             }
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
-            match serde_json::from_slice::<_>(&self.buffer) {
-                Ok(error) => Err(XrpcError::Xrpc(error)),
+            match serde_json::from_slice::<R::Err<'_>>(&self.buffer) {
+                Ok(error) => {
+                    use alloc::string::ToString;
+                    if error.to_string().contains("InvalidToken") {
+                        Err(XrpcError::Auth(AuthError::InvalidToken))
+                    } else if error.to_string().contains("ExpiredToken") {
+                        Err(XrpcError::Auth(AuthError::TokenExpired))
+                    } else {
+                        Err(XrpcError::Xrpc(error))
+                    }
+                }
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
@@ -790,8 +810,17 @@ where
             }
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
-            match serde_json::from_slice::<_>(&self.buffer) {
-                Ok(error) => Err(XrpcError::Xrpc(error)),
+            match serde_json::from_slice::<R::Err<'_>>(&self.buffer) {
+                Ok(error) => {
+                    use alloc::string::ToString;
+                    if error.to_string().contains("InvalidToken") {
+                        Err(XrpcError::Auth(AuthError::InvalidToken))
+                    } else if error.to_string().contains("ExpiredToken") {
+                        Err(XrpcError::Auth(AuthError::TokenExpired))
+                    } else {
+                        Err(XrpcError::Xrpc(error))
+                    }
+                }
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
@@ -876,7 +905,16 @@ where
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
             let error = match parse_error::<R>(&self.buffer) {
-                Ok(error) => XrpcError::Xrpc(error),
+                Ok(error) => {
+                    use alloc::string::ToString;
+                    if error.to_string().contains("InvalidToken") {
+                        XrpcError::Auth(AuthError::InvalidToken)
+                    } else if error.to_string().contains("ExpiredToken") {
+                        XrpcError::Auth(AuthError::TokenExpired)
+                    } else {
+                        XrpcError::Xrpc(error)
+                    }
+                }
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
