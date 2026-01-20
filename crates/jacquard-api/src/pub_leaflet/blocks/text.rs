@@ -23,6 +23,9 @@ pub struct Text<'a> {
     pub facets: std::option::Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub text_size: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 fn lexicon_doc_pub_leaflet_blocks_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -66,6 +69,21 @@ fn lexicon_doc_pub_leaflet_blocks_text() -> ::jacquard_lexicon::lexicon::Lexicon
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "plaintext",
                             ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("textSize"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,

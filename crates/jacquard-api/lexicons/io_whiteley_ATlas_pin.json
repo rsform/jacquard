@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "io.whiteley.ATlas.pin",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user's geographical pin on the atlas",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "longitude",
+          "latitude",
+          "description",
+          "placedAt"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "did": {
+            "type": "string",
+            "format": "did"
+          },
+          "latitude": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "longitude": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "placedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

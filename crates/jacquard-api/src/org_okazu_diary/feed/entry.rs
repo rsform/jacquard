@@ -24,7 +24,7 @@ pub struct Entry<'a> {
     /// If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub had_hiatus: std::option::Option<bool>,
-    /// General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the subjects, tags, and the note are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so. To put warnings on the subject even for explicit users of the Okazu-Diary.org application, put self-labels in the `labels` property value of individual `subject` values as well.
+    /// Self-label values for this post. Effectively content warnings for the note and tags.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
@@ -32,15 +32,17 @@ pub struct Entry<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Materials used for gratification. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain.
+    /// References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<Vec<crate::org_okazu_diary::feed::Subject<'a>>>,
-    /// User-specified tags for the entry.
+    pub subjects: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    /// User-specified tags for the activity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>,
-    /// Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.feed.collectionItem` record whose `subjects` this collection item is derived from.
+    pub tags: std::option::Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
+    /// Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` record from this entry is derived.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
@@ -90,8 +92,8 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         ::core::option::Option<bool>,
         ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::org_okazu_diary::feed::Subject<'a>>>,
-        ::core::option::Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>,
+        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<EntryVisibility<'a>>,
     ),
@@ -187,7 +189,9 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(
         mut self,
-        value: impl Into<Option<Vec<crate::org_okazu_diary::feed::Subject<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -195,7 +199,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subjects` field to an Option value (optional)
     pub fn maybe_subjects(
         mut self,
-        value: Option<Vec<crate::org_okazu_diary::feed::Subject<'a>>>,
+        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
@@ -206,7 +210,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(
         mut self,
-        value: impl Into<Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>>,
+        value: impl Into<Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -214,7 +218,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(
         mut self,
-        value: Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>,
+        value: Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
@@ -581,7 +585,7 @@ fn lexicon_doc_org_okazu_diary_feed_entry() -> ::jacquard_lexicon::lexicon::Lexi
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the subjects, tags, and the note are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so. To put warnings on the subject even for explicit users of the Okazu-Diary.org application, put self-labels in the `labels` property value of individual `subject` values as well.",
+                                            "Self-label values for this post. Effectively content warnings for the note and tags.",
                                         ),
                                     ),
                                     refs: vec![
@@ -616,13 +620,13 @@ fn lexicon_doc_org_okazu_diary_feed_entry() -> ::jacquard_lexicon::lexicon::Lexi
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "Materials used for gratification. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain.",
+                                            "References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.",
                                         ),
                                     ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
                                         r#ref: ::jacquard_common::CowStr::new_static(
-                                            "org.okazu-diary.feed.defs#subject",
+                                            "com.atproto.repo.strongRef",
                                         ),
                                     }),
                                     min_length: None,
@@ -634,13 +638,13 @@ fn lexicon_doc_org_okazu_diary_feed_entry() -> ::jacquard_lexicon::lexicon::Lexi
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "User-specified tags for the entry.",
+                                            "User-specified tags for the activity.",
                                         ),
                                     ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
                                         r#ref: ::jacquard_common::CowStr::new_static(
-                                            "org.okazu-diary.feed.defs#tag",
+                                            "org.okazu-diary.material.defs#tag",
                                         ),
                                     }),
                                     min_length: None,

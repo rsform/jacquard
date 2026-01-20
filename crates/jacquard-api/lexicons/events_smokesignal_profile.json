@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "events.smokesignal.profile",
+  "defs": {
+    "forhire": {
+      "type": "token",
+      "description": "Indicates the identity is available for hire"
+    },
+    "hiring": {
+      "type": "token",
+      "description": "Indicates the identity is actively hiring"
+    },
+    "main": {
+      "type": "record",
+      "description": "A user profile for Smoke Signal",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed next to events. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 3000000
+          },
+          "banner": {
+            "type": "blob",
+            "description": "Larger horizontal image to display behind profile view.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 3000000
+          },
+          "description": {
+            "type": "string",
+            "description": "A free text description of the identity.",
+            "maxLength": 2000,
+            "maxGraphemes": 2000
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The display name of the identity.",
+            "maxLength": 200,
+            "maxGraphemes": 200
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, hashtags, etc) in the description.",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "profileHost": {
+            "type": "string",
+            "description": "The format used for profile links",
+            "maxLength": 60,
+            "maxGraphemes": 60,
+            "knownValues": [
+              "bsky.app",
+              "blacksky.community",
+              "aturi"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

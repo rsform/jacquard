@@ -13,6 +13,11 @@
             "type": "string",
             "format": "datetime"
           },
+          "description": {
+            "type": "string",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
           "displayName": {
             "type": "string",
             "maxLength": 640,

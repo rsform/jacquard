@@ -1080,67 +1080,67 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ClientVersion;
-        type Platform;
         type StartedAt;
         type Status;
+        type ClientVersion;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ClientVersion = Unset;
-        type Platform = Unset;
         type StartedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `client_version` field to Set
-    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
-    impl<S: State> State for SetClientVersion<S> {
-        type ClientVersion = Set<members::client_version>;
-        type Platform = S::Platform;
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type ClientVersion = S::ClientVersion;
-        type Platform = Set<members::platform>;
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
+        type ClientVersion = Unset;
+        type Platform = Unset;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type ClientVersion = S::ClientVersion;
-        type Platform = S::Platform;
         type StartedAt = Set<members::started_at>;
         type Status = S::Status;
+        type ClientVersion = S::ClientVersion;
+        type Platform = S::Platform;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type ClientVersion = S::ClientVersion;
-        type Platform = S::Platform;
         type StartedAt = S::StartedAt;
         type Status = Set<members::status>;
+        type ClientVersion = S::ClientVersion;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `client_version` field to Set
+    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
+    impl<S: State> State for SetClientVersion<S> {
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type ClientVersion = Set<members::client_version>;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type ClientVersion = S::ClientVersion;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `client_version` field
-        pub struct client_version(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `client_version` field
+        pub struct client_version(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
@@ -1533,10 +1533,10 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::ClientVersion: session_state::IsSet,
-    S::Platform: session_state::IsSet,
     S::StartedAt: session_state::IsSet,
     S::Status: session_state::IsSet,
+    S::ClientVersion: session_state::IsSet,
+    S::Platform: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {

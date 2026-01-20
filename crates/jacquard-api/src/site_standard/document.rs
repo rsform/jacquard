@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+/// A document record representing a published article, blog post, or other content. Documents can belong to a publication or exist independently.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -17,36 +18,45 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Document<'a> {
+    /// Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub bsky_post_ref: std::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
+    /// Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub content: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    /// Image to used for thumbnail or cover image. Less than 1MB is size.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cover_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    /// A brief description or excerpt from the document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// combine with the publication url or the document site to construct a full url to the document
+    /// Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Timestamp of the documents publish time.
     pub published_at: jacquard_common::types::string::Datetime,
-    /// URI to the site or publication this document belongs to (https or at-uri)
+    /// Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.
     #[serde(borrow)]
     pub site: jacquard_common::types::string::Uri<'a>,
+    /// Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Plaintext representation of the documents contents. Should not contain markdown or other formatting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub text_content: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Title of the document.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
+    /// Timestamp of the documents last edit.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
@@ -114,7 +124,7 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -181,7 +191,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::value::Data<'a>>>>,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -189,7 +199,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(
         mut self,
-        value: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+        value: Option<jacquard_common::types::value::Data<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -566,7 +576,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A document record representing a published article, blog post, or other content. Documents can belong to a publication or exist independently.",
+                        ),
+                    ),
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
@@ -594,15 +608,14 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                             );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
-                                        refs: vec![],
-                                        closed: Some(false),
-                                    }),
-                                    min_length: None,
-                                    max_length: None,
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.",
+                                        ),
+                                    ),
+                                    refs: vec![],
+                                    closed: Some(false),
                                 }),
                             );
                             map.insert(
@@ -620,7 +633,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A brief description or excerpt from the document.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -637,7 +654,7 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "combine with the publication url or the document site to construct a full url to the document",
+                                            "Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash.",
                                         ),
                                     ),
                                     format: None,
@@ -656,7 +673,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                                     "publishedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp of the documents publish time.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -675,7 +696,7 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "URI to the site or publication this document belongs to (https or at-uri)",
+                                            "Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.",
                                         ),
                                     ),
                                     format: Some(
@@ -694,7 +715,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -716,7 +741,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                                     "textContent",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Plaintext representation of the documents contents. Should not contain markdown or other formatting.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -731,7 +760,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Title of the document.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -748,7 +781,11 @@ fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconD
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp of the documents last edit.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),

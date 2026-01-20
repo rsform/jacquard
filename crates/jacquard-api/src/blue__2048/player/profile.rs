@@ -36,49 +36,49 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SyncStatus;
         type CreatedAt;
+        type SyncStatus;
         type SoloPlay;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SyncStatus = Unset;
         type CreatedAt = Unset;
+        type SyncStatus = Unset;
         type SoloPlay = Unset;
-    }
-    ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
-    impl<S: State> State for SetSyncStatus<S> {
-        type SyncStatus = Set<members::sync_status>;
-        type CreatedAt = S::CreatedAt;
-        type SoloPlay = S::SoloPlay;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SyncStatus = S::SyncStatus;
         type CreatedAt = Set<members::created_at>;
+        type SyncStatus = S::SyncStatus;
+        type SoloPlay = S::SoloPlay;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = Set<members::sync_status>;
         type SoloPlay = S::SoloPlay;
     }
     ///State transition - sets the `solo_play` field to Set
     pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
     impl<S: State> State for SetSoloPlay<S> {
-        type SyncStatus = S::SyncStatus;
         type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
         type SoloPlay = Set<members::solo_play>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sync_status` field
-        pub struct sync_status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
         ///Marker type for the `solo_play` field
         pub struct solo_play(());
     }
@@ -173,8 +173,8 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::SyncStatus: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
+    S::SyncStatus: profile_state::IsSet,
     S::SoloPlay: profile_state::IsSet,
 {
     /// Build the final struct

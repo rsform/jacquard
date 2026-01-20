@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.stats",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Repository statistics stored in the hold's embedded PDS. Tracks pull/push counts per owner+repository combination. Record key is deterministic: base32(sha256(ownerDID + \"/\" + repository)[:16]).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "ownerDid",
+          "repository",
+          "pullCount",
+          "pushCount",
+          "updatedAt"
+        ],
+        "properties": {
+          "lastPull": {
+            "type": "string",
+            "description": "RFC3339 timestamp of last pull",
+            "format": "datetime"
+          },
+          "lastPush": {
+            "type": "string",
+            "description": "RFC3339 timestamp of last push",
+            "format": "datetime"
+          },
+          "ownerDid": {
+            "type": "string",
+            "description": "DID of the image owner (e.g., did:plc:xyz123)",
+            "format": "did"
+          },
+          "pullCount": {
+            "type": "integer",
+            "description": "Number of manifest downloads",
+            "minimum": 0
+          },
+          "pushCount": {
+            "type": "integer",
+            "description": "Number of manifest uploads",
+            "minimum": 0
+          },
+          "repository": {
+            "type": "string",
+            "description": "Repository name (e.g., myapp)",
+            "maxLength": 256
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when this record was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

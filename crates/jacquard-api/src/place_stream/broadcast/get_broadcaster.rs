@@ -28,6 +28,10 @@ pub struct GetBroadcaster;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBroadcasterOutput<'a> {
+    /// Array of DIDs authorized as admins
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub admins: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     /// DID of the Streamplace broadcaster to which this server belongs
     #[serde(borrow)]
     pub broadcaster: jacquard_common::types::string::Did<'a>,
@@ -37,29 +41,6 @@ pub struct GetBroadcasterOutput<'a> {
     pub server: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBroadcasterError<'a> {}
-impl core::fmt::Display for GetBroadcasterError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
 /// Response type for
 ///place.stream.broadcast.getBroadcaster
 pub struct GetBroadcasterResponse;
@@ -67,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBroadcasterResponse {
     const NSID: &'static str = "place.stream.broadcast.getBroadcaster";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = GetBroadcasterOutput<'de>;
-    type Err<'de> = GetBroadcasterError<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetBroadcaster {

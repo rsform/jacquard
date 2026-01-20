@@ -34,37 +34,37 @@ pub mod subscribe_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subscribe;
         type CreatedAt;
+        type Subscribe;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subscribe = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subscribe` field to Set
-    pub struct SetSubscribe<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubscribe<S> {}
-    impl<S: State> State for SetSubscribe<S> {
-        type Subscribe = Set<members::subscribe>;
-        type CreatedAt = S::CreatedAt;
+        type Subscribe = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subscribe = S::Subscribe;
         type CreatedAt = Set<members::created_at>;
+        type Subscribe = S::Subscribe;
+    }
+    ///State transition - sets the `subscribe` field to Set
+    pub struct SetSubscribe<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubscribe<S> {}
+    impl<S: State> State for SetSubscribe<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subscribe = Set<members::subscribe>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subscribe` field
-        pub struct subscribe(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subscribe` field
+        pub struct subscribe(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> SubscribeAcceptBuilder<'a, S>
 where
     S: subscribe_accept_state::State,
-    S::Subscribe: subscribe_accept_state::IsSet,
     S::CreatedAt: subscribe_accept_state::IsSet,
+    S::Subscribe: subscribe_accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscribeAccept<'a> {

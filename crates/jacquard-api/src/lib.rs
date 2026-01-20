@@ -13,8 +13,14 @@ pub mod app_bsky;
 #[cfg(feature = "app_dropanchor")]
 pub mod app_dropanchor;
 
+#[cfg(feature = "app_juttu")]
+pub mod app_juttu;
+
 #[cfg(feature = "app_ocho")]
 pub mod app_ocho;
+
+#[cfg(feature = "app_offprint")]
+pub mod app_offprint;
 
 #[cfg(feature = "app_rocksky")]
 pub mod app_rocksky;
@@ -34,6 +40,9 @@ pub mod blue__2048;
 #[cfg(feature = "blue_atplane")]
 pub mod blue_atplane;
 
+#[cfg(feature = "blue_atplay")]
+pub mod blue_atplay;
+
 #[cfg(feature = "blue_linkat")]
 pub mod blue_linkat;
 
@@ -43,6 +52,9 @@ pub mod blue_recipes;
 #[cfg(feature = "blue_rito")]
 pub mod blue_rito;
 
+#[cfg(feature = "blue_skytalk")]
+pub mod blue_skytalk;
+
 #[cfg(feature = "blue_zio")]
 pub mod blue_zio;
 pub mod builder_types;
@@ -50,8 +62,14 @@ pub mod builder_types;
 #[cfg(feature = "buzz_bookhive")]
 pub mod buzz_bookhive;
 
+#[cfg(feature = "cat_vt3e")]
+pub mod cat_vt3e;
+
 #[cfg(feature = "chat_bsky")]
 pub mod chat_bsky;
+
+#[cfg(feature = "city_yoyle")]
+pub mod city_yoyle;
 
 #[cfg(feature = "club_stellz")]
 pub mod club_stellz;
@@ -97,6 +115,15 @@ pub mod dev_ocbwoy3;
 
 #[cfg(feature = "dev_regnault")]
 pub mod dev_regnault;
+
+#[cfg(feature = "dev_tsunagite")]
+pub mod dev_tsunagite;
+
+#[cfg(feature = "dev_vielle")]
+pub mod dev_vielle;
+
+#[cfg(feature = "events_smokesignal")]
+pub mod events_smokesignal;
 
 #[cfg(feature = "fm_teal")]
 pub mod fm_teal;
@@ -179,6 +206,9 @@ pub mod org_okazu_diary;
 #[cfg(feature = "org_robocracy")]
 pub mod org_robocracy;
 
+#[cfg(feature = "org_stormlightlabs")]
+pub mod org_stormlightlabs;
+
 #[cfg(feature = "org_user_intents")]
 pub mod org_user_intents;
 
@@ -212,6 +242,9 @@ pub mod social_flockfeeds;
 #[cfg(feature = "social_grain")]
 pub mod social_grain;
 
+#[cfg(feature = "social_pace")]
+pub mod social_pace;
+
 #[cfg(feature = "social_pmsky")]
 pub mod social_pmsky;
 
@@ -220,6 +253,9 @@ pub mod social_psky;
 
 #[cfg(feature = "social_sket")]
 pub mod social_sket;
+
+#[cfg(feature = "social_tophhie")]
+pub mod social_tophhie;
 
 #[cfg(feature = "tech_manos")]
 pub mod tech_manos;

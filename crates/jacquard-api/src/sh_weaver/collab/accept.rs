@@ -37,51 +37,51 @@ pub mod accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Resource;
         type CreatedAt;
         type Invite;
-        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Resource = Unset;
         type CreatedAt = Unset;
         type Invite = Unset;
-        type Resource = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Invite = S::Invite;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `invite` field to Set
-    pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInvite<S> {}
-    impl<S: State> State for SetInvite<S> {
-        type CreatedAt = S::CreatedAt;
-        type Invite = Set<members::invite>;
-        type Resource = S::Resource;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
+        type Resource = Set<members::resource>;
         type CreatedAt = S::CreatedAt;
         type Invite = S::Invite;
-        type Resource = Set<members::resource>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Resource = S::Resource;
+        type CreatedAt = Set<members::created_at>;
+        type Invite = S::Invite;
+    }
+    ///State transition - sets the `invite` field to Set
+    pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInvite<S> {}
+    impl<S: State> State for SetInvite<S> {
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+        type Invite = Set<members::invite>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `resource` field
+        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `invite` field
         pub struct invite(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
     }
 }
 
@@ -174,9 +174,9 @@ where
 impl<'a, S> AcceptBuilder<'a, S>
 where
     S: accept_state::State,
+    S::Resource: accept_state::IsSet,
     S::CreatedAt: accept_state::IsSet,
     S::Invite: accept_state::IsSet,
-    S::Resource: accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Accept<'a> {

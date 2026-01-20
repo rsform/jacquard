@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.requestResponse",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A post created in response to a request",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "request",
+          "post",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional message to the requester",
+            "maxLength": 500,
+            "maxGraphemes": 150
+          },
+          "post": {
+            "type": "ref",
+            "description": "Reference to the post created as response",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "request": {
+            "type": "ref",
+            "description": "Reference to the request",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

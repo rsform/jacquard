@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "city.yoyle.status",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Short status update",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

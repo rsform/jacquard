@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.multistream.target",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An external server for rebroadcasting a Streamplace stream",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "url",
+          "active",
+          "createdAt"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether this target is currently active."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When this target was created.",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "A user-friendly name for this target.",
+            "maxLength": 100
+          },
+          "url": {
+            "type": "string",
+            "description": "The rtmp:// or rtmps:// url of the target server.",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

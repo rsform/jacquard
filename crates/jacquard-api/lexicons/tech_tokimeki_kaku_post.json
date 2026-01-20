@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A drawing post created with the drawing tool",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "image",
+          "aspectRatio",
+          "createdAt"
+        ],
+        "properties": {
+          "aspectRatio": {
+            "type": "ref",
+            "description": "Aspect ratio of the image",
+            "ref": "tech.tokimeki.kaku.defs#aspectRatio"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the post was created",
+            "format": "datetime"
+          },
+          "image": {
+            "type": "blob",
+            "description": "The drawn image (max 1MB)",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "linkedPost": {
+            "type": "ref",
+            "description": "Bluesky post created for this drawing",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Reference to a related Bluesky post",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorization",
+            "items": {
+              "type": "string",
+              "maxLength": 64,
+              "maxGraphemes": 32
+            },
+            "maxLength": 8
+          },
+          "text": {
+            "type": "string",
+            "description": "Optional description or title",
+            "maxLength": 1000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

@@ -114,105 +114,105 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
         type Album;
-        type Artist;
         type AlbumArtist;
         type Duration;
+        type Artist;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
         type Album = Unset;
-        type Artist = Unset;
         type AlbumArtist = Unset;
         type Duration = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Album = S::Album;
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
+        type Artist = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type Album = S::Album;
-        type Artist = S::Artist;
         type AlbumArtist = S::AlbumArtist;
         type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `album` field to Set
     pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbum<S> {}
     impl<S: State> State for SetAlbum<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type Album = Set<members::album>;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
         type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Album = S::Album;
-        type Artist = Set<members::artist>;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
     }
     ///State transition - sets the `album_artist` field to Set
     pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
     impl<S: State> State for SetAlbumArtist<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type Album = S::Album;
-        type Artist = S::Artist;
         type AlbumArtist = Set<members::album_artist>;
         type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type Album = S::Album;
-        type Artist = S::Artist;
         type AlbumArtist = S::AlbumArtist;
         type Duration = Set<members::duration>;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Title = S::Title;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type Artist = Set<members::artist>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `album` field
         pub struct album(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
         ///Marker type for the `album_artist` field
         pub struct album_artist(());
         ///Marker type for the `duration` field
         pub struct duration(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -693,12 +693,12 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
 impl<'a, S> ScrobbleBuilder<'a, S>
 where
     S: scrobble_state::State,
-    S::CreatedAt: scrobble_state::IsSet,
     S::Title: scrobble_state::IsSet,
     S::Album: scrobble_state::IsSet,
-    S::Artist: scrobble_state::IsSet,
     S::AlbumArtist: scrobble_state::IsSet,
     S::Duration: scrobble_state::IsSet,
+    S::Artist: scrobble_state::IsSet,
+    S::CreatedAt: scrobble_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Scrobble<'a> {

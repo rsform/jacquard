@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "dev.vielle.guestbook.book",
+  "description": "Book for guesbook signing. dev.vielle.guestbook.entry records will refer to this. The rkey should be nsid (reverse dns) for the domain this is a guestbook for",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "nsid",
+      "record": {
+        "type": "object",
+        "required": [
+          "site"
+        ],
+        "properties": {
+          "site": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

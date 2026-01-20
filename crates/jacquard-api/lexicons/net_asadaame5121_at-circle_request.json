@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "net.asadaame5121.at-circle.request",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A request to join a webring",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "ring",
+          "siteUrl",
+          "siteTitle",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "message": {
+            "type": "string",
+            "description": "Introduction message",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "ring": {
+            "type": "ref",
+            "ref": "net.asadaame5121.at-circle.defs#ringRef"
+          },
+          "rssUrl": {
+            "type": "string",
+            "description": "RSS feed URL of the site",
+            "format": "uri"
+          },
+          "siteTitle": {
+            "type": "string",
+            "description": "Title of the site",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "siteUrl": {
+            "type": "string",
+            "description": "URL of the site to register",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

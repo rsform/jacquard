@@ -3,4 +3,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-pub mod automation;
+pub mod calendar;
+pub mod lfg;
+pub mod profile;

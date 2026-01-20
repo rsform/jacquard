@@ -46,49 +46,49 @@ pub mod blob_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MediaType;
         type Size;
+        type MediaType;
         type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MediaType = Unset;
         type Size = Unset;
+        type MediaType = Unset;
         type Digest = Unset;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type MediaType = Set<members::media_type>;
-        type Size = S::Size;
-        type Digest = S::Digest;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type MediaType = S::MediaType;
         type Size = Set<members::size>;
+        type MediaType = S::MediaType;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Size = S::Size;
+        type MediaType = Set<members::media_type>;
         type Digest = S::Digest;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type MediaType = S::MediaType;
         type Size = S::Size;
+        type MediaType = S::MediaType;
         type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
         ///Marker type for the `digest` field
         pub struct digest(());
     }
@@ -223,8 +223,8 @@ impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
 impl<'a, S> BlobReferenceBuilder<'a, S>
 where
     S: blob_reference_state::State,
-    S::MediaType: blob_reference_state::IsSet,
     S::Size: blob_reference_state::IsSet,
+    S::MediaType: blob_reference_state::IsSet,
     S::Digest: blob_reference_state::IsSet,
 {
     /// Build the final struct
@@ -951,84 +951,84 @@ pub mod manifest_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type MediaType;
-        type SchemaVersion;
+        type Repository;
         type CreatedAt;
         type Digest;
-        type Repository;
+        type SchemaVersion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type MediaType = Unset;
-        type SchemaVersion = Unset;
+        type Repository = Unset;
         type CreatedAt = Unset;
         type Digest = Unset;
-        type Repository = Unset;
+        type SchemaVersion = Unset;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
         type MediaType = Set<members::media_type>;
-        type SchemaVersion = S::SchemaVersion;
+        type Repository = S::Repository;
         type CreatedAt = S::CreatedAt;
         type Digest = S::Digest;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `schema_version` field to Set
-    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
-    impl<S: State> State for SetSchemaVersion<S> {
-        type MediaType = S::MediaType;
-        type SchemaVersion = Set<members::schema_version>;
-        type CreatedAt = S::CreatedAt;
-        type Digest = S::Digest;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type MediaType = S::MediaType;
         type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = Set<members::created_at>;
-        type Digest = S::Digest;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type MediaType = S::MediaType;
-        type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = S::CreatedAt;
-        type Digest = Set<members::digest>;
-        type Repository = S::Repository;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
         type MediaType = S::MediaType;
-        type SchemaVersion = S::SchemaVersion;
+        type Repository = Set<members::repository>;
         type CreatedAt = S::CreatedAt;
         type Digest = S::Digest;
-        type Repository = Set<members::repository>;
+        type SchemaVersion = S::SchemaVersion;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+        type CreatedAt = Set<members::created_at>;
+        type Digest = S::Digest;
+        type SchemaVersion = S::SchemaVersion;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+        type CreatedAt = S::CreatedAt;
+        type Digest = Set<members::digest>;
+        type SchemaVersion = S::SchemaVersion;
+    }
+    ///State transition - sets the `schema_version` field to Set
+    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
+    impl<S: State> State for SetSchemaVersion<S> {
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+        type CreatedAt = S::CreatedAt;
+        type Digest = S::Digest;
+        type SchemaVersion = Set<members::schema_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `media_type` field
         pub struct media_type(());
-        ///Marker type for the `schema_version` field
-        pub struct schema_version(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
+        ///Marker type for the `schema_version` field
+        pub struct schema_version(());
     }
 }
 
@@ -1336,10 +1336,10 @@ impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
     S::MediaType: manifest_state::IsSet,
-    S::SchemaVersion: manifest_state::IsSet,
+    S::Repository: manifest_state::IsSet,
     S::CreatedAt: manifest_state::IsSet,
     S::Digest: manifest_state::IsSet,
-    S::Repository: manifest_state::IsSet,
+    S::SchemaVersion: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -1676,51 +1676,51 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MediaType;
         type Size;
         type Digest;
-        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MediaType = Unset;
         type Size = Unset;
         type Digest = Unset;
-        type MediaType = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Size = S::Size;
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
+        type MediaType = Set<members::media_type>;
         type Size = S::Size;
         type Digest = S::Digest;
-        type MediaType = Set<members::media_type>;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type MediaType = S::MediaType;
+        type Size = Set<members::size>;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type Size = S::Size;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
     }
 }
 
@@ -1853,9 +1853,9 @@ where
 impl<'a, S> ManifestReferenceBuilder<'a, S>
 where
     S: manifest_reference_state::State,
+    S::MediaType: manifest_reference_state::IsSet,
     S::Size: manifest_reference_state::IsSet,
     S::Digest: manifest_reference_state::IsSet,
-    S::MediaType: manifest_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestReference<'a> {

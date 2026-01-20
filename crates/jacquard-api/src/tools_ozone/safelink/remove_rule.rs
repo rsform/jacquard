@@ -42,37 +42,37 @@ pub mod remove_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pattern;
         type Url;
+        type Pattern;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pattern = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPattern<S> {}
-    impl<S: State> State for SetPattern<S> {
-        type Pattern = Set<members::pattern>;
-        type Url = S::Url;
+        type Pattern = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Pattern = S::Pattern;
         type Url = Set<members::url>;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPattern<S> {}
+    impl<S: State> State for SetPattern<S> {
+        type Url = S::Url;
+        type Pattern = Set<members::pattern>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pattern` field
-        pub struct pattern(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `pattern` field
+        pub struct pattern(());
     }
 }
 
@@ -182,8 +182,8 @@ where
 impl<'a, S> RemoveRuleBuilder<'a, S>
 where
     S: remove_rule_state::State,
-    S::Pattern: remove_rule_state::IsSet,
     S::Url: remove_rule_state::IsSet,
+    S::Pattern: remove_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveRule<'a> {

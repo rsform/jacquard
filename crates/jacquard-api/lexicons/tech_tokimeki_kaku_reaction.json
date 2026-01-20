@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.reaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reaction to a post",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "type",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Reference to the post being reacted to",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of reaction",
+            "knownValues": [
+              "suki",
+              "tasukaru",
+              "sugoi",
+              "kawaii",
+              "kami"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

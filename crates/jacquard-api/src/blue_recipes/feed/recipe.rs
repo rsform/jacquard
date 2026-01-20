@@ -362,49 +362,49 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ingredients;
         type Title;
+        type Ingredients;
         type Steps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ingredients = Unset;
         type Title = Unset;
+        type Ingredients = Unset;
         type Steps = Unset;
-    }
-    ///State transition - sets the `ingredients` field to Set
-    pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIngredients<S> {}
-    impl<S: State> State for SetIngredients<S> {
-        type Ingredients = Set<members::ingredients>;
-        type Title = S::Title;
-        type Steps = S::Steps;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Ingredients = S::Ingredients;
         type Title = Set<members::title>;
+        type Ingredients = S::Ingredients;
+        type Steps = S::Steps;
+    }
+    ///State transition - sets the `ingredients` field to Set
+    pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIngredients<S> {}
+    impl<S: State> State for SetIngredients<S> {
+        type Title = S::Title;
+        type Ingredients = Set<members::ingredients>;
         type Steps = S::Steps;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSteps<S> {}
     impl<S: State> State for SetSteps<S> {
-        type Ingredients = S::Ingredients;
         type Title = S::Title;
+        type Ingredients = S::Ingredients;
         type Steps = Set<members::steps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ingredients` field
-        pub struct ingredients(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `ingredients` field
+        pub struct ingredients(());
         ///Marker type for the `steps` field
         pub struct steps(());
     }
@@ -587,8 +587,8 @@ where
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
-    S::Ingredients: recipe_state::IsSet,
     S::Title: recipe_state::IsSet,
+    S::Ingredients: recipe_state::IsSet,
     S::Steps: recipe_state::IsSet,
 {
     /// Build the final struct

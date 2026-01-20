@@ -759,37 +759,37 @@ pub mod cursor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Container;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Container = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Container = S::Container;
+        type Id = Unset;
     }
     ///State transition - sets the `container` field to Set
     pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContainer<S> {}
     impl<S: State> State for SetContainer<S> {
-        type Id = S::Id;
         type Container = Set<members::container>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Container = S::Container;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `container` field
         pub struct container(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -882,8 +882,8 @@ impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
 impl<'a, S> CursorBuilder<'a, S>
 where
     S: cursor_state::State,
-    S::Id: cursor_state::IsSet,
     S::Container: cursor_state::IsSet,
+    S::Id: cursor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {

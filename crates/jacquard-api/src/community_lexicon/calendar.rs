@@ -4,4 +4,6 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod event;
+pub mod get_event;
 pub mod rsvp;
+pub mod search_events;

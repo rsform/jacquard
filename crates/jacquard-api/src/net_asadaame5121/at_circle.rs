@@ -8,6 +8,7 @@
 pub mod banner;
 pub mod block;
 pub mod member;
+pub mod request;
 pub mod ring;
 
 #[jacquard_derive::lexicon]

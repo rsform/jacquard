@@ -516,10 +516,10 @@ pub mod hydrated_oekaki_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Nsfw;
         type Author;
         type At;
+        type Cid;
+        type Nsfw;
         type Image;
         type CreationTime;
     }
@@ -527,43 +527,21 @@ pub mod hydrated_oekaki_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Nsfw = Unset;
         type Author = Unset;
         type At = Unset;
+        type Cid = Unset;
+        type Nsfw = Unset;
         type Image = Unset;
         type CreationTime = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Nsfw = S::Nsfw;
-        type Author = S::Author;
-        type At = S::At;
-        type Image = S::Image;
-        type CreationTime = S::CreationTime;
-    }
-    ///State transition - sets the `nsfw` field to Set
-    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNsfw<S> {}
-    impl<S: State> State for SetNsfw<S> {
-        type Cid = S::Cid;
-        type Nsfw = Set<members::nsfw>;
-        type Author = S::Author;
-        type At = S::At;
-        type Image = S::Image;
-        type CreationTime = S::CreationTime;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type Nsfw = S::Nsfw;
         type Author = Set<members::author>;
         type At = S::At;
+        type Cid = S::Cid;
+        type Nsfw = S::Nsfw;
         type Image = S::Image;
         type CreationTime = S::CreationTime;
     }
@@ -571,10 +549,32 @@ pub mod hydrated_oekaki_state {
     pub struct SetAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAt<S> {}
     impl<S: State> State for SetAt<S> {
-        type Cid = S::Cid;
-        type Nsfw = S::Nsfw;
         type Author = S::Author;
         type At = Set<members::at>;
+        type Cid = S::Cid;
+        type Nsfw = S::Nsfw;
+        type Image = S::Image;
+        type CreationTime = S::CreationTime;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type At = S::At;
+        type Cid = Set<members::cid>;
+        type Nsfw = S::Nsfw;
+        type Image = S::Image;
+        type CreationTime = S::CreationTime;
+    }
+    ///State transition - sets the `nsfw` field to Set
+    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNsfw<S> {}
+    impl<S: State> State for SetNsfw<S> {
+        type Author = S::Author;
+        type At = S::At;
+        type Cid = S::Cid;
+        type Nsfw = Set<members::nsfw>;
         type Image = S::Image;
         type CreationTime = S::CreationTime;
     }
@@ -582,10 +582,10 @@ pub mod hydrated_oekaki_state {
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Cid = S::Cid;
-        type Nsfw = S::Nsfw;
         type Author = S::Author;
         type At = S::At;
+        type Cid = S::Cid;
+        type Nsfw = S::Nsfw;
         type Image = Set<members::image>;
         type CreationTime = S::CreationTime;
     }
@@ -593,24 +593,24 @@ pub mod hydrated_oekaki_state {
     pub struct SetCreationTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreationTime<S> {}
     impl<S: State> State for SetCreationTime<S> {
-        type Cid = S::Cid;
-        type Nsfw = S::Nsfw;
         type Author = S::Author;
         type At = S::At;
+        type Cid = S::Cid;
+        type Nsfw = S::Nsfw;
         type Image = S::Image;
         type CreationTime = Set<members::creation_time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `nsfw` field
-        pub struct nsfw(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `at` field
         pub struct at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `nsfw` field
+        pub struct nsfw(());
         ///Marker type for the `image` field
         pub struct image(());
         ///Marker type for the `creation_time` field
@@ -801,10 +801,10 @@ impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
 impl<'a, S> HydratedOekakiBuilder<'a, S>
 where
     S: hydrated_oekaki_state::State,
-    S::Cid: hydrated_oekaki_state::IsSet,
-    S::Nsfw: hydrated_oekaki_state::IsSet,
     S::Author: hydrated_oekaki_state::IsSet,
     S::At: hydrated_oekaki_state::IsSet,
+    S::Cid: hydrated_oekaki_state::IsSet,
+    S::Nsfw: hydrated_oekaki_state::IsSet,
     S::Image: hydrated_oekaki_state::IsSet,
     S::CreationTime: hydrated_oekaki_state::IsSet,
 {

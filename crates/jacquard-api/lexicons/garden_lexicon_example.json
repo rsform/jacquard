@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.example",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An example value for a lexicon schema",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "lexicon",
+          "value",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The user-supplied date and time the example was created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the example."
+          },
+          "lexicon": {
+            "type": "string",
+            "description": "The NSID that the example is of.",
+            "format": "nsid"
+          },
+          "value": {
+            "type": "unknown",
+            "description": "The example itself."
+          }
+        }
+      }
+    }
+  }
+}

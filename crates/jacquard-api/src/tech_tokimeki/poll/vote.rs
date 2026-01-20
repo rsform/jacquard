@@ -36,51 +36,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type OptionIndex;
         type CreatedAt;
         type Poll;
-        type OptionIndex;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type OptionIndex = Unset;
         type CreatedAt = Unset;
         type Poll = Unset;
-        type OptionIndex = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Poll = S::Poll;
-        type OptionIndex = S::OptionIndex;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type CreatedAt = S::CreatedAt;
-        type Poll = Set<members::poll>;
-        type OptionIndex = S::OptionIndex;
     }
     ///State transition - sets the `option_index` field to Set
     pub struct SetOptionIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptionIndex<S> {}
     impl<S: State> State for SetOptionIndex<S> {
+        type OptionIndex = Set<members::option_index>;
         type CreatedAt = S::CreatedAt;
         type Poll = S::Poll;
-        type OptionIndex = Set<members::option_index>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type OptionIndex = S::OptionIndex;
+        type CreatedAt = Set<members::created_at>;
+        type Poll = S::Poll;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type OptionIndex = S::OptionIndex;
+        type CreatedAt = S::CreatedAt;
+        type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `option_index` field
+        pub struct option_index(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `poll` field
         pub struct poll(());
-        ///Marker type for the `option_index` field
-        pub struct option_index(());
     }
 }
 
@@ -173,9 +173,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
+    S::OptionIndex: vote_state::IsSet,
     S::CreatedAt: vote_state::IsSet,
     S::Poll: vote_state::IsSet,
-    S::OptionIndex: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {

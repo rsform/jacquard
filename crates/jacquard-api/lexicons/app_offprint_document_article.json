@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.document.article",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "document"
+        ],
+        "properties": {
+          "document": {
+            "type": "string",
+            "description": "Required AT-URI to a `site.standard.document` compatible record. Used to display articles with-in a publication.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

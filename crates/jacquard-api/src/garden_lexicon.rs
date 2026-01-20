@@ -3,4 +3,11 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod conquering_wolfhound;
+pub mod example;
+pub mod joyous_grackle;
+pub mod lawyerlike_deangelo;
 pub mod ngerakines;
+pub mod service;
+pub mod stunning_leafcutter;
+pub mod unconquered_modesto;

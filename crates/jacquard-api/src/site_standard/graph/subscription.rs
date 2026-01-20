@@ -18,6 +18,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Subscription<'a> {
+    /// AT-URI reference to the publication record being subscribed to (ex: at://did:plc:abc123/site.standard.publication/xyz789).
     #[serde(borrow)]
     pub publication: jacquard_common::types::string::AtUri<'a>,
 }
@@ -240,7 +241,11 @@ fn lexicon_doc_site_standard_graph_subscription() -> ::jacquard_lexicon::lexicon
                                     "publication",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "AT-URI reference to the publication record being subscribed to (ex: at://did:plc:abc123/site.standard.publication/xyz789).",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),

@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "cat.vt3e.gallery.group",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "defines a group of images in the gallery",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    }
+  }
+}

@@ -731,6 +731,10 @@
         "record"
       ],
       "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
         "embed": {
           "type": "union",
           "description": "An optional embed associated with the status.",
@@ -747,6 +751,10 @@
           "type": "boolean",
           "description": "True if the status is not expired, false if it is expired. Only present if expiration was set."
         },
+        "isDisabled": {
+          "type": "boolean",
+          "description": "True if the user's go-live access has been disabled by a moderator, false otherwise."
+        },
         "record": {
           "type": "unknown"
         },
@@ -756,6 +764,10 @@
           "knownValues": [
             "app.bsky.actor.status#live"
           ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
         }
       }
     },

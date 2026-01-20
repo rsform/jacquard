@@ -1,0 +1,84 @@
+{
+  "lexicon": 1,
+  "id": "org.stormlightlabs.malfestio.deck",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A collection of flashcards and sources.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "createdAt"
+        ],
+        "properties": {
+          "cardRefs": {
+            "type": "array",
+            "description": "Ordered list of references to cards in this deck.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the deck context.",
+            "maxLength": 3000
+          },
+          "language": {
+            "type": "string",
+            "description": "Language code for the deck content (e.g., 'en', 'es', 'fr').",
+            "maxLength": 20
+          },
+          "license": {
+            "type": "string",
+            "description": "License for the deck content.",
+            "maxLength": 500
+          },
+          "sourceRefs": {
+            "type": "array",
+            "description": "References to source materials (articles, lectures) used in this deck.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "maxLength": 64
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the deck.",
+            "maxLength": 300
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of last update.",
+            "format": "datetime"
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Visibility setting for the deck.",
+            "default": "public",
+            "maxLength": 100,
+            "knownValues": [
+              "private",
+              "unlisted",
+              "public"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

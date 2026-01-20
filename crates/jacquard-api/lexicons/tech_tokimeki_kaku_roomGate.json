@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.roomGate",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Gate settings for a ROOM post (like threadgate)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "room",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the gate was created",
+            "format": "datetime"
+          },
+          "isClosed": {
+            "type": "boolean",
+            "description": "Whether the room is closed for new replies",
+            "default": false
+          },
+          "room": {
+            "type": "ref",
+            "description": "Reference to the ROOM post",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

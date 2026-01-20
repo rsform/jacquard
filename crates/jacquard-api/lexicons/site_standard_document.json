@@ -4,6 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
+      "description": "A document record representing a published article, blog post, or other content. Documents can belong to a publication or exist independently.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -15,18 +16,18 @@
         "properties": {
           "bskyPostRef": {
             "type": "ref",
+            "description": "Strong reference to a Bluesky post. Useful to keep track of comments off-platform.",
             "ref": "com.atproto.repo.strongRef"
           },
           "content": {
-            "type": "array",
-            "items": {
-              "type": "union",
-              "refs": [],
-              "closed": false
-            }
+            "type": "union",
+            "description": "Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.",
+            "refs": [],
+            "closed": false
           },
           "coverImage": {
             "type": "blob",
+            "description": "Image to used for thumbnail or cover image. Less than 1MB is size.",
             "accept": [
               "image/*"
             ],
@@ -34,24 +35,27 @@
           },
           "description": {
             "type": "string",
+            "description": "A brief description or excerpt from the document.",
             "maxLength": 3000,
             "maxGraphemes": 300
           },
           "path": {
             "type": "string",
-            "description": "combine with the publication url or the document site to construct a full url to the document"
+            "description": "Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash."
           },
           "publishedAt": {
             "type": "string",
+            "description": "Timestamp of the documents publish time.",
             "format": "datetime"
           },
           "site": {
             "type": "string",
-            "description": "URI to the site or publication this document belongs to (https or at-uri)",
+            "description": "Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.",
             "format": "uri"
           },
           "tags": {
             "type": "array",
+            "description": "Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.",
             "items": {
               "type": "string",
               "maxLength": 100,
@@ -59,15 +63,18 @@
             }
           },
           "textContent": {
-            "type": "string"
+            "type": "string",
+            "description": "Plaintext representation of the documents contents. Should not contain markdown or other formatting."
           },
           "title": {
             "type": "string",
+            "description": "Title of the document.",
             "maxLength": 1280,
             "maxGraphemes": 128
           },
           "updatedAt": {
             "type": "string",
+            "description": "Timestamp of the documents last edit.",
             "format": "datetime"
           }
         }

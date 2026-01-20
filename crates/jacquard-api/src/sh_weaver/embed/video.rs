@@ -940,37 +940,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Playlist;
         type Cid;
+        type Playlist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Playlist = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `playlist` field to Set
-    pub struct SetPlaylist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlaylist<S> {}
-    impl<S: State> State for SetPlaylist<S> {
-        type Playlist = Set<members::playlist>;
-        type Cid = S::Cid;
+        type Playlist = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Playlist = S::Playlist;
         type Cid = Set<members::cid>;
+        type Playlist = S::Playlist;
+    }
+    ///State transition - sets the `playlist` field to Set
+    pub struct SetPlaylist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaylist<S> {}
+    impl<S: State> State for SetPlaylist<S> {
+        type Cid = S::Cid;
+        type Playlist = Set<members::playlist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `playlist` field
-        pub struct playlist(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `playlist` field
+        pub struct playlist(());
     }
 }
 
@@ -1108,8 +1108,8 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
-    S::Playlist: view_state::IsSet,
     S::Cid: view_state::IsSet,
+    S::Playlist: view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> View<'a> {

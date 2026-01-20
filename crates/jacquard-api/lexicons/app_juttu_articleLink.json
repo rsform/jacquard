@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "app.juttu.articleLink",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Maps a unique article ID to its Bluesky comments thread, preserving original creation time.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "articleId",
+          "commentsThread",
+          "createdAt"
+        ],
+        "properties": {
+          "articleId": {
+            "type": "string",
+            "description": "The site-specific unique identifier for the article (e.g., slug).",
+            "maxLength": 300
+          },
+          "articleUrl": {
+            "type": "string",
+            "description": "The URL of the article.",
+            "format": "uri"
+          },
+          "commentsThread": {
+            "type": "ref",
+            "description": "A strong reference to the root post (e.g., app.bsky.feed.post) of the comments thread.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The original publication timestamp of the article.",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

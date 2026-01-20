@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.branding.updateBlob",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update or create a branding asset blob. Requires admin authorization.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "key",
+            "data",
+            "mimeType"
+          ],
+          "properties": {
+            "broadcaster": {
+              "type": "string",
+              "description": "DID of the broadcaster. If not provided, uses the server's default broadcaster.",
+              "format": "did"
+            },
+            "data": {
+              "type": "string",
+              "description": "Base64-encoded blob data"
+            },
+            "height": {
+              "type": "integer",
+              "description": "Image height in pixels (optional, for images only)"
+            },
+            "key": {
+              "type": "string",
+              "description": "Branding asset key (mainLogo, favicon, siteTitle, etc.)"
+            },
+            "mimeType": {
+              "type": "string",
+              "description": "MIME type of the blob (e.g., image/png, text/plain)"
+            },
+            "width": {
+              "type": "integer",
+              "description": "Image width in pixels (optional, for images only)"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The authenticated DID is not authorized to modify branding",
+          "name": "Unauthorized"
+        },
+        {
+          "description": "The blob exceeds the maximum size limit",
+          "name": "BlobTooLarge"
+        }
+      ]
+    }
+  }
+}

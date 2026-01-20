@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "events.smokesignal.lfg",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A Looking For Group record that broadcasts interest in finding activity partners within a geographic area.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "location",
+          "tags",
+          "startsAt",
+          "endsAt",
+          "createdAt",
+          "active"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether the LFG is currently active and visible to others."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Record creation timestamp.",
+            "format": "datetime"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "When the LFG expires and is no longer visible.",
+            "format": "datetime"
+          },
+          "location": {
+            "type": "ref",
+            "description": "The geographic location for activity partner matching.",
+            "ref": "community.lexicon.location#geo"
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "When the LFG becomes active.",
+            "format": "datetime"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Interest tags for matching with events and other users.",
+            "items": {
+              "type": "string",
+              "maxLength": 64,
+              "maxGraphemes": 64
+            },
+            "minLength": 1,
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

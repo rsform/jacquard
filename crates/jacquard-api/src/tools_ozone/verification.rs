@@ -77,9 +77,9 @@ pub mod verification_view_state {
         type DisplayName;
         type CreatedAt;
         type Issuer;
-        type Handle;
-        type Subject;
         type Uri;
+        type Subject;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -88,9 +88,9 @@ pub mod verification_view_state {
         type DisplayName = Unset;
         type CreatedAt = Unset;
         type Issuer = Unset;
-        type Handle = Unset;
-        type Subject = Unset;
         type Uri = Unset;
+        type Subject = Unset;
+        type Handle = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
@@ -99,9 +99,9 @@ pub mod verification_view_state {
         type DisplayName = Set<members::display_name>;
         type CreatedAt = S::CreatedAt;
         type Issuer = S::Issuer;
-        type Handle = S::Handle;
-        type Subject = S::Subject;
         type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -110,9 +110,9 @@ pub mod verification_view_state {
         type DisplayName = S::DisplayName;
         type CreatedAt = Set<members::created_at>;
         type Issuer = S::Issuer;
-        type Handle = S::Handle;
-        type Subject = S::Subject;
         type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
@@ -121,31 +121,9 @@ pub mod verification_view_state {
         type DisplayName = S::DisplayName;
         type CreatedAt = S::CreatedAt;
         type Issuer = Set<members::issuer>;
-        type Handle = S::Handle;
+        type Uri = S::Uri;
         type Subject = S::Subject;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
-        type Handle = Set<members::handle>;
-        type Subject = S::Subject;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
         type Handle = S::Handle;
-        type Subject = Set<members::subject>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -154,9 +132,31 @@ pub mod verification_view_state {
         type DisplayName = S::DisplayName;
         type CreatedAt = S::CreatedAt;
         type Issuer = S::Issuer;
-        type Handle = S::Handle;
-        type Subject = S::Subject;
         type Uri = Set<members::uri>;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type Subject = Set<members::subject>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -167,12 +167,12 @@ pub mod verification_view_state {
         pub struct created_at(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -482,9 +482,9 @@ where
     S::DisplayName: verification_view_state::IsSet,
     S::CreatedAt: verification_view_state::IsSet,
     S::Issuer: verification_view_state::IsSet,
-    S::Handle: verification_view_state::IsSet,
-    S::Subject: verification_view_state::IsSet,
     S::Uri: verification_view_state::IsSet,
+    S::Subject: verification_view_state::IsSet,
+    S::Handle: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {

@@ -1,0 +1,367 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.defs",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "description": "Width and height representing the aspect ratio of an image",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Height component of aspect ratio",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "description": "Width component of aspect ratio",
+          "minimum": 1
+        }
+      }
+    },
+    "collectionView": {
+      "type": "object",
+      "description": "A view of a collection with author profile and item count",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "name",
+        "createdAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "Collection owner profile",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the collection record",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the collection was created",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "description": "Collection description",
+          "maxLength": 500,
+          "maxGraphemes": 200
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "Timestamp when the collection was indexed",
+          "format": "datetime"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Whether the collection is publicly visible",
+          "default": true
+        },
+        "itemCount": {
+          "type": "integer",
+          "description": "Number of items in the collection"
+        },
+        "name": {
+          "type": "string",
+          "description": "Collection name",
+          "maxLength": 100,
+          "maxGraphemes": 50
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the collection record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "postView": {
+      "type": "object",
+      "description": "A view of a drawing post with author profile and metadata",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "image",
+        "aspectRatio",
+        "createdAt"
+      ],
+      "properties": {
+        "aspectRatio": {
+          "type": "ref",
+          "description": "Aspect ratio of the image",
+          "ref": "#aspectRatio"
+        },
+        "author": {
+          "type": "ref",
+          "description": "Author profile",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the post record",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the post was created",
+          "format": "datetime"
+        },
+        "image": {
+          "type": "string",
+          "description": "URL of the drawing image",
+          "format": "uri"
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "Timestamp when the post was indexed",
+          "format": "datetime"
+        },
+        "linkedPost": {
+          "type": "ref",
+          "description": "Reference to linked Bluesky post",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "reactionCounts": {
+          "type": "ref",
+          "description": "Counts of each reaction type",
+          "ref": "#reactionCounts"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags for categorization",
+          "items": {
+            "type": "string",
+            "maxLength": 64,
+            "maxGraphemes": 32
+          },
+          "maxLength": 8
+        },
+        "text": {
+          "type": "string",
+          "description": "Optional description or title",
+          "maxLength": 1000,
+          "maxGraphemes": 300
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the post record",
+          "format": "at-uri"
+        },
+        "viewerReaction": {
+          "type": "ref",
+          "description": "Current user's reaction to this post",
+          "ref": "#reactionType"
+        }
+      }
+    },
+    "reactionCounts": {
+      "type": "object",
+      "description": "Counts of each reaction type on a post",
+      "properties": {
+        "kami": {
+          "type": "integer",
+          "description": "Count of kami (godly) reactions",
+          "default": 0
+        },
+        "kawaii": {
+          "type": "integer",
+          "description": "Count of kawaii (cute) reactions",
+          "default": 0
+        },
+        "sugoi": {
+          "type": "integer",
+          "description": "Count of sugoi (amazing) reactions",
+          "default": 0
+        },
+        "suki": {
+          "type": "integer",
+          "description": "Count of suki (like) reactions",
+          "default": 0
+        },
+        "tasukaru": {
+          "type": "integer",
+          "description": "Count of tasukaru (helpful) reactions",
+          "default": 0
+        }
+      }
+    },
+    "reactionType": {
+      "type": "string",
+      "description": "Type of reaction to a post",
+      "knownValues": [
+        "suki",
+        "tasukaru",
+        "sugoi",
+        "kawaii",
+        "kami"
+      ]
+    },
+    "replyView": {
+      "type": "object",
+      "description": "A view of a Bluesky reply to a linked post",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "text",
+        "createdAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "Reply author profile",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the Bluesky reply",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the reply was created",
+          "format": "datetime"
+        },
+        "text": {
+          "type": "string",
+          "description": "Reply text content",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the Bluesky reply",
+          "format": "at-uri"
+        }
+      }
+    },
+    "requestResponseView": {
+      "type": "object",
+      "description": "A view of a response to a drawing request",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "post",
+        "createdAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "Response author profile",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the response record",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the response was created",
+          "format": "datetime"
+        },
+        "message": {
+          "type": "string",
+          "description": "Optional message to the requester",
+          "maxLength": 500,
+          "maxGraphemes": 150
+        },
+        "post": {
+          "type": "ref",
+          "description": "The drawing post submitted as response",
+          "ref": "#postView"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the response record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "requestView": {
+      "type": "object",
+      "description": "A view of a drawing request with author profile and response count",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "text",
+        "isOpen",
+        "createdAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "Request author profile",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the request record",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the request was created",
+          "format": "datetime"
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "Timestamp when the request was indexed",
+          "format": "datetime"
+        },
+        "isOpen": {
+          "type": "boolean",
+          "description": "Whether the request is still accepting responses"
+        },
+        "referenceImages": {
+          "type": "array",
+          "description": "URLs of reference images for the request",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxLength": 4
+        },
+        "responseCount": {
+          "type": "integer",
+          "description": "Number of responses to this request"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags for categorization",
+          "items": {
+            "type": "string",
+            "maxLength": 64,
+            "maxGraphemes": 32
+          },
+          "maxLength": 8
+        },
+        "targetActor": {
+          "type": "ref",
+          "description": "Specific artist the request is directed to",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "text": {
+          "type": "string",
+          "description": "Description of what to draw",
+          "maxLength": 1000,
+          "maxGraphemes": 300
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the request record",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

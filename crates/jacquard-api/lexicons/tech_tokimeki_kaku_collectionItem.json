@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.collectionItem",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An item in a collection linking to a post",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "collection",
+          "post",
+          "createdAt"
+        ],
+        "properties": {
+          "collection": {
+            "type": "ref",
+            "description": "Reference to the collection",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Order within the collection",
+            "minimum": 0
+          },
+          "post": {
+            "type": "ref",
+            "description": "Reference to the post",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

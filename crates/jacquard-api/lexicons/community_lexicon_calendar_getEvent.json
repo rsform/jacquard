@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "community.lexicon.calendar.getEvent",
+  "defs": {
+    "eventView": {
+      "type": "object",
+      "description": "An event record with RSVP counts and URL.",
+      "required": [
+        "countGoing",
+        "countInterested",
+        "countNotGoing",
+        "url"
+      ],
+      "properties": {
+        "countGoing": {
+          "type": "integer",
+          "description": "Number of users who have RSVP'd as going."
+        },
+        "countInterested": {
+          "type": "integer",
+          "description": "Number of users who have RSVP'd as interested."
+        },
+        "countNotGoing": {
+          "type": "integer",
+          "description": "Number of users who have RSVP'd as not going."
+        },
+        "url": {
+          "type": "string",
+          "description": "The canonical URL for this event on Smoke Signal.",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get a single event by repository and record key.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repository",
+          "recordKey"
+        ],
+        "properties": {
+          "recordKey": {
+            "type": "string",
+            "description": "The record key (rkey) of the event.",
+            "maxLength": 150,
+            "maxGraphemes": 150
+          },
+          "repository": {
+            "type": "string",
+            "description": "The DID of the repository containing the event.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "#eventView"
+        }
+      },
+      "errors": [
+        {
+          "name": "NotFound"
+        }
+      ]
+    }
+  }
+}

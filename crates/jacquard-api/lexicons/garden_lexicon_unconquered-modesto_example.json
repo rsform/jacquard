@@ -1,0 +1,22 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.unconquered-modesto.example",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "My lexicon description",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "message2"
+        ],
+        "properties": {
+          "message2": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

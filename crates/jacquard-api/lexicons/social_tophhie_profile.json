@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "social.tophhie.profile",
+  "revision": 0,
+  "description": "Tophhie Social: profile record containing various PDS specific settings.",
+  "defs": {
+    "communicationPreferences": {
+      "type": "object",
+      "description": "Granular communication consent flags.",
+      "required": [
+        "marketing"
+      ],
+      "properties": {
+        "marketing": {
+          "type": "boolean",
+          "description": "True if the user consents to receive marketing communications."
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "description": "Tophhie profile record",
+        "required": [
+          "createdAt",
+          "communicationPreferences"
+        ],
+        "properties": {
+          "communicationPreferences": {
+            "type": "ref",
+            "description": "User's opt-in/out preferences for communications.",
+            "ref": "#communicationPreferences"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO 8601 timestamp when this profile record was created.",
+            "format": "datetime"
+          },
+          "pdsPreferences": {
+            "type": "ref",
+            "description": "User's opt-in/out preferences for PDS features.",
+            "ref": "#pdsPreferences"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "ISO 8601 timestamp when this profile record was updated.",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "pdsPreferences": {
+      "type": "object",
+      "description": "Granular PDS preference consent flags.",
+      "required": [],
+      "properties": {
+        "accessibilityScoring": {
+          "type": "boolean",
+          "description": "True if the user participates in accessibility scoring."
+        },
+        "showOnHomepage": {
+          "type": "boolean",
+          "description": "True if the user is shown on the Tophhie Social homepage."
+        }
+      }
+    }
+  }
+}

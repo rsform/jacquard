@@ -39,8 +39,8 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Y;
+        type Width;
         type Block;
         type X;
     }
@@ -48,26 +48,26 @@ pub mod block_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Y = Unset;
+        type Width = Unset;
         type Block = Unset;
         type X = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Y = S::Y;
-        type Block = S::Block;
-        type X = S::X;
     }
     ///State transition - sets the `y` field to Set
     pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetY<S> {}
     impl<S: State> State for SetY<S> {
-        type Width = S::Width;
         type Y = Set<members::y>;
+        type Width = S::Width;
+        type Block = S::Block;
+        type X = S::X;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Y = S::Y;
+        type Width = Set<members::width>;
         type Block = S::Block;
         type X = S::X;
     }
@@ -75,8 +75,8 @@ pub mod block_state {
     pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlock<S> {}
     impl<S: State> State for SetBlock<S> {
-        type Width = S::Width;
         type Y = S::Y;
+        type Width = S::Width;
         type Block = Set<members::block>;
         type X = S::X;
     }
@@ -84,18 +84,18 @@ pub mod block_state {
     pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetX<S> {}
     impl<S: State> State for SetX<S> {
-        type Width = S::Width;
         type Y = S::Y;
+        type Width = S::Width;
         type Block = S::Block;
         type X = Set<members::x>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `y` field
         pub struct y(());
+        ///Marker type for the `width` field
+        pub struct width(());
         ///Marker type for the `block` field
         pub struct block(());
         ///Marker type for the `x` field
@@ -234,8 +234,8 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
-    S::Width: block_state::IsSet,
     S::Y: block_state::IsSet,
+    S::Width: block_state::IsSet,
     S::Block: block_state::IsSet,
     S::X: block_state::IsSet,
 {

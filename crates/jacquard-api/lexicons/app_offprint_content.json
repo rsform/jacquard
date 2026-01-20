@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.content",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "Required array of `app.offprint.block.*` unions.",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.offprint.block.text",
+              "app.offprint.block.heading",
+              "app.offprint.block.blockquote",
+              "app.offprint.block.callout",
+              "app.offprint.block.unorderedList",
+              "app.offprint.block.orderedList",
+              "app.offprint.block.todoList",
+              "app.offprint.block.image",
+              "app.offprint.block.imageGrid",
+              "app.offprint.block.button",
+              "app.offprint.block.codeBlock",
+              "app.offprint.block.horizontalRule",
+              "app.offprint.block.bskyPost",
+              "app.offprint.block.iframeEmbed",
+              "app.offprint.block.linkEmbed"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

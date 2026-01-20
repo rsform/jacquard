@@ -1,0 +1,99 @@
+{
+  "lexicon": 1,
+  "id": "community.lexicon.calendar.searchEvents",
+  "defs": {
+    "eventView": {
+      "type": "object",
+      "description": "An event record with RSVP counts and URL.",
+      "required": [
+        "countGoing",
+        "countInterested",
+        "countNotGoing",
+        "url"
+      ],
+      "properties": {
+        "countGoing": {
+          "type": "integer",
+          "description": "Number of users who have RSVP'd as going."
+        },
+        "countInterested": {
+          "type": "integer",
+          "description": "Number of users who have RSVP'd as interested."
+        },
+        "countNotGoing": {
+          "type": "integer",
+          "description": "Number of users who have RSVP'd as not going."
+        },
+        "url": {
+          "type": "string",
+          "description": "The canonical web URL for this event.",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Search for events. Supports full-text search, filtering by repository, and filtering by location CIDs.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results to return.",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "location": {
+            "type": "array",
+            "description": "Filter events by location CIDs. Can be specified multiple times.",
+            "items": {
+              "type": "string",
+              "format": "cid"
+            }
+          },
+          "query": {
+            "type": "string",
+            "description": "Full-text search query.",
+            "maxLength": 150,
+            "maxGraphemes": 150
+          },
+          "repository": {
+            "type": "string",
+            "description": "Filter events by DID.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "results"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#eventView"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidRepository"
+        },
+        {
+          "name": "SearchUnavailable"
+        },
+        {
+          "name": "SearchError"
+        }
+      ]
+    }
+  }
+}

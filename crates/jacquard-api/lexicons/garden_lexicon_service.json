@@ -1,0 +1,103 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.service",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Declares XRPC methods available on a DID document service. The rkey is the service fragment ID without the # prefix (e.g., 'atproto_pds' for '#atproto_pds').",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "serviceType"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of what this service provides.",
+            "maxLength": 1000
+          },
+          "methods": {
+            "type": "array",
+            "description": "Methods available on this service.",
+            "items": {
+              "type": "ref",
+              "ref": "#method"
+            }
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "The type of service being declared.",
+            "maxLength": 100
+          },
+          "urlTemplates": {
+            "type": "array",
+            "description": "URL templates for constructing web URLs from AT-URIs or record data. Useful for linking to web views of records.",
+            "items": {
+              "type": "ref",
+              "ref": "#urlTemplate"
+            }
+          }
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "required": [
+        "lexicon"
+      ],
+      "properties": {
+        "authMethods": {
+          "type": "array",
+          "description": "Authentication methods supported by this method.",
+          "items": {
+            "type": "string",
+            "maxLength": 50,
+            "knownValues": [
+              "none",
+              "atproto.admin",
+              "atproto.bearer",
+              "atproto.oauth",
+              "atproto.inter-service"
+            ]
+          }
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "Whether this method is deprecated and should no longer be used."
+        },
+        "lexicon": {
+          "type": "string",
+          "description": "AT-URI pointing to a lexicon schema that defines this method.",
+          "format": "at-uri"
+        }
+      }
+    },
+    "urlTemplate": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "collections": {
+          "type": "array",
+          "description": "NSIDs of collections this URL template applies to.",
+          "items": {
+            "type": "string",
+            "format": "nsid"
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what this URL template is for.",
+          "maxLength": 1000
+        },
+        "url": {
+          "type": "string",
+          "description": "URI template with placeholders for record data",
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}

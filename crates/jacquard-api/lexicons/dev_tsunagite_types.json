@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "dev.tsunagite.types",
+  "description": "Assistant data types for Tsunagite lexicons.",
+  "defs": {
+    "indexable": {
+      "type": "object",
+      "description": "A named value with a numeric index for sorting.",
+      "required": [
+        "id",
+        "name",
+        "index"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The internal ID for the value, limited to the RecordKey character set.",
+          "format": "record-key",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "index": {
+          "type": "integer",
+          "description": "The numeric index used for sorting."
+        },
+        "name": {
+          "type": "ref",
+          "description": "The human-readable name of the value for displaying in UIs.",
+          "ref": "dev.tsunagite.translatable"
+        }
+      }
+    },
+    "typedRef": {
+      "type": "object",
+      "description": "A typed record reference that does not require a CID hash.",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "The AT URI of the record this object references.",
+          "format": "at-uri"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of the record this object references.",
+          "format": "record-key"
+        }
+      }
+    }
+  }
+}

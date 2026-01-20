@@ -27,8 +27,13 @@ pub struct Pull<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    /// (deprecated) use patchBlob instead
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub patch: jacquard_common::CowStr<'a>,
+    pub patch: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// patch content
+    #[serde(borrow)]
+    pub patch_blob: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
@@ -51,8 +56,8 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Patch;
         type Title;
+        type PatchBlob;
         type CreatedAt;
         type Target;
     }
@@ -60,26 +65,26 @@ pub mod pull_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Patch = Unset;
         type Title = Unset;
+        type PatchBlob = Unset;
         type CreatedAt = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `patch` field to Set
-    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatch<S> {}
-    impl<S: State> State for SetPatch<S> {
-        type Patch = Set<members::patch>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Patch = S::Patch;
         type Title = Set<members::title>;
+        type PatchBlob = S::PatchBlob;
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `patch_blob` field to Set
+    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
+    impl<S: State> State for SetPatchBlob<S> {
+        type Title = S::Title;
+        type PatchBlob = Set<members::patch_blob>;
         type CreatedAt = S::CreatedAt;
         type Target = S::Target;
     }
@@ -87,8 +92,8 @@ pub mod pull_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Patch = S::Patch;
         type Title = S::Title;
+        type PatchBlob = S::PatchBlob;
         type CreatedAt = Set<members::created_at>;
         type Target = S::Target;
     }
@@ -96,18 +101,18 @@ pub mod pull_state {
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Patch = S::Patch;
         type Title = S::Title;
+        type PatchBlob = S::PatchBlob;
         type CreatedAt = S::CreatedAt;
         type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `patch` field
-        pub struct patch(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `patch_blob` field
+        pub struct patch_blob(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `target` field
@@ -123,6 +128,7 @@ pub struct PullBuilder<'a, S: pull_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
         ::core::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
         ::core::option::Option<crate::sh_tangled::repo::pull::Target<'a>>,
@@ -143,7 +149,17 @@ impl<'a> PullBuilder<'a, pull_state::Empty> {
     pub fn new() -> Self {
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -203,17 +219,33 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     }
 }
 
+impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+    /// Set the `patch` field (optional)
+    pub fn patch(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `patch` field to an Option value (optional)
+    pub fn maybe_patch(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
-    S::Patch: pull_state::IsUnset,
+    S::PatchBlob: pull_state::IsUnset,
 {
-    /// Set the `patch` field (required)
-    pub fn patch(
+    /// Set the `patchBlob` field (required)
+    pub fn patch_blob(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> PullBuilder<'a, pull_state::SetPatch<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> PullBuilder<'a, pull_state::SetPatchBlob<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -228,7 +260,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
@@ -236,7 +268,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -247,7 +279,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::sh_tangled::repo::pull::Source<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
@@ -255,7 +287,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_tangled::repo::pull::Source<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -270,7 +302,7 @@ where
         mut self,
         value: impl Into<crate::sh_tangled::repo::pull::Target<'a>>,
     ) -> PullBuilder<'a, pull_state::SetTarget<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -289,7 +321,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> PullBuilder<'a, pull_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -301,8 +333,8 @@ where
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
-    S::Patch: pull_state::IsSet,
     S::Title: pull_state::IsSet,
+    S::PatchBlob: pull_state::IsSet,
     S::CreatedAt: pull_state::IsSet,
     S::Target: pull_state::IsSet,
 {
@@ -312,11 +344,12 @@ where
             body: self.__unsafe_private_named.0,
             created_at: self.__unsafe_private_named.1.unwrap(),
             mentions: self.__unsafe_private_named.2,
-            patch: self.__unsafe_private_named.3.unwrap(),
-            references: self.__unsafe_private_named.4,
-            source: self.__unsafe_private_named.5,
-            target: self.__unsafe_private_named.6.unwrap(),
-            title: self.__unsafe_private_named.7.unwrap(),
+            patch: self.__unsafe_private_named.3,
+            patch_blob: self.__unsafe_private_named.4.unwrap(),
+            references: self.__unsafe_private_named.5,
+            source: self.__unsafe_private_named.6,
+            target: self.__unsafe_private_named.7.unwrap(),
+            title: self.__unsafe_private_named.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -332,11 +365,12 @@ where
             body: self.__unsafe_private_named.0,
             created_at: self.__unsafe_private_named.1.unwrap(),
             mentions: self.__unsafe_private_named.2,
-            patch: self.__unsafe_private_named.3.unwrap(),
-            references: self.__unsafe_private_named.4,
-            source: self.__unsafe_private_named.5,
-            target: self.__unsafe_private_named.6.unwrap(),
-            title: self.__unsafe_private_named.7.unwrap(),
+            patch: self.__unsafe_private_named.3,
+            patch_blob: self.__unsafe_private_named.4.unwrap(),
+            references: self.__unsafe_private_named.5,
+            source: self.__unsafe_private_named.6,
+            target: self.__unsafe_private_named.7.unwrap(),
+            title: self.__unsafe_private_named.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -441,7 +475,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             vec![
                                 ::jacquard_common::smol_str::SmolStr::new_static("target"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("patch"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("patchBlob"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
@@ -510,7 +544,11 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("patch"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "(deprecated) use patchBlob instead",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -520,6 +558,16 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "patchBlob",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                    description: None,
+                                    accept: None,
+                                    max_size: None,
                                 }),
                             );
                             map.insert(

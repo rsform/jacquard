@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.moderation.updateLivestream",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update livestream metadata on behalf of a streamer. Requires 'livestream.manage' permission. Updates a place.stream.livestream record in the streamer's repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "streamer",
+            "livestreamUri"
+          ],
+          "properties": {
+            "livestreamUri": {
+              "type": "string",
+              "description": "The AT-URI of the livestream record to update.",
+              "format": "at-uri"
+            },
+            "streamer": {
+              "type": "string",
+              "description": "The DID of the streamer.",
+              "format": "did"
+            },
+            "title": {
+              "type": "string",
+              "description": "New title for the livestream.",
+              "maxLength": 1400,
+              "maxGraphemes": 140
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "The CID of the updated livestream record.",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the updated livestream record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The request lacks valid authentication credentials.",
+          "name": "Unauthorized"
+        },
+        {
+          "description": "The caller does not have permission to update livestream metadata for this streamer.",
+          "name": "Forbidden"
+        },
+        {
+          "description": "The streamer's OAuth session could not be found or is invalid.",
+          "name": "SessionNotFound"
+        },
+        {
+          "description": "The specified livestream record does not exist.",
+          "name": "RecordNotFound"
+        }
+      ]
+    }
+  }
+}

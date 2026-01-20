@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "dev.baileytownsend.demo.example",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An example record for showing permissions ets",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "A name of something",
+            "minLength": 1,
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

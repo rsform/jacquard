@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "social.pace.daily.step",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A daily recording of your steps for that day. This record is expected to be update throughout the day and represent's 12am-12pm in your timezone, or what you count as a \"day\". The key is also traditionally the date of your \"day\" yyy-mm-dd.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "steps",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The first time this record was created",
+            "format": "datetime"
+          },
+          "steps": {
+            "type": "integer",
+            "description": "The number of steps taken during the day"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "The last time this record was updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

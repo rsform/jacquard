@@ -127,6 +127,9 @@ where
 pub struct GetSuggestedUsersOutput<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
+    /// Snowflake for this recommendation, use when submitting recommendation events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rec_id: std::option::Option<i64>,
 }
 
 /// Response type for

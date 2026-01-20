@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.collection",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A collection to organize drawings into folders",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Collection description",
+            "maxLength": 500,
+            "maxGraphemes": 200
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Whether the collection is publicly visible",
+            "default": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Collection name",
+            "minLength": 1,
+            "maxLength": 100,
+            "maxGraphemes": 50
+          }
+        }
+      }
+    }
+  }
+}

@@ -44,9 +44,9 @@ pub mod rings_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type MoveGoal;
-        type CreatedAt;
         type StandGoal;
         type StandHours;
+        type CreatedAt;
         type Move;
         type Exercise;
         type ExerciseGoal;
@@ -56,9 +56,9 @@ pub mod rings_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type MoveGoal = Unset;
-        type CreatedAt = Unset;
         type StandGoal = Unset;
         type StandHours = Unset;
+        type CreatedAt = Unset;
         type Move = Unset;
         type Exercise = Unset;
         type ExerciseGoal = Unset;
@@ -68,21 +68,9 @@ pub mod rings_state {
     impl<S: State> sealed::Sealed for SetMoveGoal<S> {}
     impl<S: State> State for SetMoveGoal<S> {
         type MoveGoal = Set<members::move_goal>;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
         type CreatedAt = S::CreatedAt;
-        type StandGoal = S::StandGoal;
-        type StandHours = S::StandHours;
-        type Move = S::Move;
-        type Exercise = S::Exercise;
-        type ExerciseGoal = S::ExerciseGoal;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type MoveGoal = S::MoveGoal;
-        type CreatedAt = Set<members::created_at>;
-        type StandGoal = S::StandGoal;
-        type StandHours = S::StandHours;
         type Move = S::Move;
         type Exercise = S::Exercise;
         type ExerciseGoal = S::ExerciseGoal;
@@ -92,9 +80,9 @@ pub mod rings_state {
     impl<S: State> sealed::Sealed for SetStandGoal<S> {}
     impl<S: State> State for SetStandGoal<S> {
         type MoveGoal = S::MoveGoal;
-        type CreatedAt = S::CreatedAt;
         type StandGoal = Set<members::stand_goal>;
         type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
         type Move = S::Move;
         type Exercise = S::Exercise;
         type ExerciseGoal = S::ExerciseGoal;
@@ -104,9 +92,21 @@ pub mod rings_state {
     impl<S: State> sealed::Sealed for SetStandHours<S> {}
     impl<S: State> State for SetStandHours<S> {
         type MoveGoal = S::MoveGoal;
-        type CreatedAt = S::CreatedAt;
         type StandGoal = S::StandGoal;
         type StandHours = Set<members::stand_hours>;
+        type CreatedAt = S::CreatedAt;
+        type Move = S::Move;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type MoveGoal = S::MoveGoal;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
+        type CreatedAt = Set<members::created_at>;
         type Move = S::Move;
         type Exercise = S::Exercise;
         type ExerciseGoal = S::ExerciseGoal;
@@ -116,9 +116,9 @@ pub mod rings_state {
     impl<S: State> sealed::Sealed for SetMove<S> {}
     impl<S: State> State for SetMove<S> {
         type MoveGoal = S::MoveGoal;
-        type CreatedAt = S::CreatedAt;
         type StandGoal = S::StandGoal;
         type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
         type Move = Set<members::r#move>;
         type Exercise = S::Exercise;
         type ExerciseGoal = S::ExerciseGoal;
@@ -128,9 +128,9 @@ pub mod rings_state {
     impl<S: State> sealed::Sealed for SetExercise<S> {}
     impl<S: State> State for SetExercise<S> {
         type MoveGoal = S::MoveGoal;
-        type CreatedAt = S::CreatedAt;
         type StandGoal = S::StandGoal;
         type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
         type Move = S::Move;
         type Exercise = Set<members::exercise>;
         type ExerciseGoal = S::ExerciseGoal;
@@ -140,9 +140,9 @@ pub mod rings_state {
     impl<S: State> sealed::Sealed for SetExerciseGoal<S> {}
     impl<S: State> State for SetExerciseGoal<S> {
         type MoveGoal = S::MoveGoal;
-        type CreatedAt = S::CreatedAt;
         type StandGoal = S::StandGoal;
         type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
         type Move = S::Move;
         type Exercise = S::Exercise;
         type ExerciseGoal = Set<members::exercise_goal>;
@@ -152,12 +152,12 @@ pub mod rings_state {
     pub mod members {
         ///Marker type for the `move_goal` field
         pub struct move_goal(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `stand_goal` field
         pub struct stand_goal(());
         ///Marker type for the `stand_hours` field
         pub struct stand_hours(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `move` field
         pub struct r#move(());
         ///Marker type for the `exercise` field
@@ -337,9 +337,9 @@ impl<'a, S> RingsBuilder<'a, S>
 where
     S: rings_state::State,
     S::MoveGoal: rings_state::IsSet,
-    S::CreatedAt: rings_state::IsSet,
     S::StandGoal: rings_state::IsSet,
     S::StandHours: rings_state::IsSet,
+    S::CreatedAt: rings_state::IsSet,
     S::Move: rings_state::IsSet,
     S::Exercise: rings_state::IsSet,
     S::ExerciseGoal: rings_state::IsSet,

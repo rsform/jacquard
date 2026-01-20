@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "cat.vt3e.gallery.groupItem",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "defines an item in a gallery group",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "group",
+          "image",
+          "addedAt"
+        ],
+        "properties": {
+          "addedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "group": {
+            "type": "string",
+            "description": "uri of the group that the image belongs to",
+            "format": "at-uri"
+          },
+          "image": {
+            "type": "string",
+            "description": "uri of the image that this item represents",
+            "format": "at-uri"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.branding.getBlob",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a specific branding asset blob by key.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "broadcaster": {
+            "type": "string",
+            "description": "DID of the broadcaster. If not provided, uses the server's default broadcaster.",
+            "format": "did"
+          },
+          "key": {
+            "type": "string",
+            "description": "Branding asset key (mainLogo, favicon, siteTitle, etc.)"
+          }
+        }
+      },
+      "output": {
+        "description": "Raw blob data with appropriate content-type",
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "The requested branding asset does not exist",
+          "name": "BrandingNotFound"
+        }
+      ]
+    }
+  }
+}

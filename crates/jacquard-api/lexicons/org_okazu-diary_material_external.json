@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "org.okazu-diary.material.external",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A descriptor of a pornographic material.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the material, typically taken from the material's HTML metadata."
+          },
+          "genericLabels": {
+            "type": "union",
+            "description": "General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the material and tags are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "labels": {
+            "type": "union",
+            "description": "User-specified self-label values for the material. While the Lexicon by its nature assumes the material to be possibly sensitive by default, these label values are intended to signal that a warning should be put on the material even for the explicit Okazu-Diary.org application users who are willing to see mature contents in general.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "record": {
+            "type": "ref",
+            "description": "Reference to a record representing the material, such as a Bluesky post.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "tags": {
+            "type": "array",
+            "description": "User-specified tags for the material.",
+            "items": {
+              "type": "ref",
+              "ref": "org.okazu-diary.material.defs#tag"
+            },
+            "maxLength": 64
+          },
+          "thumb": {
+            "type": "ref",
+            "description": "Link to a thumbnail of the material, typically taken from the material's HTML metadata.",
+            "ref": "#thumb"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the material, typically taken from the material's HTML `<title>` element."
+          },
+          "uri": {
+            "type": "string",
+            "description": "URI of the material, typically an HTTP(S) URL. If the URL is of a Web interface for an AT resource (such as a `bsky.app` URL), the record should also include the `record` property referencing the AT resource.",
+            "format": "uri"
+          },
+          "via": {
+            "type": "ref",
+            "description": "Reference to an `org.okazu-diary.feed.material` record from another repository from which this collection item is derived. Clients can use this property to offer the user to update this record if the original record have updated from the referenced version.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    },
+    "thumb": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

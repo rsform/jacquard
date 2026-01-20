@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "events.smokesignal.calendar.acceptance",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cryptographic proof record that contains RSVP acceptance data.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "cid"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "The CID (Content Identifier) of the rsvp that this proof validates.",
+            "format": "cid"
+          }
+        }
+      }
+    }
+  }
+}

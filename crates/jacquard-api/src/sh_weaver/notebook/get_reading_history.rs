@@ -214,37 +214,37 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Progress;
         type Notebook;
+        type Progress;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Progress = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `progress` field to Set
-    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProgress<S> {}
-    impl<S: State> State for SetProgress<S> {
-        type Progress = Set<members::progress>;
-        type Notebook = S::Notebook;
+        type Progress = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type Progress = S::Progress;
         type Notebook = Set<members::notebook>;
+        type Progress = S::Progress;
+    }
+    ///State transition - sets the `progress` field to Set
+    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProgress<S> {}
+    impl<S: State> State for SetProgress<S> {
+        type Notebook = S::Notebook;
+        type Progress = Set<members::progress>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `progress` field
-        pub struct progress(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `progress` field
+        pub struct progress(());
     }
 }
 
@@ -337,8 +337,8 @@ where
 impl<'a, S> ReadingHistoryItemBuilder<'a, S>
 where
     S: reading_history_item_state::State,
-    S::Progress: reading_history_item_state::IsSet,
     S::Notebook: reading_history_item_state::IsSet,
+    S::Progress: reading_history_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReadingHistoryItem<'a> {

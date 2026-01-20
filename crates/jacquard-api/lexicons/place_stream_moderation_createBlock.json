@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.moderation.createBlock",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a block (ban) on behalf of a streamer. Requires 'ban' permission. Creates an app.bsky.graph.block record in the streamer's repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "streamer",
+            "subject"
+          ],
+          "properties": {
+            "reason": {
+              "type": "string",
+              "description": "Optional reason for the block.",
+              "maxLength": 300
+            },
+            "streamer": {
+              "type": "string",
+              "description": "The DID of the streamer whose chat this block applies to.",
+              "format": "did"
+            },
+            "subject": {
+              "type": "string",
+              "description": "The DID of the user being blocked from chat.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "The CID of the created block record.",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the created block record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The request lacks valid authentication credentials.",
+          "name": "Unauthorized"
+        },
+        {
+          "description": "The caller does not have permission to create blocks for this streamer.",
+          "name": "Forbidden"
+        },
+        {
+          "description": "The streamer's OAuth session could not be found or is invalid.",
+          "name": "SessionNotFound"
+        }
+      ]
+    }
+  }
+}

@@ -38,49 +38,49 @@ pub mod delete_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Rkey;
+        type Did;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Rkey = Unset;
+        type Did = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Rkey = S::Rkey;
-        type Name = S::Name;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Did = S::Did;
         type Rkey = Set<members::rkey>;
+        type Did = S::Did;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Rkey = S::Rkey;
+        type Did = Set<members::did>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Did = S::Did;
         type Rkey = S::Rkey;
+        type Did = S::Did;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -175,8 +175,8 @@ where
 impl<'a, S> DeleteBuilder<'a, S>
 where
     S: delete_state::State,
-    S::Did: delete_state::IsSet,
     S::Rkey: delete_state::IsSet,
+    S::Did: delete_state::IsSet,
     S::Name: delete_state::IsSet,
 {
     /// Build the final struct

@@ -10,7 +10,7 @@
         "required": [
           "target",
           "title",
-          "patch",
+          "patchBlob",
           "createdAt"
         ],
         "properties": {
@@ -29,7 +29,15 @@
             }
           },
           "patch": {
-            "type": "string"
+            "type": "string",
+            "description": "(deprecated) use patchBlob instead"
+          },
+          "patchBlob": {
+            "type": "blob",
+            "description": "patch content",
+            "accept": [
+              "text/x-patch"
+            ]
           },
           "references": {
             "type": "array",

@@ -5,6 +5,7 @@
 
 pub mod block;
 pub mod blog;
+pub mod content;
 pub mod document;
 pub mod mark;
 pub mod post;

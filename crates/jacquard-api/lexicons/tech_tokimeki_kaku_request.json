@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.kaku.request",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A request for someone to draw something",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "isOpen": {
+            "type": "boolean",
+            "description": "Whether still accepting responses",
+            "default": true
+          },
+          "referenceImages": {
+            "type": "array",
+            "description": "Reference images for the request",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/png",
+                "image/jpeg"
+              ],
+              "maxSize": 1000000
+            },
+            "maxLength": 4
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorization",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "maxLength": 8
+          },
+          "targetActor": {
+            "type": "string",
+            "description": "Optional: specific artist to request",
+            "format": "did"
+          },
+          "text": {
+            "type": "string",
+            "description": "Description of what to draw",
+            "maxLength": 1000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

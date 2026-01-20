@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.multistream.putTarget",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update an existing target for rebroadcasting a Streamplace stream.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "multistreamTarget"
+          ],
+          "properties": {
+            "multistreamTarget": {
+              "type": "ref",
+              "ref": "place.stream.multistream.target"
+            },
+            "rkey": {
+              "type": "string",
+              "description": "The Record Key.",
+              "format": "record-key",
+              "maxLength": 512
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "place.stream.multistream.defs#targetView"
+        }
+      },
+      "errors": [
+        {
+          "description": "The provided target URL is invalid or unreachable.",
+          "name": "InvalidTargetUrl"
+        }
+      ]
+    }
+  }
+}

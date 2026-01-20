@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "dev.tsunagite.song",
+  "description": "Definitions related to songs included in games hosting leaderboards via Tsunagite.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A song included in a game hosting leaderboards via Tsunagite.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "game",
+          "title",
+          "composer"
+        ],
+        "properties": {
+          "composer": {
+            "type": "ref",
+            "description": "The name of the composer of this song. Translations will typically be listed alongside the default.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "game": {
+            "type": "array",
+            "description": "The game(s) this song is included in.",
+            "items": {
+              "type": "string",
+              "description": "All URIs must point to records of type `dev.tsunagite.game`.",
+              "format": "at-uri"
+            }
+          },
+          "genre": {
+            "type": "ref",
+            "description": "The genre this song belongs to.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "jacket": {
+            "type": "blob",
+            "description": "The jacket or banner art of this song, for display in UI.",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/jxl",
+              "image/webp"
+            ],
+            "maxSize": 8000000
+          },
+          "jacketArtist": {
+            "type": "ref",
+            "description": "The name of the jacket artist for this song.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "source": {
+            "type": "ref",
+            "description": "The source this song is from - an album, competition, other game, etc.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "subtitle": {
+            "type": "ref",
+            "description": "The human-readable subtitle of this song.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "title": {
+            "type": "ref",
+            "description": "The human-readable title of this song in UI. Translations will typically be listed alongside the default.",
+            "ref": "dev.tsunagite.translatable"
+          }
+        }
+      }
+    }
+  }
+}

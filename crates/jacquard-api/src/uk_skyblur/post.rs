@@ -37,7 +37,7 @@ pub struct Post<'a> {
     pub text: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    /// For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.
+    /// For 'login', the post requires login to view (Bluesky account required). For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.
     #[serde(borrow)]
     pub visibility: jacquard_common::CowStr<'a>,
 }
@@ -54,8 +54,8 @@ pub mod post_state {
     pub trait State: sealed::Sealed {
         type CreatedAt;
         type Text;
-        type Uri;
         type Visibility;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -63,8 +63,8 @@ pub mod post_state {
     impl State for Empty {
         type CreatedAt = Unset;
         type Text = Unset;
-        type Uri = Unset;
         type Visibility = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -72,8 +72,8 @@ pub mod post_state {
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
         type Text = S::Text;
-        type Uri = S::Uri;
         type Visibility = S::Visibility;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
@@ -81,17 +81,8 @@ pub mod post_state {
     impl<S: State> State for SetText<S> {
         type CreatedAt = S::CreatedAt;
         type Text = Set<members::text>;
+        type Visibility = S::Visibility;
         type Uri = S::Uri;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Text = S::Text;
-        type Uri = Set<members::uri>;
-        type Visibility = S::Visibility;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
@@ -99,8 +90,17 @@ pub mod post_state {
     impl<S: State> State for SetVisibility<S> {
         type CreatedAt = S::CreatedAt;
         type Text = S::Text;
-        type Uri = S::Uri;
         type Visibility = Set<members::visibility>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Visibility = S::Visibility;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -109,10 +109,10 @@ pub mod post_state {
         pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -267,8 +267,8 @@ where
     S: post_state::State,
     S::CreatedAt: post_state::IsSet,
     S::Text: post_state::IsSet,
-    S::Uri: post_state::IsSet,
     S::Visibility: post_state::IsSet,
+    S::Uri: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -602,7 +602,7 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.",
+                                            "For 'login', the post requires login to view (Bluesky account required). For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.",
                                         ),
                                     ),
                                     format: None,

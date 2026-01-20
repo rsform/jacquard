@@ -34,37 +34,37 @@ pub mod task_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Checked;
         type Content;
+        type Checked;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Checked = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `checked` field to Set
-    pub struct SetChecked<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecked<S> {}
-    impl<S: State> State for SetChecked<S> {
-        type Checked = Set<members::checked>;
-        type Content = S::Content;
+        type Checked = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Checked = S::Checked;
         type Content = Set<members::content>;
+        type Checked = S::Checked;
+    }
+    ///State transition - sets the `checked` field to Set
+    pub struct SetChecked<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChecked<S> {}
+    impl<S: State> State for SetChecked<S> {
+        type Content = S::Content;
+        type Checked = Set<members::checked>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checked` field
-        pub struct checked(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `checked` field
+        pub struct checked(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> TaskItemBuilder<'a, S>
 where
     S: task_item_state::State,
-    S::Checked: task_item_state::IsSet,
     S::Content: task_item_state::IsSet,
+    S::Checked: task_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TaskItem<'a> {

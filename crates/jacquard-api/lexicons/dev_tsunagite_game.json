@@ -1,0 +1,204 @@
+{
+  "lexicon": 1,
+  "id": "dev.tsunagite.game",
+  "description": "Definitions related to games hosting leaderboards via Tunagite.",
+  "defs": {
+    "enum": {
+      "type": "object",
+      "description": "A closed set of indexable named values.",
+      "required": [
+        "name",
+        "id",
+        "values"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The internal ID of this component, limited to the RecordKey characterset.",
+          "format": "record-key",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "name": {
+          "type": "ref",
+          "description": "The human-readable name of this component in UI.",
+          "ref": "dev.tsunagite.translatable"
+        },
+        "values": {
+          "type": "array",
+          "description": "The allowed values for this enum to take.",
+          "items": {
+            "type": "ref",
+            "ref": "dev.tsunagite.types#indexable"
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A record describing a game hosting leaderboards via Tsunagite.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "judgments",
+          "scoreComponents",
+          "defaultComponent"
+        ],
+        "properties": {
+          "defaultComponent": {
+            "type": "string",
+            "description": "The default component for leaderboard sorting.",
+            "format": "record-key"
+          },
+          "inputMethods": {
+            "type": "array",
+            "description": "An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.",
+            "items": {
+              "type": "string",
+              "description": "Can be tokens or raw strings.",
+              "knownValues": [
+                "dev.tsunagite.keyboard",
+                "dev.tsunagite.gamepad"
+              ]
+            }
+          },
+          "judgments": {
+            "type": "array",
+            "description": "The obtainable judgments during gameplay.",
+            "items": {
+              "type": "ref",
+              "description": "Indices will be displayed in ascending order.",
+              "ref": "dev.tsunagite.types#indexable"
+            }
+          },
+          "logo": {
+            "type": "blob",
+            "description": "The logo of the game, for display in UI.",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/jxl",
+              "image/webp"
+            ],
+            "maxSize": 8000000
+          },
+          "modes": {
+            "type": "array",
+            "description": "An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.",
+            "items": {
+              "type": "string",
+              "description": "Can be tokens or raw strings.",
+              "knownValues": [
+                "dev.tsunagite.singles",
+                "dev.tsunagite.doubles"
+              ]
+            }
+          },
+          "name": {
+            "type": "ref",
+            "description": "The human-readable name of the game, for display in UI.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "scoreComponents": {
+            "type": "array",
+            "description": "All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.",
+            "items": {
+              "type": "union",
+              "description": "If you need a component type that doesn't exist yet, contact @lemmaeof.gay",
+              "refs": [
+                "#enum",
+                "#points",
+                "#percentage",
+                "#text"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "percentage": {
+      "type": "object",
+      "description": "A percentage score with customizable precision.",
+      "required": [
+        "name",
+        "id",
+        "maximum",
+        "precision"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The internal ID of this component, limited to the RecordKey characterset.",
+          "format": "record-key",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "maximum": {
+          "type": "integer",
+          "description": "The maximum allowed percentage for this score.",
+          "default": 100
+        },
+        "name": {
+          "type": "ref",
+          "description": "The human-readable name of this component in UI.",
+          "ref": "dev.tsunagite.translatable"
+        },
+        "precision": {
+          "type": "integer",
+          "description": "The number of decimal places to include in the percentage.",
+          "default": 2
+        }
+      }
+    },
+    "points": {
+      "type": "object",
+      "description": "An integer point score, with or without a cap.",
+      "required": [
+        "name",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The internal ID of this component, limited to the RecordKey characterset.",
+          "format": "record-key",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "maximum": {
+          "type": "integer",
+          "description": "The maximum allowed value for this score."
+        },
+        "name": {
+          "type": "ref",
+          "description": "The human-readable name of this component in UI.",
+          "ref": "dev.tsunagite.translatable"
+        }
+      }
+    },
+    "text": {
+      "type": "object",
+      "description": "A fallback component for displaying arbitrary text.",
+      "required": [
+        "name",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The internal ID of this component, limited to the RecordKey characterset.",
+          "format": "record-key",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "name": {
+          "type": "ref",
+          "description": "The human-readable name of this component in UI.",
+          "ref": "dev.tsunagite.translatable"
+        }
+      }
+    }
+  }
+}

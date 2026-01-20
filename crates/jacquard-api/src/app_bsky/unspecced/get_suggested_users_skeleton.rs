@@ -168,6 +168,9 @@ where
 pub struct GetSuggestedUsersSkeletonOutput<'a> {
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    /// Snowflake for this recommendation, use when submitting recommendation events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rec_id: std::option::Option<i64>,
 }
 
 /// Response type for

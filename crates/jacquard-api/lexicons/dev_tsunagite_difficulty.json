@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "dev.tsunagite.difficulty",
+  "description": "Definitions related to difficulty slots in games hosting leaderboards via Tsunagite.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A difficulty slot in a game hosting leaderboards via Tsunagite.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "The hex code color of the difficulty slot."
+          },
+          "name": {
+            "type": "ref",
+            "description": "The human-readable name of the difficulty slot for use in UI.",
+            "ref": "dev.tsunagite.translatable"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.moderation.createGate",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a gate (hide message) on behalf of a streamer. Requires 'hide' permission. Creates a place.stream.chat.gate record in the streamer's repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "streamer",
+            "messageUri"
+          ],
+          "properties": {
+            "messageUri": {
+              "type": "string",
+              "description": "The AT-URI of the chat message to hide.",
+              "format": "at-uri"
+            },
+            "streamer": {
+              "type": "string",
+              "description": "The DID of the streamer.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "The CID of the created gate record.",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the created gate record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The request lacks valid authentication credentials.",
+          "name": "Unauthorized"
+        },
+        {
+          "description": "The caller does not have permission to hide messages for this streamer.",
+          "name": "Forbidden"
+        },
+        {
+          "description": "The streamer's OAuth session could not be found or is invalid.",
+          "name": "SessionNotFound"
+        }
+      ]
+    }
+  }
+}

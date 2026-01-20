@@ -6,3 +6,4 @@
 pub mod captain;
 pub mod crew;
 pub mod layer;
+pub mod stats;

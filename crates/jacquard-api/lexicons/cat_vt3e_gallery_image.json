@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "cat.vt3e.gallery.image",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "defines an image in the gallery",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "image",
+          "createdAt"
+        ],
+        "properties": {
+          "alt": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "aspectRatio": {
+            "type": "integer"
+          },
+          "blurhash": {
+            "type": "string",
+            "description": "provides a blurred preview of the image for use while loading, see github.com/woltapp/blurhash"
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "checksum": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "dominantColour": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "image": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 32000000
+          },
+          "sizeInBytes": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "width": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

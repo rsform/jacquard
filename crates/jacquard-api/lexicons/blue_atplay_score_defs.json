@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "blue.atplay.score.defs",
+  "defs": {
+    "attestation": {
+      "type": "object",
+      "description": "Attestation signature proving a score was submitted through ATPlay SDK",
+      "required": [
+        "key",
+        "signature"
+      ],
+      "properties": {
+        "attestedAt": {
+          "type": "string",
+          "description": "Timestamp when the attestation was created (optional)",
+          "format": "datetime"
+        },
+        "key": {
+          "type": "string",
+          "description": "DID key reference for verifying the signature",
+          "maxLength": 512
+        },
+        "signature": {
+          "type": "bytes",
+          "description": "ES256 signature over the score record CID",
+          "maxLength": 8192
+        }
+      }
+    }
+  }
+}
