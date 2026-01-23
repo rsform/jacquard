@@ -13,10 +13,10 @@ use super::Lazy;
 use crate::{CowStr, IntoStatic};
 #[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
 use regex::Regex;
-#[cfg(target_arch = "wasm32")]
-use regex_lite::Regex;
 #[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
 use regex_automata::meta::Regex;
+#[cfg(target_arch = "wasm32")]
+use regex_lite::Regex;
 
 /// Regex for ISO 8601 datetime validation per AT Protocol spec
 pub static ISO8601_REGEX: Lazy<Regex> = Lazy::new(|| {
@@ -105,6 +105,33 @@ impl Datetime {
     #[must_use]
     pub fn as_str(&self) -> &str {
         self.serialized.as_ref()
+    }
+
+    /// Extracts the number of non-leap seconds since January 1, 1970 0:00:00 UTC (aka "UNIX timestamp").
+    ///
+    /// For full access to the underlying DateTime, use the [`AsRef<chrono::DateTime<chrono::FixedOffset>>`] implementation.
+    #[inline]
+    #[must_use]
+    pub fn timestamp(&self) -> i64 {
+        self.dt.timestamp()
+    }
+
+    /// Extracts the number of non-leap-milliseconds since January 1, 1970 UTC.
+    ///
+    /// For full access to the underlying DateTime, use the [`AsRef<chrono::DateTime<chrono::FixedOffset>>`] implementation.
+    #[inline]
+    #[must_use]
+    pub fn timestamp_ms(&self) -> i64 {
+        self.dt.timestamp_millis()
+    }
+
+    /// Extracts the number of non-leap-microseconds since January 1, 1970 UTC.
+    ///
+    /// For full access to the underlying DateTime, use the [`AsRef<chrono::DateTime<chrono::FixedOffset>>`] implementation.
+    #[inline]
+    #[must_use]
+    pub fn timestamp_micros(&self) -> i64 {
+        self.dt.timestamp_micros()
     }
 }
 
