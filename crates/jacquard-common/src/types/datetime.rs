@@ -121,7 +121,7 @@ impl Datetime {
     /// For full access to the underlying DateTime, use the [`AsRef<chrono::DateTime<chrono::FixedOffset>>`] implementation.
     #[inline]
     #[must_use]
-    pub fn timestamp_ms(&self) -> i64 {
+    pub fn timestamp_millis(&self) -> i64 {
         self.dt.timestamp_millis()
     }
 
