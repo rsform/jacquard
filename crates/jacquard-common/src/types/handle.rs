@@ -1,18 +1,18 @@
 use crate::types::string::AtStrError;
 use crate::types::{DISALLOWED_TLDS, ends_with};
 use crate::{CowStr, IntoStatic};
-#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
-use regex::Regex;
-#[cfg(target_arch = "wasm32")]
-use regex_lite::Regex;
-#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
-use regex_automata::meta::Regex;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::{SmolStr, ToSmolStr};
 use alloc::string::{String, ToString};
 use core::fmt;
 use core::ops::Deref;
 use core::str::FromStr;
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
+use regex::Regex;
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
+use regex_automata::meta::Regex;
+#[cfg(target_arch = "wasm32")]
+use regex_lite::Regex;
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::{SmolStr, StrExt};
 
 use super::Lazy;
 
@@ -47,11 +47,13 @@ impl<'h> Handle<'h> {
     ///
     /// Accepts (and strips) preceding '@' or 'at://' if present
     pub fn new(handle: &'h str) -> Result<Self, AtStrError> {
+        if handle.contains(|c: char| c.is_ascii_uppercase()) {
+            return Self::new_owned(handle);
+        }
         let stripped = handle
             .strip_prefix("at://")
             .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
-
         if stripped.len() > 253 {
             Err(AtStrError::too_long(
                 "handle",
@@ -66,7 +68,7 @@ impl<'h> Handle<'h> {
                 SmolStr::new_static("invalid"),
             ))
         } else if ends_with(stripped, DISALLOWED_TLDS) {
-            // speicifically pass this through as it is returned in instances where someone
+            // specifically pass this through as it is returned in instances where someone
             // has screwed up their handle, and it's awkward to fail so early
             if handle == "handle.invalid" {
                 Ok(Self(CowStr::Borrowed(stripped)))
@@ -93,7 +95,8 @@ impl<'h> Handle<'h> {
             .strip_prefix("at://")
             .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
-        let handle = stripped;
+        let normalized = stripped.to_lowercase_smolstr();
+        let handle = normalized.as_str();
         if handle.len() > 253 {
             Err(AtStrError::too_long("handle", handle, 253, handle.len()))
         } else if !HANDLE_REGEX.is_match(handle) {
@@ -103,9 +106,19 @@ impl<'h> Handle<'h> {
                 SmolStr::new_static("invalid"),
             ))
         } else if ends_with(handle, DISALLOWED_TLDS) {
-            Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
+            // specifically pass this through as it is returned in instances where someone
+            // has screwed up their handle, and it's awkward to fail so early
+            if handle == "handle.invalid" {
+                Ok(Self(CowStr::Owned(normalized)))
+            } else {
+                Err(AtStrError::disallowed(
+                    "handle",
+                    normalized.as_str(),
+                    DISALLOWED_TLDS,
+                ))
+            }
         } else {
-            Ok(Self(CowStr::Owned(handle.to_smolstr())))
+            Ok(Self(CowStr::Owned(normalized)))
         }
     }
 
@@ -115,19 +128,30 @@ impl<'h> Handle<'h> {
             .strip_prefix("at://")
             .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
-        let handle = stripped;
+
+        let handle = if handle.contains(|c: char| c.is_ascii_uppercase()) {
+            stripped.to_lowercase_smolstr()
+        } else {
+            SmolStr::new_static(stripped)
+        };
         if handle.len() > 253 {
-            Err(AtStrError::too_long("handle", handle, 253, handle.len()))
-        } else if !HANDLE_REGEX.is_match(handle) {
+            Err(AtStrError::too_long("handle", &handle, 253, handle.len()))
+        } else if !HANDLE_REGEX.is_match(&handle) {
             Err(AtStrError::regex(
                 "handle",
-                handle,
+                &handle,
                 SmolStr::new_static("invalid"),
             ))
-        } else if ends_with(handle, DISALLOWED_TLDS) {
-            Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
+        } else if ends_with(&handle, DISALLOWED_TLDS) {
+            // specifically pass this through as it is returned in instances where someone
+            // has screwed up their handle, and it's awkward to fail so early
+            if handle == "handle.invalid" {
+                Ok(Self(CowStr::Owned(handle)))
+            } else {
+                Err(AtStrError::disallowed("handle", stripped, DISALLOWED_TLDS))
+            }
         } else {
-            Ok(Self(CowStr::new_static(handle)))
+            Ok(Self(CowStr::Owned(handle)))
         }
     }
 
@@ -136,6 +160,9 @@ impl<'h> Handle<'h> {
     /// May allocate for a long handle with an at:// or @ prefix, otherwise borrows.
     /// Accepts (and strips) preceding '@' or 'at://' if present
     pub fn new_cow(handle: CowStr<'h>) -> Result<Self, AtStrError> {
+        if handle.contains(|c: char| c.is_ascii_uppercase()) {
+            return Self::new_owned(handle);
+        }
         let handle = if let Some(stripped) = handle.strip_prefix("at://") {
             CowStr::copy_from_str(stripped)
         } else if let Some(stripped) = handle.strip_prefix('@') {
@@ -152,7 +179,17 @@ impl<'h> Handle<'h> {
                 SmolStr::new_static("invalid"),
             ))
         } else if ends_with(&handle, DISALLOWED_TLDS) {
-            Err(AtStrError::disallowed("handle", &handle, DISALLOWED_TLDS))
+            // specifically pass this through as it is returned in instances where someone
+            // has screwed up their handle, and it's awkward to fail so early
+            if handle == "handle.invalid" {
+                Ok(Self(handle))
+            } else {
+                Err(AtStrError::disallowed(
+                    "handle",
+                    handle.as_str(),
+                    DISALLOWED_TLDS,
+                ))
+            }
         } else {
             Ok(Self(handle))
         }
@@ -165,6 +202,9 @@ impl<'h> Handle<'h> {
     ///
     /// Accepts (and strips) preceding '@' or 'at://' if present
     pub fn raw(handle: &'h str) -> Self {
+        if handle.contains(|c: char| c.is_ascii_uppercase()) {
+            return Self::new_owned(handle).expect("Invalid handle");
+        }
         let stripped = handle
             .strip_prefix("at://")
             .or_else(|| handle.strip_prefix('@'))
@@ -175,7 +215,13 @@ impl<'h> Handle<'h> {
         } else if !HANDLE_REGEX.is_match(handle) {
             panic!("Invalid handle")
         } else if ends_with(handle, DISALLOWED_TLDS) {
-            panic!("top-level domain not allowed in handles")
+            // specifically pass this through as it is returned in instances where someone
+            // has screwed up their handle, and it's awkward to fail so early
+            if handle == "handle.invalid" {
+                Self(CowStr::Borrowed(stripped))
+            } else {
+                panic!("top-level domain not allowed in handles")
+            }
         } else {
             Self(CowStr::Borrowed(handle))
         }
@@ -190,6 +236,9 @@ impl<'h> Handle<'h> {
             .strip_prefix("at://")
             .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
+        if stripped.contains(|c: char| c.is_ascii_uppercase()) {
+            return Self(CowStr::Owned(stripped.to_lowercase_smolstr()));
+        }
         Self(CowStr::Borrowed(stripped))
     }
 
