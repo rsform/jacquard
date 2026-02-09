@@ -103,7 +103,6 @@ impl<'a> DidDocument<'a> {
             .as_ref()
             .map(|v| {
                 v.iter()
-                    .filter_map(|s| s.strip_prefix("at://"))
                     .filter_map(|h| Handle::new(h).ok())
                     .map(|h| h.into_static())
                     .collect()
