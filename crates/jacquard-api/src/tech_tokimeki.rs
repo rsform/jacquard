@@ -5,3 +5,4 @@
 
 pub mod kaku;
 pub mod poll;
+pub mod takibi;

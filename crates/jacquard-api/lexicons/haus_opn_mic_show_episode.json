@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "haus.opn.mic.show.episode",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A specific episode or VOD of a show.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "showUri",
+          "title",
+          "createdAt"
+        ],
+        "properties": {
+          "airingDate": {
+            "type": "string",
+            "description": "Scheduled or actual date/time when this episode airs.",
+            "format": "datetime"
+          },
+          "coverArt": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "showUri": {
+            "type": "string",
+            "description": "Reference to the haus.opn.mic.show record.",
+            "format": "at-uri"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current episode lifecycle status.",
+            "knownValues": [
+              "upcoming",
+              "live",
+              "ended"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "vodUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

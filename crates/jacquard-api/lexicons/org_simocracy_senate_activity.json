@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.senate.activity",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Senate simulation activity log entry.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "activityType",
+          "committeeSims",
+          "createdAt"
+        ],
+        "properties": {
+          "activityType": {
+            "type": "string",
+            "description": "Type of senate activity",
+            "knownValues": [
+              "committee_evaluation",
+              "simulation_started",
+              "simulation_completed"
+            ]
+          },
+          "committeeSims": {
+            "type": "array",
+            "description": "References to the sim records participating in this committee",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 7
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the activity was logged",
+            "format": "datetime"
+          },
+          "evaluation": {
+            "type": "ref",
+            "description": "Link to org.hypercerts.claim.evaluation record",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "proposalText": {
+            "type": "string",
+            "description": "The proposal text being evaluated",
+            "maxLength": 10000
+          },
+          "resultSummary": {
+            "type": "string",
+            "description": "Summary of the simulation result",
+            "maxLength": 50000
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the activity",
+            "knownValues": [
+              "in_progress",
+              "completed",
+              "failed"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

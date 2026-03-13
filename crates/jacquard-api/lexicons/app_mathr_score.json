@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "app.mathr.score",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A player's score record stored in their own PDS for personal backup",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "level",
+          "totalSuccesses",
+          "totalChallenges",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the score was recorded",
+            "format": "datetime"
+          },
+          "level": {
+            "type": "integer",
+            "description": "The highest level reached by the player",
+            "minimum": 1
+          },
+          "percentage": {
+            "type": "integer",
+            "description": "Success rate as a percentage (0-100)",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "totalChallenges": {
+            "type": "integer",
+            "description": "Total number of challenges attempted",
+            "minimum": 1
+          },
+          "totalSuccesses": {
+            "type": "integer",
+            "description": "Total number of correct answers",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

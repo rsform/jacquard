@@ -25,6 +25,7 @@
         "description": "Tophhie profile record",
         "required": [
           "createdAt",
+          "pdsPreferences",
           "communicationPreferences"
         ],
         "properties": {
@@ -54,7 +55,10 @@
     "pdsPreferences": {
       "type": "object",
       "description": "Granular PDS preference consent flags.",
-      "required": [],
+      "required": [
+        "showOnHomepage",
+        "accessibilityScoring"
+      ],
       "properties": {
         "accessibilityScoring": {
           "type": "boolean",

@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.listBookIds",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List all book IDs and locations for static site generation.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books",
+            "locations"
+          ],
+          "properties": {
+            "books": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "org.passingreads.defs#bookIdEntry"
+              }
+            },
+            "locations": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "org.passingreads.defs#locationEntry"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

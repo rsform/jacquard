@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "io.sound.credit",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Attribution for a creative work",
+      "required": [
+        "name",
+        "role"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the credited person",
+          "maxLength": 640,
+          "maxGraphemes": 320
+        },
+        "role": {
+          "type": "string",
+          "description": "Role: composer, lyricist, arranger, etc",
+          "maxLength": 64,
+          "maxGraphemes": 32,
+          "knownValues": [
+            "composer",
+            "arranger",
+            "lyricist",
+            "transcriber",
+            "orchestrator",
+            "adapter",
+            "artist",
+            "producer"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "description": "URL to credited person's profile or website",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

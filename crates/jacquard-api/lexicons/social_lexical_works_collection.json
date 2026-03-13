@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "social.lexical.works.collection",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "",
+            "maxLength": 1024,
+            "maxGraphemes": 512
+          }
+        }
+      }
+    }
+  }
+}

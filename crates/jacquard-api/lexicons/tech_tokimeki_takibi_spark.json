@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.takibi.spark",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A spark record - throwing a short message into the fire. Something you like or words that cheer you up.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "text": {
+            "type": "string",
+            "description": "Short text (up to 30 graphemes)",
+            "maxLength": 100,
+            "maxGraphemes": 30
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.getBooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get full details about multiple books in a single request.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "string",
+            "description": "Comma-separated list of book IDs"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books"
+          ],
+          "properties": {
+            "books": {
+              "type": "array",
+              "description": "List of books found. Missing books are omitted.",
+              "items": {
+                "type": "ref",
+                "ref": "org.passingreads.book.defs#statefulBook"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

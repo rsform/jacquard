@@ -1,0 +1,136 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.evaluator.service",
+  "description": "Declaration record published at rkey 'self' to register an account as an evaluator service. Analogous to app.bsky.labeler.service for labelers.",
+  "defs": {
+    "evaluationTypeDefinition": {
+      "type": "object",
+      "description": "Definition of a single evaluation type produced by this evaluator.",
+      "required": [
+        "identifier",
+        "resultType"
+      ],
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "The evaluation type identifier (must match an entry in evaluationTypes).",
+          "maxGraphemes": 64
+        },
+        "locales": {
+          "type": "array",
+          "description": "Human-readable names and descriptions in various languages.",
+          "items": {
+            "type": "ref",
+            "ref": "#evaluationTypeLocale"
+          },
+          "maxLength": 20
+        },
+        "method": {
+          "type": "ref",
+          "description": "Default method info for this evaluation type (can be overridden per-evaluation).",
+          "ref": "app.gainforest.evaluator.defs#methodInfo"
+        },
+        "resultType": {
+          "type": "string",
+          "description": "The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').",
+          "maxGraphemes": 128
+        }
+      }
+    },
+    "evaluationTypeLocale": {
+      "type": "object",
+      "description": "Localized name and description for an evaluation type.",
+      "required": [
+        "lang",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Longer description of what this evaluation type does.",
+          "maxGraphemes": 2048
+        },
+        "lang": {
+          "type": "string",
+          "description": "Language code (BCP-47, e.g., 'en', 'pt-BR').",
+          "maxGraphemes": 16
+        },
+        "name": {
+          "type": "string",
+          "description": "Short human-readable name for this evaluation type.",
+          "maxGraphemes": 128
+        }
+      }
+    },
+    "evaluatorPolicies": {
+      "type": "object",
+      "description": "Policies declaring what this evaluator does and how it operates.",
+      "required": [
+        "evaluationTypes"
+      ],
+      "properties": {
+        "accessModel": {
+          "type": "string",
+          "description": "Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').",
+          "maxGraphemes": 64,
+          "knownValues": [
+            "open",
+            "subscription"
+          ]
+        },
+        "evaluationTypeDefinitions": {
+          "type": "array",
+          "description": "Detailed definitions for each evaluation type, including human-readable descriptions.",
+          "items": {
+            "type": "ref",
+            "ref": "#evaluationTypeDefinition"
+          },
+          "maxLength": 20
+        },
+        "evaluationTypes": {
+          "type": "array",
+          "description": "List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').",
+          "items": {
+            "type": "string",
+            "maxGraphemes": 64
+          },
+          "maxLength": 20
+        },
+        "subjectCollections": {
+          "type": "array",
+          "description": "NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').",
+          "items": {
+            "type": "string",
+            "maxGraphemes": 128
+          },
+          "maxLength": 20
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "An evaluator service declaration. Publish at /app.gainforest.evaluator.service/self to declare this account as an evaluator.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "policies",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of when this evaluator service was declared.",
+            "format": "datetime"
+          },
+          "policies": {
+            "type": "ref",
+            "description": "The evaluator's policies including supported evaluation types and access model.",
+            "ref": "#evaluatorPolicies"
+          }
+        }
+      }
+    }
+  }
+}

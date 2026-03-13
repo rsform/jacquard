@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.answer",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A person's answer to a question",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "question",
+          "text",
+          "certainty",
+          "timestamp"
+        ],
+        "properties": {
+          "certainty": {
+            "type": "string",
+            "description": "How certain the person is about this answer",
+            "knownValues": [
+              "deadCertain",
+              "fairlySure",
+              "educatedGuess",
+              "wildGuess"
+            ]
+          },
+          "question": {
+            "type": "ref",
+            "description": "Reference to the question being answered",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "The answer text",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When this answer was submitted",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

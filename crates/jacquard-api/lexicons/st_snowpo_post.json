@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "st.snowpo.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record linking to a Markdown file.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "commentRoot": {
+            "type": "string",
+            "description": "A Bluesky post to use as the comment root",
+            "format": "at-uri"
+          },
+          "content": {
+            "type": "blob",
+            "accept": [
+              "text/markdown"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this post was originally created.",
+            "format": "datetime"
+          },
+          "previewText": {
+            "type": "string",
+            "description": "Display title or preview text",
+            "maxLength": 300
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this post was last updated.",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

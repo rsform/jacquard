@@ -37,51 +37,51 @@ pub mod device_list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Current;
-        type Id;
         type Name;
+        type Id;
+        type Current;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Current = Unset;
-        type Id = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `current` field to Set
-    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrent<S> {}
-    impl<S: State> State for SetCurrent<S> {
-        type Current = Set<members::current>;
-        type Id = S::Id;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Current = S::Current;
-        type Id = Set<members::id>;
-        type Name = S::Name;
+        type Id = Unset;
+        type Current = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Current = S::Current;
-        type Id = S::Id;
         type Name = Set<members::name>;
+        type Id = S::Id;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `current` field to Set
+    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrent<S> {}
+    impl<S: State> State for SetCurrent<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Current = Set<members::current>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current` field
-        pub struct current(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `current` field
+        pub struct current(());
     }
 }
 
@@ -174,9 +174,9 @@ where
 impl<'a, S> DeviceListItemBuilder<'a, S>
 where
     S: device_list_item_state::State,
-    S::Current: device_list_item_state::IsSet,
-    S::Id: device_list_item_state::IsSet,
     S::Name: device_list_item_state::IsSet,
+    S::Id: device_list_item_state::IsSet,
+    S::Current: device_list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeviceListItem<'a> {

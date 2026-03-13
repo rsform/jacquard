@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "org.hyperboards.displayProfile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User-declared visual presentation defaults for how a contributor appears on hyperboards. Stored in the contributor's own PDS and reusable across multiple boards.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created.",
+            "format": "datetime"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name override for this user on hyperboards.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "hoverIframeUrl": {
+            "type": "string",
+            "description": "Default hover iframe URL for this user across boards.",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "hoverImage": {
+            "type": "union",
+            "description": "Default hover image for this user across boards, as a URI or image blob.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallImage"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "description": "Avatar or face image override for this user on hyperboards, as a URI or image blob.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallImage"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "Default click-through link URL for this user across boards.",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "video": {
+            "type": "union",
+            "description": "Default video for this user across boards, as a URI (embed/direct link) or uploaded video blob.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallVideo"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

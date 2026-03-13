@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.dwc.measurement",
+  "description": "A measurement or fact record aligned with the Darwin Core MeasurementOrFact class. Extension record that links to an occurrence, enabling multiple measurements per organism (e.g., DBH, height, canopy cover for a tree).",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A measurement, fact, characteristic, or assertion about an occurrence. Multiple measurement records can reference the same occurrence, solving the Simple DwC one-measurement-per-record limitation.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "occurrenceRef",
+          "measurementType",
+          "measurementValue",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of record creation in the ATProto PDS.",
+            "format": "datetime"
+          },
+          "measurementAccuracy": {
+            "type": "string",
+            "description": "The description of the potential error associated with the measurementValue (e.g., '0.5 cm', '5%').",
+            "maxGraphemes": 256
+          },
+          "measurementDeterminedBy": {
+            "type": "string",
+            "description": "Person(s) who determined the measurement. Pipe-delimited for multiple.",
+            "maxGraphemes": 512
+          },
+          "measurementDeterminedDate": {
+            "type": "string",
+            "description": "The date the measurement was made. ISO 8601 format.",
+            "maxGraphemes": 64
+          },
+          "measurementID": {
+            "type": "string",
+            "description": "An identifier for the measurement. Should be unique within the dataset.",
+            "maxGraphemes": 256
+          },
+          "measurementMethod": {
+            "type": "string",
+            "description": "The description of or reference to the method used to determine the measurement (e.g., 'diameter tape at 1.3m height', 'laser rangefinder', 'Bitterlich method').",
+            "maxGraphemes": 1024
+          },
+          "measurementRemarks": {
+            "type": "string",
+            "description": "Comments or notes accompanying the measurement.",
+            "maxGraphemes": 5000
+          },
+          "measurementType": {
+            "type": "string",
+            "description": "The nature of the measurement, fact, characteristic, or assertion (e.g., 'DBH', 'tree height', 'canopy cover', 'tail length', 'body mass', 'soil pH', 'water temperature').",
+            "maxGraphemes": 256
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The units for the measurementValue (e.g., 'cm', 'm', 'kg', 'mm', '%', 'degrees Celsius').",
+            "maxGraphemes": 64
+          },
+          "measurementValue": {
+            "type": "string",
+            "description": "The value of the measurement, fact, characteristic, or assertion (e.g., '45.2', 'present', 'blue').",
+            "maxGraphemes": 1024
+          },
+          "occurrenceID": {
+            "type": "string",
+            "description": "The occurrenceID of the linked occurrence record (for cross-system interoperability).",
+            "maxGraphemes": 256
+          },
+          "occurrenceRef": {
+            "type": "string",
+            "description": "AT-URI reference to the app.gainforest.dwc.occurrence record this measurement belongs to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

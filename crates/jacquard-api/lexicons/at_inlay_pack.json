@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.pack",
+  "defs": {
+    "export": {
+      "type": "object",
+      "required": [
+        "type",
+        "component"
+      ],
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "AT-URI of the component record",
+          "format": "at-uri"
+        },
+        "type": {
+          "type": "string",
+          "description": "NSID of the type being exported",
+          "format": "nsid"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A list of type to component exports",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "exports"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "exports": {
+            "type": "array",
+            "description": "Type to component mappings",
+            "items": {
+              "type": "ref",
+              "ref": "#export"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Short slug for the pack (e.g. \"core\", \"ui\")",
+            "maxLength": 64
+          }
+        }
+      }
+    }
+  }
+}

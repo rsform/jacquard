@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "at.margin.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A profile for a user on the Margin network.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "User avatar image.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "bio": {
+            "type": "string",
+            "description": "User biography or description.",
+            "maxLength": 5000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for the user.",
+            "maxLength": 640
+          },
+          "links": {
+            "type": "array",
+            "description": "List of other relevant links (e.g. GitHub, Bluesky, etc).",
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "maxLength": 20
+          },
+          "website": {
+            "type": "string",
+            "description": "User website URL.",
+            "maxLength": 1000
+          }
+        }
+      }
+    }
+  }
+}

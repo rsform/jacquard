@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Loading",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Shows fallback content while children are loading.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children",
+            "fallback"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            },
+            "fallback": {
+              "type": "ref",
+              "ref": "at.inlay.defs#element"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

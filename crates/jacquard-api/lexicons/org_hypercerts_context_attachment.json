@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.context.attachment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An attachment providing commentary, context, evidence, or documentary material related to a hypercert record (e.g. an activity, project, claim, or evaluation).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "The files, documents, or external references included in this attachment record.",
+            "items": {
+              "type": "union",
+              "refs": [
+                "org.hypercerts.defs#uri",
+                "org.hypercerts.defs#smallBlob"
+              ]
+            },
+            "maxLength": 100
+          },
+          "contentType": {
+            "type": "string",
+            "description": "The type of attachment, e.g. report, audit, evidence, testimonial, methodology, etc.",
+            "maxLength": 64
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "ref",
+            "description": "Rich-text description, represented as a Leaflet linear document.",
+            "ref": "pub.leaflet.pages.linearDocument#main"
+          },
+          "location": {
+            "type": "ref",
+            "description": "A strong reference to the location where this attachment's subject matter occurred. The record referenced must conform with the lexicon app.certified.location.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Short summary of this attachment, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "shortDescriptionFacets": {
+            "type": "array",
+            "description": "Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "description": "References to the subject(s) the attachment is connected to—this may be an activity claim, outcome claim, measurement, evaluation, or even another attachment. This is optional as the attachment can exist before the claim is recorded.",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 100
+          },
+          "title": {
+            "type": "string",
+            "description": "Display title for this attachment (e.g. 'Impact Assessment Report', 'Audit Findings')",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

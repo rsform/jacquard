@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "app.fitsky.goal",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A fitness goal to track progress against",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "metric",
+          "targetValue",
+          "period",
+          "startDate",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "metric": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "distance",
+              "workouts",
+              "duration",
+              "pace"
+            ]
+          },
+          "period": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "weekly",
+              "monthly",
+              "yearly"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "targetValue": {
+            "type": "integer",
+            "description": "Target value in base units (meters for distance, seconds for duration, seconds-per-km for pace, count for workouts)",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

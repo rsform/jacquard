@@ -1,0 +1,90 @@
+{
+  "lexicon": 1,
+  "id": "org.atpodcasting.podcast",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A podcast feed/show. Record key is the podcast's Podcasting 2.0 UUIDv5 GUID, enabling direct lookup from RSS feed metadata.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "artwork",
+          "language",
+          "feedUrl",
+          "categories",
+          "guid",
+          "createdAt"
+        ],
+        "properties": {
+          "artwork": {
+            "type": "blob",
+            "description": "Cover artwork for the podcast. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 5000000
+          },
+          "categories": {
+            "type": "array",
+            "description": "Podcast categories (max 3).",
+            "items": {
+              "type": "union",
+              "refs": [
+                "org.atpodcasting.defs#appleCategory"
+              ]
+            },
+            "maxLength": 3
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the podcast record was created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the podcast.",
+            "maxLength": 4000
+          },
+          "explicit": {
+            "type": "boolean",
+            "description": "Whether the podcast contains explicit content. Defaults to false."
+          },
+          "feedUrl": {
+            "type": "string",
+            "description": "URL of the podcast's RSS feed.",
+            "format": "uri"
+          },
+          "guid": {
+            "type": "string",
+            "description": "Podcasting 2.0 UUIDv5 GUID of the podcast. Must match the record key.",
+            "maxLength": 36
+          },
+          "language": {
+            "type": "string",
+            "description": "Primary language of the podcast (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').",
+            "format": "language"
+          },
+          "link": {
+            "type": "string",
+            "description": "URL of the podcast's homepage or companion website.",
+            "format": "uri"
+          },
+          "movedTo": {
+            "type": "string",
+            "description": "AT URI of the new canonical podcast record after an ownership transfer. When set, consumers should follow this reference to the current record.",
+            "format": "at-uri"
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of the podcast.",
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}

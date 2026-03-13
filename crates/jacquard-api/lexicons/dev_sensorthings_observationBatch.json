@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.observationBatch",
+  "defs": {
+    "batchEntry": {
+      "type": "object",
+      "required": [
+        "t",
+        "result"
+      ],
+      "properties": {
+        "q": {
+          "type": "string",
+          "knownValues": [
+            "dev.sensorthings.quality#good",
+            "dev.sensorthings.quality#suspect",
+            "dev.sensorthings.quality#missing"
+          ]
+        },
+        "result": {
+          "type": "union",
+          "description": "Observation result, same union as dev.sensorthings.observation",
+          "refs": [
+            "dev.sensorthings.observation#numericResult",
+            "dev.sensorthings.observation#categoryResult",
+            "dev.sensorthings.observation#booleanResult",
+            "dev.sensorthings.observation#arrayResult",
+            "dev.sensorthings.observation#geoPointResult"
+          ]
+        },
+        "t": {
+          "type": "string",
+          "description": "phenomenonTime",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A batch of observations for a single Datastream, covering a contiguous time window. Trades individual addressability for reduced commit overhead.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "datastream",
+          "windowStart",
+          "windowEnd",
+          "observations"
+        ],
+        "properties": {
+          "datastream": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "observations": {
+            "type": "array",
+            "description": "Array of observations in chronological order",
+            "items": {
+              "type": "ref",
+              "ref": "#batchEntry"
+            },
+            "maxLength": 1440
+          },
+          "windowEnd": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "windowStart": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

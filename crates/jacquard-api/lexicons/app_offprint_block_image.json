@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.image",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "properties": {
+        "alignment": {
+          "type": "string",
+          "description": "Horizontal alignment",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility",
+          "maxGraphemes": 300
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
+        "blob": {
+          "type": "blob",
+          "description": "The image blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 10000000
+        },
+        "caption": {
+          "type": "string",
+          "description": "Image caption"
+        },
+        "captionFacets": {
+          "type": "array",
+          "description": "Facets for caption formatting",
+          "items": {
+            "type": "ref",
+            "ref": "app.offprint.richtext.facet"
+          }
+        },
+        "width": {
+          "type": "string",
+          "description": "CSS width value (e.g., \"50%\", \"300px\")"
+        }
+      }
+    }
+  }
+}

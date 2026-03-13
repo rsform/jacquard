@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.recipe.collection",
+  "description": "Record representing a public list of recipes. If it's on ATProto, it's public.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this collection was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the collection",
+            "maxLength": 3000
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the collection",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this collection was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

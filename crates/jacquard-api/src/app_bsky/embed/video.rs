@@ -269,6 +269,27 @@ fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "presentation",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A hint to the client about how to present the video.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("video"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
@@ -356,6 +377,27 @@ fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "presentation",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A hint to the client about how to present the video.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "thumbnail",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -421,6 +463,10 @@ pub struct Video<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub captions: std::option::Option<Vec<crate::app_bsky::embed::video::Caption<'a>>>,
+    /// A hint to the client about how to present the video.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub presentation: std::option::Option<VideoPresentation<'a>>,
     /// The mp4 video file. May be up to 100mb, formerly limited to 50mb.
     #[serde(borrow)]
     pub video: jacquard_common::types::blob::BlobRef<'a>,
@@ -465,6 +511,7 @@ pub struct VideoBuilder<'a, S: video_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::embed::video::Caption<'a>>>,
+        ::core::option::Option<VideoPresentation<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -482,7 +529,7 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
     pub fn new() -> Self {
         VideoBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -539,6 +586,22 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     }
 }
 
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `presentation` field (optional)
+    pub fn presentation(
+        mut self,
+        value: impl Into<Option<VideoPresentation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `presentation` field to an Option value (optional)
+    pub fn maybe_presentation(mut self, value: Option<VideoPresentation<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
 impl<'a, S> VideoBuilder<'a, S>
 where
     S: video_state::State,
@@ -549,7 +612,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
     ) -> VideoBuilder<'a, video_state::SetVideo<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         VideoBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -569,7 +632,8 @@ where
             alt: self.__unsafe_private_named.0,
             aspect_ratio: self.__unsafe_private_named.1,
             captions: self.__unsafe_private_named.2,
-            video: self.__unsafe_private_named.3.unwrap(),
+            presentation: self.__unsafe_private_named.3,
+            video: self.__unsafe_private_named.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -585,8 +649,98 @@ where
             alt: self.__unsafe_private_named.0,
             aspect_ratio: self.__unsafe_private_named.1,
             captions: self.__unsafe_private_named.2,
-            video: self.__unsafe_private_named.3.unwrap(),
+            presentation: self.__unsafe_private_named.3,
+            video: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// A hint to the client about how to present the video.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VideoPresentation<'a> {
+    Default,
+    Gif,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VideoPresentation<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Default => "default",
+            Self::Gif => "gif",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VideoPresentation<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "default" => Self::Default,
+            "gif" => Self::Gif,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VideoPresentation<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "default" => Self::Default,
+            "gif" => Self::Gif,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VideoPresentation<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VideoPresentation<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VideoPresentation<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VideoPresentation<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VideoPresentation<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VideoPresentation<'_> {
+    type Output = VideoPresentation<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VideoPresentation::Default => VideoPresentation::Default,
+            VideoPresentation::Gif => VideoPresentation::Gif,
+            VideoPresentation::Other(v) => VideoPresentation::Other(v.into_static()),
         }
     }
 }
@@ -672,6 +826,10 @@ pub struct View<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(borrow)]
     pub playlist: jacquard_common::types::string::Uri<'a>,
+    /// A hint to the client about how to present the video.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub presentation: std::option::Option<ViewPresentation<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub thumbnail: std::option::Option<jacquard_common::types::string::Uri<'a>>,
@@ -687,37 +845,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Playlist;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Playlist = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Playlist = S::Playlist;
+        type Cid = Unset;
     }
     ///State transition - sets the `playlist` field to Set
     pub struct SetPlaylist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlaylist<S> {}
     impl<S: State> State for SetPlaylist<S> {
-        type Cid = S::Cid;
         type Playlist = Set<members::playlist>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Playlist = S::Playlist;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `playlist` field
         pub struct playlist(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -729,6 +887,7 @@ pub struct ViewBuilder<'a, S: view_state::State> {
         ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ViewPresentation<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -746,7 +905,7 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     pub fn new() -> Self {
         ViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -823,12 +982,28 @@ where
 }
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
+    /// Set the `presentation` field (optional)
+    pub fn presentation(
+        mut self,
+        value: impl Into<Option<ViewPresentation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `presentation` field to an Option value (optional)
+    pub fn maybe_presentation(mut self, value: Option<ViewPresentation<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
@@ -836,7 +1011,7 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -844,8 +1019,8 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
-    S::Cid: view_state::IsSet,
     S::Playlist: view_state::IsSet,
+    S::Cid: view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> View<'a> {
@@ -854,7 +1029,8 @@ where
             aspect_ratio: self.__unsafe_private_named.1,
             cid: self.__unsafe_private_named.2.unwrap(),
             playlist: self.__unsafe_private_named.3.unwrap(),
-            thumbnail: self.__unsafe_private_named.4,
+            presentation: self.__unsafe_private_named.4,
+            thumbnail: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -871,8 +1047,98 @@ where
             aspect_ratio: self.__unsafe_private_named.1,
             cid: self.__unsafe_private_named.2.unwrap(),
             playlist: self.__unsafe_private_named.3.unwrap(),
-            thumbnail: self.__unsafe_private_named.4,
+            presentation: self.__unsafe_private_named.4,
+            thumbnail: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// A hint to the client about how to present the video.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ViewPresentation<'a> {
+    Default,
+    Gif,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ViewPresentation<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Default => "default",
+            Self::Gif => "gif",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ViewPresentation<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "default" => Self::Default,
+            "gif" => Self::Gif,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ViewPresentation<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "default" => Self::Default,
+            "gif" => Self::Gif,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ViewPresentation<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ViewPresentation<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ViewPresentation<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ViewPresentation<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ViewPresentation<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ViewPresentation<'_> {
+    type Output = ViewPresentation<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ViewPresentation::Default => ViewPresentation::Default,
+            ViewPresentation::Gif => ViewPresentation::Gif,
+            ViewPresentation::Other(v) => ViewPresentation::Other(v.into_static()),
         }
     }
 }

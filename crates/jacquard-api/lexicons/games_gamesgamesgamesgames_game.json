@@ -1,0 +1,181 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.game",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A video game.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt",
+          "applicationType"
+        ],
+        "properties": {
+          "ageRatings": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#ageRating"
+            }
+          },
+          "alternativeNames": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#alternativeName"
+            }
+          },
+          "applicationType": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#applicationType"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed game description in plain text, with formatting expressed via descriptionFacets."
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Rich text facets for the description field.",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.richtext.facet"
+            }
+          },
+          "engines": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "externalIds": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#externalIds"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#genre"
+            }
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "languageSupports": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#languageSupport"
+            }
+          },
+          "media": {
+            "type": "array",
+            "description": "Images associated with the game.",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+            }
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#mode"
+            }
+          },
+          "multiplayerModes": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#multiplayerMode"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "platformFeatures": {
+            "type": "array",
+            "description": "Platform-specific feature support.",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#platformFeatures"
+            }
+          },
+          "playerPerspectives": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#playerPerspective"
+            }
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "When this record was marked ready for public viewing.",
+            "format": "datetime"
+          },
+          "releases": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#release"
+            }
+          },
+          "storyline": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "systemRequirements": {
+            "type": "array",
+            "description": "System requirements per platform.",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#systemRequirements"
+            }
+          },
+          "themes": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#theme"
+            }
+          },
+          "timeToBeat": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#timeToBeat"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#externalVideo"
+            }
+          },
+          "websites": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#website"
+            }
+          }
+        }
+      }
+    }
+  }
+}

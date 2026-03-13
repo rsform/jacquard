@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.graph.getLikes",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the like count for a game and whether the authenticated user has liked it.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "AT URI of the game record.",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "count",
+            "liked"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Total number of likes on this game."
+            },
+            "liked": {
+              "type": "boolean",
+              "description": "Whether the authenticated user has liked this game."
+            }
+          }
+        }
+      }
+    }
+  }
+}

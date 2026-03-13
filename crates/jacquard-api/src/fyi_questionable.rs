@@ -6,3 +6,5 @@
 pub mod actor;
 pub mod answer;
 pub mod question;
+pub mod richtext;
+pub mod selected_answer;

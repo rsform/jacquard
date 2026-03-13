@@ -1,0 +1,89 @@
+{
+  "lexicon": 1,
+  "id": "media.ionosphere.programme",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A programme represents an individual piece of media. It does not represent a long-running show.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "ionosphere",
+          "name",
+          "language"
+        ],
+        "properties": {
+          "credits": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#credit"
+            }
+          },
+          "delivery": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "media.ionosphere.defs#broadcast",
+                "media.ionosphere.defs#recording"
+              ],
+              "closed": true
+            }
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#genre"
+            }
+          },
+          "icon": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ]
+          },
+          "ionosphere": {
+            "type": "string",
+            "description": "Version identifier",
+            "maxLength": 128
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the string values in this record. NOT the language of the content",
+            "format": "language"
+          },
+          "memberOf": {
+            "type": "array",
+            "description": "A list of groups this record is a member of",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#membership"
+            }
+          },
+          "name": {
+            "type": "string",
+            "maxGraphemes": 128
+          },
+          "presentationLanguage": {
+            "type": "string",
+            "format": "language"
+          }
+        }
+      }
+    }
+  }
+}

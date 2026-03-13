@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Avatar",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Circular profile image at a fixed size.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "src"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID of the blob owner. Used to resolve blob URLs.",
+              "format": "did"
+            },
+            "lift": {
+              "type": "boolean",
+              "description": "Pull the avatar up by half its own height, overlapping the element above."
+            },
+            "size": {
+              "type": "string",
+              "description": "Size token.",
+              "default": "medium",
+              "maxLength": 32,
+              "knownValues": [
+                "xsmall",
+                "small",
+                "medium",
+                "large"
+              ]
+            },
+            "src": {
+              "type": "unknown",
+              "description": "Blob ref for the image."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

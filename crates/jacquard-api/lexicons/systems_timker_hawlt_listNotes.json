@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "systems.timker.hawlt.listNotes",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List note records from a repo, with optional pagination.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "repo": {
+            "type": "string",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notes"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#noteView"
+              }
+            }
+          }
+        }
+      }
+    },
+    "noteView": {
+      "type": "object",
+      "description": "A note record with its AT URI, CID, and server-side index timestamp.",
+      "required": [
+        "uri",
+        "cid",
+        "value",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "ref",
+          "ref": "systems.timker.hawlt.note"
+        }
+      }
+    }
+  }
+}

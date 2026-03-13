@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.storageBlobs",
+  "defs": {
+    "blobEntry": {
+      "type": "object",
+      "description": "A single PDS blob shard with optional integrity checksum",
+      "required": [
+        "blob"
+      ],
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "description": "Blob reference to a WebDataset tar archive",
+          "accept": [
+            "application/x-tar"
+          ],
+          "maxSize": 52428800
+        },
+        "checksum": {
+          "type": "ref",
+          "description": "Content hash for integrity verification (optional since PDS blobs have built-in CID integrity)",
+          "ref": "science.alt.dataset.entry#shardChecksum"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "description": "Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.",
+      "required": [
+        "blobs"
+      ],
+      "properties": {
+        "blobs": {
+          "type": "array",
+          "description": "Array of blob entries for WebDataset tar files",
+          "items": {
+            "type": "ref",
+            "ref": "#blobEntry"
+          },
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

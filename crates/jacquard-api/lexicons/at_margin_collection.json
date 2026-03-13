@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "at.margin.collection",
+  "description": "A collection of annotations (like a folder or notebook)",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A named collection for organizing annotations",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Collection description",
+            "maxLength": 500,
+            "maxGraphemes": 150
+          },
+          "icon": {
+            "type": "string",
+            "description": "Emoji icon or icon identifier for the collection",
+            "maxLength": 100,
+            "maxGraphemes": 100
+          },
+          "name": {
+            "type": "string",
+            "description": "Collection name",
+            "maxLength": 100,
+            "maxGraphemes": 50
+          }
+        }
+      }
+    }
+  }
+}

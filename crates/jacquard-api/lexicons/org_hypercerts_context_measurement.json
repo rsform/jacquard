@@ -1,0 +1,112 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.context.measurement",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Measurement data related to one or more records (e.g. activities, projects, etc.).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "metric",
+          "unit",
+          "value",
+          "createdAt"
+        ],
+        "properties": {
+          "comment": {
+            "type": "string",
+            "description": "Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "commentFacets": {
+            "type": "array",
+            "description": "Rich text annotations for `comment` (mentions, URLs, hashtags, etc).",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date and time when the measurement ended. For one-time measurements, this should equal the start date.",
+            "format": "datetime"
+          },
+          "evidenceURI": {
+            "type": "array",
+            "description": "URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "maxLength": 50
+          },
+          "locations": {
+            "type": "array",
+            "description": "Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 100
+          },
+          "measurers": {
+            "type": "array",
+            "description": "DIDs of the entities that performed this measurement",
+            "items": {
+              "type": "ref",
+              "ref": "app.certified.defs#did"
+            },
+            "maxLength": 100
+          },
+          "methodType": {
+            "type": "string",
+            "description": "Short identifier for the measurement methodology",
+            "maxLength": 30
+          },
+          "methodURI": {
+            "type": "string",
+            "description": "URI to methodology documentation, standard protocol, or measurement procedure",
+            "format": "uri"
+          },
+          "metric": {
+            "type": "string",
+            "description": "The metric being measured, e.g. forest area restored, number of users, etc.",
+            "maxLength": 500
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date and time when the measurement began.",
+            "format": "datetime"
+          },
+          "subjects": {
+            "type": "array",
+            "description": "Strong references to the records this measurement refers to (e.g. activities, projects, or claims).",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 100
+          },
+          "unit": {
+            "type": "string",
+            "description": "The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).",
+            "maxLength": 50
+          },
+          "value": {
+            "type": "string",
+            "description": "The measured value as a numeric string (e.g. '1234.56')",
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}

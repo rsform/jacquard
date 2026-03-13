@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "com.deckbelcher.collection.list",
+  "defs": {
+    "cardItem": {
+      "type": "object",
+      "description": "A card saved to the list.",
+      "required": [
+        "ref",
+        "addedAt"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "description": "Timestamp when this item was added to the list.",
+          "format": "datetime"
+        },
+        "ref": {
+          "type": "ref",
+          "description": "Reference to the card (scryfall printing + oracle card).",
+          "ref": "com.deckbelcher.defs#cardRef"
+        }
+      }
+    },
+    "deckItem": {
+      "type": "object",
+      "description": "A deck saved to the list.",
+      "required": [
+        "ref",
+        "addedAt"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "description": "Timestamp when this item was added to the list.",
+          "format": "datetime"
+        },
+        "ref": {
+          "type": "ref",
+          "description": "Reference to the deck record.",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A curated list of cards and/or decks.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "items",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the list was created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "ref",
+            "description": "Description of the list.",
+            "ref": "com.deckbelcher.richtext#document"
+          },
+          "items": {
+            "type": "array",
+            "description": "Items in the list.",
+            "items": {
+              "type": "union",
+              "refs": [
+                "#cardItem",
+                "#deckItem"
+              ]
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the list.",
+            "maxLength": 1280,
+            "maxGraphemes": 128
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when the list was last updated.",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

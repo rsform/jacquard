@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "app.protoimsg.chat.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A vote on a poll. Lives in the voter's repo.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "poll",
+          "selectedOptions",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of vote.",
+            "format": "datetime"
+          },
+          "poll": {
+            "type": "string",
+            "description": "AT-URI of the poll being voted on.",
+            "format": "at-uri"
+          },
+          "selectedOptions": {
+            "type": "array",
+            "description": "Indices of selected options (0-based).",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

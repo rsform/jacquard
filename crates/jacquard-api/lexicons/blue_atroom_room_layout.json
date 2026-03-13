@@ -1,0 +1,169 @@
+{
+  "lexicon": 1,
+  "id": "blue.atroom.room.layout",
+  "defs": {
+    "color": {
+      "type": "object",
+      "description": "RGB color with 8-bit channels.",
+      "required": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "properties": {
+        "blue": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "green": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "red": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
+      }
+    },
+    "floor": {
+      "type": "object",
+      "required": [
+        "surface"
+      ],
+      "properties": {
+        "surface": {
+          "type": "ref",
+          "ref": "#surface"
+        }
+      }
+    },
+    "furnishing": {
+      "type": "object",
+      "description": "A placed object in the room.",
+      "required": [
+        "object",
+        "position",
+        "rotation"
+      ],
+      "properties": {
+        "object": {
+          "type": "ref",
+          "description": "Strong reference to a blue.atroom.room.object record.",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "position": {
+          "type": "array",
+          "description": "Position [x, y, z] in millimeters.",
+          "items": {
+            "type": "integer"
+          },
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "rotation": {
+          "type": "array",
+          "description": "Euler rotation [x, y, z] in degrees.",
+          "items": {
+            "type": "integer"
+          },
+          "minLength": 3,
+          "maxLength": 3
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A room layout with placed objects.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "size",
+          "floor",
+          "wall",
+          "furnishings",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "floor": {
+            "type": "ref",
+            "ref": "#floor"
+          },
+          "furnishings": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#furnishing"
+            },
+            "maxLength": 100
+          },
+          "size": {
+            "type": "integer",
+            "description": "Room size in millimeters (square room).",
+            "minimum": 1000,
+            "maximum": 20000
+          },
+          "wall": {
+            "type": "ref",
+            "ref": "#wall"
+          }
+        }
+      }
+    },
+    "surface": {
+      "type": "object",
+      "required": [
+        "color"
+      ],
+      "properties": {
+        "color": {
+          "type": "ref",
+          "ref": "#color"
+        },
+        "texture": {
+          "type": "string",
+          "description": "Texture identifier."
+        },
+        "textureTiling": {
+          "type": "array",
+          "description": "Texture tiling [u, v].",
+          "items": {
+            "type": "integer"
+          },
+          "minLength": 2,
+          "maxLength": 2
+        }
+      }
+    },
+    "wall": {
+      "type": "object",
+      "description": "Wall configuration.",
+      "required": [
+        "height",
+        "thickness",
+        "surface"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Wall height in millimeters."
+        },
+        "surface": {
+          "type": "ref",
+          "ref": "#surface"
+        },
+        "thickness": {
+          "type": "integer",
+          "description": "Wall thickness in millimeters."
+        }
+      }
+    }
+  }
+}

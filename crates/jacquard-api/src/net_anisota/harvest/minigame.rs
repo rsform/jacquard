@@ -80,85 +80,85 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShapesCollected;
-        type RoundDuration;
         type GameContext;
         type PlayedAt;
         type FinalScore;
+        type ShapesCollected;
+        type RoundDuration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShapesCollected = Unset;
-        type RoundDuration = Unset;
         type GameContext = Unset;
         type PlayedAt = Unset;
         type FinalScore = Unset;
-    }
-    ///State transition - sets the `shapes_collected` field to Set
-    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
-    impl<S: State> State for SetShapesCollected<S> {
-        type ShapesCollected = Set<members::shapes_collected>;
-        type RoundDuration = S::RoundDuration;
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
-    }
-    ///State transition - sets the `round_duration` field to Set
-    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
-    impl<S: State> State for SetRoundDuration<S> {
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = Set<members::round_duration>;
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
+        type ShapesCollected = Unset;
+        type RoundDuration = Unset;
     }
     ///State transition - sets the `game_context` field to Set
     pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameContext<S> {}
     impl<S: State> State for SetGameContext<S> {
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
         type GameContext = Set<members::game_context>;
         type PlayedAt = S::PlayedAt;
         type FinalScore = S::FinalScore;
+        type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = S::RoundDuration;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
     impl<S: State> State for SetPlayedAt<S> {
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
         type GameContext = S::GameContext;
         type PlayedAt = Set<members::played_at>;
         type FinalScore = S::FinalScore;
+        type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = S::RoundDuration;
     }
     ///State transition - sets the `final_score` field to Set
     pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFinalScore<S> {}
     impl<S: State> State for SetFinalScore<S> {
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
         type GameContext = S::GameContext;
         type PlayedAt = S::PlayedAt;
         type FinalScore = Set<members::final_score>;
+        type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = S::RoundDuration;
+    }
+    ///State transition - sets the `shapes_collected` field to Set
+    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
+    impl<S: State> State for SetShapesCollected<S> {
+        type GameContext = S::GameContext;
+        type PlayedAt = S::PlayedAt;
+        type FinalScore = S::FinalScore;
+        type ShapesCollected = Set<members::shapes_collected>;
+        type RoundDuration = S::RoundDuration;
+    }
+    ///State transition - sets the `round_duration` field to Set
+    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
+    impl<S: State> State for SetRoundDuration<S> {
+        type GameContext = S::GameContext;
+        type PlayedAt = S::PlayedAt;
+        type FinalScore = S::FinalScore;
+        type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = Set<members::round_duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shapes_collected` field
-        pub struct shapes_collected(());
-        ///Marker type for the `round_duration` field
-        pub struct round_duration(());
         ///Marker type for the `game_context` field
         pub struct game_context(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
         ///Marker type for the `final_score` field
         pub struct final_score(());
+        ///Marker type for the `shapes_collected` field
+        pub struct shapes_collected(());
+        ///Marker type for the `round_duration` field
+        pub struct round_duration(());
     }
 }
 
@@ -499,11 +499,11 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S> MinigameBuilder<'a, S>
 where
     S: minigame_state::State,
-    S::ShapesCollected: minigame_state::IsSet,
-    S::RoundDuration: minigame_state::IsSet,
     S::GameContext: minigame_state::IsSet,
     S::PlayedAt: minigame_state::IsSet,
     S::FinalScore: minigame_state::IsSet,
+    S::ShapesCollected: minigame_state::IsSet,
+    S::RoundDuration: minigame_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Minigame<'a> {

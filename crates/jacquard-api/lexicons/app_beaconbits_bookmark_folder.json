@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "app.beaconbits.bookmark.folder",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A folder for organizing bookmarks",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "Hex color code for the folder (e.g., #ff0000)",
+            "maxGraphemes": 7
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the folder was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the folder",
+            "maxGraphemes": 280
+          },
+          "icon": {
+            "type": "string",
+            "description": "Lucide icon name",
+            "maxGraphemes": 64
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the folder",
+            "maxGraphemes": 64
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Visibility setting for the folder",
+            "default": "hidden",
+            "maxGraphemes": 32,
+            "knownValues": [
+              "public",
+              "unlisted",
+              "hidden"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.schedule.getPost",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get details of a specific scheduled post by ID.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Post ID.",
+            "maxLength": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "post"
+          ],
+          "properties": {
+            "post": {
+              "type": "ref",
+              "ref": "app.chronosky.schedule.listPosts#scheduledPost"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "PostNotFound"
+        }
+      ]
+    }
+  }
+}

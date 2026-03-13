@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "social.drydown.house",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A fragrance house or brand",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when house was created",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "House/brand name (must be unique per user)",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of last update (for name corrections)",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

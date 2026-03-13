@@ -1,7 +1,6 @@
 {
   "lexicon": 1,
   "id": "app.dropanchor.checkin",
-  "description": "A location check-in record for the Anchor app",
   "defs": {
     "address": {
       "type": "object",

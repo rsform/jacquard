@@ -1,0 +1,123 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.defs",
+  "defs": {
+    "cachePolicy": {
+      "type": "object",
+      "description": "Cache lifetime and invalidation tags returned by XRPC components.",
+      "properties": {
+        "life": {
+          "type": "string",
+          "description": "How frequently the underlying data changes",
+          "maxLength": 32,
+          "knownValues": [
+            "seconds",
+            "minutes",
+            "hours",
+            "max"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "description": "Data dependencies for cache invalidation",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#tagRecord",
+              "#tagLink"
+            ]
+          }
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "description": "A renderable Inlay element.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Stable key that identifies the component among its siblings.",
+          "maxLength": 256
+        },
+        "props": {
+          "type": "unknown",
+          "description": "Properties to pass to the component."
+        },
+        "type": {
+          "type": "string",
+          "description": "NSID of the component to render.",
+          "format": "nsid"
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "description": "Standard response from a component render call.",
+      "required": [
+        "node",
+        "cache"
+      ],
+      "properties": {
+        "cache": {
+          "type": "ref",
+          "description": "Cache lifetime and invalidation tags",
+          "ref": "#cachePolicy"
+        },
+        "node": {
+          "type": "ref",
+          "description": "Rendered element tree",
+          "ref": "#element"
+        }
+      }
+    },
+    "tagLink": {
+      "type": "object",
+      "description": "Cache tag: depend on backlink relationships to a subject.",
+      "required": [
+        "subject"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Collection NSID of the linking records. Omit for any collection.",
+          "format": "nsid"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Subject AT URI that is linked to",
+          "format": "at-uri"
+        }
+      }
+    },
+    "tagRecord": {
+      "type": "object",
+      "description": "Cache tag: depend on a specific record, collection, or identity.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "AT URI at record, collection, or identity granularity",
+          "format": "at-uri"
+        }
+      }
+    },
+    "viaValtown": {
+      "type": "object",
+      "required": [
+        "valId"
+      ],
+      "properties": {
+        "valId": {
+          "type": "string",
+          "description": "Val Town val UUID",
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

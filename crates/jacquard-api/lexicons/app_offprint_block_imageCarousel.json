@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.imageCarousel",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "autoplay": {
+          "type": "boolean",
+          "description": "Auto-advance slides",
+          "default": false
+        },
+        "caption": {
+          "type": "string",
+          "description": "Carousel caption"
+        },
+        "images": {
+          "type": "array",
+          "description": "Array of images in the carousel (2-6)",
+          "items": {
+            "type": "ref",
+            "ref": "app.offprint.block.imageGrid#gridImage"
+          },
+          "minLength": 2,
+          "maxLength": 6
+        },
+        "interval": {
+          "type": "integer",
+          "description": "Milliseconds between slides",
+          "default": 3000
+        }
+      }
+    }
+  }
+}

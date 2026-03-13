@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.agents",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A sim's constitution and agent configuration. One document per sim.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "sim",
+          "shortDescription",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the record was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Full constitution text: beliefs, values, governance positions. Rich text annotations may be provided via descriptionFacets.",
+            "maxLength": 30000,
+            "maxGraphemes": 3000
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Rich text annotations for description (mentions, URLs, hashtags, etc).",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Short summary of this sim's constitution, suitable for previews and list views. Rich text annotations may be provided via shortDescriptionFacets.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "shortDescriptionFacets": {
+            "type": "array",
+            "description": "Rich text annotations for shortDescription (mentions, URLs, hashtags, etc).",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "sim": {
+            "type": "ref",
+            "description": "Reference to the sim record this constitution belongs to",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

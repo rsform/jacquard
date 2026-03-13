@@ -33,37 +33,37 @@ pub mod remove_options_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Keys;
         type Scope;
+        type Keys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Keys = Unset;
         type Scope = Unset;
-    }
-    ///State transition - sets the `keys` field to Set
-    pub struct SetKeys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKeys<S> {}
-    impl<S: State> State for SetKeys<S> {
-        type Keys = Set<members::keys>;
-        type Scope = S::Scope;
+        type Keys = Unset;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
-        type Keys = S::Keys;
         type Scope = Set<members::scope>;
+        type Keys = S::Keys;
+    }
+    ///State transition - sets the `keys` field to Set
+    pub struct SetKeys<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKeys<S> {}
+    impl<S: State> State for SetKeys<S> {
+        type Scope = S::Scope;
+        type Keys = Set<members::keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `keys` field
-        pub struct keys(());
         ///Marker type for the `scope` field
         pub struct scope(());
+        ///Marker type for the `keys` field
+        pub struct keys(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> RemoveOptionsBuilder<'a, S>
 where
     S: remove_options_state::State,
-    S::Keys: remove_options_state::IsSet,
     S::Scope: remove_options_state::IsSet,
+    S::Keys: remove_options_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveOptions<'a> {

@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "events.smokesignal.event.configure",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Configure Smoke Signal specific settings for an event. Requires authentication and ownership of the event.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "event"
+          ],
+          "properties": {
+            "disableDirectRsvp": {
+              "type": "boolean",
+              "description": "When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP."
+            },
+            "event": {
+              "type": "string",
+              "description": "AT-URI of the event to configure.",
+              "format": "at-uri"
+            },
+            "requireConfirmedEmail": {
+              "type": "boolean",
+              "description": "When true, RSVPs require a confirmed email address."
+            },
+            "rsvpRedirectUrl": {
+              "type": "string",
+              "description": "URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).",
+              "format": "uri",
+              "maxLength": 2048
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "errors": [
+        {
+          "description": "The specified event does not exist.",
+          "name": "EventNotFound"
+        },
+        {
+          "description": "The authenticated user does not own this event.",
+          "name": "NotAuthorized"
+        },
+        {
+          "description": "The provided redirect URL is invalid or not allowed.",
+          "name": "InvalidRedirectUrl"
+        }
+      ]
+    }
+  }
+}

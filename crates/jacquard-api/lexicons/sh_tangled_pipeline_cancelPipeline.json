@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.pipeline.cancelPipeline",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Cancel a running pipeline",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "pipeline",
+            "workflow"
+          ],
+          "properties": {
+            "pipeline": {
+              "type": "string",
+              "description": "pipeline at-uri",
+              "format": "at-uri"
+            },
+            "repo": {
+              "type": "string",
+              "description": "repo at-uri, spindle can't resolve repo from pipeline at-uri yet",
+              "format": "at-uri"
+            },
+            "workflow": {
+              "type": "string",
+              "description": "workflow name"
+            }
+          }
+        }
+      }
+    }
+  }
+}

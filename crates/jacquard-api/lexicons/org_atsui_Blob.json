@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Blob",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Displays an AT Protocol blob as an image.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "src",
+            "did"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID of the blob owner. Used to resolve blob URLs.",
+              "format": "did"
+            },
+            "fit": {
+              "type": "string",
+              "description": "When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.",
+              "maxLength": 32,
+              "enum": [
+                "cover",
+                "contain"
+              ]
+            },
+            "ratio": {
+              "type": "ref",
+              "description": "Known aspect ratio for CLS prevention. Reserves space before the image loads.",
+              "ref": "#aspectRatio"
+            },
+            "src": {
+              "type": "unknown",
+              "description": "Blob ref for the image."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "app.fitsky.blueskyPost",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Links a Fitsky workout record to its cross-posted Bluesky post",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "workoutUri",
+          "postUri",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "postUri": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "workoutUri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

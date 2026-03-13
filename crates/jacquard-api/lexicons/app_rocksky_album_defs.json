@@ -90,6 +90,12 @@
           "type": "string",
           "description": "The SHA256 hash of the album."
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "title": {
           "type": "string",
           "description": "The title of the album."

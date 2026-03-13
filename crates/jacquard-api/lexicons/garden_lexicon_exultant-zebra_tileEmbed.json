@@ -1,0 +1,21 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.exultant-zebra.tileEmbed",
+  "description": "An embed type for including a Web Tile in a Bluesky post.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "A tile embed containing a strong reference to a tile record.",
+      "required": [
+        "tile"
+      ],
+      "properties": {
+        "tile": {
+          "type": "ref",
+          "description": "A strong reference to a garden.lexicon.exultant-zebra.tile record.",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

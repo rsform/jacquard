@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.graph.like",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record representing a user's like of a game.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "AT URI of the game record being liked.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

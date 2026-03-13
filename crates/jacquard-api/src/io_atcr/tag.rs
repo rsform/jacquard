@@ -18,8 +18,6 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
-    /// Tag creation timestamp
-    pub created_at: jacquard_common::types::string::Datetime,
     /// AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -34,6 +32,9 @@ pub struct Tag<'a> {
     /// Tag name (e.g., 'latest', 'v1.0.0', '12-slim')
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
+    /// Timestamp of last tag update
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod tag_state {
@@ -46,7 +47,6 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Repository;
         type Tag;
     }
@@ -54,23 +54,13 @@ pub mod tag_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Repository = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Repository = S::Repository;
-        type Tag = S::Tag;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type CreatedAt = S::CreatedAt;
         type Repository = Set<members::repository>;
         type Tag = S::Tag;
     }
@@ -78,15 +68,12 @@ pub mod tag_state {
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type CreatedAt = S::CreatedAt;
         type Repository = S::Repository;
         type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `tag` field
@@ -98,11 +85,11 @@ pub mod tag_state {
 pub struct TagBuilder<'a, S: tag_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -125,32 +112,13 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
-where
-    S: tag_state::State,
-    S::CreatedAt: tag_state::IsUnset,
-{
-    /// Set the `createdAt` field (required)
-    pub fn created_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> TagBuilder<'a, tag_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `manifest` field (optional)
     pub fn manifest(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `manifest` field to an Option value (optional)
@@ -158,7 +126,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.0 = value;
         self
     }
 }
@@ -169,7 +137,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `manifestDigest` field to an Option value (optional)
@@ -177,7 +145,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.1 = value;
         self
     }
 }
@@ -192,7 +160,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetRepository<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         TagBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -211,7 +179,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetTag<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         TagBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -220,21 +188,39 @@ where
     }
 }
 
+impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::CreatedAt: tag_state::IsSet,
     S::Repository: tag_state::IsSet,
     S::Tag: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
         Tag {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            manifest: self.__unsafe_private_named.1,
-            manifest_digest: self.__unsafe_private_named.2,
-            repository: self.__unsafe_private_named.3.unwrap(),
-            tag: self.__unsafe_private_named.4.unwrap(),
+            manifest: self.__unsafe_private_named.0,
+            manifest_digest: self.__unsafe_private_named.1,
+            repository: self.__unsafe_private_named.2.unwrap(),
+            tag: self.__unsafe_private_named.3.unwrap(),
+            updated_at: self.__unsafe_private_named.4,
             extra_data: Default::default(),
         }
     }
@@ -247,11 +233,11 @@ where
         >,
     ) -> Tag<'a> {
         Tag {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            manifest: self.__unsafe_private_named.1,
-            manifest_digest: self.__unsafe_private_named.2,
-            repository: self.__unsafe_private_named.3.unwrap(),
-            tag: self.__unsafe_private_named.4.unwrap(),
+            manifest: self.__unsafe_private_named.0,
+            manifest_digest: self.__unsafe_private_named.1,
+            repository: self.__unsafe_private_named.2.unwrap(),
+            tag: self.__unsafe_private_named.3.unwrap(),
+            updated_at: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
     }
@@ -395,37 +381,13 @@ fn lexicon_doc_io_atcr_tag() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
                         required: Some(
                             vec![
                                 ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("tag"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::smol_str::SmolStr::new_static("tag")
                             ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Tag creation timestamp",
-                                        ),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "manifest",
@@ -503,6 +465,29 @@ fn lexicon_doc_io_atcr_tag() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
                                     default: None,
                                     min_length: None,
                                     max_length: Some(128usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp of last tag update",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
                                     min_graphemes: None,
                                     max_graphemes: None,
                                     r#enum: None,

@@ -1,0 +1,86 @@
+{
+  "lexicon": 1,
+  "id": "scot.comhairle.testingPolisVoteV1",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A vote on a statement in the Polis-style deliberation system",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "value",
+          "subject",
+          "poll",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the vote was created",
+            "format": "datetime"
+          },
+          "poll": {
+            "type": "ref",
+            "description": "Reference to the poll this vote belongs to",
+            "ref": "#pollRef"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Reference to the statement being voted on",
+            "ref": "#statementRef"
+          },
+          "value": {
+            "type": "string",
+            "description": "The vote value",
+            "enum": [
+              "agree",
+              "disagree",
+              "pass"
+            ]
+          }
+        }
+      }
+    },
+    "pollRef": {
+      "type": "object",
+      "description": "Reference to a poll record",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "Content identifier of the poll record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the poll record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "statementRef": {
+      "type": "object",
+      "description": "Reference to a statement record",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "Content identifier of the statement record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the statement record",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

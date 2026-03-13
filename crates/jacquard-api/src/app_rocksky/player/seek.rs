@@ -15,7 +15,10 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct SeekParams {
+pub struct SeekParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
     pub position: i64,
 }
 
@@ -52,29 +55,53 @@ pub mod seek_params_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct SeekParamsBuilder<S: seek_params_state::State> {
+pub struct SeekParamsBuilder<'a, S: seek_params_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl SeekParams {
+impl<'a> SeekParams<'a> {
     /// Create a new builder for this type
-    pub fn new() -> SeekParamsBuilder<seek_params_state::Empty> {
+    pub fn new() -> SeekParamsBuilder<'a, seek_params_state::Empty> {
         SeekParamsBuilder::new()
     }
 }
 
-impl SeekParamsBuilder<seek_params_state::Empty> {
+impl<'a> SeekParamsBuilder<'a, seek_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SeekParamsBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
-impl<S> SeekParamsBuilder<S>
+impl<'a, S: seek_params_state::State> SeekParamsBuilder<'a, S> {
+    /// Set the `playerId` field (optional)
+    pub fn player_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `playerId` field to an Option value (optional)
+    pub fn maybe_player_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> SeekParamsBuilder<'a, S>
 where
     S: seek_params_state::State,
     S::Position: seek_params_state::IsUnset,
@@ -83,24 +110,26 @@ where
     pub fn position(
         mut self,
         value: impl Into<i64>,
-    ) -> SeekParamsBuilder<seek_params_state::SetPosition<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+    ) -> SeekParamsBuilder<'a, seek_params_state::SetPosition<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         SeekParamsBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
-impl<S> SeekParamsBuilder<S>
+impl<'a, S> SeekParamsBuilder<'a, S>
 where
     S: seek_params_state::State,
     S::Position: seek_params_state::IsSet,
 {
     /// Build the final struct
-    pub fn build(self) -> SeekParams {
+    pub fn build(self) -> SeekParams<'a> {
         SeekParams {
-            position: self.__unsafe_private_named.0.unwrap(),
+            player_id: self.__unsafe_private_named.0,
+            position: self.__unsafe_private_named.1.unwrap(),
         }
     }
 }

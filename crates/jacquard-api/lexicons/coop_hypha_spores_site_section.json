@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "coop.hypha.spores.site.section",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A single site section for spores.garden. Each section is a record in a collection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string",
+            "description": "Collection NSID to display (for type=collection)"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content for block sections",
+            "maxLength": 500000,
+            "maxGraphemes": 50000
+          },
+          "format": {
+            "type": "string",
+            "description": "Content format",
+            "knownValues": [
+              "markdown",
+              "html",
+              "text"
+            ]
+          },
+          "hideHeader": {
+            "type": "boolean",
+            "description": "If true, hides the section header in display mode"
+          },
+          "layout": {
+            "type": "string",
+            "description": "Layout to use for rendering",
+            "knownValues": [
+              "post",
+              "card",
+              "image",
+              "link",
+              "links",
+              "list",
+              "profile",
+              "raw"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum records to display",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "records": {
+            "type": "array",
+            "description": "Specific record URIs to display (for type=records)",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "ref": {
+            "type": "string",
+            "description": "AT-URI of the referenced record (for content/profile sections)",
+            "format": "at-uri"
+          },
+          "rkey": {
+            "type": "string",
+            "description": "Record key within the collection to display (e.g. 'self' for profile)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Section title",
+            "maxLength": 2000,
+            "maxGraphemes": 200
+          },
+          "type": {
+            "type": "string",
+            "description": "Section type",
+            "knownValues": [
+              "collection",
+              "records",
+              "content",
+              "block",
+              "profile",
+              "share-to-bluesky",
+              "collected-flowers"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.platform",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A platform for playing video games.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "abbreviation": {
+            "type": "string"
+          },
+          "alternativeName": {
+            "type": "string"
+          },
+          "category": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#platformCategory"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "generation": {
+            "type": "integer"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#platformVersion"
+            }
+          },
+          "websites": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#website"
+            }
+          }
+        }
+      }
+    }
+  }
+}

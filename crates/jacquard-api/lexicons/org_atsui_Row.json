@@ -1,0 +1,79 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Row",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Arranges children horizontally with consistent spacing.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "align": {
+              "type": "string",
+              "description": "Cross-axis (vertical) alignment of children.",
+              "default": "center",
+              "maxLength": 32,
+              "knownValues": [
+                "start",
+                "center",
+                "end",
+                "stretch"
+              ]
+            },
+            "children": {
+              "type": "unknown"
+            },
+            "gap": {
+              "type": "string",
+              "description": "Space between children.",
+              "default": "medium",
+              "maxLength": 32,
+              "knownValues": [
+                "none",
+                "small",
+                "medium",
+                "large"
+              ]
+            },
+            "inset": {
+              "type": "boolean",
+              "description": "Whether this container has inset padding. The theme controls the amount."
+            },
+            "justify": {
+              "type": "string",
+              "description": "Main-axis distribution of children.",
+              "default": "start",
+              "maxLength": 32,
+              "knownValues": [
+                "start",
+                "center",
+                "end",
+                "between"
+              ]
+            },
+            "opaque": {
+              "type": "boolean",
+              "description": "Whether the container has an opaque background."
+            },
+            "sticky": {
+              "type": "boolean",
+              "description": "Whether the container sticks to the top of the scroll area."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

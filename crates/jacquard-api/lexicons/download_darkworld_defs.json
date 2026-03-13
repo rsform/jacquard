@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "download.darkworld.defs",
+  "defs": {
+    "genderFemale": {
+      "type": "string",
+      "description": "Identifies as female.",
+      "const": "female"
+    },
+    "genderMale": {
+      "type": "string",
+      "description": "Identifies as male.",
+      "const": "male"
+    },
+    "genderNonBinary": {
+      "type": "string",
+      "description": "Identifies as non-binary.",
+      "const": "non_binary"
+    },
+    "genderOther": {
+      "type": "string",
+      "description": "Other gender identity not listed.",
+      "const": "other"
+    },
+    "genderQuestioning": {
+      "type": "string",
+      "description": "Currently questioning gender identity.",
+      "const": "questioning"
+    },
+    "pronounsAny": {
+      "type": "string",
+      "const": "any"
+    },
+    "pronounsHeHim": {
+      "type": "string",
+      "const": "he/him"
+    },
+    "pronounsHeThey": {
+      "type": "string",
+      "const": "he/they"
+    },
+    "pronounsSheHer": {
+      "type": "string",
+      "const": "she/her"
+    },
+    "pronounsSheThey": {
+      "type": "string",
+      "const": "she/they"
+    },
+    "pronounsTheyThem": {
+      "type": "string",
+      "const": "they/them"
+    }
+  }
+}

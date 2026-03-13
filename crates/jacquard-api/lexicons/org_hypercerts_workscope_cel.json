@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.workscope.cel",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "A structured, machine-evaluable work scope definition using CEL (Common Expression Language). Tags referenced in the expression correspond to org.hypercerts.workscope.tag keys. See https://github.com/google/cel-spec. Note: this is intentionally type 'object' (not 'record') so it can be directly embedded inline in union types (e.g., activity.workScope) without requiring a separate collection or strongRef indirection.",
+      "required": [
+        "expression",
+        "usedTags",
+        "version",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "Client-declared timestamp when this expression was originally created.",
+          "format": "datetime"
+        },
+        "expression": {
+          "type": "string",
+          "description": "A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'",
+          "maxLength": 10000,
+          "maxGraphemes": 5000
+        },
+        "usedTags": {
+          "type": "array",
+          "description": "Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "maxLength": 100
+        },
+        "version": {
+          "type": "string",
+          "description": "CEL context schema version.",
+          "maxLength": 16,
+          "knownValues": [
+            "v1"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "lexicon": 1,
+  "id": "app.greengale.blog.defs",
+  "defs": {
+    "blobMetadata": {
+      "type": "object",
+      "description": "Metadata for uploaded binary content",
+      "required": [
+        "blobref"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility",
+          "maxLength": 1000
+        },
+        "blobref": {
+          "type": "blob",
+          "description": "Reference to the blob",
+          "accept": [
+            "*/*"
+          ]
+        },
+        "labels": {
+          "type": "ref",
+          "description": "Content labels (self-labels) for this image",
+          "ref": "#selfLabels"
+        },
+        "name": {
+          "type": "string",
+          "description": "Original filename",
+          "maxLength": 256
+        }
+      }
+    },
+    "customColors": {
+      "type": "object",
+      "description": "Custom color values (CSS color strings)",
+      "properties": {
+        "accent": {
+          "type": "string",
+          "description": "Accent/link color",
+          "maxLength": 64
+        },
+        "background": {
+          "type": "string",
+          "description": "Background color",
+          "maxLength": 64
+        },
+        "codeBackground": {
+          "type": "string",
+          "description": "Code block background color",
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "description": "Primary text color",
+          "maxLength": 64
+        }
+      }
+    },
+    "ogp": {
+      "type": "object",
+      "description": "Open Graph Protocol metadata for social sharing",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Image height in pixels"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the OGP image",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "width": {
+          "type": "integer",
+          "description": "Image width in pixels"
+        }
+      }
+    },
+    "selfLabel": {
+      "type": "object",
+      "description": "Metadata tag on an atproto resource, published by the author",
+      "required": [
+        "val"
+      ],
+      "properties": {
+        "val": {
+          "type": "string",
+          "description": "The short string name of the value or type of this label",
+          "maxLength": 128
+        }
+      }
+    },
+    "selfLabels": {
+      "type": "object",
+      "description": "Metadata tags on an atproto resource, published by the author",
+      "required": [
+        "values"
+      ],
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#selfLabel"
+          },
+          "maxLength": 10
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "description": "Theme configuration for a blog entry",
+      "properties": {
+        "custom": {
+          "type": "ref",
+          "description": "Custom color overrides",
+          "ref": "#customColors"
+        },
+        "preset": {
+          "type": "string",
+          "description": "Predefined color theme",
+          "maxLength": 32,
+          "enum": [
+            "github-light",
+            "github-dark",
+            "dracula",
+            "nord",
+            "solarized-light",
+            "solarized-dark",
+            "monokai"
+          ]
+        }
+      }
+    },
+    "voiceTheme": {
+      "type": "object",
+      "description": "Voice theme configuration for TTS playback",
+      "properties": {
+        "pitch": {
+          "type": "integer",
+          "description": "Pitch multiplier x100 (100 = normal, range 50-150)"
+        },
+        "speed": {
+          "type": "integer",
+          "description": "Playback speed multiplier x100 (100 = normal, range 50-200)"
+        },
+        "voice": {
+          "type": "string",
+          "description": "Voice ID for TTS (e.g., 'af_heart', 'am_adam')",
+          "maxLength": 32
+        }
+      }
+    }
+  }
+}

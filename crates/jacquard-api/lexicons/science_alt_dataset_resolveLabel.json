@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.resolveLabel",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Resolve a named dataset label to its underlying dataset entry. When version is omitted, resolves to the most recently created label with the given name.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "handle",
+          "name"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "DID or handle of the dataset owner"
+          },
+          "name": {
+            "type": "string",
+            "description": "Label name, e.g. 'mnist'",
+            "maxLength": 200
+          },
+          "version": {
+            "type": "string",
+            "description": "Specific version to resolve. If omitted, resolves to latest.",
+            "maxLength": 50
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "label"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the resolved dataset entry"
+            },
+            "label": {
+              "type": "ref",
+              "description": "The label record that was resolved",
+              "ref": "science.alt.dataset.label"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the resolved dataset entry",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "No label found with the given name",
+          "name": "LabelNotFound"
+        }
+      ]
+    }
+  }
+}

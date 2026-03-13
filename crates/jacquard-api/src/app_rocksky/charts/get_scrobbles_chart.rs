@@ -27,6 +27,9 @@ pub struct GetScrobblesChart<'a> {
     pub did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
     pub songuri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
@@ -56,6 +59,7 @@ pub struct GetScrobblesChartBuilder<'a, S: get_scrobbles_chart_state::State> {
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -73,7 +77,7 @@ impl<'a> GetScrobblesChartBuilder<'a, get_scrobbles_chart_state::Empty> {
     pub fn new() -> Self {
         GetScrobblesChartBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -137,12 +141,28 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 }
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `songuri` field (optional)
     pub fn songuri(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `songuri` field to an Option value (optional)
@@ -150,7 +170,7 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -165,7 +185,8 @@ where
             albumuri: self.__unsafe_private_named.0,
             artisturi: self.__unsafe_private_named.1,
             did: self.__unsafe_private_named.2,
-            songuri: self.__unsafe_private_named.3,
+            genre: self.__unsafe_private_named.3,
+            songuri: self.__unsafe_private_named.4,
         }
     }
 }

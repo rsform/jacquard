@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "mov.danabra.ProfileTab",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "default": 10
+            },
+            "tab": {
+              "type": "string",
+              "default": "posts_and_author_threads",
+              "knownValues": [
+                "posts_and_author_threads",
+                "posts_and_replies"
+              ]
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "lex:at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

@@ -51,6 +51,18 @@
         "showInDiscover": {
           "type": "boolean",
           "default": true
+        },
+        "showMentions": {
+          "type": "boolean",
+          "default": true
+        },
+        "showPrevNext": {
+          "type": "boolean",
+          "default": true
+        },
+        "showRecommends": {
+          "type": "boolean",
+          "default": true
         }
       }
     },
@@ -81,6 +93,14 @@
         "backgroundImage": {
           "type": "ref",
           "ref": "pub.leaflet.theme.backgroundImage"
+        },
+        "bodyFont": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "headingFont": {
+          "type": "string",
+          "maxLength": 100
         },
         "pageBackground": {
           "type": "union",

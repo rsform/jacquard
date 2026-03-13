@@ -12,6 +12,9 @@
             "type": "string",
             "description": "Handle or DID of the actor to retrieve the currently playing track for. If not provided, defaults to the current user.",
             "format": "at-identifier"
+          },
+          "playerId": {
+            "type": "string"
           }
         }
       },

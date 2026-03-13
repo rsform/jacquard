@@ -15,7 +15,7 @@
         },
         "url": {
           "type": "string",
-          "description": "URL of the link"
+          "description": "URL of the card"
         }
       }
     },

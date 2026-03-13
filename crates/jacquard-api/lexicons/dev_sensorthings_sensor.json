@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.sensor",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An instrument or procedure that produces observations.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "encodingType",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "encodingType": {
+            "type": "string",
+            "description": "IANA media type of the metadata field, e.g. application/pdf, application/sensorML+xml",
+            "maxLength": 128
+          },
+          "metadata": {
+            "type": "string",
+            "description": "URL or inline content describing the sensor (SensorML, datasheet URL, etc.)",
+            "maxLength": 10000
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

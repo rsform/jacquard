@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Binding",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Data placeholder resolved by the host during deserialization.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "type": "array",
+              "description": "Path segments to resolve against scope",
+              "items": {
+                "type": "string",
+                "maxLength": 256
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

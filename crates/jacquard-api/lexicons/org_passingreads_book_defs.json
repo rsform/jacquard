@@ -1,0 +1,155 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.defs",
+  "defs": {
+    "confirmedEvent": {
+      "type": "object",
+      "description": "A confirmed book event for display purposes. Omits cryptographic fields (bookPub, bookSig) and book reference since it's shown in context of a book.",
+      "required": [
+        "uri",
+        "actor",
+        "event",
+        "location",
+        "occurredAt"
+      ],
+      "properties": {
+        "actor": {
+          "type": "ref",
+          "description": "The person who performed this event",
+          "ref": "org.passingreads.defs#actor"
+        },
+        "event": {
+          "type": "string",
+          "description": "What event occurred",
+          "knownValues": [
+            "org.passingreads.book.checkin",
+            "org.passingreads.book.drop",
+            "org.passingreads.book.find"
+          ]
+        },
+        "location": {
+          "type": "ref",
+          "description": "Where this event occurred",
+          "ref": "community.lexicon.location.hthree#main"
+        },
+        "occurredAt": {
+          "type": "string",
+          "description": "When this event occurred",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT URI of this event record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "registrationView": {
+      "type": "object",
+      "description": "A view of a book registration for API responses. Omits cryptographic fields (bookPub, bookSig) and the cover blob.",
+      "required": [
+        "registeredBy",
+        "bookId",
+        "title",
+        "authors",
+        "occurredAt"
+      ],
+      "properties": {
+        "authors": {
+          "type": "array",
+          "description": "Authors of this book, in order of credit",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bookId": {
+          "type": "string",
+          "description": "The book's ID (as defined on its QR Code)"
+        },
+        "occurredAt": {
+          "type": "string",
+          "description": "When the book was registered",
+          "format": "datetime"
+        },
+        "publicationId": {
+          "type": "string",
+          "description": "The book's Open Library Edition ID"
+        },
+        "registeredBy": {
+          "type": "ref",
+          "description": "The person who registered the book",
+          "ref": "org.passingreads.defs#actor"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the book"
+        }
+      }
+    },
+    "statefulBook": {
+      "type": "object",
+      "description": "A book with its current state, combining registration data with computed state information.",
+      "required": [
+        "uri",
+        "cid",
+        "registration",
+        "state",
+        "currentHolder"
+      ],
+      "properties": {
+        "aspectRatio": {
+          "type": "ref",
+          "description": "Aspect ratio of the cover image",
+          "ref": "org.passingreads.defs#aspectRatio"
+        },
+        "cid": {
+          "type": "string",
+          "description": "The CID of the book registration record"
+        },
+        "coverUrl": {
+          "type": "string",
+          "description": "Resolved URL to the cover image (from the registration blob)",
+          "format": "uri"
+        },
+        "currentHolder": {
+          "type": "string",
+          "description": "The DID of the current holder of the book",
+          "format": "did"
+        },
+        "currentLocation": {
+          "type": "ref",
+          "description": "The current location of the book (only present if state is 'org.passingreads.book.drop')",
+          "ref": "community.lexicon.location.hthree#main"
+        },
+        "events": {
+          "type": "array",
+          "description": "List of confirmed events for this book, in chronological order",
+          "items": {
+            "type": "ref",
+            "ref": "#confirmedEvent"
+          }
+        },
+        "registration": {
+          "type": "ref",
+          "description": "The book registration data (without cryptographic fields)",
+          "ref": "#registrationView"
+        },
+        "state": {
+          "type": "string",
+          "description": "The current state of the book, derived from the latest event",
+          "knownValues": [
+            "org.passingreads.book.checkin",
+            "org.passingreads.book.drop",
+            "org.passingreads.book.find",
+            "org.passingreads.book.registration"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT URI of the book registration record",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

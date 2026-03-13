@@ -19,6 +19,9 @@ pub struct GetCurrentlyPlaying<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub actor: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod get_currently_playing_state {
@@ -45,6 +48,7 @@ pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State>
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -61,7 +65,7 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -86,6 +90,25 @@ impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S
     }
 }
 
+impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
+    /// Set the `playerId` field (optional)
+    pub fn player_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `playerId` field to an Option value (optional)
+    pub fn maybe_player_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
 impl<'a, S> GetCurrentlyPlayingBuilder<'a, S>
 where
     S: get_currently_playing_state::State,
@@ -94,6 +117,7 @@ where
     pub fn build(self) -> GetCurrentlyPlaying<'a> {
         GetCurrentlyPlaying {
             actor: self.__unsafe_private_named.0,
+            player_id: self.__unsafe_private_named.1,
         }
     }
 }

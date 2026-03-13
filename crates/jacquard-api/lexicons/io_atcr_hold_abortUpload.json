@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.abortUpload",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Cancel a multipart upload and cleanup any temporary data.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uploadId"
+          ],
+          "properties": {
+            "uploadId": {
+              "type": "string",
+              "description": "Upload session ID from initiateUpload",
+              "maxLength": 256
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Always 'aborted' on success",
+              "maxLength": 16,
+              "const": "aborted"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidUploadId"
+        },
+        {
+          "name": "AbortFailed"
+        }
+      ]
+    }
+  }
+}

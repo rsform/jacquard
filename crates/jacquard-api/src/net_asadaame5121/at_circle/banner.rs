@@ -35,51 +35,51 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ring;
         type CreatedAt;
         type Banner;
+        type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ring = Unset;
         type CreatedAt = Unset;
         type Banner = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type Ring = Set<members::ring>;
-        type CreatedAt = S::CreatedAt;
-        type Banner = S::Banner;
+        type Ring = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Ring = S::Ring;
         type CreatedAt = Set<members::created_at>;
         type Banner = S::Banner;
+        type Ring = S::Ring;
     }
     ///State transition - sets the `banner` field to Set
     pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBanner<S> {}
     impl<S: State> State for SetBanner<S> {
-        type Ring = S::Ring;
         type CreatedAt = S::CreatedAt;
         type Banner = Set<members::banner>;
+        type Ring = S::Ring;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type CreatedAt = S::CreatedAt;
+        type Banner = S::Banner;
+        type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ring` field
-        pub struct ring(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `banner` field
         pub struct banner(());
+        ///Marker type for the `ring` field
+        pub struct ring(());
     }
 }
 
@@ -172,9 +172,9 @@ where
 impl<'a, S> BannerBuilder<'a, S>
 where
     S: banner_state::State,
-    S::Ring: banner_state::IsSet,
     S::CreatedAt: banner_state::IsSet,
     S::Banner: banner_state::IsSet,
+    S::Ring: banner_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Banner<'a> {

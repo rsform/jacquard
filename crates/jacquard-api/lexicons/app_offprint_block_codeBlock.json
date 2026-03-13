@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.codeBlock",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "The code content"
+        },
+        "language": {
+          "type": "string",
+          "description": "Programming language for syntax highlighting"
+        },
+        "showLineNumbers": {
+          "type": "boolean",
+          "description": "Whether to display line numbers",
+          "default": false
+        }
+      }
+    }
+  }
+}

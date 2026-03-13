@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.sim",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An avatar/sim record. One user can have multiple sims.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "settings",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the sim was created",
+            "format": "datetime"
+          },
+          "image": {
+            "type": "blob",
+            "description": "Rendered avatar PNG thumbnail for quick display",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the sim",
+            "maxLength": 64
+          },
+          "settings": {
+            "type": "ref",
+            "description": "Sprite appearance settings",
+            "ref": "org.simocracy.defs#spriteSettings"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.release",
+  "defs": {
+    "artist": {
+      "type": "object",
+      "description": "Information about an artist contributing to the release",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "artist": {
+          "type": "ref",
+          "ref": "ch.indiemusi.alpha.actor.artist"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A release (album, EP, single) containing recordings of songs or musical works",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "artists",
+          "recordings"
+        ],
+        "properties": {
+          "artists": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#artist"
+            },
+            "minLength": 1
+          },
+          "artworkImage": {
+            "type": "blob"
+          },
+          "gtin": {
+            "type": "string",
+            "description": "GTIN (Global Trade Item Number) with which the release is registered, e.g. EAN or UPC",
+            "maxLength": 14
+          },
+          "recordings": {
+            "type": "array",
+            "description": "List of recordings (ch.indiemusi.alpha.recording) included in this release",
+            "items": {
+              "type": "ref",
+              "ref": "ch.indiemusi.alpha.recording"
+            },
+            "minLength": 1
+          },
+          "releaseDate": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  }
+}

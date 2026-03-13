@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.organization.observations.dendogram",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a dendogram observation for an organization",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "dendogram",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time of the creation of the record",
+            "format": "datetime"
+          },
+          "dendogram": {
+            "type": "ref",
+            "description": "An SVG of the dendogram uploaded as blob",
+            "ref": "app.gainforest.common.defs#smallBlob"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "events.smokesignal.calendar.eventConfiguration",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Configuration settings for a Smoke Signal event, controlling RSVP behavior and access requirements.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "properties": {
+          "disableDirectRsvp": {
+            "type": "boolean",
+            "description": "When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP."
+          },
+          "requireConfirmedEmail": {
+            "type": "boolean",
+            "description": "When true, RSVPs require a confirmed email address."
+          },
+          "rsvpRedirectUrl": {
+            "type": "string",
+            "description": "URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        }
+      }
+    }
+  }
+}

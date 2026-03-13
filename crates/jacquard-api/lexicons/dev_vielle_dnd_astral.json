@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "dev.vielle.dnd.astral",
+  "description": "Schema for storing astral powers. Used for dnd.vielle.dev",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "points",
+          "powers"
+        ],
+        "properties": {
+          "points": {
+            "type": "integer",
+            "default": 0
+          },
+          "powers": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#power"
+            }
+          }
+        }
+      }
+    },
+    "power": {
+      "type": "string",
+      "knownValues": [
+        "dev.vielle.dnd.power#eldritchAdaptability",
+        "dev.vielle.dnd.power#eldritchAssault",
+        "dev.vielle.dnd.power#runeSeeker",
+        "dev.vielle.dnd.power#fateScriber",
+        "dev.vielle.dnd.power#faceless",
+        "dev.vielle.dnd.power#bind",
+        "dev.vielle.dnd.power#spray",
+        "dev.vielle.dnd.power#acursed",
+        "dev.vielle.dnd.power#darksight",
+        "dev.vielle.dnd.power#eldritchVisage",
+        "dev.vielle.dnd.power#regenerate",
+        "dev.vielle.dnd.power#instil",
+        "dev.vielle.dnd.power#eldritchEnchantment",
+        "dev.vielle.dnd.power#whisper",
+        "dev.vielle.dnd.power#bond",
+        "dev.vielle.dnd.power#claw",
+        "dev.vielle.dnd.power#invalid"
+      ]
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.org.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a Pentaract org profile.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "displayName",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Image to be displayed on profile page. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 10000000
+          },
+          "country": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 3000
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640
+          },
+          "foundedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+            }
+          },
+          "parent": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "status": {
+            "type": "string",
+            "knownValues": [
+              "active",
+              "inactive",
+              "merged",
+              "acquired",
+              "defunct"
+            ]
+          },
+          "websites": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#website"
+            }
+          }
+        }
+      }
+    }
+  }
+}

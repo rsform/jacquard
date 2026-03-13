@@ -14,6 +14,19 @@
           "createdAt"
         ],
         "properties": {
+          "blobs": {
+            "type": "array",
+            "description": "Optional attached media (image or audio)",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/*",
+                "audio/*"
+              ],
+              "maxSize": 10000000
+            },
+            "maxLength": 1
+          },
           "channelId": {
             "type": "string",
             "description": "The channel this thread belongs to"

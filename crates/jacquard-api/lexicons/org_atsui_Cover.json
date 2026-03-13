@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Cover",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Full-width background image.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "src"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID of the blob owner. Used to resolve blob URLs.",
+              "format": "did"
+            },
+            "src": {
+              "type": "unknown",
+              "description": "Blob ref for the background image."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

@@ -167,10 +167,26 @@ pub struct GetPostOutput<'a> {
     #[serde(borrow)]
     pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub encrypt_cid: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Description of the error code.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error_description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for

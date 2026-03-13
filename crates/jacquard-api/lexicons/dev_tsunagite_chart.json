@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "dev.tsunagite.chart",
+  "description": "Definitions related to charts included in games hosting leaderboards via Tsunagite.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A chart included in a game hosting leaderboards via Tsunagite.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "game",
+          "song",
+          "difficulty",
+          "rating"
+        ],
+        "properties": {
+          "difficulty": {
+            "type": "union",
+            "description": "The difficulty slot this chart is placed in. Can be an inline definition or a reference to a standard-defined difficulty slot.",
+            "refs": [
+              "dev.tsunagite.difficulty",
+              "dev.tsunagite.types#typedRef"
+            ]
+          },
+          "game": {
+            "type": "string",
+            "description": "The game this chart is included in. URI must point to a record of type `dev.tsunagite.game`.",
+            "format": "at-uri"
+          },
+          "jacket": {
+            "type": "blob",
+            "description": "The jacket or banner art of this chart, for display in UI. Will fall back to the song jacket if not present",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/jxl",
+              "image/webp"
+            ],
+            "maxSize": 8000000
+          },
+          "jacketArtist": {
+            "type": "ref",
+            "description": "The name of the jacket artist for this chart.",
+            "ref": "dev.tsunagite.translatable"
+          },
+          "rankedVersions": {
+            "type": "array",
+            "description": "The md5 hashes of any versions of the chart that are up-to-date enough to be leaderboard-legal. Optional if you will not perform leaderboard resets upon any chart changes.",
+            "items": {
+              "type": "bytes",
+              "maxLength": 16,
+              "minLength": 16
+            }
+          },
+          "rating": {
+            "type": "string",
+            "description": "The numeric difficulty rating displayed to players, formatted as a string to support decimal or + difficulties."
+          },
+          "song": {
+            "type": "string",
+            "description": "The song this chart is for. URI must point to a record of type `dev.tsunagite.song`.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

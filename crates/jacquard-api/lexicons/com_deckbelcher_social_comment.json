@@ -1,0 +1,132 @@
+{
+  "lexicon": 1,
+  "id": "com.deckbelcher.social.comment",
+  "defs": {
+    "cardSubject": {
+      "type": "object",
+      "description": "Subject: a card (global comment on the card itself).",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "ref": "com.deckbelcher.defs#cardRef"
+        }
+      }
+    },
+    "cardTarget": {
+      "type": "object",
+      "description": "Target: a card (in a deck or collection).",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "ref": "com.deckbelcher.defs#cardRef"
+        }
+      }
+    },
+    "deckTarget": {
+      "type": "object",
+      "description": "Target: a deck (in a collection).",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Top-level comment on a card, deck, or collection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "ref",
+            "description": "Rich text content.",
+            "ref": "com.deckbelcher.richtext#document"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "union",
+            "description": "What this comment is on.",
+            "refs": [
+              "#cardSubject",
+              "#recordSubject"
+            ]
+          },
+          "target": {
+            "type": "union",
+            "description": "Optional refinement within subject (card/section/tag in a deck).",
+            "refs": [
+              "#cardTarget",
+              "#deckTarget",
+              "#sectionTarget",
+              "#tagTarget"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "recordSubject": {
+      "type": "object",
+      "description": "Subject: an ATProto record (deck, collection).",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "sectionTarget": {
+      "type": "object",
+      "description": "Target: a deck section (mainboard, sideboard, etc).",
+      "required": [
+        "section"
+      ],
+      "properties": {
+        "section": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        }
+      }
+    },
+    "tagTarget": {
+      "type": "object",
+      "description": "Target: a tag package (ramp, removal, wincons, etc).",
+      "required": [
+        "tag"
+      ],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Grid",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Arranges children in a grid of equal columns.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            },
+            "columns": {
+              "type": "integer",
+              "description": "Number of equal columns.",
+              "default": 3,
+              "minimum": 1
+            },
+            "gap": {
+              "type": "string",
+              "description": "Space between children.",
+              "default": "small",
+              "maxLength": 32,
+              "knownValues": [
+                "none",
+                "small",
+                "medium",
+                "large"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

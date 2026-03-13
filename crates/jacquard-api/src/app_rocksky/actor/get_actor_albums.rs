@@ -18,12 +18,16 @@
 pub struct GetActorAlbums<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
     ///(min: 1)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     ///(min: 0)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod get_actor_albums_state {
@@ -63,8 +67,10 @@ pub struct GetActorAlbumsBuilder<'a, S: get_actor_albums_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -81,7 +87,7 @@ impl<'a> GetActorAlbumsBuilder<'a, get_actor_albums_state::Empty> {
     pub fn new() -> Self {
         GetActorAlbumsBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -107,14 +113,33 @@ where
 }
 
 impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
+    /// Set the `endDate` field (optional)
+    pub fn end_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `endDate` field to an Option value (optional)
+    pub fn maybe_end_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -122,12 +147,31 @@ impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
 impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
+    /// Set the `startDate` field (optional)
+    pub fn start_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `startDate` field to an Option value (optional)
+    pub fn maybe_start_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -141,8 +185,10 @@ where
     pub fn build(self) -> GetActorAlbums<'a> {
         GetActorAlbums {
             did: self.__unsafe_private_named.0.unwrap(),
-            limit: self.__unsafe_private_named.1,
-            offset: self.__unsafe_private_named.2,
+            end_date: self.__unsafe_private_named.1,
+            limit: self.__unsafe_private_named.2,
+            offset: self.__unsafe_private_named.3,
+            start_date: self.__unsafe_private_named.4,
         }
     }
 }

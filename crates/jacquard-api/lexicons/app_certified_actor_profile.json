@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "app.certified.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a Certified account profile.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "union",
+            "description": "Small image to be displayed next to posts from account. AKA, 'profile picture'",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallImage"
+            ]
+          },
+          "banner": {
+            "type": "union",
+            "description": "Larger horizontal image to display behind profile view.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#largeImage"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for the account",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "pronouns": {
+            "type": "string",
+            "description": "Free-form pronouns text.",
+            "maxLength": 200,
+            "maxGraphemes": 20
+          },
+          "website": {
+            "type": "string",
+            "description": "Account website URL",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

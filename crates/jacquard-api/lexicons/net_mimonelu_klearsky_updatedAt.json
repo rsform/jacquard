@@ -1,0 +1,11 @@
+{
+  "lexicon": 1,
+  "id": "net.mimonelu.klearsky.updatedAt",
+  "defs": {
+    "main": {
+      "type": "string",
+      "description": "Timestamp when the post was last edited. Used as an extension field in app.bsky.feed.post records to indicate post modification by Klearsky's edit feature.",
+      "format": "datetime"
+    }
+  }
+}

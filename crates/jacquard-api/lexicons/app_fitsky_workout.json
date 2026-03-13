@@ -1,0 +1,490 @@
+{
+  "lexicon": 1,
+  "id": "app.fitsky.workout",
+  "defs": {
+    "cardioDetails": {
+      "type": "object",
+      "properties": {
+        "calories": {
+          "type": "integer"
+        },
+        "cardioZones": {
+          "type": "ref",
+          "ref": "#cardioZoneData"
+        },
+        "distanceMeters": {
+          "type": "integer",
+          "description": "Distance in meters",
+          "minimum": 0
+        },
+        "elevationGainMeters": {
+          "type": "integer",
+          "description": "Elevation gain in meters",
+          "minimum": 0
+        },
+        "heartRate": {
+          "type": "ref",
+          "ref": "#heartRateData"
+        },
+        "heartRateSamples": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#heartRateSample"
+          }
+        },
+        "paceSecondsPerKm": {
+          "type": "integer",
+          "description": "Pace in seconds per kilometer",
+          "minimum": 0
+        },
+        "routePoints": {
+          "type": "array",
+          "description": "GPS route points recorded during the workout",
+          "items": {
+            "type": "ref",
+            "ref": "#routePoint"
+          }
+        },
+        "steps": {
+          "type": "integer"
+        }
+      }
+    },
+    "cardioZoneData": {
+      "type": "object",
+      "description": "Time in seconds spent in each heart rate zone",
+      "properties": {
+        "zone1Rest": {
+          "type": "integer"
+        },
+        "zone2Easy": {
+          "type": "integer"
+        },
+        "zone3Aerobic": {
+          "type": "integer"
+        },
+        "zone4Threshold": {
+          "type": "integer"
+        },
+        "zone5Max": {
+          "type": "integer"
+        }
+      }
+    },
+    "exercise": {
+      "type": "object",
+      "required": [
+        "name",
+        "sets"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "sets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#exerciseSet"
+          }
+        }
+      }
+    },
+    "exerciseSet": {
+      "type": "object",
+      "properties": {
+        "reps": {
+          "type": "integer"
+        },
+        "weightGrams": {
+          "type": "integer",
+          "description": "Weight in grams",
+          "minimum": 0
+        }
+      }
+    },
+    "flexibilityDetails": {
+      "type": "object",
+      "properties": {
+        "calories": {
+          "type": "integer"
+        },
+        "cardioZones": {
+          "type": "ref",
+          "ref": "#cardioZoneData"
+        },
+        "heartRate": {
+          "type": "ref",
+          "ref": "#heartRateData"
+        },
+        "heartRateSamples": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#heartRateSample"
+          }
+        },
+        "intensity": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": [
+            "light",
+            "moderate",
+            "intense"
+          ]
+        },
+        "movements": {
+          "type": "integer"
+        },
+        "steps": {
+          "type": "integer"
+        }
+      }
+    },
+    "heartRateData": {
+      "type": "object",
+      "properties": {
+        "avg": {
+          "type": "integer"
+        },
+        "max": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "integer"
+        },
+        "resting": {
+          "type": "integer"
+        }
+      }
+    },
+    "heartRateSample": {
+      "type": "object",
+      "required": [
+        "timestamp",
+        "bpm"
+      ],
+      "properties": {
+        "bpm": {
+          "type": "integer"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "hiitSportsDetails": {
+      "type": "object",
+      "properties": {
+        "calories": {
+          "type": "integer"
+        },
+        "cardioZones": {
+          "type": "ref",
+          "ref": "#cardioZoneData"
+        },
+        "distanceMeters": {
+          "type": "integer",
+          "description": "Distance in meters",
+          "minimum": 0
+        },
+        "heartRate": {
+          "type": "ref",
+          "ref": "#heartRateData"
+        },
+        "heartRateSamples": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#heartRateSample"
+          }
+        },
+        "intensity": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": [
+            "light",
+            "moderate",
+            "intense"
+          ]
+        },
+        "paceSecondsPerKm": {
+          "type": "integer",
+          "description": "Pace in seconds per kilometer",
+          "minimum": 0
+        },
+        "rounds": {
+          "type": "integer"
+        },
+        "routePoints": {
+          "type": "array",
+          "description": "GPS route points recorded during the workout",
+          "items": {
+            "type": "ref",
+            "ref": "#routePoint"
+          }
+        },
+        "sport": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "steps": {
+          "type": "integer"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A fitness workout record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "startedAt",
+          "duration",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "details": {
+            "type": "union",
+            "refs": [
+              "#cardioDetails",
+              "#strengthDetails",
+              "#flexibilityDetails",
+              "#hiitSportsDetails"
+            ]
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in seconds",
+            "minimum": 0
+          },
+          "endedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "milestones": {
+            "type": "array",
+            "description": "Progress milestones for linear workouts",
+            "items": {
+              "type": "ref",
+              "ref": "#milestone"
+            }
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "ogImage": {
+            "type": "blob",
+            "description": "Open Graph preview image for social sharing",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "planUri": {
+            "type": "string",
+            "description": "Reference to the workoutPlan used, if any",
+            "format": "at-uri"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "status": {
+            "type": "string",
+            "description": "Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).",
+            "maxLength": 64,
+            "knownValues": [
+              "active",
+              "completed"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "running",
+              "cycling",
+              "swimming",
+              "walking",
+              "weightlifting",
+              "bodyweight",
+              "yoga",
+              "hiit",
+              "sports",
+              "stretching",
+              "hiking"
+            ]
+          },
+          "visibility": {
+            "type": "ref",
+            "ref": "#visibilitySettings"
+          }
+        }
+      }
+    },
+    "milestone": {
+      "type": "object",
+      "required": [
+        "type",
+        "timestamp"
+      ],
+      "properties": {
+        "note": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "type": {
+          "type": "string",
+          "maxLength": 64,
+          "knownValues": [
+            "distance",
+            "lap",
+            "note"
+          ]
+        },
+        "valueMeters": {
+          "type": "integer",
+          "description": "Milestone value in meters",
+          "minimum": 0
+        }
+      }
+    },
+    "routePoint": {
+      "type": "object",
+      "required": [
+        "latE6",
+        "lngE6",
+        "timestamp"
+      ],
+      "properties": {
+        "latE6": {
+          "type": "integer",
+          "description": "Latitude in microdegrees (degrees * 1,000,000)"
+        },
+        "lngE6": {
+          "type": "integer",
+          "description": "Longitude in microdegrees (degrees * 1,000,000)"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "strengthDetails": {
+      "type": "object",
+      "properties": {
+        "calories": {
+          "type": "integer"
+        },
+        "cardioZones": {
+          "type": "ref",
+          "ref": "#cardioZoneData"
+        },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#exercise"
+          }
+        },
+        "heartRate": {
+          "type": "ref",
+          "ref": "#heartRateData"
+        },
+        "heartRateSamples": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#heartRateSample"
+          }
+        },
+        "steps": {
+          "type": "integer"
+        }
+      }
+    },
+    "visibilitySettings": {
+      "type": "object",
+      "description": "Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.",
+      "properties": {
+        "calories": {
+          "type": "string",
+          "default": "public",
+          "maxLength": 64,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        },
+        "cardioZones": {
+          "type": "string",
+          "default": "private",
+          "maxLength": 64,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        },
+        "details": {
+          "type": "string",
+          "default": "public",
+          "maxLength": 64,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        },
+        "heartRate": {
+          "type": "string",
+          "default": "private",
+          "maxLength": 64,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "default": "public",
+          "maxLength": 64,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        },
+        "steps": {
+          "type": "string",
+          "default": "public",
+          "maxLength": 64,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        }
+      }
+    }
+  }
+}

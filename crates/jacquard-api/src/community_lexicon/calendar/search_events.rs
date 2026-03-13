@@ -39,8 +39,8 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CountGoing;
         type CountInterested;
+        type CountGoing;
         type CountNotGoing;
         type Url;
     }
@@ -48,26 +48,26 @@ pub mod event_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CountGoing = Unset;
         type CountInterested = Unset;
+        type CountGoing = Unset;
         type CountNotGoing = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `count_going` field to Set
-    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
-    impl<S: State> State for SetCountGoing<S> {
-        type CountGoing = Set<members::count_going>;
-        type CountInterested = S::CountInterested;
-        type CountNotGoing = S::CountNotGoing;
-        type Url = S::Url;
     }
     ///State transition - sets the `count_interested` field to Set
     pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountInterested<S> {}
     impl<S: State> State for SetCountInterested<S> {
-        type CountGoing = S::CountGoing;
         type CountInterested = Set<members::count_interested>;
+        type CountGoing = S::CountGoing;
+        type CountNotGoing = S::CountNotGoing;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `count_going` field to Set
+    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
+    impl<S: State> State for SetCountGoing<S> {
+        type CountInterested = S::CountInterested;
+        type CountGoing = Set<members::count_going>;
         type CountNotGoing = S::CountNotGoing;
         type Url = S::Url;
     }
@@ -75,8 +75,8 @@ pub mod event_view_state {
     pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
     impl<S: State> State for SetCountNotGoing<S> {
-        type CountGoing = S::CountGoing;
         type CountInterested = S::CountInterested;
+        type CountGoing = S::CountGoing;
         type CountNotGoing = Set<members::count_not_going>;
         type Url = S::Url;
     }
@@ -84,18 +84,18 @@ pub mod event_view_state {
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CountGoing = S::CountGoing;
         type CountInterested = S::CountInterested;
+        type CountGoing = S::CountGoing;
         type CountNotGoing = S::CountNotGoing;
         type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count_going` field
-        pub struct count_going(());
         ///Marker type for the `count_interested` field
         pub struct count_interested(());
+        ///Marker type for the `count_going` field
+        pub struct count_going(());
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
         ///Marker type for the `url` field
@@ -212,8 +212,8 @@ where
 impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
-    S::CountGoing: event_view_state::IsSet,
     S::CountInterested: event_view_state::IsSet,
+    S::CountGoing: event_view_state::IsSet,
     S::CountNotGoing: event_view_state::IsSet,
     S::Url: event_view_state::IsSet,
 {

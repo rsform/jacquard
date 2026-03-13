@@ -1,0 +1,20 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.actor.artist",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An artist or band who performs music",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  }
+}

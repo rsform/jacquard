@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "social.pace.feed.activity",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A recording of an activity. Like running, walking, lifting weights, etc. Helpful to create the rkey tid from the start time and clock id 23 so you can upsert easily.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "startedAt",
+          "endedAt",
+          "type",
+          "createdAt"
+        ],
+        "properties": {
+          "calories": {
+            "type": "integer",
+            "description": "The number of active calories burned during the activity."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the activity was created",
+            "format": "datetime"
+          },
+          "distance": {
+            "type": "string",
+            "description": "The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters."
+          },
+          "distanceUnits": {
+            "type": "string",
+            "description": "The units used for distance measurement.",
+            "maxLength": 10,
+            "enum": [
+              "feet",
+              "miles",
+              "meters",
+              "kilometers"
+            ]
+          },
+          "endedAt": {
+            "type": "string",
+            "description": "When the activity ended.",
+            "format": "datetime"
+          },
+          "route": {
+            "type": "blob",
+            "description": "An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.",
+            "accept": [
+              "application/vnd.garmin.tcx+xml",
+              "application/gpx+xml."
+            ]
+          },
+          "splits": {
+            "type": "array",
+            "description": "Array of splits if any.",
+            "items": {
+              "type": "ref",
+              "ref": "social.pace.feed.defs#split"
+            }
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "When the activity was started.",
+            "format": "datetime"
+          },
+          "steps": {
+            "type": "integer",
+            "description": "The number of steps taken during the activity."
+          },
+          "type": {
+            "type": "ref",
+            "ref": "social.pace.feed.defs#activityType"
+          }
+        }
+      }
+    }
+  }
+}

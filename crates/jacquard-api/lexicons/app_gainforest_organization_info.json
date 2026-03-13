@@ -1,0 +1,94 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.organization.info",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of an organization or project",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "displayName",
+          "shortDescription",
+          "longDescription",
+          "objectives",
+          "country",
+          "visibility",
+          "createdAt"
+        ],
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The country of the organization or project in two letter code (ISO 3166-1 alpha-2)"
+          },
+          "coverImage": {
+            "type": "ref",
+            "description": "Cover image for the organization",
+            "ref": "app.gainforest.common.defs#smallImage"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time of the creation of the record",
+            "format": "datetime"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The name of the organization or project",
+            "minLength": 8,
+            "maxLength": 255
+          },
+          "logo": {
+            "type": "ref",
+            "description": "Logo for the organization",
+            "ref": "app.gainforest.common.defs#smallImage"
+          },
+          "longDescription": {
+            "type": "string",
+            "description": "The long description of the organization or project in richtext",
+            "minLength": 50,
+            "maxLength": 5000
+          },
+          "objectives": {
+            "type": "array",
+            "description": "The objectives of the organization or project",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Conservation",
+                "Research",
+                "Education",
+                "Community",
+                "Other"
+              ]
+            }
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "The description of the organization or project",
+            "minLength": 50,
+            "maxLength": 2000
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date of the organization or project",
+            "format": "datetime"
+          },
+          "visibility": {
+            "type": "string",
+            "description": "The visibility of the organization or project in the Green Globe",
+            "enum": [
+              "Public",
+              "Hidden"
+            ]
+          },
+          "website": {
+            "type": "string",
+            "description": "The website of the organization or project",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

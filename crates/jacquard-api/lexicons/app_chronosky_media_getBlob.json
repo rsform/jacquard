@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.media.getBlob",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a blob by its CID from temporary R2 storage. Returns the raw binary content. The authenticated user's temporary blob is retrieved using their DID and the provided CID.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "cid"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "Content Identifier (CID) of the blob to retrieve.",
+            "maxLength": 200
+          }
+        }
+      },
+      "output": {
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "The requested blob was not found.",
+          "name": "BlobNotFound"
+        },
+        {
+          "description": "Invalid CID format or missing parameters.",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

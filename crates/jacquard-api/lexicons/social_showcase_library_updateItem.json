@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.library.updateItem",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update an existing item. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "category": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 3000
+            },
+            "externalLink": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 2048
+            },
+            "images": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#itemImage"
+              },
+              "maxLength": 6
+            },
+            "metadata": {
+              "type": "unknown"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "maxLength": 20
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 300
+            },
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the item",
+              "format": "at-uri"
+            },
+            "visibility": {
+              "type": "string",
+              "maxLength": 10,
+              "knownValues": [
+                "public",
+                "unlisted",
+                "private"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#itemView"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "lexicon": 1,
+  "id": "directory.evnt.event",
+  "defs": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "addr": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        }
+      }
+    },
+    "Coordinates": {
+      "type": "object",
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "properties": {
+        "lat": {
+          "type": "integer"
+        },
+        "lng": {
+          "type": "integer"
+        }
+      }
+    },
+    "EventComponent": {
+      "type": "object",
+      "required": [
+        "type",
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "unknown"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "EventInstance": {
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string"
+        },
+        "status": {
+          "type": "ref",
+          "ref": "#eventStatus"
+        },
+        "venueIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "EventStatus": {
+      "type": "string",
+      "knownValues": [
+        "planned",
+        "uncertain",
+        "postponed",
+        "cancelled",
+        "suspended"
+      ]
+    },
+    "OnlineVenue": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "unknown"
+        },
+        "type": {
+          "type": "string",
+          "const": "online"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "PhysicalVenue": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "name"
+      ],
+      "properties": {
+        "address": {
+          "type": "ref",
+          "ref": "#address"
+        },
+        "coordinates": {
+          "type": "ref",
+          "ref": "#coordinates"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "unknown"
+        },
+        "type": {
+          "type": "string",
+          "const": "physical"
+        }
+      }
+    },
+    "UnknownVenue": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "unknown"
+        },
+        "type": {
+          "type": "string",
+          "const": "unknown"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "v",
+        "name"
+      ],
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#eventComponent"
+          }
+        },
+        "instances": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#eventInstance"
+          }
+        },
+        "label": {
+          "type": "unknown"
+        },
+        "name": {
+          "type": "unknown"
+        },
+        "status": {
+          "type": "ref",
+          "ref": "#eventStatus"
+        },
+        "v": {
+          "type": "integer",
+          "const": 0
+        },
+        "venues": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#physicalVenue",
+              "#onlineVenue",
+              "#unknownVenue"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

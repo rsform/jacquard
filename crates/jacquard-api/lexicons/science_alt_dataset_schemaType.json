@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.schemaType",
+  "defs": {
+    "jsonSchema": {
+      "type": "token",
+      "description": "JSON Schema Draft 7 format for sample type definitions. When schemaType is 'jsonSchema', the schema field must contain an object conforming to science.alt.dataset.schema#jsonSchemaFormat."
+    },
+    "main": {
+      "type": "string",
+      "description": "Schema type identifier for atdata sample definitions. Known values correspond to token definitions in this Lexicon. New schema types can be added as tokens without breaking changes.",
+      "maxLength": 50,
+      "knownValues": [
+        "jsonSchema"
+      ]
+    }
+  }
+}

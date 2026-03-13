@@ -29,6 +29,10 @@ pub struct Crew<'a> {
     /// Member's role in the hold
     #[serde(borrow)]
     pub role: CrewRole<'a>,
+    /// Optional tier for quota limits (e.g., 'deckhand', 'bosun', 'quartermaster'). If empty, uses defaults.new_crew_tier from quotas.yaml.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod crew_state {
@@ -43,8 +47,8 @@ pub mod crew_state {
     pub trait State: sealed::Sealed {
         type Role;
         type AddedAt;
-        type Permissions;
         type Member;
+        type Permissions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -52,8 +56,8 @@ pub mod crew_state {
     impl State for Empty {
         type Role = Unset;
         type AddedAt = Unset;
-        type Permissions = Unset;
         type Member = Unset;
+        type Permissions = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
@@ -61,8 +65,8 @@ pub mod crew_state {
     impl<S: State> State for SetRole<S> {
         type Role = Set<members::role>;
         type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
         type Member = S::Member;
+        type Permissions = S::Permissions;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -70,17 +74,8 @@ pub mod crew_state {
     impl<S: State> State for SetAddedAt<S> {
         type Role = S::Role;
         type AddedAt = Set<members::added_at>;
+        type Member = S::Member;
         type Permissions = S::Permissions;
-        type Member = S::Member;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type Role = S::Role;
-        type AddedAt = S::AddedAt;
-        type Permissions = Set<members::permissions>;
-        type Member = S::Member;
     }
     ///State transition - sets the `member` field to Set
     pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
@@ -88,8 +83,17 @@ pub mod crew_state {
     impl<S: State> State for SetMember<S> {
         type Role = S::Role;
         type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
         type Member = Set<members::member>;
+        type Permissions = S::Permissions;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Role = S::Role;
+        type AddedAt = S::AddedAt;
+        type Member = S::Member;
+        type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -98,10 +102,10 @@ pub mod crew_state {
         pub struct role(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
         ///Marker type for the `member` field
         pub struct member(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
     }
 }
 
@@ -113,6 +117,7 @@ pub struct CrewBuilder<'a, S: crew_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<CrewRole<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -129,7 +134,7 @@ impl<'a> CrewBuilder<'a, crew_state::Empty> {
     pub fn new() -> Self {
         CrewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -211,13 +216,29 @@ where
     }
 }
 
+impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
+    /// Set the `tier` field (optional)
+    pub fn tier(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `tier` field to an Option value (optional)
+    pub fn maybe_tier(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
     S::Role: crew_state::IsSet,
     S::AddedAt: crew_state::IsSet,
-    S::Permissions: crew_state::IsSet,
     S::Member: crew_state::IsSet,
+    S::Permissions: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
@@ -226,6 +247,7 @@ where
             member: self.__unsafe_private_named.1.unwrap(),
             permissions: self.__unsafe_private_named.2.unwrap(),
             role: self.__unsafe_private_named.3.unwrap(),
+            tier: self.__unsafe_private_named.4,
             extra_data: Default::default(),
         }
     }
@@ -242,6 +264,7 @@ where
             member: self.__unsafe_private_named.1.unwrap(),
             permissions: self.__unsafe_private_named.2.unwrap(),
             role: self.__unsafe_private_named.3.unwrap(),
+            tier: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
     }
@@ -433,6 +456,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
                 });
             }
         }
+        if let Some(ref value) = self.tier {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tier",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -542,6 +577,25 @@ fn lexicon_doc_io_atcr_hold_crew() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
                                             "Member's role in the hold",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(32usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("tier"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional tier for quota limits (e.g., 'deckhand', 'bosun', 'quartermaster'). If empty, uses defaults.new_crew_tier from quotas.yaml.",
                                         ),
                                     ),
                                     format: None,

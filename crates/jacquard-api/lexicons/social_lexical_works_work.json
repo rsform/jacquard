@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "social.lexical.works.work",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "workType"
+        ],
+        "nullable": [
+          "id",
+          "year"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "maxLength": 64,
+            "maxGraphemes": 32
+          },
+          "title": {
+            "type": "string",
+            "description": "",
+            "maxLength": 1024,
+            "maxGraphemes": 512
+          },
+          "workType": {
+            "type": "string",
+            "description": "",
+            "maxLength": 128,
+            "maxGraphemes": 64,
+            "knownValues": [
+              "Movie"
+            ]
+          },
+          "year": {
+            "type": "integer",
+            "description": "",
+            "minimum": 0,
+            "maximum": 2199
+          }
+        }
+      }
+    }
+  }
+}

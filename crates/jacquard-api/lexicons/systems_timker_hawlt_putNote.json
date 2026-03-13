@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "systems.timker.hawlt.putNote",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Write a note record to the repo. Creates a new record at the given rkey.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "rkey",
+            "record"
+          ],
+          "properties": {
+            "record": {
+              "type": "ref",
+              "description": "The note record to write.",
+              "ref": "systems.timker.hawlt.note"
+            },
+            "rkey": {
+              "type": "string",
+              "description": "The record key (TID) for this note.",
+              "format": "record-key"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

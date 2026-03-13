@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.recipe.collectionfollow",
+  "description": "Record declaring a follow of a public recipe collection.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this follow was created",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The collection being followed",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

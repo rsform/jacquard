@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.fetchRecords",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fetches one or more private records from someone's hidden repository. Requires auth.\n\nThis method is implemented by the HDS and subject to some implementation-defined behaviour, especially regarding authentication and the \"strategy\" used.\n\nGenerally, errors are completely silent, you just won't get a result. This is for privacy - we don't want to leak information about whether a record exists or not.\n\nYou should just pass the public post URI to this method and it should work. It is safe to assume that any sane implementation will use the exact same repo handle/DID, collection NSID, and record key for both the public version and private version of any given record.\nSo, if you see a record in the wild with a `\"ooo.bsky.authfetch.privateRecord\": true` field, you should try to find the author's `#authfetch_hds` service and perform a service-proxied request to try to fetch it from there with the same IDs.\nIf you get a result, you should display that instead of the public version.\n\nOf course, posting publically to `app.bsky.feed.post` with a `\"ooo.bsky.authfetch.privateRecord\": true` field is a bad idea, as people on unsupported clients will see the placeholder.\nAs an alternative, post to `ooo.bsky.authfetch.feed.post` instead, which is exactly the same as `app.bsky.feed.post` but with the private record field added, and a guarentee that it won't show up on normal clients.\n\nFinally, you may encounter \"encrypted blobs\", which can be decrypted with a key that is only saved in the private record, avoiding the pain of having the HDS store blobs. Look for a `\"ooo.bsky.authfetch.encryptedBlobs\": [...]` field in the record.\n",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uris"
+        ],
+        "properties": {
+          "uris": {
+            "type": "array",
+            "description": "The AT URIs of the records to fetch.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "minLength": 1,
+            "maxLength": 50
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "results"
+          ],
+          "properties": {
+            "results": {
+              "type": "array",
+              "description": "The results of the queries. Missing results indicate an error. For privacy, the error is not returned.",
+              "items": {
+                "type": "ref",
+                "ref": "#result"
+              },
+              "minLength": 1,
+              "maxLength": 50
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "description": "Successful result, with the record value.",
+      "required": [
+        "uri",
+        "strategy",
+        "record"
+      ],
+      "properties": {
+        "record": {
+          "type": "unknown",
+          "description": "The stored private record value."
+        },
+        "strategy": {
+          "type": "ref",
+          "description": "The strategy used to authenticate fetch requests for this record.",
+          "ref": "ooo.bsky.authfetch.strategy"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT URI of the record.",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

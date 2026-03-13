@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "app.protoimsg.chat.channel",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A channel within a chat room. Created by the room owner.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "room",
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of channel creation.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "What the channel is about.",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the channel.",
+            "maxLength": 100
+          },
+          "position": {
+            "type": "integer",
+            "description": "Sort position within the room. Lower numbers appear first.",
+            "minimum": 0
+          },
+          "postPolicy": {
+            "type": "string",
+            "description": "Who can post messages in this channel.",
+            "knownValues": [
+              "everyone",
+              "owner",
+              "moderators"
+            ]
+          },
+          "room": {
+            "type": "string",
+            "description": "AT-URI of the room this channel belongs to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.profile.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User profile record",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "handle",
+          "tags",
+          "createdAt"
+        ],
+        "properties": {
+          "accentColor": {
+            "type": "string",
+            "description": "Custom accent color hex code (e.g. #2e4a6e)",
+            "maxLength": 7
+          },
+          "avatar": {
+            "type": "blob",
+            "description": "Avatar image blob (1000x1000px max)",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "banner": {
+            "type": "blob",
+            "description": "Banner image blob (3000x1000px max)",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "bio": {
+            "type": "string",
+            "description": "Profile description",
+            "maxLength": 256
+          },
+          "collectionCount": {
+            "type": "integer",
+            "description": "Total number of collections",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "did": {
+            "type": "string",
+            "description": "User's DID",
+            "maxLength": 2048
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name",
+            "maxLength": 64
+          },
+          "handle": {
+            "type": "string",
+            "description": "User's handle",
+            "maxLength": 253
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "Total number of items in the user's library",
+            "default": 0
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "description": "Schema version for migrations (defaults to 1 if missing)",
+            "default": 1
+          },
+          "showcase": {
+            "type": "array",
+            "description": "Featured showcase items",
+            "items": {
+              "type": "ref",
+              "ref": "social.showcase.defs#showcaseItem"
+            },
+            "maxLength": 4
+          },
+          "tags": {
+            "type": "array",
+            "description": "Profile tags for discovery (max 10)",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "maxLength": 10
+          },
+          "theme": {
+            "type": "string",
+            "description": "Profile theme preset name",
+            "maxLength": 64
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "website": {
+            "type": "string",
+            "description": "External website URL",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        }
+      }
+    }
+  }
+}

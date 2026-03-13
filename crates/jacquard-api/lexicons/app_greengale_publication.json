@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "app.greengale.publication",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A publication configuration with title, description, and default theme.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "url",
+          "name"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Publication description",
+            "maxLength": 1000
+          },
+          "enableSiteStandard": {
+            "type": "boolean",
+            "description": "When enabled, also publishes to site.standard.publication and site.standard.document collections for cross-platform compatibility",
+            "default": false
+          },
+          "name": {
+            "type": "string",
+            "description": "Publication/blog title",
+            "maxLength": 200
+          },
+          "theme": {
+            "type": "ref",
+            "description": "Default theme for posts in this publication",
+            "ref": "app.greengale.blog.defs#theme"
+          },
+          "url": {
+            "type": "string",
+            "description": "Publication base URL (e.g., https://greengale.app)",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "voiceTheme": {
+            "type": "ref",
+            "description": "Default voice settings for TTS playback on posts",
+            "ref": "app.greengale.blog.defs#voiceTheme"
+          }
+        }
+      }
+    }
+  }
+}

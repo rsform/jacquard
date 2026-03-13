@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "com.deckbelcher.social.like",
+  "defs": {
+    "cardSubject": {
+      "type": "object",
+      "description": "Subject for liking a card.",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "description": "Reference to the card.",
+          "ref": "com.deckbelcher.defs#cardRef"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record declaring a 'like' of a piece of content (card, deck, reply, etc).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the like was created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "union",
+            "description": "Reference to the content being liked.",
+            "refs": [
+              "#cardSubject",
+              "#recordSubject"
+            ]
+          }
+        }
+      }
+    },
+    "recordSubject": {
+      "type": "object",
+      "description": "Subject for liking an ATProto record (deck, reply, etc).",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "description": "Reference to the record.",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

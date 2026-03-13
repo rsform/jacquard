@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.accomplishment",
+  "description": "Record declaring that the user has earned an accomplishment (badge/milestone). One record per accomplishment type per user.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "type",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "metadata": {
+            "type": "unknown",
+            "description": "Optional free-form metadata for extra accomplishment context."
+          },
+          "type": {
+            "type": "string",
+            "description": "Accomplishment type key (e.g. first_made, first_recipe)"
+          }
+        }
+      }
+    }
+  }
+}

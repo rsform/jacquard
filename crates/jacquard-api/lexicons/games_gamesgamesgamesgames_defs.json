@@ -1,0 +1,1259 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.defs",
+  "defs": {
+    "actorProfileDetailView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "did"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 10000000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "descriptionFacets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "pronouns": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "websites": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#website"
+          }
+        }
+      }
+    },
+    "actorProfileSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "did"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 10000000
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "ageRating": {
+      "type": "object",
+      "required": [
+        "organization",
+        "rating"
+      ],
+      "properties": {
+        "contentDescriptors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organization": {
+          "type": "string",
+          "knownValues": [
+            "esrb",
+            "pegi",
+            "cero",
+            "usk",
+            "grac",
+            "classInd",
+            "acb"
+          ]
+        },
+        "rating": {
+          "type": "string"
+        }
+      }
+    },
+    "alternativeName": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "applicationType": {
+      "type": "string",
+      "enum": [
+        "addon",
+        "bundle",
+        "dlc",
+        "episode",
+        "expandedGame",
+        "expansion",
+        "fork",
+        "game",
+        "mod",
+        "port",
+        "remake",
+        "remaster",
+        "season",
+        "standaloneExpansion",
+        "update"
+      ]
+    },
+    "collectionSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "franchise",
+            "series",
+            "curated"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "companyRole": {
+      "type": "string",
+      "knownValues": [
+        "developer",
+        "publisher",
+        "porter",
+        "supporter"
+      ]
+    },
+    "creditEntry": {
+      "type": "object",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "department": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "role": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#individualRole"
+        }
+      }
+    },
+    "engineSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "externalIds": {
+      "type": "object",
+      "properties": {
+        "appleAppStore": {
+          "type": "string"
+        },
+        "epicGames": {
+          "type": "string"
+        },
+        "gog": {
+          "type": "string"
+        },
+        "googlePlay": {
+          "type": "string"
+        },
+        "humbleBundle": {
+          "type": "string"
+        },
+        "igdb": {
+          "type": "string"
+        },
+        "itchIo": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#itchIoId"
+        },
+        "nintendoEshop": {
+          "type": "string"
+        },
+        "playStation": {
+          "type": "string"
+        },
+        "steam": {
+          "type": "string"
+        },
+        "xbox": {
+          "type": "string"
+        }
+      }
+    },
+    "externalVideo": {
+      "type": "object",
+      "required": [
+        "videoId",
+        "platform"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "knownValues": [
+            "youtube",
+            "twitch",
+            "vimeo"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "videoId": {
+          "type": "string"
+        }
+      }
+    },
+    "gameDetailView": {
+      "type": "object",
+      "required": [
+        "name",
+        "uri",
+        "createdAt"
+      ],
+      "properties": {
+        "ageRatings": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#ageRating"
+          }
+        },
+        "alternativeNames": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#alternativeName"
+          }
+        },
+        "applicationType": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#applicationType"
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "engines": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        },
+        "externalIds": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#externalIds"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#genre"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "languageSupports": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#languageSupport"
+          }
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+          }
+        },
+        "modes": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#mode"
+          }
+        },
+        "multiplayerModes": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#multiplayerMode"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "playerPerspectives": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#playerPerspective"
+          }
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "releases": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#release"
+          }
+        },
+        "slug": {
+          "type": "string"
+        },
+        "storyline": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "themes": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#theme"
+          }
+        },
+        "timeToBeat": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#timeToBeat"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "videos": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#externalVideo"
+          }
+        },
+        "websites": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#website"
+          }
+        }
+      }
+    },
+    "gameFeedViewItem": {
+      "type": "object",
+      "required": [
+        "game"
+      ],
+      "properties": {
+        "feedContext": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "game": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#gameView"
+        }
+      }
+    },
+    "gameSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "applicationType": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#applicationType"
+        },
+        "firstReleaseDate": {
+          "type": "integer",
+          "description": "Earliest release date as YYYYMMDD integer."
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "gameView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name",
+        "applicationType"
+      ],
+      "properties": {
+        "applicationType": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#applicationType"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#genre"
+          }
+        },
+        "likeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "releases": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#release"
+          }
+        },
+        "slug": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "themes": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#theme"
+          }
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#viewerState"
+        }
+      }
+    },
+    "genre": {
+      "type": "string",
+      "knownValues": [
+        "fighting",
+        "music",
+        "platform",
+        "pointAndClick",
+        "puzzle",
+        "racing",
+        "rpg",
+        "rts",
+        "shooter",
+        "simulator"
+      ]
+    },
+    "individualRole": {
+      "type": "string",
+      "knownValues": [
+        "director",
+        "producer",
+        "designer",
+        "programmer",
+        "artist",
+        "animator",
+        "writer",
+        "composer",
+        "soundDesigner",
+        "voiceActor",
+        "qa",
+        "localization",
+        "communityManager",
+        "marketing"
+      ]
+    },
+    "itchIoId": {
+      "type": "object",
+      "required": [
+        "developer",
+        "game"
+      ],
+      "properties": {
+        "developer": {
+          "type": "string"
+        },
+        "game": {
+          "type": "string"
+        }
+      }
+    },
+    "languageSupport": {
+      "type": "object",
+      "required": [
+        "language"
+      ],
+      "properties": {
+        "audio": {
+          "type": "boolean"
+        },
+        "interface": {
+          "type": "boolean"
+        },
+        "language": {
+          "type": "string"
+        },
+        "subtitles": {
+          "type": "boolean"
+        }
+      }
+    },
+    "mediaItem": {
+      "type": "object",
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "accept": [
+            "image/*",
+            "video/*"
+          ],
+          "maxSize": 200000000
+        },
+        "description": {
+          "type": "string"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "mediaType": {
+          "type": "string",
+          "enum": [
+            "accoladesTrailer",
+            "announcementTrailer",
+            "artwork",
+            "cinematicTrailer",
+            "conceptArt",
+            "cover",
+            "coverAlt",
+            "coverHistorical",
+            "coverSquare",
+            "cutscene",
+            "devDiary",
+            "gameplayImage",
+            "gameplayTrailer",
+            "icon",
+            "infographic",
+            "intro",
+            "keyArt",
+            "keyArtLogo",
+            "launchTrailer",
+            "logoBlack",
+            "logoColor",
+            "logoWhite",
+            "releaseDateTrailer",
+            "screenshot",
+            "teaser",
+            "trailer"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "width": {
+          "type": "integer"
+        }
+      }
+    },
+    "mode": {
+      "type": "string",
+      "knownValues": [
+        "battleRoyale",
+        "cooperative",
+        "mmo",
+        "multiplayer",
+        "singlePlayer",
+        "splitScreen"
+      ]
+    },
+    "multiplayerMode": {
+      "type": "object",
+      "properties": {
+        "hasCampaignCoop": {
+          "type": "boolean"
+        },
+        "hasDropIn": {
+          "type": "boolean"
+        },
+        "hasLanCoop": {
+          "type": "boolean"
+        },
+        "hasSplitscreen": {
+          "type": "boolean"
+        },
+        "hasSplitscreenOnline": {
+          "type": "boolean"
+        },
+        "offlineCoopMax": {
+          "type": "integer"
+        },
+        "offlineMax": {
+          "type": "integer"
+        },
+        "onlineCoopMax": {
+          "type": "integer"
+        },
+        "onlineMax": {
+          "type": "integer"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "orgProfileDetailView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "did"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 10000000
+        },
+        "country": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "descriptionFacets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "foundedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+          }
+        },
+        "parent": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "active",
+            "inactive",
+            "merged",
+            "acquired",
+            "defunct"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "websites": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#website"
+          }
+        }
+      }
+    },
+    "orgProfileSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "did"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 10000000
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "platformCategory": {
+      "type": "string",
+      "knownValues": [
+        "console",
+        "portable",
+        "computer",
+        "arcade",
+        "operatingSystem"
+      ]
+    },
+    "platformFeatures": {
+      "type": "object",
+      "description": "Features supported by a game on a specific storefront/platform.",
+      "required": [
+        "platform",
+        "features"
+      ],
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "knownValues": [
+              "achievements",
+              "cloudSaves",
+              "controllerSupport",
+              "controllerSupportFull",
+              "coop",
+              "coopLan",
+              "coopOnline",
+              "crossPlatformMultiplayer",
+              "familySharing",
+              "inAppPurchases",
+              "leaderboards",
+              "levelEditor",
+              "moddingSupport",
+              "multiPlayer",
+              "multiPlayerLan",
+              "multiPlayerOnline",
+              "pvp",
+              "pvpLan",
+              "pvpOnline",
+              "remotePlayPhone",
+              "remotePlayTablet",
+              "remotePlayTV",
+              "remotePlayTogether",
+              "singlePlayer",
+              "steamTradingCards",
+              "steamWorkshop",
+              "trackingAndManagement",
+              "vrSupport"
+            ]
+          }
+        },
+        "platform": {
+          "type": "string",
+          "knownValues": [
+            "steam",
+            "gog",
+            "epicGames",
+            "playStation",
+            "xbox",
+            "nintendoEshop"
+          ]
+        }
+      }
+    },
+    "platformSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "abbreviation": {
+          "type": "string"
+        },
+        "category": {
+          "type": "ref",
+          "ref": "games.gamesgamesgamesgames.defs#platformCategory"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "platformVersion": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "connectivity": {
+          "type": "string"
+        },
+        "cpu": {
+          "type": "string"
+        },
+        "gpu": {
+          "type": "string"
+        },
+        "maxResolution": {
+          "type": "string"
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+          }
+        },
+        "memory": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        },
+        "storage": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    },
+    "playerPerspective": {
+      "type": "string",
+      "knownValues": [
+        "auditory",
+        "firstPerson",
+        "isometric",
+        "sideView",
+        "text",
+        "thirdPerson",
+        "topDown",
+        "vr"
+      ]
+    },
+    "profileSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "did",
+        "profileType"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 10000000
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "profileType": {
+          "type": "string",
+          "knownValues": [
+            "actor",
+            "org"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "Free-text platform name, used when no platform record exists."
+        },
+        "platformUri": {
+          "type": "string",
+          "description": "AT URI of a platform record.",
+          "format": "at-uri"
+        },
+        "releaseDates": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#releaseDate"
+          }
+        }
+      }
+    },
+    "releaseDate": {
+      "type": "object",
+      "properties": {
+        "region": {
+          "type": "string",
+          "knownValues": [
+            "worldwide",
+            "europe",
+            "northAmerica",
+            "australia",
+            "newZealand",
+            "japan",
+            "china",
+            "asia",
+            "korea",
+            "brazil"
+          ]
+        },
+        "releasedAt": {
+          "type": "string"
+        },
+        "releasedAtFormat": {
+          "type": "string",
+          "enum": [
+            "YYYY-MM-DD",
+            "YYYY-MM",
+            "YYYY-Q1",
+            "YYYY-Q2",
+            "YYYY-Q3",
+            "YYYY-Q4",
+            "YYYY",
+            "TBD"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "advancedAccess",
+            "alpha",
+            "beta",
+            "cancelled",
+            "digitalCompatibilityRelease",
+            "earlyAccess",
+            "nextGenOptimizationRelease",
+            "offline",
+            "release"
+          ]
+        }
+      }
+    },
+    "skeletonGameFeedItem": {
+      "type": "object",
+      "required": [
+        "game"
+      ],
+      "properties": {
+        "feedContext": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "game": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "systemRequirements": {
+      "type": "object",
+      "description": "System requirements for a game on a specific platform.",
+      "required": [
+        "platform"
+      ],
+      "properties": {
+        "minimum": {
+          "type": "ref",
+          "ref": "#systemSpec"
+        },
+        "platform": {
+          "type": "string",
+          "knownValues": [
+            "windows",
+            "mac",
+            "linux"
+          ]
+        },
+        "recommended": {
+          "type": "ref",
+          "ref": "#systemSpec"
+        }
+      }
+    },
+    "systemSpec": {
+      "type": "object",
+      "description": "Hardware/software specification for a platform.",
+      "properties": {
+        "additionalNotes": {
+          "type": "string"
+        },
+        "directx": {
+          "type": "string"
+        },
+        "graphics": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        },
+        "processor": {
+          "type": "string"
+        },
+        "soundCard": {
+          "type": "string"
+        },
+        "storage": {
+          "type": "string"
+        }
+      }
+    },
+    "theme": {
+      "type": "string",
+      "knownValues": [
+        "4x",
+        "action",
+        "business",
+        "comedy",
+        "drama",
+        "educational",
+        "erotic",
+        "fantasy",
+        "historical",
+        "horror",
+        "kids",
+        "mystery",
+        "nonfiction",
+        "openWorld",
+        "party",
+        "romance",
+        "sandbox",
+        "scifi",
+        "stealth",
+        "survival",
+        "thriller",
+        "warfare"
+      ]
+    },
+    "timeToBeat": {
+      "type": "object",
+      "properties": {
+        "completely": {
+          "type": "integer"
+        },
+        "hastily": {
+          "type": "integer"
+        },
+        "normally": {
+          "type": "integer"
+        }
+      }
+    },
+    "viewerState": {
+      "type": "object",
+      "properties": {
+        "like": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "website": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "official",
+            "wiki",
+            "steam",
+            "gog",
+            "epicGames",
+            "itchIo",
+            "twitter",
+            "instagram",
+            "youtube",
+            "twitch",
+            "discord",
+            "reddit",
+            "facebook",
+            "wikipedia",
+            "bluesky",
+            "xbox",
+            "playstation",
+            "nintendo",
+            "meta",
+            "other"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

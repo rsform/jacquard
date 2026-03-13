@@ -17,6 +17,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BskyPost<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub client_host: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -57,6 +60,7 @@ pub mod bsky_post_state {
 pub struct BskyPostBuilder<'a, S: bsky_post_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -74,9 +78,28 @@ impl<'a> BskyPostBuilder<'a, bsky_post_state::Empty> {
     pub fn new() -> Self {
         BskyPostBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: bsky_post_state::State> BskyPostBuilder<'a, S> {
+    /// Set the `clientHost` field (optional)
+    pub fn client_host(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `clientHost` field to an Option value (optional)
+    pub fn maybe_client_host(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -90,7 +113,7 @@ where
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> BskyPostBuilder<'a, bsky_post_state::SetPostRef<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         BskyPostBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -107,7 +130,8 @@ where
     /// Build the final struct
     pub fn build(self) -> BskyPost<'a> {
         BskyPost {
-            post_ref: self.__unsafe_private_named.0.unwrap(),
+            client_host: self.__unsafe_private_named.0,
+            post_ref: self.__unsafe_private_named.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -120,7 +144,8 @@ where
         >,
     ) -> BskyPost<'a> {
         BskyPost {
-            post_ref: self.__unsafe_private_named.0.unwrap(),
+            client_host: self.__unsafe_private_named.0,
+            post_ref: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -147,6 +172,23 @@ fn lexicon_doc_pub_leaflet_blocks_bskyPost() -> ::jacquard_lexicon::lexicon::Lex
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "clientHost",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("postRef"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

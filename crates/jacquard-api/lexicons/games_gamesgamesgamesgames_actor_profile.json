@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a Pentaract actor profile.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "displayName",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Image to be displayed on profile page. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 10000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 3000
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640
+          },
+          "pronouns": {
+            "type": "string",
+            "description": "Free-form pronouns text.",
+            "maxLength": 200
+          },
+          "websites": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#website"
+            }
+          }
+        }
+      }
+    }
+  }
+}

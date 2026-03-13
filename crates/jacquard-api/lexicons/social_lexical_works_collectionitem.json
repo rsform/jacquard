@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "social.lexical.works.collectionitem",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "list",
+          "work",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "",
+            "format": "datetime"
+          },
+          "list": {
+            "type": "string",
+            "description": "",
+            "format": "at-uri"
+          },
+          "work": {
+            "type": "string",
+            "description": "",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+/// Hybrid content storage: inline for small content (≤20KB), blob for large content (>20KB)
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -13,118 +14,23 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
-    /// Array of content blocks
+    /// Reference to external JSON blob containing content (extended mode, used when content > 20KB)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub items: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-pub mod content_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Items;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Items = Unset;
-    }
-    ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
-        type Items = Set<members::items>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `items` field
-        pub struct items(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ContentBuilder<'a, S: content_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Content<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContentBuilder<'a, content_state::Empty> {
-        ContentBuilder::new()
-    }
-}
-
-impl<'a> ContentBuilder<'a, content_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ContentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ContentBuilder<'a, S>
-where
-    S: content_state::State,
-    S::Items: content_state::IsUnset,
-{
-    /// Set the `items` field (required)
-    pub fn items(
-        mut self,
-        value: impl Into<Vec<jacquard_common::types::value::Data<'a>>>,
-    ) -> ContentBuilder<'a, content_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ContentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ContentBuilder<'a, S>
-where
-    S: content_state::State,
-    S::Items: content_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Content<'a> {
-        Content {
-            items: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Content<'a> {
-        Content {
-            items: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
+    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    /// Array of content blocks (inline mode, used when content ≤ 20KB)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub items: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    /// Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub references: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
 }
 
 fn lexicon_doc_blog_pckt_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
@@ -138,26 +44,55 @@ fn lexicon_doc_blog_pckt_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("items")],
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Hybrid content storage: inline for small content (≤20KB), blob for large content (>20KB)",
+                        ),
                     ),
+                    required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("blob"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                description: None,
+                                accept: None,
+                                max_size: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("items"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Array of content blocks",
+                                        "Array of content blocks (inline mode, used when content ≤ 20KB)",
                                     ),
                                 ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![],
                                     closed: Some(false),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "references",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                    description: None,
+                                    accept: None,
+                                    max_size: None,
                                 }),
                                 min_length: None,
                                 max_length: None,

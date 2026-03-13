@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "app.beaconbits.favorite",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A favorite relationship to another user",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the favorite was created",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the user being favorited",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

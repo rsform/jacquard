@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "top.launchpadx.agent.thought",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Agent thought record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "workType",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the thought was recorded.",
+            "format": "datetime"
+          },
+          "note": {
+            "type": "string",
+            "description": "Additional context or details for the thought."
+          },
+          "subjectUri": {
+            "type": "string",
+            "description": "URI of the content being processed by the agent.",
+            "format": "uri"
+          },
+          "workType": {
+            "type": "string",
+            "description": "Job type identifier the agent is thinking about."
+          }
+        }
+      }
+    }
+  }
+}

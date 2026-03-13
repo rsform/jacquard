@@ -1,0 +1,146 @@
+{
+  "lexicon": 1,
+  "id": "zone.stratos.sync.subscribeRecords",
+  "defs": {
+    "commit": {
+      "type": "object",
+      "description": "A commit event containing record operations.",
+      "required": [
+        "seq",
+        "did",
+        "time",
+        "rev",
+        "ops"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "The DID of the account.",
+          "format": "did"
+        },
+        "ops": {
+          "type": "array",
+          "description": "List of record operations in this commit.",
+          "items": {
+            "type": "ref",
+            "ref": "#recordOp"
+          }
+        },
+        "rev": {
+          "type": "string",
+          "description": "The repo revision.",
+          "format": "tid"
+        },
+        "seq": {
+          "type": "integer",
+          "description": "The sequence number of this event."
+        },
+        "time": {
+          "type": "string",
+          "description": "Timestamp of when the event was sequenced.",
+          "format": "datetime"
+        }
+      }
+    },
+    "info": {
+      "type": "object",
+      "description": "An informational message about the subscription state.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Additional details about the info message.",
+          "maxLength": 1024
+        },
+        "name": {
+          "type": "string",
+          "description": "The type of info message.",
+          "maxLength": 128,
+          "knownValues": [
+            "OutdatedCursor"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "subscription",
+      "description": "Subscribe to stratos record updates for a specific account. Requires service auth or owner authentication.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "description": "The last known event sequence number to resume from."
+          },
+          "did": {
+            "type": "string",
+            "description": "The DID of the account to subscribe to.",
+            "format": "did"
+          },
+          "domain": {
+            "type": "string",
+            "description": "Optional domain filter. Only events for records with this domain in their boundary will be emitted.",
+            "maxLength": 253
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": [
+            "#commit",
+            "#info"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "description": "Cursor is in the future.",
+          "name": "FutureCursor"
+        },
+        {
+          "description": "Authentication is required.",
+          "name": "AuthRequired"
+        }
+      ]
+    },
+    "recordOp": {
+      "type": "object",
+      "description": "A single record operation within a commit.",
+      "required": [
+        "action",
+        "path"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "The type of operation.",
+          "maxLength": 32,
+          "knownValues": [
+            "create",
+            "update",
+            "delete"
+          ]
+        },
+        "cid": {
+          "type": "cid-link",
+          "description": "The CID of the record. Present for create and update operations."
+        },
+        "path": {
+          "type": "string",
+          "description": "The record path (collection/rkey).",
+          "maxLength": 512
+        },
+        "record": {
+          "type": "unknown",
+          "description": "The record content. Present for create and update operations."
+        }
+      }
+    }
+  }
+}

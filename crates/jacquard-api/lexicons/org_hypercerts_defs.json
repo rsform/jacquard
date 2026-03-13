@@ -1,0 +1,113 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.defs",
+  "description": "Common type definitions used across all Hypercerts protocols.",
+  "defs": {
+    "largeBlob": {
+      "type": "object",
+      "description": "Object containing a blob to external data",
+      "required": [
+        "blob"
+      ],
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "description": "Blob to external data (up to 100MB)",
+          "accept": [
+            "*/*"
+          ],
+          "maxSize": 104857600
+        }
+      }
+    },
+    "largeImage": {
+      "type": "object",
+      "description": "Object containing a large image",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "type": "blob",
+          "description": "Image (up to 10MB)",
+          "accept": [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+          ],
+          "maxSize": 10485760
+        }
+      }
+    },
+    "smallBlob": {
+      "type": "object",
+      "description": "Object containing a blob to external data",
+      "required": [
+        "blob"
+      ],
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "description": "Blob to external data (up to 10MB)",
+          "accept": [
+            "*/*"
+          ],
+          "maxSize": 10485760
+        }
+      }
+    },
+    "smallImage": {
+      "type": "object",
+      "description": "Object containing a small image",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "type": "blob",
+          "description": "Image (up to 5MB)",
+          "accept": [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+          ],
+          "maxSize": 5242880
+        }
+      }
+    },
+    "smallVideo": {
+      "type": "object",
+      "description": "Object containing a small video",
+      "required": [
+        "video"
+      ],
+      "properties": {
+        "video": {
+          "type": "blob",
+          "description": "Video (up to 20MB)",
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "maxSize": 20971520
+        }
+      }
+    },
+    "uri": {
+      "type": "object",
+      "description": "Object containing a URI to external data",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI to external data",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

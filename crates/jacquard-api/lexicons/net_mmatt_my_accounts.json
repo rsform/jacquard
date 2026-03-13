@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "net.mmatt.my.accounts",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a list of account references.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "accounts"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            }
+          }
+        }
+      }
+    }
+  }
+}

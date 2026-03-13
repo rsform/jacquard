@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.feed.getSimilarGamesFeed",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get games similar to a given game, based on shared genres, themes, and other attributes. Deprecated: use getGameFeed with the 'similar' feed URI instead.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 5,
+            "minimum": 1,
+            "maximum": 10
+          },
+          "uri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "feed"
+          ],
+          "properties": {
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#gameFeedViewItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

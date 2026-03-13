@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Title",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "The primary heading for a card or section.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

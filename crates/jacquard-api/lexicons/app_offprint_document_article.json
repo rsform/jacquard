@@ -12,9 +12,9 @@
         ],
         "properties": {
           "document": {
-            "type": "string",
-            "description": "Required AT-URI to a `site.standard.document` compatible record. Used to display articles with-in a publication.",
-            "format": "at-uri"
+            "type": "ref",
+            "description": "Strong reference to a `site.standard.document` compatible record.",
+            "ref": "com.atproto.repo.strongRef"
           }
         }
       }

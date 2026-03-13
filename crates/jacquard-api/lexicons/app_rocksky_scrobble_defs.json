@@ -37,6 +37,12 @@
           "type": "string",
           "description": "The unique identifier of the scrobble."
         },
+        "liked": {
+          "type": "boolean"
+        },
+        "likesCount": {
+          "type": "integer"
+        },
         "sha256": {
           "type": "string",
           "description": "The SHA256 hash of the scrobble data."
@@ -53,6 +59,15 @@
         "user": {
           "type": "string",
           "description": "The handle of the user who created the scrobble."
+        },
+        "userAvatar": {
+          "type": "string",
+          "description": "The avatar URL of the user who created the scrobble.",
+          "format": "uri"
+        },
+        "userDisplayName": {
+          "type": "string",
+          "description": "The display name of the user who created the scrobble."
         }
       }
     },
@@ -76,6 +91,13 @@
           "type": "string",
           "description": "The URI of the artist.",
           "format": "at-uri"
+        },
+        "artists": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "app.rocksky.artist.defs#artistViewBasic"
+          }
         },
         "cover": {
           "type": "string",

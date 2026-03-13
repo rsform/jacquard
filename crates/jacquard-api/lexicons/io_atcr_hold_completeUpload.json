@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.completeUpload",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Finalize a multipart upload and move the assembled blob to its final location.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uploadId",
+            "digest",
+            "parts"
+          ],
+          "properties": {
+            "digest": {
+              "type": "string",
+              "description": "Final blob digest (e.g., sha256:abc123...)",
+              "maxLength": 128
+            },
+            "parts": {
+              "type": "array",
+              "description": "List of uploaded parts with their ETags",
+              "items": {
+                "type": "ref",
+                "ref": "#partInfo"
+              }
+            },
+            "uploadId": {
+              "type": "string",
+              "description": "Upload session ID from initiateUpload",
+              "maxLength": 256
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "status",
+            "digest"
+          ],
+          "properties": {
+            "digest": {
+              "type": "string",
+              "description": "The digest of the completed blob",
+              "maxLength": 128
+            },
+            "status": {
+              "type": "string",
+              "description": "Always 'completed' on success",
+              "maxLength": 16,
+              "const": "completed"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidUploadId"
+        },
+        {
+          "name": "InvalidDigest"
+        },
+        {
+          "name": "MissingParts"
+        },
+        {
+          "name": "CompletionFailed"
+        }
+      ]
+    },
+    "partInfo": {
+      "type": "object",
+      "description": "Information about a completed upload part",
+      "required": [
+        "partNumber",
+        "etag"
+      ],
+      "properties": {
+        "etag": {
+          "type": "string",
+          "description": "ETag returned when the part was uploaded",
+          "maxLength": 256
+        },
+        "partNumber": {
+          "type": "integer",
+          "description": "Part sequence number (1-indexed)",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

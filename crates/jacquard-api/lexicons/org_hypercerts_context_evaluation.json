@@ -1,0 +1,100 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.context.evaluation",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An evaluation of a hypercert record (e.g. an activity and its impact).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "evaluators",
+          "summary",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "Evaluation data (URIs or blobs) containing detailed reports or methodology",
+            "items": {
+              "type": "union",
+              "refs": [
+                "org.hypercerts.defs#uri",
+                "org.hypercerts.defs#smallBlob"
+              ]
+            },
+            "maxLength": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "evaluators": {
+            "type": "array",
+            "description": "DIDs of the evaluators",
+            "items": {
+              "type": "ref",
+              "ref": "app.certified.defs#did"
+            },
+            "maxLength": 1000
+          },
+          "location": {
+            "type": "ref",
+            "description": "An optional reference for georeferenced evaluations. The record referenced must conform with the lexicon app.certified.location.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "measurements": {
+            "type": "array",
+            "description": "Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 100
+          },
+          "score": {
+            "type": "ref",
+            "description": "Optional overall score for this evaluation on a numeric scale.",
+            "ref": "#score"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "A strong reference to what is being evaluated (e.g. activity, measurement, contribution, etc.)",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Brief evaluation summary",
+            "maxLength": 5000,
+            "maxGraphemes": 1000
+          }
+        }
+      }
+    },
+    "score": {
+      "type": "object",
+      "description": "Overall score for an evaluation on a numeric scale.",
+      "required": [
+        "min",
+        "max",
+        "value"
+      ],
+      "properties": {
+        "max": {
+          "type": "integer",
+          "description": "Maximum value of the scale, e.g. 5 or 10."
+        },
+        "min": {
+          "type": "integer",
+          "description": "Minimum value of the scale, e.g. 0 or 1."
+        },
+        "value": {
+          "type": "integer",
+          "description": "Score within the inclusive range [min, max]."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.claim.contribution",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Details about a specific contribution including role, description, and timeframe.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "contributionDescription": {
+            "type": "string",
+            "description": "Description of what the contribution concretely involved.",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created.",
+            "format": "datetime"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "When this contribution finished. Should fall within the parent hypercert's timeframe.",
+            "format": "datetime"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role or title of the contributor.",
+            "maxLength": 100
+          },
+          "startDate": {
+            "type": "string",
+            "description": "When this contribution started. Should fall within the parent hypercert's timeframe.",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.schedule.deletePost",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a scheduled post. Only PENDING posts can be deleted.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Post ID to delete.",
+              "maxLength": 100
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Deletion success flag.",
+              "const": true
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "PostNotFound"
+        },
+        {
+          "name": "PostNotPending"
+        }
+      ]
+    }
+  }
+}

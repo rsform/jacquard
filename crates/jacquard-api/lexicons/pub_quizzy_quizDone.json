@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.quizDone",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Signals that a participant has finished contributing to answers for this quiz",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "quizBegin",
+          "timestamp"
+        ],
+        "properties": {
+          "quizBegin": {
+            "type": "ref",
+            "description": "Reference to the quizBegin record",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When this participant finished",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

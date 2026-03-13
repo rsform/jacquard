@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.context.acknowledgement",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Acknowledges a record (subject) or its relationship in a context. Created in the acknowledging actor's repo to form a bidirectional link. Examples: a contributor acknowledging inclusion in an activity, an activity owner acknowledging inclusion in a collection, or a record owner acknowledging an evaluation.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "acknowledged",
+          "createdAt"
+        ],
+        "properties": {
+          "acknowledged": {
+            "type": "boolean",
+            "description": "Whether the relationship is acknowledged (true) or rejected (false)."
+          },
+          "comment": {
+            "type": "string",
+            "description": "Optional plain-text comment providing additional context or reasoning.",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "context": {
+            "type": "union",
+            "description": "Context for the acknowledgement (e.g. the collection that includes an activity, or the activity that includes a contributor). A URI for a lightweight reference or a strong reference for content-hash verification.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "com.atproto.repo.strongRef"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The record being acknowledged (e.g. an activity, a contributor information record, an evaluation).",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "za.co.ciaran.cumulus.market",
+  "description": "The record containing a Cumulus Market",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The record containing a Cumulus Market",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "question",
+          "liquidity",
+          "closesAt",
+          "createdAt"
+        ],
+        "properties": {
+          "closesAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "liquidity": {
+            "type": "integer",
+            "enum": [
+              10,
+              50,
+              200
+            ]
+          },
+          "question": {
+            "type": "string",
+            "maxLength": 140
+          }
+        }
+      }
+    }
+  }
+}

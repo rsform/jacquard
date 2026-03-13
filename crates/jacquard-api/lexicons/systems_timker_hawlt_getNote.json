@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "systems.timker.hawlt.getNote",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a single note record by repo and record key.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "rkey"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "format": "at-identifier"
+          },
+          "rkey": {
+            "type": "string",
+            "format": "record-key"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "value"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "value": {
+              "type": "ref",
+              "ref": "systems.timker.hawlt.note"
+            }
+          }
+        }
+      }
+    }
+  }
+}

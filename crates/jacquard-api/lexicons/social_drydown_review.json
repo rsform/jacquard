@@ -1,0 +1,125 @@
+{
+  "lexicon": 1,
+  "id": "social.drydown.review",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A single wearing review of a fragrance",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "fragrance",
+          "createdAt"
+        ],
+        "properties": {
+          "complexity": {
+            "type": "integer",
+            "description": "Final: Depth and evolution (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the review was created",
+            "format": "datetime"
+          },
+          "drydownRating": {
+            "type": "integer",
+            "description": "Mid-Wear: How it smells after settling (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "elevation": {
+            "type": "integer",
+            "description": "Elevation in meters above sea level"
+          },
+          "endRating": {
+            "type": "integer",
+            "description": "Final: How it smells at the end (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "fragrance": {
+            "type": "string",
+            "description": "Reference to the social.drydown.fragrance record",
+            "format": "at-uri"
+          },
+          "longevity": {
+            "type": "integer",
+            "description": "Final: Total duration (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "midProjection": {
+            "type": "integer",
+            "description": "Mid-Wear: Scent bubble radius during mid-wear (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "openingProjection": {
+            "type": "integer",
+            "description": "First Impression: Immediate scent bubble radius (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "openingRating": {
+            "type": "integer",
+            "description": "First Impression: How it smells immediately (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "overallRating": {
+            "type": "integer",
+            "description": "Final: Holistic 'Gut Score' (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "sillage": {
+            "type": "integer",
+            "description": "Mid-Wear: Trail left behind (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "stage1Temp": {
+            "type": "integer",
+            "description": "Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)"
+          },
+          "stage2CompletedAt": {
+            "type": "string",
+            "description": "Timestamp when Stage 2 was completed (for accurate temperature)",
+            "format": "datetime"
+          },
+          "stage2Temp": {
+            "type": "integer",
+            "description": "Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)"
+          },
+          "stage3Temp": {
+            "type": "integer",
+            "description": "Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)"
+          },
+          "text": {
+            "type": "string",
+            "description": "Written review (max 255 graphemes)",
+            "maxLength": 3000,
+            "maxGraphemes": 255
+          },
+          "uvIndex": {
+            "type": "integer",
+            "description": "Daily maximum UV index (0-11+)",
+            "minimum": 0,
+            "maximum": 11
+          },
+          "weatherOptIn": {
+            "type": "boolean",
+            "description": "User opted in to weather data collection"
+          },
+          "weightedScore": {
+            "type": "integer",
+            "description": "Calculated final score * 1000 (e.g. 4250 = 4.25)"
+          }
+        }
+      }
+    }
+  }
+}

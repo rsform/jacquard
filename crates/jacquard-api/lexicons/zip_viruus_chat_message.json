@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "zip.viruus.chat.message",
+  "description": "A chat message sent via whoossh IRC-over-SSH.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A single chat message in a whoossh channel.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt",
+          "channel"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string",
+            "description": "The channel the message was sent in.",
+            "maxLength": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of when the message was sent.",
+            "format": "datetime"
+          },
+          "text": {
+            "type": "string",
+            "description": "The message content.",
+            "maxLength": 500,
+            "maxGraphemes": 500
+          }
+        }
+      }
+    }
+  }
+}

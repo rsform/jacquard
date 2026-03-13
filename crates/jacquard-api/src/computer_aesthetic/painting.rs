@@ -52,9 +52,9 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Code;
         type When;
+        type Ref;
         type ImageUrl;
         type Slug;
     }
@@ -62,29 +62,19 @@ pub mod painting_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Code = Unset;
         type When = Unset;
+        type Ref = Unset;
         type ImageUrl = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Code = S::Code;
-        type When = S::When;
-        type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Ref = S::Ref;
         type Code = Set<members::code>;
         type When = S::When;
+        type Ref = S::Ref;
         type ImageUrl = S::ImageUrl;
         type Slug = S::Slug;
     }
@@ -92,9 +82,19 @@ pub mod painting_state {
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Ref = S::Ref;
         type Code = S::Code;
         type When = Set<members::when>;
+        type Ref = S::Ref;
+        type ImageUrl = S::ImageUrl;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Code = S::Code;
+        type When = S::When;
+        type Ref = Set<members::r#ref>;
         type ImageUrl = S::ImageUrl;
         type Slug = S::Slug;
     }
@@ -102,9 +102,9 @@ pub mod painting_state {
     pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImageUrl<S> {}
     impl<S: State> State for SetImageUrl<S> {
-        type Ref = S::Ref;
         type Code = S::Code;
         type When = S::When;
+        type Ref = S::Ref;
         type ImageUrl = Set<members::image_url>;
         type Slug = S::Slug;
     }
@@ -112,21 +112,21 @@ pub mod painting_state {
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Ref = S::Ref;
         type Code = S::Code;
         type When = S::When;
+        type Ref = S::Ref;
         type ImageUrl = S::ImageUrl;
         type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `code` field
         pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
         ///Marker type for the `image_url` field
         pub struct image_url(());
         ///Marker type for the `slug` field
@@ -303,9 +303,9 @@ where
 impl<'a, S> PaintingBuilder<'a, S>
 where
     S: painting_state::State,
-    S::Ref: painting_state::IsSet,
     S::Code: painting_state::IsSet,
     S::When: painting_state::IsSet,
+    S::Ref: painting_state::IsSet,
     S::ImageUrl: painting_state::IsSet,
     S::Slug: painting_state::IsSet,
 {

@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "org.impactindexer.review.like",
+  "description": "A like on an AT-Proto entity. Users can like records, users, PDSes, or lexicons. One like per subject per user - delete the record to remove the like.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A like on a subject. Create to like, delete to remove like.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the like was created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The subject being liked.",
+            "ref": "org.impactindexer.review.defs#subjectRef"
+          }
+        }
+      }
+    }
+  }
+}

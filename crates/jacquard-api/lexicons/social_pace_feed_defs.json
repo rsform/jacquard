@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "social.pace.feed.defs",
+  "defs": {
+    "activityType": {
+      "type": "string",
+      "description": "The type of activity being recorded. List taken from Apple Health Activities mostly",
+      "maxLength": 50,
+      "knownValues": [
+        "Running",
+        "Walking",
+        "Cycling",
+        "Hiking",
+        "Swimming",
+        "Yoga",
+        "Functional Training",
+        "Strength Training",
+        "Elliptical",
+        "Rowing",
+        "Stair Climbing",
+        "Dancing",
+        "Golf",
+        "Tennis",
+        "Basketball",
+        "Soccer",
+        "Baseball",
+        "Football",
+        "Skiing",
+        "Snowboarding",
+        "Climbing",
+        "Boxing",
+        "Martial Arts",
+        "Jump Rope",
+        "Pilates",
+        "Cross Training",
+        "Mixed Cardio",
+        "HIIT",
+        "Core Training",
+        "Flexibility",
+        "Cooldown",
+        "Wheelchair Walk",
+        "Wheelchair Run",
+        "Pickleball",
+        "Skating",
+        "Other Workout",
+        "Activity"
+      ]
+    },
+    "split": {
+      "type": "object",
+      "description": "A split within an activity, like a mile split or kilometer split.",
+      "required": [
+        "order",
+        "distance",
+        "duration"
+      ],
+      "properties": {
+        "distance": {
+          "type": "string",
+          "description": "The distance covered in this split. Follows the units defined in the parent."
+        },
+        "duration": {
+          "type": "integer",
+          "description": "The duration of the split in seconds."
+        },
+        "order": {
+          "type": "integer",
+          "description": "The order of the split within the activity, starting at 1."
+        }
+      }
+    }
+  }
+}

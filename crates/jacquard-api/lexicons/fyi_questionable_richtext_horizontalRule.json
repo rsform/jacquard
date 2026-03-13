@@ -1,0 +1,11 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.richtext.horizontalRule",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    }
+  }
+}

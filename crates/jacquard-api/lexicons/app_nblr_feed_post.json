@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "app.nblr.feed.post",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "description": "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record containing a nblr post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "aspectRatio": {
+            "type": "ref",
+            "description": "Approximate aspect ratio of the image (width:height).",
+            "ref": "#aspectRatio"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description for the post",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "image": {
+            "type": "blob",
+            "description": "Optional image for the post",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional title for the post",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "uri": {
+            "type": "string",
+            "description": "The URI of the linked resource; a web URL or AT URI",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "app.certified.badge.definition",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Defines a badge that can be awarded via badge award records to users, projects, or activity claims.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "badgeType",
+          "icon",
+          "createdAt"
+        ],
+        "properties": {
+          "allowedIssuers": {
+            "type": "array",
+            "description": "Optional allowlist of DIDs allowed to issue this badge. If omitted, anyone may issue it.",
+            "items": {
+              "type": "ref",
+              "ref": "app.certified.defs#did"
+            },
+            "maxLength": 100
+          },
+          "badgeType": {
+            "type": "string",
+            "description": "Category of the badge (e.g. endorsement, participation, affiliation).",
+            "maxLength": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional short statement describing what the badge represents.",
+            "maxLength": 5000,
+            "maxGraphemes": 500
+          },
+          "icon": {
+            "type": "blob",
+            "description": "Icon representing the badge, stored as a blob for compact visual display.",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/svg+xml"
+            ],
+            "maxSize": 1048576
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable title of the badge.",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

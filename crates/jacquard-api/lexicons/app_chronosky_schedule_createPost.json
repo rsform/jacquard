@@ -1,0 +1,142 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.schedule.createPost",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Schedule one or more posts for later publishing to Bluesky. Supports single posts, threads, and reply posts.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "posts",
+            "scheduledAt"
+          ],
+          "properties": {
+            "disableQuotePosts": {
+              "type": "boolean",
+              "description": "Whether to disable quote posts"
+            },
+            "parentPostId": {
+              "type": "string",
+              "description": "Chronosky-internal scheduled post ID of the parent post (for scheduling threads or replies). Not an AT Protocol URI or Record Key.",
+              "maxLength": 100
+            },
+            "posts": {
+              "type": "array",
+              "description": "Array of posts to schedule (1 element = single post, multiple = thread)",
+              "items": {
+                "type": "ref",
+                "ref": "#threadPostInput"
+              },
+              "minLength": 1,
+              "maxLength": 25
+            },
+            "scheduledAt": {
+              "type": "string",
+              "description": "Scheduled publish time",
+              "format": "datetime",
+              "maxLength": 100
+            },
+            "threadgateRules": {
+              "type": "array",
+              "description": "Thread gate rules to control who can reply",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "app.bsky.feed.threadgate#mentionRule",
+                  "app.bsky.feed.threadgate#followerRule",
+                  "app.bsky.feed.threadgate#followingRule",
+                  "app.bsky.feed.threadgate#listRule"
+                ]
+              },
+              "maxLength": 5
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "id",
+            "scheduledAt"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Chronosky schedule ID (parent post ID for threads)",
+              "maxLength": 100
+            },
+            "postCount": {
+              "type": "integer",
+              "description": "Number of posts created (1 for single post, N for thread)"
+            },
+            "scheduledAt": {
+              "type": "string",
+              "format": "datetime",
+              "maxLength": 100
+            }
+          }
+        }
+      }
+    },
+    "threadPostInput": {
+      "type": "object",
+      "description": "Individual post input for thread scheduling.",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "Post creation timestamp (optional)",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "embed": {
+          "type": "union",
+          "description": "Embedded content (images, external links, records).",
+          "refs": [
+            "app.bsky.embed.images",
+            "app.bsky.embed.external",
+            "app.bsky.embed.record",
+            "app.bsky.embed.video",
+            "app.bsky.embed.recordWithMedia"
+          ]
+        },
+        "facets": {
+          "type": "array",
+          "description": "Rich text facets (mentions, links, tags)",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          },
+          "maxLength": 50
+        },
+        "labels": {
+          "type": "ref",
+          "description": "Self-applied content labels for content warnings (AT Protocol standard).",
+          "ref": "com.atproto.label.defs#selfLabels"
+        },
+        "langs": {
+          "type": "array",
+          "description": "Language codes (ISO 639-1)",
+          "items": {
+            "type": "string",
+            "format": "language"
+          },
+          "maxLength": 3
+        },
+        "text": {
+          "type": "string",
+          "description": "Post text content",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        }
+      }
+    }
+  }
+}

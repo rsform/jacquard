@@ -28,6 +28,9 @@ pub struct Theme<'a> {
     /// Light mode color palette
     #[serde(borrow)]
     pub light: crate::blog_pckt::theme::Palette<'a>,
+    /// Content background transparency percentage (optional)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub transparency: std::option::Option<i64>,
 }
 
 pub mod theme_state {
@@ -81,6 +84,7 @@ pub struct ThemeBuilder<'a, S: theme_state::State> {
         ::core::option::Option<crate::blog_pckt::theme::Palette<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::blog_pckt::theme::Palette<'a>>,
+        ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -97,7 +101,7 @@ impl<'a> ThemeBuilder<'a, theme_state::Empty> {
     pub fn new() -> Self {
         ThemeBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -157,6 +161,19 @@ where
     }
 }
 
+impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
+    /// Set the `transparency` field (optional)
+    pub fn transparency(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `transparency` field to an Option value (optional)
+    pub fn maybe_transparency(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
 impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
@@ -169,6 +186,7 @@ where
             dark: self.__unsafe_private_named.0.unwrap(),
             font: self.__unsafe_private_named.1,
             light: self.__unsafe_private_named.2.unwrap(),
+            transparency: self.__unsafe_private_named.3,
             extra_data: Default::default(),
         }
     }
@@ -184,6 +202,7 @@ where
             dark: self.__unsafe_private_named.0.unwrap(),
             font: self.__unsafe_private_named.1,
             light: self.__unsafe_private_named.2.unwrap(),
+            transparency: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
     }
@@ -246,6 +265,19 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#palette"),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "transparency",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: Some(100i64),
+                                r#enum: None,
+                                r#const: None,
                             }),
                         );
                         map
@@ -403,6 +435,28 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
                     ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.transparency {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transparency",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.transparency {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transparency",
+                    ),
+                    min: 0i64,
+                    actual: *value,
                 });
             }
         }

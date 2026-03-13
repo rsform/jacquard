@@ -1,0 +1,11 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.destroyRepo",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Permanently deletes the entire associated hidden repository for your account, including all records. Requires auth."
+    }
+  }
+}

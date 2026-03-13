@@ -1,0 +1,325 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.schedule.listPosts",
+  "defs": {
+    "imageView": {
+      "type": "object",
+      "description": "Image embed view with CID references. Similar to app.bsky.embed.images#view but includes cid on each image.",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "description": "List of image views with CID references.",
+          "items": {
+            "type": "ref",
+            "ref": "#imageViewImage"
+          },
+          "maxLength": 4
+        }
+      }
+    },
+    "imageViewImage": {
+      "type": "object",
+      "description": "Image view with CID for referencing in updatePost. Extends app.bsky.embed.images#viewImage with cid field.",
+      "required": [
+        "thumb",
+        "fullsize",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for the image."
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.",
+          "maxLength": 200
+        },
+        "fullsize": {
+          "type": "string",
+          "description": "Full-size URL for the image."
+        },
+        "thumb": {
+          "type": "string",
+          "description": "Thumbnail URL for the image."
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "List scheduled posts for the authenticated user with pagination and filtering.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Number of parent posts per page. Thread posts always include all children regardless of limit (e.g., limit=100 returns up to 100 parent posts plus all their children).",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number (1-indexed).",
+            "default": 1,
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Filter by post status.",
+            "maxLength": 20,
+            "enum": [
+              "PENDING",
+              "EXECUTING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "posts",
+            "pagination"
+          ],
+          "properties": {
+            "pagination": {
+              "type": "ref",
+              "ref": "#pagination"
+            },
+            "posts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#scheduledPost"
+              }
+            }
+          }
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "description": "Pagination information.",
+      "required": [
+        "page",
+        "limit",
+        "total",
+        "totalPages"
+      ],
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "description": "Posts per page.",
+          "minimum": 1
+        },
+        "page": {
+          "type": "integer",
+          "description": "Current page number.",
+          "minimum": 1
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total number of posts.",
+          "minimum": 0
+        },
+        "totalPages": {
+          "type": "integer",
+          "description": "Total number of pages.",
+          "minimum": 0
+        }
+      }
+    },
+    "scheduledPost": {
+      "type": "object",
+      "description": "Scheduled post object with AT Protocol standard fields.",
+      "required": [
+        "id",
+        "userId",
+        "text",
+        "scheduledAt",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "retryCount",
+        "langs"
+      ],
+      "properties": {
+        "atRkey": {
+          "type": "string",
+          "description": "AT Protocol record key. Present after successful execution.",
+          "maxLength": 100
+        },
+        "atUri": {
+          "type": "string",
+          "description": "AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.",
+          "maxLength": 500
+        },
+        "children": {
+          "type": "array",
+          "description": "Child posts in thread. Only present for parent posts with children.",
+          "items": {
+            "type": "ref",
+            "ref": "#scheduledPost"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Post creation datetime (ISO 8601).",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "embed": {
+          "type": "union",
+          "description": "Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.",
+          "refs": [
+            "app.bsky.embed.images",
+            "#imageView",
+            "app.bsky.embed.external",
+            "app.bsky.embed.record",
+            "app.bsky.embed.video",
+            "app.bsky.embed.recordWithMedia"
+          ]
+        },
+        "errorMsg": {
+          "type": "string",
+          "description": "Error message if execution failed. Present only when status is FAILED.",
+          "maxLength": 2000
+        },
+        "executedAt": {
+          "type": "string",
+          "description": "Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "facets": {
+          "type": "array",
+          "description": "Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "id": {
+          "type": "string",
+          "description": "Post ID.",
+          "maxLength": 100
+        },
+        "labels": {
+          "type": "ref",
+          "description": "Self-applied content labels for content warnings (AT Protocol standard).",
+          "ref": "com.atproto.label.defs#selfLabels"
+        },
+        "langs": {
+          "type": "array",
+          "description": "Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.",
+          "items": {
+            "type": "string",
+            "format": "language"
+          },
+          "maxLength": 3
+        },
+        "parentPostId": {
+          "type": "string",
+          "description": "Parent post ID for thread posts. Null for root posts.",
+          "maxLength": 100
+        },
+        "postgateCid": {
+          "type": "string",
+          "description": "CID for postgate record. Present after successful execution with postgate settings.",
+          "maxLength": 100
+        },
+        "postgateDisableEmbedding": {
+          "type": "boolean",
+          "description": "Whether to disable quote posts and embeds for this post (app.bsky.feed.postgate)."
+        },
+        "postgateUri": {
+          "type": "string",
+          "description": "AT Protocol URI for postgate record. Present after successful execution with postgate settings.",
+          "maxLength": 500
+        },
+        "retryCount": {
+          "type": "integer",
+          "description": "Number of execution retry attempts.",
+          "minimum": 0
+        },
+        "scheduledAt": {
+          "type": "string",
+          "description": "Scheduled publication datetime (ISO 8601).",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "status": {
+          "type": "string",
+          "description": "Post status.",
+          "maxLength": 20,
+          "enum": [
+            "PENDING",
+            "EXECUTING",
+            "COMPLETED",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Post content text (app.bsky.feed.post#text). May be empty if embeds are present.",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "threadDepth": {
+          "type": "integer",
+          "description": "Thread depth level (0 for root post, 1 for direct reply, etc.).",
+          "minimum": 0
+        },
+        "threadPosition": {
+          "type": "integer",
+          "description": "Position in thread (0-indexed). 0 for parent post, 1+ for children.",
+          "minimum": 0
+        },
+        "threadgateCid": {
+          "type": "string",
+          "description": "CID for threadgate record. Present after successful execution with threadgate rules.",
+          "maxLength": 100
+        },
+        "threadgateRules": {
+          "type": "array",
+          "description": "Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.bsky.feed.threadgate#mentionRule",
+              "app.bsky.feed.threadgate#followerRule",
+              "app.bsky.feed.threadgate#followingRule",
+              "app.bsky.feed.threadgate#listRule"
+            ]
+          },
+          "maxLength": 5
+        },
+        "threadgateUri": {
+          "type": "string",
+          "description": "AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.",
+          "maxLength": 500
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Post last update datetime (ISO 8601).",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "userId": {
+          "type": "string",
+          "description": "User ID who created this post.",
+          "maxLength": 200
+        }
+      }
+    }
+  }
+}

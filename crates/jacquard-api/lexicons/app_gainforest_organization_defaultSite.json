@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.organization.defaultSite",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of the default site for an organization",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "site",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time of the creation of the record",
+            "format": "datetime"
+          },
+          "site": {
+            "type": "string",
+            "description": "The reference to the default site record in the PDS",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Fragment",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Renders children without a wrapper element.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

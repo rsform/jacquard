@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "zone.stratos.repo.hydrateRecord",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Hydrate a single record by URI. Returns the record if viewer has boundary access.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "Optional CID to verify record version",
+            "format": "cid"
+          },
+          "uri": {
+            "type": "string",
+            "description": "The AT-URI of the record to hydrate",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "value"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "value": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The requested record does not exist",
+          "name": "RecordNotFound"
+        },
+        {
+          "description": "Access to the record is blocked due to boundary restrictions",
+          "name": "RecordBlocked"
+        }
+      ]
+    }
+  }
+}

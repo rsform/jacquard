@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Details about this person's account",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed near the account handle. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1500000
+          },
+          "avatarAlt": {
+            "type": "string",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

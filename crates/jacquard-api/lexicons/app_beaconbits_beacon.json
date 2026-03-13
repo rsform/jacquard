@@ -1,0 +1,117 @@
+{
+  "lexicon": 1,
+  "id": "app.beaconbits.beacon",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A location-based check-in record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "venueUri",
+          "venueName",
+          "visibility",
+          "createdAt"
+        ],
+        "properties": {
+          "addressDetails": {
+            "type": "ref",
+            "description": "Structured address using community lexicon",
+            "ref": "community.lexicon.location.address"
+          },
+          "chainEmoji": {
+            "type": "string",
+            "description": "Chain emoji (root beacon only)",
+            "maxGraphemes": 8
+          },
+          "chainName": {
+            "type": "string",
+            "description": "Custom chain name (root beacon only)",
+            "maxGraphemes": 64
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the beacon was created",
+            "format": "datetime"
+          },
+          "location": {
+            "type": "ref",
+            "description": "Structured location using community lexicon",
+            "ref": "community.lexicon.location.geo"
+          },
+          "mentions": {
+            "type": "array",
+            "description": "DIDs of users mentioned in the beacon",
+            "items": {
+              "type": "string",
+              "format": "did"
+            }
+          },
+          "parentBeacon": {
+            "type": "ref",
+            "description": "Reference to parent beacon for chaining",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "post": {
+            "type": "ref",
+            "description": "Reference to associated Bluesky post",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "rating": {
+            "type": "integer",
+            "description": "Star rating (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "revealAt": {
+            "type": "string",
+            "description": "ISO timestamp when beacon becomes visible (delayed reveal)",
+            "format": "datetime"
+          },
+          "shout": {
+            "type": "string",
+            "description": "User comment or caption",
+            "maxGraphemes": 280
+          },
+          "threadRoot": {
+            "type": "ref",
+            "description": "Reference to root post for threading",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "venueAddress": {
+            "type": "string",
+            "description": "Human-readable address",
+            "maxGraphemes": 256
+          },
+          "venueCategory": {
+            "type": "string",
+            "description": "Category classification (bar, cafe, restaurant, etc.)",
+            "maxGraphemes": 64
+          },
+          "venueName": {
+            "type": "string",
+            "description": "Display name of the venue",
+            "maxGraphemes": 128
+          },
+          "venueUri": {
+            "type": "string",
+            "description": "OSM URI identifier (osm://node/123 or osm://way/456)",
+            "maxGraphemes": 512
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Visibility setting for the beacon",
+            "maxGraphemes": 32,
+            "knownValues": [
+              "public",
+              "followers",
+              "mutuals",
+              "hidden"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.storageS3",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "S3 or S3-compatible storage for WebDataset tar archives. Supports custom endpoints for MinIO, Cloudflare R2, and other S3-compatible services.",
+      "required": [
+        "bucket",
+        "shards"
+      ],
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "description": "S3 bucket name",
+          "maxLength": 255
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "Custom S3-compatible endpoint URL (e.g., for MinIO, Cloudflare R2). Omit for standard AWS S3.",
+          "format": "uri",
+          "maxLength": 500
+        },
+        "region": {
+          "type": "string",
+          "description": "AWS region (e.g., 'us-east-1'). Optional for S3-compatible services.",
+          "maxLength": 50
+        },
+        "shards": {
+          "type": "array",
+          "description": "Array of shard entries with object key and integrity checksum",
+          "items": {
+            "type": "ref",
+            "ref": "#shardEntry"
+          },
+          "minLength": 1
+        }
+      }
+    },
+    "shardEntry": {
+      "type": "object",
+      "description": "A single S3 object shard with integrity checksum",
+      "required": [
+        "key",
+        "checksum"
+      ],
+      "properties": {
+        "checksum": {
+          "type": "ref",
+          "description": "Content hash for integrity verification",
+          "ref": "science.alt.dataset.entry#shardChecksum"
+        },
+        "key": {
+          "type": "string",
+          "description": "S3 object key for this WebDataset tar shard",
+          "maxLength": 1024
+        }
+      }
+    }
+  }
+}

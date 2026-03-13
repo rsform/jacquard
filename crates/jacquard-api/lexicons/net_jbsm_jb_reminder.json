@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "net.jbsm.jb.reminder",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reminder scheduled to trigger at a specific time",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "triggerAt",
+          "subject",
+          "requester"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the reminder was created",
+            "format": "datetime"
+          },
+          "occurred": {
+            "type": "boolean",
+            "description": "Whether the reminder has been triggered",
+            "default": false
+          },
+          "originUri": {
+            "type": "string",
+            "description": "AT-URI of the original post/message that triggered this reminder",
+            "format": "at-uri"
+          },
+          "requester": {
+            "type": "string",
+            "description": "DID of the user who created the reminder",
+            "format": "did"
+          },
+          "subject": {
+            "type": "string",
+            "description": "The reminder message/content",
+            "maxLength": 1000
+          },
+          "triggerAt": {
+            "type": "string",
+            "description": "Timestamp when the reminder should fire",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

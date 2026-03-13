@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.listDroppedBooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List all currently dropped books (books whose current state is 'org.passingreads.book.drop').",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books"
+          ],
+          "properties": {
+            "books": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "org.passingreads.book.defs#statefulBook"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

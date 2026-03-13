@@ -1,0 +1,156 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.dwc.event",
+  "description": "A sampling event record aligned with Darwin Core Event class. Enables star-schema pattern where multiple occurrences reference a shared event context (location, protocol, effort).",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A sampling or collecting event. Multiple dwc.occurrence records can reference the same event via eventRef, sharing location and protocol metadata.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "eventID",
+          "eventDate",
+          "createdAt"
+        ],
+        "properties": {
+          "coordinateUncertaintyInMeters": {
+            "type": "integer",
+            "description": "Uncertainty radius in meters around the coordinates.",
+            "minimum": 1
+          },
+          "country": {
+            "type": "string",
+            "description": "The name of the country.",
+            "maxGraphemes": 128
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code.",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "county": {
+            "type": "string",
+            "description": "Second-level administrative division.",
+            "maxGraphemes": 256
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of record creation in the ATProto PDS.",
+            "format": "datetime"
+          },
+          "decimalLatitude": {
+            "type": "string",
+            "description": "Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.",
+            "maxGraphemes": 32
+          },
+          "decimalLongitude": {
+            "type": "string",
+            "description": "Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.",
+            "maxGraphemes": 32
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').",
+            "maxGraphemes": 64
+          },
+          "eventID": {
+            "type": "string",
+            "description": "An identifier for the event. Should be globally unique or unique within the dataset.",
+            "maxGraphemes": 256
+          },
+          "eventRemarks": {
+            "type": "string",
+            "description": "Comments or notes about the event.",
+            "maxGraphemes": 5000
+          },
+          "eventTime": {
+            "type": "string",
+            "description": "The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').",
+            "maxGraphemes": 64
+          },
+          "fieldNotes": {
+            "type": "string",
+            "description": "Notes or a reference to notes taken in the field about the event.",
+            "maxGraphemes": 10000
+          },
+          "geodeticDatum": {
+            "type": "string",
+            "description": "The spatial reference system. Recommended: 'EPSG:4326'.",
+            "maxGraphemes": 64
+          },
+          "habitat": {
+            "type": "string",
+            "description": "A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').",
+            "maxGraphemes": 512
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality description.",
+            "maxGraphemes": 1024
+          },
+          "locationID": {
+            "type": "string",
+            "description": "Identifier for the location where the event occurred.",
+            "maxGraphemes": 256
+          },
+          "locationRemarks": {
+            "type": "string",
+            "description": "Comments about the location.",
+            "maxGraphemes": 2048
+          },
+          "maximumElevationInMeters": {
+            "type": "integer",
+            "description": "Upper limit of elevation range in meters above sea level."
+          },
+          "minimumElevationInMeters": {
+            "type": "integer",
+            "description": "Lower limit of elevation range in meters above sea level."
+          },
+          "municipality": {
+            "type": "string",
+            "description": "Third-level administrative division.",
+            "maxGraphemes": 256
+          },
+          "parentEventID": {
+            "type": "string",
+            "description": "An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).",
+            "maxGraphemes": 256
+          },
+          "parentEventRef": {
+            "type": "string",
+            "description": "AT-URI reference to the parent app.gainforest.dwc.event record.",
+            "format": "at-uri"
+          },
+          "sampleSizeUnit": {
+            "type": "string",
+            "description": "The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').",
+            "maxGraphemes": 128
+          },
+          "sampleSizeValue": {
+            "type": "string",
+            "description": "A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').",
+            "maxGraphemes": 64
+          },
+          "samplingEffort": {
+            "type": "string",
+            "description": "The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').",
+            "maxGraphemes": 256
+          },
+          "samplingProtocol": {
+            "type": "string",
+            "description": "The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').",
+            "maxGraphemes": 1024
+          },
+          "stateProvince": {
+            "type": "string",
+            "description": "First-level administrative division.",
+            "maxGraphemes": 256
+          }
+        }
+      }
+    }
+  }
+}

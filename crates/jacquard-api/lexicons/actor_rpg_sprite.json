@@ -1,0 +1,106 @@
+{
+  "lexicon": 1,
+  "id": "actor.rpg.sprite",
+  "revision": 1,
+  "description": "A sprite sheet for an RPG character avatar. Contains the image blob and metadata for animating the character in various game engines.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user's RPG character sprite. One record per user (rkey: self).",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "spriteSheet",
+          "engine",
+          "createdAt"
+        ],
+        "properties": {
+          "animationSpeed": {
+            "type": "integer",
+            "description": "Milliseconds per frame for animation playback",
+            "default": 200,
+            "minimum": 50,
+            "maximum": 2000
+          },
+          "columns": {
+            "type": "integer",
+            "description": "Number of columns per animation cycle",
+            "minimum": 1,
+            "maximum": 16
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When this record was first created",
+            "format": "datetime"
+          },
+          "engine": {
+            "type": "string",
+            "description": "The game engine format this sprite is designed for. Determines animation interpretation.",
+            "knownValues": [
+              "rmmz",
+              "rmmv",
+              "rpgmaker2003",
+              "custom"
+            ]
+          },
+          "frameHeight": {
+            "type": "integer",
+            "description": "Height of a single frame in pixels (if not auto-calculated from height/rows)",
+            "minimum": 1,
+            "maximum": 512
+          },
+          "frameWidth": {
+            "type": "integer",
+            "description": "Width of a single frame in pixels (if not auto-calculated from width/columns)",
+            "minimum": 1,
+            "maximum": 512
+          },
+          "frames": {
+            "type": "integer",
+            "description": "Total number of animation frames",
+            "minimum": 1,
+            "maximum": 64
+          },
+          "height": {
+            "type": "integer",
+            "description": "Total height of the sprite sheet in pixels",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the character (optional, can differ from Bluesky display name)",
+            "maxLength": 100,
+            "maxGraphemes": 50
+          },
+          "rows": {
+            "type": "integer",
+            "description": "Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)",
+            "minimum": 1,
+            "maximum": 16
+          },
+          "spriteSheet": {
+            "type": "blob",
+            "description": "The sprite sheet image (PNG only). Max 10MB.",
+            "accept": [
+              "image/png"
+            ],
+            "maxSize": 10000000
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this record was last modified",
+            "format": "datetime"
+          },
+          "width": {
+            "type": "integer",
+            "description": "Total width of the sprite sheet in pixels",
+            "minimum": 1,
+            "maximum": 4096
+          }
+        }
+      }
+    }
+  }
+}

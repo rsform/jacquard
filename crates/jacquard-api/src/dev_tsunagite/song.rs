@@ -59,51 +59,51 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Game;
         type Title;
         type Composer;
-        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Game = Unset;
         type Title = Unset;
         type Composer = Unset;
-        type Game = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Composer = S::Composer;
-        type Game = S::Game;
-    }
-    ///State transition - sets the `composer` field to Set
-    pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComposer<S> {}
-    impl<S: State> State for SetComposer<S> {
-        type Title = S::Title;
-        type Composer = Set<members::composer>;
-        type Game = S::Game;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
+        type Game = Set<members::game>;
         type Title = S::Title;
         type Composer = S::Composer;
-        type Game = Set<members::game>;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Game = S::Game;
+        type Title = Set<members::title>;
+        type Composer = S::Composer;
+    }
+    ///State transition - sets the `composer` field to Set
+    pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComposer<S> {}
+    impl<S: State> State for SetComposer<S> {
+        type Game = S::Game;
+        type Title = S::Title;
+        type Composer = Set<members::composer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `game` field
+        pub struct game(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `composer` field
         pub struct composer(());
-        ///Marker type for the `game` field
-        pub struct game(());
     }
 }
 
@@ -296,9 +296,9 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
+    S::Game: song_state::IsSet,
     S::Title: song_state::IsSet,
     S::Composer: song_state::IsSet,
-    S::Game: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {

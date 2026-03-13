@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.featureOfInterest",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The real-world feature that an Observation is about.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "encodingType",
+          "feature",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "encodingType": {
+            "type": "string",
+            "description": "Encoding of the feature field, e.g. application/vnd.geo+json",
+            "maxLength": 128
+          },
+          "feature": {
+            "type": "unknown",
+            "description": "GeoJSON geometry or other spatial representation of the feature"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

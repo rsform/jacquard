@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.skill",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A skill the sim possesses. A sim can have many skills.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "sim",
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the skill was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Short description of what this skill does. Rich text annotations may be provided via descriptionFacets.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Rich text annotations for description.",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Detailed step-by-step instructions for executing this skill. Rich text annotations may be provided via instructionsFacets.",
+            "maxLength": 30000,
+            "maxGraphemes": 3000
+          },
+          "instructionsFacets": {
+            "type": "array",
+            "description": "Rich text annotations for instructions.",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the skill",
+            "maxLength": 128
+          },
+          "sim": {
+            "type": "ref",
+            "description": "Reference to the sim record this skill belongs to",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "triggers": {
+            "type": "array",
+            "description": "Conditions or phrases that trigger this skill",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

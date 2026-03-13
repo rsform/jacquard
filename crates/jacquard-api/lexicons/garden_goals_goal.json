@@ -1,0 +1,106 @@
+{
+  "lexicon": 1,
+  "id": "garden.goals.goal",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A goal to track daily completions for a year.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "goalId",
+          "name",
+          "year",
+          "createdAt"
+        ],
+        "properties": {
+          "accentColor": {
+            "type": "string",
+            "description": "Preset name or hex color for incomplete state",
+            "maxLength": 50
+          },
+          "categories": {
+            "type": "array",
+            "description": "Array of category UUIDs this goal belongs to",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            }
+          },
+          "completedAccentColor": {
+            "type": "string",
+            "description": "Preset name or hex color for complete state",
+            "maxLength": 50
+          },
+          "completedPiece": {
+            "type": "string",
+            "description": "Shape name or emoji for complete state",
+            "maxLength": 100
+          },
+          "completedPieceBlob": {
+            "type": "blob",
+            "description": "Uploaded image for complete state",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "completedPieceUrl": {
+            "type": "string",
+            "description": "Favicon URL for complete state",
+            "format": "uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the goal was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the goal",
+            "maxLength": 500
+          },
+          "goalId": {
+            "type": "string",
+            "description": "Unique identifier for the goal (UUID)",
+            "maxLength": 64
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the goal",
+            "maxLength": 100
+          },
+          "piece": {
+            "type": "string",
+            "description": "Shape name or emoji for incomplete state",
+            "maxLength": 100
+          },
+          "pieceBlob": {
+            "type": "blob",
+            "description": "Uploaded image for incomplete state",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "pieceUrl": {
+            "type": "string",
+            "description": "Favicon URL for incomplete state",
+            "format": "uri"
+          },
+          "targetCount": {
+            "type": "integer",
+            "description": "Target count for countable goals",
+            "minimum": 1
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year this goal is tracked for",
+            "minimum": 1970
+          }
+        }
+      }
+    }
+  }
+}

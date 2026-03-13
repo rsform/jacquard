@@ -1,0 +1,152 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.plan.getAssignment",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the authenticated user's active plan assignment",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "assignment": {
+              "type": "ref",
+              "description": "Active plan assignment (null if no active plan)",
+              "ref": "#planAssignment"
+            },
+            "message": {
+              "type": "string",
+              "description": "Response message",
+              "maxLength": 1000
+            }
+          }
+        }
+      }
+    },
+    "planAssignment": {
+      "type": "object",
+      "description": "Plan assignment details.",
+      "required": [
+        "id",
+        "planId",
+        "plan",
+        "activatedAt",
+        "expiresAt",
+        "status"
+      ],
+      "properties": {
+        "activatedAt": {
+          "type": "string",
+          "description": "Plan activation timestamp",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "Plan expiration timestamp",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "id": {
+          "type": "string",
+          "description": "Plan assignment ID",
+          "maxLength": 100
+        },
+        "plan": {
+          "type": "ref",
+          "ref": "#planInfo"
+        },
+        "planId": {
+          "type": "string",
+          "description": "Plan ID",
+          "maxLength": 100
+        },
+        "status": {
+          "type": "string",
+          "description": "Plan assignment status",
+          "maxLength": 20,
+          "enum": [
+            "ACTIVE",
+            "EXPIRED",
+            "CANCELLED"
+          ]
+        },
+        "ticket": {
+          "type": "ref",
+          "description": "Ticket information (if redeemed from ticket)",
+          "ref": "#ticketInfo"
+        }
+      }
+    },
+    "planInfo": {
+      "type": "object",
+      "description": "Plan information.",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Plan description",
+          "maxLength": 1000
+        },
+        "id": {
+          "type": "string",
+          "description": "Plan ID",
+          "maxLength": 100
+        },
+        "maxConcurrentPosts": {
+          "type": "integer",
+          "description": "Maximum concurrent posts"
+        },
+        "maxImagesPerPost": {
+          "type": "integer",
+          "description": "Maximum images per post"
+        },
+        "maxPostsPerDay": {
+          "type": "integer",
+          "description": "Maximum posts per day"
+        },
+        "maxScheduleDays": {
+          "type": "integer",
+          "description": "Maximum days to schedule in advance"
+        },
+        "maxThreadPosts": {
+          "type": "integer",
+          "description": "Maximum posts per thread"
+        },
+        "minScheduleInterval": {
+          "type": "integer",
+          "description": "Minimum interval between posts (minutes)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Plan name",
+          "maxLength": 200
+        }
+      }
+    },
+    "ticketInfo": {
+      "type": "object",
+      "description": "Ticket information.",
+      "required": [
+        "id",
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Ticket code",
+          "maxLength": 100
+        },
+        "id": {
+          "type": "string",
+          "description": "Ticket ID",
+          "maxLength": 100
+        }
+      }
+    }
+  }
+}

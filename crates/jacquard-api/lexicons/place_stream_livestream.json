@@ -63,6 +63,20 @@
             "description": "Client-declared timestamp when this livestream started.",
             "format": "datetime"
           },
+          "endedAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this livestream ended. Ended livestreams are not supposed to start up again.",
+            "format": "datetime"
+          },
+          "idleTimeoutSeconds": {
+            "type": "integer",
+            "description": "Time in seconds after which this livestream should be automatically ended if idle. Zero means no timeout."
+          },
+          "lastSeenAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this livestream was last seen by the Streamplace station.",
+            "format": "datetime"
+          },
           "notificationSettings": {
             "type": "ref",
             "ref": "place.stream.livestream#notificationSettings"
@@ -95,6 +109,7 @@
     },
     "notificationSettings": {
       "type": "object",
+      "required": [],
       "properties": {
         "pushNotification": {
           "type": "boolean",
@@ -113,11 +128,71 @@
           "refs": [
             "#livestreamView",
             "#viewerCount",
+            "#teleportArrival",
+            "#teleportCanceled",
             "place.stream.defs#blockView",
             "place.stream.defs#renditions",
             "place.stream.defs#rendition",
             "place.stream.chat.defs#messageView"
           ]
+        }
+      }
+    },
+    "teleportArrival": {
+      "type": "object",
+      "required": [
+        "teleportUri",
+        "source",
+        "viewerCount",
+        "startsAt"
+      ],
+      "properties": {
+        "chatProfile": {
+          "type": "ref",
+          "description": "The chat profile of the source streamer",
+          "ref": "place.stream.chat.profile"
+        },
+        "source": {
+          "type": "ref",
+          "description": "The streamer who is teleporting their viewers here",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "startsAt": {
+          "type": "string",
+          "description": "When this teleport started",
+          "format": "datetime"
+        },
+        "teleportUri": {
+          "type": "string",
+          "description": "The URI of the teleport record",
+          "format": "at-uri"
+        },
+        "viewerCount": {
+          "type": "integer",
+          "description": "How many viewers are arriving from this teleport"
+        }
+      }
+    },
+    "teleportCanceled": {
+      "type": "object",
+      "required": [
+        "teleportUri",
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Why this teleport was canceled",
+          "enum": [
+            "deleted",
+            "denied",
+            "expired"
+          ]
+        },
+        "teleportUri": {
+          "type": "string",
+          "description": "The URI of the teleport record that was canceled",
+          "format": "at-uri"
         }
       }
     },

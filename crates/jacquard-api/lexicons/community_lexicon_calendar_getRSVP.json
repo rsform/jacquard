@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "community.lexicon.calendar.getRSVP",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get an RSVP record for a specific identity and event.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "event",
+          "identity"
+        ],
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "AT-URI of the event.",
+            "format": "at-uri"
+          },
+          "identity": {
+            "type": "string",
+            "description": "DID of the identity to get the RSVP for.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "record"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the RSVP record."
+            },
+            "record": {
+              "type": "ref",
+              "description": "The RSVP record.",
+              "ref": "community.lexicon.calendar.rsvp"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the RSVP record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotFound"
+        }
+      ]
+    }
+  }
+}

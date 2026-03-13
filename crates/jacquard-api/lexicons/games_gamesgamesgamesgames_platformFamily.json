@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.platformFamily",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A family of related platforms.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

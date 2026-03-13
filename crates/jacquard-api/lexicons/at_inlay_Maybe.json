@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Maybe",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Renders children if all bindings resolve; otherwise renders fallback.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            },
+            "fallback": {
+              "type": "ref",
+              "ref": "at.inlay.defs#element"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

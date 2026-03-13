@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.initiateUpload",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Start a new multipart upload session for an OCI blob. Returns an uploadId to be used with subsequent part upload and completion endpoints.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "digest"
+          ],
+          "properties": {
+            "digest": {
+              "type": "string",
+              "description": "The blob digest (e.g., sha256:abc123...)",
+              "maxLength": 128
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uploadId"
+          ],
+          "properties": {
+            "uploadId": {
+              "type": "string",
+              "description": "Unique identifier for this upload session",
+              "maxLength": 256
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidDigest"
+        }
+      ]
+    }
+  }
+}

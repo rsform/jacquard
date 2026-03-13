@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.exultant-zebra.masl",
+  "description": "MASL types for DASL, notably for Web Tiles. This variant uses a typed resources array.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "A bundle of resources.",
+      "required": [
+        "resources"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Optional name for the bundle."
+        },
+        "resources": {
+          "type": "array",
+          "description": "The resources in this bundle.",
+          "items": {
+            "type": "ref",
+            "ref": "garden.lexicon.exultant-zebra.masl#resource"
+          }
+        }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "description": "A single resource identified by a CID.",
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "contentType": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "description": "Optional path for this resource (e.g. '/index.html')."
+        },
+        "src": {
+          "type": "blob",
+          "description": "The content identifier for this resource."
+        }
+      }
+    }
+  }
+}

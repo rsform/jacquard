@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.note",
+  "description": "Structured note for drafts, investigations, and summaries.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "createdAt",
+          "lastUpdated"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "relatedFacts": {
+            "type": "array",
+            "description": "AT URIs of related facts",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 20
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

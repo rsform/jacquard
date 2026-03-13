@@ -10,7 +10,7 @@
       "properties": {
         "items": {
           "type": "array",
-          "description": "Required array of `app.offprint.block.*` unions.",
+          "description": "Array of content blocks",
           "items": {
             "type": "union",
             "refs": [
@@ -18,17 +18,15 @@
               "app.offprint.block.heading",
               "app.offprint.block.blockquote",
               "app.offprint.block.callout",
-              "app.offprint.block.unorderedList",
+              "app.offprint.block.bulletList",
               "app.offprint.block.orderedList",
-              "app.offprint.block.todoList",
-              "app.offprint.block.image",
-              "app.offprint.block.imageGrid",
-              "app.offprint.block.button",
+              "app.offprint.block.taskList",
               "app.offprint.block.codeBlock",
               "app.offprint.block.horizontalRule",
-              "app.offprint.block.bskyPost",
-              "app.offprint.block.iframeEmbed",
-              "app.offprint.block.linkEmbed"
+              "app.offprint.block.image",
+              "app.offprint.block.imageGrid",
+              "app.offprint.block.imageCarousel",
+              "app.offprint.block.imageDiff"
             ]
           }
         }

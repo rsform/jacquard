@@ -1,0 +1,155 @@
+{
+  "lexicon": 1,
+  "id": "ai.syui.log.chat",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a chat message. Compatible with site.standard.document.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "site",
+          "title",
+          "publishedAt"
+        ],
+        "properties": {
+          "bskyPostRef": {
+            "type": "ref",
+            "description": "Strong reference to a Bluesky post.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "content": {
+            "type": "union",
+            "description": "Open union for content. Supports markdown and other formats via $type.",
+            "refs": [
+              "#markdown"
+            ],
+            "closed": false
+          },
+          "coverImage": {
+            "type": "blob",
+            "description": "Cover image. Less than 1MB.",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description or excerpt from the message.",
+            "maxLength": 30000,
+            "maxGraphemes": 3000
+          },
+          "langs": {
+            "type": "array",
+            "description": "Indicates human language of message content.",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "parent": {
+            "type": "string",
+            "description": "AT-URI of the parent message being replied to.",
+            "format": "at-uri"
+          },
+          "path": {
+            "type": "string",
+            "description": "Combine with site URL to construct a canonical URL to the message."
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Timestamp of the message's publish time.",
+            "format": "datetime"
+          },
+          "root": {
+            "type": "string",
+            "description": "AT-URI of the root message in a thread.",
+            "format": "at-uri"
+          },
+          "site": {
+            "type": "string",
+            "description": "Points to a publication record (at://) or a publication URL (https://).",
+            "format": "uri"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags to categorize the message.",
+            "items": {
+              "type": "string",
+              "maxLength": 1280,
+              "maxGraphemes": 128
+            }
+          },
+          "textContent": {
+            "type": "string",
+            "description": "Plaintext representation of the message content. Should not contain markdown or other formatting."
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the message or thread topic.",
+            "maxLength": 5000,
+            "maxGraphemes": 500
+          },
+          "translations": {
+            "type": "ref",
+            "description": "Translations of the message in other languages.",
+            "ref": "#translationMap"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of the message's last edit.",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "markdown": {
+      "type": "object",
+      "description": "Markdown content format.",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Markdown text content.",
+          "maxLength": 1000000,
+          "maxGraphemes": 100000
+        }
+      }
+    },
+    "translation": {
+      "type": "object",
+      "description": "A translation of a chat message.",
+      "properties": {
+        "content": {
+          "type": "string",
+          "maxLength": 1000000,
+          "maxGraphemes": 100000
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 5000,
+          "maxGraphemes": 500
+        }
+      }
+    },
+    "translationMap": {
+      "type": "object",
+      "description": "Map of language codes to translations.",
+      "properties": {
+        "en": {
+          "type": "ref",
+          "ref": "#translation"
+        },
+        "ja": {
+          "type": "ref",
+          "ref": "#translation"
+        }
+      }
+    }
+  }
+}

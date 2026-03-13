@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.wikiLink",
+  "description": "Typed semantic link between any two ATProto records. Supports 9 link types and cross-PDS targeting.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "linkType",
+          "createdAt"
+        ],
+        "properties": {
+          "context": {
+            "type": "string",
+            "description": "Why this link exists",
+            "maxLength": 512
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "linkType": {
+            "type": "string",
+            "knownValues": [
+              "related-to",
+              "depends-on",
+              "extends",
+              "contradicts",
+              "is-example-of",
+              "supersedes",
+              "references",
+              "defines",
+              "is-part-of"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "sourceAnchor": {
+            "type": "string",
+            "description": "Section heading slug in source"
+          },
+          "target": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "targetAnchor": {
+            "type": "string",
+            "description": "Section heading slug in target"
+          }
+        }
+      }
+    }
+  }
+}

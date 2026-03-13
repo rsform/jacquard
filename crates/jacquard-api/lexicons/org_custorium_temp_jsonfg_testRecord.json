@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "org.custorium.temp.jsonfg.testRecord",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A test record type for geometries",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "geometry",
+          "text"
+        ],
+        "properties": {
+          "geometry": {
+            "type": "union",
+            "refs": [
+              "org.custorium.temp.jsonfg.geometryObject#point",
+              "org.custorium.temp.jsonfg.geometryObject#polygon",
+              "org.custorium.temp.jsonfg.geometryObject#lineString",
+              "org.custorium.temp.jsonfg.geometryObject#multiPoint",
+              "org.custorium.temp.jsonfg.geometryObject#multiPolygon",
+              "org.custorium.temp.jsonfg.geometryObject#multiLineString"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.uploadPart",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Direct buffered part upload. Alternative to using presigned URLs from getPartUploadUrl. Requires X-Upload-Id and X-Part-Number headers.",
+      "input": {
+        "description": "Raw binary part data",
+        "encoding": "*/*"
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "etag"
+          ],
+          "properties": {
+            "etag": {
+              "type": "string",
+              "description": "ETag of the uploaded part, required for completeUpload",
+              "maxLength": 256
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidUploadId"
+        },
+        {
+          "name": "InvalidPartNumber"
+        },
+        {
+          "name": "UploadFailed"
+        }
+      ]
+    }
+  }
+}

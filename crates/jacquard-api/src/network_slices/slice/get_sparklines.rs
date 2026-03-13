@@ -252,37 +252,37 @@ pub mod sparkline_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SliceUri;
         type Points;
+        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SliceUri = Unset;
         type Points = Unset;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type SliceUri = Set<members::slice_uri>;
-        type Points = S::Points;
+        type SliceUri = Unset;
     }
     ///State transition - sets the `points` field to Set
     pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoints<S> {}
     impl<S: State> State for SetPoints<S> {
-        type SliceUri = S::SliceUri;
         type Points = Set<members::points>;
+        type SliceUri = S::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type Points = S::Points;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `points` field
         pub struct points(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
     }
 }
 
@@ -355,8 +355,8 @@ where
 impl<'a, S> SparklineEntryBuilder<'a, S>
 where
     S: sparkline_entry_state::State,
-    S::SliceUri: sparkline_entry_state::IsSet,
     S::Points: sparkline_entry_state::IsSet,
+    S::SliceUri: sparkline_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparklineEntry<'a> {

@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.style",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Speaking and reply style for a sim — describes how the sim communicates.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "sim",
+          "description",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the sim's speaking and reply style.",
+            "maxLength": 30000,
+            "maxGraphemes": 3000
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "sim": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

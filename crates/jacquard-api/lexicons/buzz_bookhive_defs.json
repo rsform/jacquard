@@ -48,6 +48,28 @@
         }
       }
     },
+    "bookIdentifiers": {
+      "type": "object",
+      "description": "External identifiers for a book",
+      "properties": {
+        "goodreadsId": {
+          "type": "string",
+          "description": "Goodreads book ID"
+        },
+        "hiveId": {
+          "type": "string",
+          "description": "BookHive's internal ID"
+        },
+        "isbn10": {
+          "type": "string",
+          "description": "10-digit ISBN"
+        },
+        "isbn13": {
+          "type": "string",
+          "description": "13-digit ISBN"
+        }
+      }
+    },
     "bookProgress": {
       "type": "object",
       "description": "Reading progress tracking data",

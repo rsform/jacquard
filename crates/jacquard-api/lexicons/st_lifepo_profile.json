@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "st.lifepo.profile",
+  "defs": {
+    "lifeEvent": {
+      "type": "object",
+      "description": "A single life event entry.",
+      "required": [
+        "title",
+        "startDate"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get a user's do-life profile including bio and life events.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "The DID or handle of the user."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "handle",
+            "bio",
+            "lifeEvents"
+          ],
+          "properties": {
+            "bio": {
+              "type": "string"
+            },
+            "handle": {
+              "type": "string"
+            },
+            "lifeEvents": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#lifeEvent"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

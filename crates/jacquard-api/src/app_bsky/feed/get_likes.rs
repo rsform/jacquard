@@ -33,49 +33,49 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actor;
         type CreatedAt;
+        type Actor;
         type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actor = Unset;
         type CreatedAt = Unset;
+        type Actor = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type CreatedAt = S::CreatedAt;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Actor = S::Actor;
         type CreatedAt = Set<members::created_at>;
+        type Actor = S::Actor;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type CreatedAt = S::CreatedAt;
+        type Actor = Set<members::actor>;
         type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Actor = S::Actor;
         type CreatedAt = S::CreatedAt;
+        type Actor = S::Actor;
         type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actor` field
-        pub struct actor(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
     }
@@ -170,8 +170,8 @@ where
 impl<'a, S> LikeBuilder<'a, S>
 where
     S: like_state::State,
-    S::Actor: like_state::IsSet,
     S::CreatedAt: like_state::IsSet,
+    S::Actor: like_state::IsSet,
     S::IndexedAt: like_state::IsSet,
 {
     /// Build the final struct

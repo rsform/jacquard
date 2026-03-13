@@ -35,49 +35,49 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameId;
         type Emoji;
+        type GameId;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameId = Unset;
         type Emoji = Unset;
+        type GameId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `game_id` field to Set
-    pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameId<S> {}
-    impl<S: State> State for SetGameId<S> {
-        type GameId = Set<members::game_id>;
-        type Emoji = S::Emoji;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `emoji` field to Set
     pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmoji<S> {}
     impl<S: State> State for SetEmoji<S> {
-        type GameId = S::GameId;
         type Emoji = Set<members::emoji>;
+        type GameId = S::GameId;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `game_id` field to Set
+    pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGameId<S> {}
+    impl<S: State> State for SetGameId<S> {
+        type Emoji = S::Emoji;
+        type GameId = Set<members::game_id>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GameId = S::GameId;
         type Emoji = S::Emoji;
+        type GameId = S::GameId;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_id` field
-        pub struct game_id(());
         ///Marker type for the `emoji` field
         pub struct emoji(());
+        ///Marker type for the `game_id` field
+        pub struct game_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -172,8 +172,8 @@ where
 impl<'a, S> ReactionBuilder<'a, S>
 where
     S: reaction_state::State,
-    S::GameId: reaction_state::IsSet,
     S::Emoji: reaction_state::IsSet,
+    S::GameId: reaction_state::IsSet,
     S::CreatedAt: reaction_state::IsSet,
 {
     /// Build the final struct

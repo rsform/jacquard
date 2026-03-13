@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "app.protoimsg.chat.presence",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User's current presence status. Lives in their repo, updated by their client. IMPORTANT: visibleTo is intentionally excluded — it is a privacy preference and must remain server-side only. Writing it to the PDS would publicly expose who the user is hiding from.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "status",
+          "updatedAt"
+        ],
+        "properties": {
+          "awayMessage": {
+            "type": "string",
+            "description": "Custom away message / status text.",
+            "maxLength": 300
+          },
+          "status": {
+            "type": "string",
+            "description": "Current presence status.",
+            "knownValues": [
+              "online",
+              "away",
+              "idle",
+              "offline",
+              "invisible"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When presence was last updated.",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

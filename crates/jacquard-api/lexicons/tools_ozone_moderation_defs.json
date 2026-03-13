@@ -207,6 +207,20 @@
         }
       }
     },
+    "ageAssurancePurgeEvent": {
+      "type": "object",
+      "description": "Purges all age assurance events for the subject. Only works on DID subjects. Moderator-only.",
+      "required": [
+        "comment"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string",
+          "description": "Comment describing the reason for the purge.",
+          "minLength": 1
+        }
+      }
+    },
     "blobView": {
       "type": "object",
       "required": [
@@ -656,6 +670,7 @@
             "#modEventPriorityScore",
             "#ageAssuranceEvent",
             "#ageAssuranceOverrideEvent",
+            "#ageAssurancePurgeEvent",
             "#revokeAccountCredentialsEvent",
             "#scheduleTakedownEvent",
             "#cancelScheduledTakedownEvent"
@@ -730,6 +745,7 @@
             "#modEventPriorityScore",
             "#ageAssuranceEvent",
             "#ageAssuranceOverrideEvent",
+            "#ageAssurancePurgeEvent",
             "#revokeAccountCredentialsEvent",
             "#scheduleTakedownEvent",
             "#cancelScheduledTakedownEvent"

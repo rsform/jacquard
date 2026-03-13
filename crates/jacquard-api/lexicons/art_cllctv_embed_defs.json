@@ -62,7 +62,7 @@
         "fnumber": {
           "type": "string"
         },
-        "focalLenth": {
+        "focalLength": {
           "type": "string"
         },
         "iso": {

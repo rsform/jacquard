@@ -32,9 +32,12 @@
             "format": "datetime"
           },
           "location": {
-            "type": "ref",
+            "type": "union",
             "description": "The geographic location for activity partner matching.",
-            "ref": "community.lexicon.location#geo"
+            "refs": [
+              "community.lexicon.location#geo",
+              "community.lexicon.location#hthree"
+            ]
           },
           "startsAt": {
             "type": "string",

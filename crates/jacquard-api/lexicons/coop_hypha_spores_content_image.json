@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "coop.hypha.spores.content.image",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An image uploaded to the garden.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "image",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when the image was uploaded.",
+            "format": "datetime"
+          },
+          "embed": {
+            "type": "unknown",
+            "description": "Optional Bluesky-compatible image embed payload."
+          },
+          "image": {
+            "type": "blob",
+            "description": "The image blob.",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 10000000
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional title for the image.",
+            "maxLength": 2000,
+            "maxGraphemes": 200
+          }
+        }
+      }
+    }
+  }
+}

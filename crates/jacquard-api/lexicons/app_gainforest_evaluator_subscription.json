@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.evaluator.subscription",
+  "description": "A subscription record published by a user in their own repo to request evaluations from a specific evaluator service. The evaluator detects subscriptions via Jetstream and processes matching records. Deleting this record unsubscribes.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User subscription to an evaluator service. Published by the user (not the evaluator) to declare they want evaluations.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "evaluator",
+          "createdAt"
+        ],
+        "properties": {
+          "collections": {
+            "type": "array",
+            "description": "Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.",
+            "items": {
+              "type": "string",
+              "maxGraphemes": 128
+            },
+            "maxLength": 20
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of when this subscription was created.",
+            "format": "datetime"
+          },
+          "evaluationTypes": {
+            "type": "array",
+            "description": "Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.",
+            "items": {
+              "type": "string",
+              "maxGraphemes": 64
+            },
+            "maxLength": 20
+          },
+          "evaluator": {
+            "type": "string",
+            "description": "DID of the evaluator service to subscribe to.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

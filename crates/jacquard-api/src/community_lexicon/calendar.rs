@@ -5,5 +5,6 @@
 
 pub mod event;
 pub mod get_event;
+pub mod get_rsvp;
 pub mod rsvp;
 pub mod search_events;

@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Clip",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Clips child content to a height range relative to its own width. Use min and max to bound the box proportions. Set both to the same value to force an exact aspect ratio.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            },
+            "max": {
+              "type": "ref",
+              "description": "Maximum box proportions (tallest allowed shape). E.g. {width:1, height:2} means at most twice as tall as wide.",
+              "ref": "#aspectRatio"
+            },
+            "min": {
+              "type": "ref",
+              "description": "Minimum box proportions (shortest allowed shape). E.g. {width:1, height:1} means at least as tall as wide.",
+              "ref": "#aspectRatio"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

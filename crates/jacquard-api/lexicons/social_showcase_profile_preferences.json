@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.profile.preferences",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User preferences and settings",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "visibility",
+          "activity",
+          "notifications",
+          "privacy",
+          "updatedAt"
+        ],
+        "properties": {
+          "activity": {
+            "type": "ref",
+            "ref": "social.showcase.defs#activitySettings"
+          },
+          "display": {
+            "type": "ref",
+            "ref": "social.showcase.defs#displaySettings"
+          },
+          "notifications": {
+            "type": "ref",
+            "ref": "social.showcase.defs#notificationSettings"
+          },
+          "privacy": {
+            "type": "ref",
+            "ref": "social.showcase.defs#privacySettings"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "description": "Schema version for migrations (defaults to 1 if missing)",
+            "default": 1
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "visibility": {
+            "type": "ref",
+            "ref": "social.showcase.defs#visibilitySettings"
+          }
+        }
+      }
+    }
+  }
+}

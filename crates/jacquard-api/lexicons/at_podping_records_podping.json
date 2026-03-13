@@ -1,0 +1,91 @@
+{
+  "lexicon": 1,
+  "id": "at.podping.records.podping",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Normalized podping fields, supporting podping v0 through v1.1. Record TID timestamp should represent when the event was received, useful for global ordering.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "version",
+          "medium",
+          "reason",
+          "iris",
+          "timestamp"
+        ],
+        "properties": {
+          "iris": {
+            "type": "array",
+            "description": "The updated feeds, e.g. [ \"https://example.com/path/to/feed.xml\" ]",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "medium": {
+            "type": "string",
+            "description": "Common medium, e.g. podcast",
+            "enum": [
+              "podcast",
+              "video",
+              "music",
+              "publisher",
+              "audiobook",
+              "film",
+              "blog",
+              "newsletter",
+              "mixed",
+              "course",
+              "podcastL",
+              "videoL",
+              "musicL",
+              "publisherL",
+              "audiobookL",
+              "filmL",
+              "blogL",
+              "newsletterL",
+              "mixedL",
+              "courseL"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "description": "Common reason, e.g. update",
+            "enum": [
+              "update",
+              "live",
+              "liveEnd"
+            ]
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Optional identifier for the writer session, e.g. 9624937909978522000"
+          },
+          "source": {
+            "type": "string",
+            "description": "Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Sender timestamp in ISO format, untrustworthy due to client bugs, not so useful for global ordering, in either millisecond (3 decimals) or nanosecond precision (9 decimals), e.g. 2025-12-29T22:25:09.123456789Z",
+            "format": "datetime"
+          },
+          "version": {
+            "type": "string",
+            "description": "Podping schema version, e.g. 1.1",
+            "enum": [
+              "0.0",
+              "0.2",
+              "0.3",
+              "0.6",
+              "1.0",
+              "1.1"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

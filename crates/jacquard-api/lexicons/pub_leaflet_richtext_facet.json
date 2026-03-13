@@ -58,6 +58,29 @@
         }
       }
     },
+    "footnote": {
+      "type": "object",
+      "description": "Facet feature for a footnote reference",
+      "required": [
+        "footnoteId",
+        "contentPlaintext"
+      ],
+      "properties": {
+        "contentFacets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#main"
+          }
+        },
+        "contentPlaintext": {
+          "type": "string"
+        },
+        "footnoteId": {
+          "type": "string"
+        }
+      }
+    },
     "highlight": {
       "type": "object",
       "description": "Facet feature for highlighted text.",
@@ -114,7 +137,8 @@
               "#strikethrough",
               "#id",
               "#bold",
-              "#italic"
+              "#italic",
+              "#footnote"
             ]
           }
         },

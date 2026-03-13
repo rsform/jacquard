@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "actor.rpg.master",
+  "revision": 3,
+  "description": "A game master's validation of a player's RPG data for a specific system. One record per player per system per GM.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A master record validating one player's stats for one system. Multiple GMs can validate the same player.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "player",
+          "system",
+          "createdAt"
+        ],
+        "properties": {
+          "campaign": {
+            "type": "string",
+            "description": "Name of the campaign this validation relates to",
+            "maxLength": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "player": {
+            "type": "string",
+            "description": "DID of the player this record validates",
+            "format": "did"
+          },
+          "snapshotScope": {
+            "type": "string",
+            "description": "What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match",
+            "default": "full",
+            "knownValues": [
+              "none",
+              "custom",
+              "full"
+            ]
+          },
+          "spriteCid": {
+            "type": "string",
+            "description": "CID of the approved sprite blob (optional)"
+          },
+          "stats": {
+            "type": "unknown",
+            "description": "Snapshot of the player's stats for this system. Omitted when snapshotScope is 'none'."
+          },
+          "system": {
+            "type": "string",
+            "description": "The stat system being validated (e.g. 'dnd', 'reverie', 'rmmz')",
+            "maxLength": 50
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

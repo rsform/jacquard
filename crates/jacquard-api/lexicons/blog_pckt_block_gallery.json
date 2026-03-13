@@ -1,0 +1,20 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.gallery",
+  "description": "An embeddable gallery block that references a standalone gallery.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "Reference to a blog.pckt.gallery record",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

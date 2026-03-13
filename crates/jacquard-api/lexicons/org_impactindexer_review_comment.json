@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "org.impactindexer.review.comment",
+  "description": "A text comment on an AT-Proto entity. Users can comment on records, users, PDSes, or lexicons to provide feedback, ask questions, or share insights.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A text comment on a subject.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the comment was created.",
+            "format": "datetime"
+          },
+          "replyTo": {
+            "type": "string",
+            "description": "Optional AT-URI of another comment this is replying to, enabling threaded discussions.",
+            "format": "at-uri"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The subject being commented on.",
+            "ref": "org.impactindexer.review.defs#subjectRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "The comment text.",
+            "maxLength": 20480,
+            "maxGraphemes": 6000
+          }
+        }
+      }
+    }
+  }
+}

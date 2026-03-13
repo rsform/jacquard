@@ -23,6 +23,11 @@
             ],
             "maxSize": 2000000
           },
+          "albumArtUrl": {
+            "type": "string",
+            "description": "The URL of the album art of the album.",
+            "format": "uri"
+          },
           "appleMusicLink": {
             "type": "string",
             "description": "The Apple Music link of the album.",

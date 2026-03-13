@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.organization.layer",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a layer for an organization",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "uri",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time of the creation of the record",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the layer"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the site"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of the layer",
+            "enum": [
+              "geojson_points",
+              "geojson_points_trees",
+              "geojson_line",
+              "choropleth",
+              "choropleth_shannon",
+              "raster_tif",
+              "tms_tile"
+            ]
+          },
+          "uri": {
+            "type": "string",
+            "description": "The URI of the layer",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

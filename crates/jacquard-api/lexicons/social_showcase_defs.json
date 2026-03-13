@@ -1,0 +1,465 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.defs",
+  "description": "Shared type definitions for Showcase lexicons",
+  "defs": {
+    "activitySettings": {
+      "type": "object",
+      "description": "Activity sharing preferences",
+      "required": [
+        "shareNewItems",
+        "shareActivity",
+        "retentionDays"
+      ],
+      "properties": {
+        "retentionDays": {
+          "type": "integer",
+          "description": "Activity retention period",
+          "default": 90
+        },
+        "shareActivity": {
+          "type": "string",
+          "description": "Who sees your activity feed",
+          "maxLength": 10,
+          "knownValues": [
+            "all",
+            "followers",
+            "none"
+          ]
+        },
+        "shareNewItems": {
+          "type": "boolean",
+          "description": "Share new items in followers' feeds"
+        }
+      }
+    },
+    "aspectRatio": {
+      "type": "object",
+      "description": "Image aspect ratio",
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "collectionItem": {
+      "type": "object",
+      "description": "Reference to an item in a collection",
+      "required": [
+        "uri",
+        "addedAt",
+        "order"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "order": {
+          "type": "integer",
+          "description": "For custom sorting"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI reference to item (always shows latest version)",
+          "maxLength": 8192
+        }
+      }
+    },
+    "collectionView": {
+      "type": "object",
+      "description": "View of a collection with items",
+      "required": [
+        "uri",
+        "cid",
+        "name",
+        "tags",
+        "type",
+        "visibility",
+        "author",
+        "createdAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#profileView"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "coverImage": {
+          "type": "blob"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "itemCount": {
+          "type": "integer"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#itemView"
+          }
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "type": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "visibility": {
+          "type": "string",
+          "maxLength": 10
+        }
+      }
+    },
+    "displaySettings": {
+      "type": "object",
+      "description": "Display preferences",
+      "properties": {
+        "gridLayout": {
+          "type": "string",
+          "maxLength": 10,
+          "knownValues": [
+            "compact",
+            "spacious"
+          ]
+        },
+        "theme": {
+          "type": "string",
+          "maxLength": 10,
+          "knownValues": [
+            "light",
+            "dark",
+            "auto"
+          ]
+        }
+      }
+    },
+    "itemImage": {
+      "type": "object",
+      "description": "Image embedded in an item",
+      "required": [
+        "blob"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility",
+          "maxLength": 300
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
+        "blob": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ],
+          "maxSize": 5000000
+        }
+      }
+    },
+    "itemView": {
+      "type": "object",
+      "description": "View of an item with metadata",
+      "required": [
+        "uri",
+        "cid",
+        "title",
+        "tags",
+        "images",
+        "visibility",
+        "author",
+        "createdAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#profileView"
+        },
+        "category": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "externalLink": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#itemImage"
+          }
+        },
+        "metadata": {
+          "type": "unknown"
+        },
+        "reactionCount": {
+          "type": "integer"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "visibility": {
+          "type": "string",
+          "maxLength": 10
+        }
+      }
+    },
+    "notificationSettings": {
+      "type": "object",
+      "description": "Notification preferences",
+      "required": [
+        "reactions",
+        "follows",
+        "comments"
+      ],
+      "properties": {
+        "comments": {
+          "type": "boolean"
+        },
+        "follows": {
+          "type": "boolean"
+        },
+        "reactions": {
+          "type": "boolean"
+        }
+      }
+    },
+    "privacySettings": {
+      "type": "object",
+      "description": "Privacy preferences",
+      "required": [
+        "allowReactions",
+        "allowComments",
+        "indexable"
+      ],
+      "properties": {
+        "allowComments": {
+          "type": "boolean",
+          "description": "Let others comment"
+        },
+        "allowReactions": {
+          "type": "boolean",
+          "description": "Let others react to your items"
+        },
+        "indexable": {
+          "type": "boolean",
+          "description": "Appear in search results"
+        }
+      }
+    },
+    "profileView": {
+      "type": "object",
+      "description": "View of a user profile",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob"
+        },
+        "banner": {
+          "type": "blob"
+        },
+        "did": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "handle": {
+          "type": "string",
+          "maxLength": 253
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        }
+      }
+    },
+    "reactionSubject": {
+      "type": "object",
+      "description": "Subject of a reaction",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "reactionView": {
+      "type": "object",
+      "description": "View of a reaction to content",
+      "required": [
+        "uri",
+        "actor",
+        "subject",
+        "type",
+        "createdAt"
+      ],
+      "properties": {
+        "actor": {
+          "type": "ref",
+          "ref": "#profileView"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "subject": {
+          "type": "ref",
+          "ref": "#reactionSubject"
+        },
+        "type": {
+          "type": "string",
+          "description": "Emoji shortcode",
+          "maxLength": 100
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "showcaseItem": {
+      "type": "object",
+      "description": "A reference to an item featured in a user's showcase (hydrated at read time)",
+      "required": [
+        "uri",
+        "addedAt",
+        "order"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "order": {
+          "type": "integer",
+          "description": "Display order (0 = first)"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI reference to the item (e.g., at://did:plc:.../social.showcase.library.item/abc123)",
+          "format": "at-uri"
+        }
+      }
+    },
+    "visibilitySettings": {
+      "type": "object",
+      "description": "Visibility preferences",
+      "required": [
+        "profileVisibility",
+        "defaultItemVisibility",
+        "defaultCollectionVisibility"
+      ],
+      "properties": {
+        "defaultCollectionVisibility": {
+          "type": "string",
+          "maxLength": 10,
+          "knownValues": [
+            "public",
+            "private"
+          ]
+        },
+        "defaultItemVisibility": {
+          "type": "string",
+          "maxLength": 10,
+          "knownValues": [
+            "public",
+            "unlisted",
+            "private"
+          ]
+        },
+        "profileVisibility": {
+          "type": "string",
+          "maxLength": 10,
+          "knownValues": [
+            "public",
+            "unlisted",
+            "private"
+          ]
+        }
+      }
+    }
+  }
+}

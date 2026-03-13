@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.storageHttp",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "HTTP/HTTPS storage for WebDataset tar archives. Each shard is listed individually with a checksum for integrity verification. Consumers build brace-expansion patterns on the fly when needed.",
+      "required": [
+        "shards"
+      ],
+      "properties": {
+        "shards": {
+          "type": "array",
+          "description": "Array of shard entries with URL and integrity checksum",
+          "items": {
+            "type": "ref",
+            "ref": "#shardEntry"
+          },
+          "minLength": 1
+        }
+      }
+    },
+    "shardEntry": {
+      "type": "object",
+      "description": "A single HTTP-accessible shard with integrity checksum",
+      "required": [
+        "url",
+        "checksum"
+      ],
+      "properties": {
+        "checksum": {
+          "type": "ref",
+          "description": "Content hash for integrity verification",
+          "ref": "science.alt.dataset.entry#shardChecksum"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTP/HTTPS URL for this WebDataset tar shard",
+          "format": "uri",
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}

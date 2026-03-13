@@ -7,6 +7,7 @@ pub mod block;
 pub mod blog;
 pub mod content;
 pub mod document;
+pub mod gallery;
 pub mod mark;
 pub mod post;
 pub mod publication;

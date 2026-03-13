@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.deleteRecords",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Deletes one or more private records in your hidden repository. Requires auth.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uris"
+          ],
+          "properties": {
+            "uris": {
+              "type": "array",
+              "description": "The AT URIs of the records to delete.",
+              "items": {
+                "type": "string",
+                "format": "at-uri"
+              },
+              "minLength": 1,
+              "maxLength": 50
+            }
+          }
+        }
+      }
+    }
+  }
+}

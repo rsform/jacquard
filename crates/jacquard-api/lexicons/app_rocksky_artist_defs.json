@@ -2,6 +2,21 @@
   "lexicon": 1,
   "id": "app.rocksky.artist.defs",
   "defs": {
+    "artistMbid": {
+      "type": "object",
+      "properties": {
+        "mbid": {
+          "type": "string",
+          "description": "The MusicBrainz Identifier (MBID) of the artist."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the artist.",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
     "artistViewBasic": {
       "type": "object",
       "properties": {
@@ -25,6 +40,12 @@
         "sha256": {
           "type": "string",
           "description": "The SHA256 hash of the artist."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "uniqueListeners": {
           "type": "integer",
@@ -62,6 +83,12 @@
           "type": "string",
           "description": "The SHA256 hash of the artist."
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "uniqueListeners": {
           "type": "integer",
           "description": "The number of unique listeners who have played the artist.",
@@ -70,6 +97,65 @@
         "uri": {
           "type": "string",
           "description": "The URI of the artist.",
+          "format": "at-uri"
+        }
+      }
+    },
+    "listenerViewBasic": {
+      "type": "object",
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "description": "The URL of the listener's avatar image.",
+          "format": "uri"
+        },
+        "did": {
+          "type": "string",
+          "description": "The DID of the listener."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the listener."
+        },
+        "handle": {
+          "type": "string",
+          "description": "The handle of the listener."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the actor."
+        },
+        "mostListenedSong": {
+          "type": "ref",
+          "ref": "app.rocksky.artist.defs#songViewBasic"
+        },
+        "rank": {
+          "type": "integer",
+          "description": "The rank of the listener among all listeners of the artist.",
+          "minimum": 1
+        },
+        "totalPlays": {
+          "type": "integer",
+          "description": "The total number of plays by the listener.",
+          "minimum": 0
+        }
+      }
+    },
+    "songViewBasic": {
+      "type": "object",
+      "properties": {
+        "playCount": {
+          "type": "integer",
+          "description": "The number of times the song has been played.",
+          "minimum": 0
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the song."
+        },
+        "uri": {
+          "type": "string",
+          "description": "The URI of the song.",
           "format": "at-uri"
         }
       }

@@ -4,5 +4,6 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod calendar;
+pub mod event;
 pub mod lfg;
 pub mod profile;

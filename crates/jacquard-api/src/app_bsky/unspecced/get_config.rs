@@ -33,37 +33,37 @@ pub mod live_now_config_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Domains;
         type Did;
+        type Domains;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Domains = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `domains` field to Set
-    pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomains<S> {}
-    impl<S: State> State for SetDomains<S> {
-        type Domains = Set<members::domains>;
-        type Did = S::Did;
+        type Domains = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Domains = S::Domains;
         type Did = Set<members::did>;
+        type Domains = S::Domains;
+    }
+    ///State transition - sets the `domains` field to Set
+    pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomains<S> {}
+    impl<S: State> State for SetDomains<S> {
+        type Did = S::Did;
+        type Domains = Set<members::domains>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `domains` field
-        pub struct domains(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `domains` field
+        pub struct domains(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> LiveNowConfigBuilder<'a, S>
 where
     S: live_now_config_state::State,
-    S::Domains: live_now_config_state::IsSet,
     S::Did: live_now_config_state::IsSet,
+    S::Domains: live_now_config_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LiveNowConfig<'a> {

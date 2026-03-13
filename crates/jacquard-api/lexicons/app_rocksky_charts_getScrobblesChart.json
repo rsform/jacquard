@@ -23,6 +23,10 @@
             "description": "The DID or handle of the actor",
             "format": "at-identifier"
           },
+          "genre": {
+            "type": "string",
+            "description": "The genre to filter by"
+          },
           "songuri": {
             "type": "string",
             "description": "The URI of the track to filter by",

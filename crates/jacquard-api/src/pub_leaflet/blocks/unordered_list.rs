@@ -17,6 +17,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
+    /// Nested unordered list items. Mutually exclusive with orderedListChildren; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub children: std::option::Option<
@@ -24,6 +25,12 @@ pub struct ListItem<'a> {
     >,
     #[serde(borrow)]
     pub content: ListItemContent<'a>,
+    /// Nested ordered list items. Mutually exclusive with children; if both are present, children takes precedence.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ordered_list_children: std::option::Option<
+        crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>,
+    >,
 }
 
 pub mod list_item_state {
@@ -66,6 +73,7 @@ pub struct ListItemBuilder<'a, S: list_item_state::State> {
             Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
         >,
         ::core::option::Option<ListItemContent<'a>>,
+        ::core::option::Option<crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -82,7 +90,7 @@ impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
     pub fn new() -> Self {
         ListItemBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -128,6 +136,27 @@ where
     }
 }
 
+impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
+    /// Set the `orderedListChildren` field (optional)
+    pub fn ordered_list_children(
+        mut self,
+        value: impl Into<
+            Option<crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `orderedListChildren` field to an Option value (optional)
+    pub fn maybe_ordered_list_children(
+        mut self,
+        value: Option<crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
@@ -138,6 +167,7 @@ where
         ListItem {
             children: self.__unsafe_private_named.0,
             content: self.__unsafe_private_named.1.unwrap(),
+            ordered_list_children: self.__unsafe_private_named.2,
             extra_data: Default::default(),
         }
     }
@@ -152,6 +182,7 @@ where
         ListItem {
             children: self.__unsafe_private_named.0,
             content: self.__unsafe_private_named.1.unwrap(),
+            ordered_list_children: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
     }
@@ -202,7 +233,11 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("children"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Nested unordered list items. Mutually exclusive with orderedListChildren; if both are present, children takes precedence.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#listItem"),
@@ -221,6 +256,17 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.image")
                                 ],
                                 closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "orderedListChildren",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "pub.leaflet.blocks.orderedList",
+                                ),
                             }),
                         );
                         map

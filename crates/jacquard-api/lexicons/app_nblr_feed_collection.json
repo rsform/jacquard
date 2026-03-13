@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "app.nblr.feed.collection",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record defining a collection of resources.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the collection",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

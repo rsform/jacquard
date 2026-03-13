@@ -10,15 +10,9 @@
         "type": "object",
         "required": [
           "repository",
-          "tag",
-          "createdAt"
+          "tag"
         ],
         "properties": {
-          "createdAt": {
-            "type": "string",
-            "description": "Tag creation timestamp",
-            "format": "datetime"
-          },
           "manifest": {
             "type": "string",
             "description": "AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.",
@@ -38,6 +32,11 @@
             "type": "string",
             "description": "Tag name (e.g., 'latest', 'v1.0.0', '12-slim')",
             "maxLength": 128
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of last tag update",
+            "format": "datetime"
           }
         }
       }

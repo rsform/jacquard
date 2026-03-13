@@ -4,7 +4,6 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A publication record representing a blog, website, or content platform. Publications serve as containers for documents and define the overall branding and settings.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -15,18 +14,15 @@
         "properties": {
           "basicTheme": {
             "type": "ref",
-            "description": "Simplified publication theme for tools and apps to utilize when displaying content.",
             "ref": "site.standard.theme.basic"
           },
           "description": {
             "type": "string",
-            "description": "Brief description of the publication.",
             "maxLength": 3000,
             "maxGraphemes": 300
           },
           "icon": {
             "type": "blob",
-            "description": "Square image to identify the publication. Should be at least 256x256.",
             "accept": [
               "image/*"
             ],
@@ -34,18 +30,21 @@
           },
           "name": {
             "type": "string",
-            "description": "Name of the publication.",
             "maxLength": 1280,
             "maxGraphemes": 128
           },
           "preferences": {
             "type": "ref",
-            "description": "Object containing platform specific preferences (with a few shared properties).",
             "ref": "#preferences"
+          },
+          "theme": {
+            "type": "union",
+            "refs": [
+              "pub.leaflet.publication#theme"
+            ]
           },
           "url": {
             "type": "string",
-            "description": "Base publication url (ex: https://standard.site). The canonical document URL is formed by combining this value with the document path.",
             "format": "uri"
           }
         }
@@ -53,11 +52,25 @@
     },
     "preferences": {
       "type": "object",
-      "description": "Platform-specific preferences for the publication, including discovery and visibility settings.",
       "properties": {
+        "showComments": {
+          "type": "boolean",
+          "default": true
+        },
         "showInDiscover": {
           "type": "boolean",
-          "description": "Boolean which decides whether the publication should appear in discovery feeds.",
+          "default": true
+        },
+        "showMentions": {
+          "type": "boolean",
+          "default": true
+        },
+        "showPrevNext": {
+          "type": "boolean",
+          "default": false
+        },
+        "showRecommends": {
+          "type": "boolean",
           "default": true
         }
       }

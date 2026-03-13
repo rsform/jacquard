@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "at.podping.records.startup",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Normalized podping startup fields. Record TID timestamp should represent when the event was received, useful for global ordering.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "serverAccount",
+          "message",
+          "timestamp"
+        ],
+        "properties": {
+          "capacity": {
+            "type": "string",
+            "description": "Optional, e.g. 1,078"
+          },
+          "hive": {
+            "type": "string",
+            "description": "Optional, e.g. https://rpc.mahdiyari.info",
+            "format": "uri"
+          },
+          "message": {
+            "type": "string",
+            "description": "e.g. Podping startup complete"
+          },
+          "pingingApp": {
+            "type": "string",
+            "description": "Optional, e.g. hivepinger"
+          },
+          "serverAccount": {
+            "type": "string",
+            "description": "e.g. podping.aaa"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Optional, e.g. 9887936240807410000"
+          },
+          "source": {
+            "type": "string",
+            "description": "Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Sender timestamp in ISO format, e.g. 2025-12-29T22:25:09.123Z",
+            "format": "datetime"
+          },
+          "useTestNode": {
+            "type": "boolean",
+            "description": "Optional"
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Optional, e.g. 38a44421-a535-42de-b634-d1f6edce18ce"
+          },
+          "v": {
+            "type": "string",
+            "description": "Optional, e.g. 2.1.0"
+          }
+        }
+      }
+    }
+  }
+}

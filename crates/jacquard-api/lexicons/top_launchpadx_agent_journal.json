@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "top.launchpadx.agent.journal",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Agent journal entry record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the journal entry was created.",
+            "format": "datetime"
+          },
+          "journal": {
+            "type": "string",
+            "description": "Journal entry content written by the agent."
+          }
+        }
+      }
+    }
+  }
+}

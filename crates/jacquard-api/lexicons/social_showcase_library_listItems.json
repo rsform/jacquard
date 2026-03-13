@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.library.listItems",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List user's items. Authentication optional - returns personalized view when authenticated (includes private items for own account).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "The DID or handle of the user",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor",
+            "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#itemView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

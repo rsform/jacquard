@@ -70,37 +70,37 @@ pub mod rsvp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Subject;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Subject = S::Subject;
+        type Status = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Status = S::Status;
         type Subject = Set<members::subject>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Subject = S::Subject;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -173,8 +173,8 @@ where
 impl<'a, S> RsvpBuilder<'a, S>
 where
     S: rsvp_state::State,
-    S::Status: rsvp_state::IsSet,
     S::Subject: rsvp_state::IsSet,
+    S::Status: rsvp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rsvp<'a> {

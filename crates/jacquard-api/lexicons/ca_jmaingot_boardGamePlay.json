@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "ca.jmaingot.boardGamePlay",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A single board game play",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "bggId",
+          "playedAt"
+        ],
+        "properties": {
+          "bggId": {
+            "type": "string",
+            "description": "corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game"
+          },
+          "name": {
+            "type": "string"
+          },
+          "playedAt": {
+            "type": "string",
+            "description": "ISO 8601 date string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

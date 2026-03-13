@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "at.margin.preferences",
+  "defs": {
+    "labelPreference": {
+      "type": "object",
+      "required": [
+        "labelerDid",
+        "label",
+        "visibility"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label identifier (e.g. sexual, violence, spam)."
+        },
+        "labelerDid": {
+          "type": "string",
+          "description": "DID of the labeler service."
+        },
+        "visibility": {
+          "type": "string",
+          "description": "How to handle content with this label: hide, warn, or ignore.",
+          "knownValues": [
+            "hide",
+            "warn",
+            "ignore"
+          ]
+        }
+      }
+    },
+    "labelerSubscription": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "DID of the labeler service."
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "User preferences for the Margin application.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "disableExternalLinkWarning": {
+            "type": "boolean",
+            "description": "If true, do not show the confirmation modal when opening external links."
+          },
+          "externalLinkSkippedHostnames": {
+            "type": "array",
+            "description": "List of hostnames to skip the external link warning modal for.",
+            "items": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "maxLength": 100
+          },
+          "labelPreferences": {
+            "type": "array",
+            "description": "Per-label visibility preferences for subscribed labelers.",
+            "items": {
+              "type": "ref",
+              "ref": "#labelPreference"
+            },
+            "maxLength": 500
+          },
+          "subscribedLabelers": {
+            "type": "array",
+            "description": "List of labeler services the user subscribes to for content moderation.",
+            "items": {
+              "type": "ref",
+              "ref": "#labelerSubscription"
+            },
+            "maxLength": 50
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "com.kipclip.tag",
+  "description": "A user-defined tag for organizing bookmarks",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user-defined tag for organizing bookmarks",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "value",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when tag was created",
+            "format": "datetime"
+          },
+          "value": {
+            "type": "string",
+            "description": "The tag text",
+            "maxLength": 64
+          }
+        }
+      }
+    }
+  }
+}

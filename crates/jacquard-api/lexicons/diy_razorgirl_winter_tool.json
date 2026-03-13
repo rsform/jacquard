@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.tool",
+  "description": "Custom JavaScript/TypeScript tool with sandboxing and operator approval workflow.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "code",
+          "inputSchema",
+          "createdAt"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "TS/JS source, must export default async function",
+            "maxLength": 100000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "inputSchema": {
+            "type": "unknown",
+            "description": "JSON Schema for tool input"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "requiredCommands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiredSecrets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiredTools": {
+            "type": "array",
+            "description": "Tools this tool chains to (AT URIs or built-in names)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiresNetwork": {
+            "type": "boolean"
+          },
+          "requiresWorkspace": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

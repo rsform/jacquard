@@ -1,0 +1,163 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.schedule.updatePost",
+  "defs": {
+    "imageRef": {
+      "type": "object",
+      "description": "Image reference that supports both new blob uploads and existing image CID references.",
+      "required": [
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for the image.",
+          "maxLength": 1000
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of an image blob. Can reference an existing image in the post or a newly uploaded image via media.uploadBlob.",
+          "maxLength": 200
+        },
+        "image": {
+          "type": "blob",
+          "description": "New image blob (for newly uploaded images).",
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/gif"
+          ],
+          "maxSize": 1000000
+        }
+      }
+    },
+    "imagesEmbed": {
+      "type": "object",
+      "description": "Images embed that supports CID references for existing images.",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#imageRef"
+          },
+          "maxLength": 4
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Update a scheduled post. Only PENDING posts can be updated.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "disableQuotePosts": {
+              "type": "boolean",
+              "description": "Whether to disable quote posts"
+            },
+            "embed": {
+              "type": "union",
+              "description": "Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.",
+              "refs": [
+                "#imagesEmbed",
+                "app.bsky.embed.images",
+                "app.bsky.embed.external",
+                "app.bsky.embed.record",
+                "app.bsky.embed.video",
+                "app.bsky.embed.recordWithMedia"
+              ]
+            },
+            "facets": {
+              "type": "array",
+              "description": "Rich text facets (links, mentions, tags).",
+              "items": {
+                "type": "ref",
+                "ref": "app.bsky.richtext.facet"
+              }
+            },
+            "id": {
+              "type": "string",
+              "description": "Post ID to update.",
+              "maxLength": 100
+            },
+            "labels": {
+              "type": "ref",
+              "description": "Self-applied content labels for content warnings (AT Protocol standard).",
+              "ref": "com.atproto.label.defs#selfLabels"
+            },
+            "langs": {
+              "type": "array",
+              "description": "Language codes (ISO 639-1).",
+              "items": {
+                "type": "string",
+                "format": "language"
+              },
+              "maxLength": 3
+            },
+            "scheduledAt": {
+              "type": "string",
+              "description": "New scheduled publication datetime (ISO 8601).",
+              "format": "datetime",
+              "maxLength": 100
+            },
+            "text": {
+              "type": "string",
+              "description": "New post text content.",
+              "maxLength": 3000,
+              "maxGraphemes": 300
+            },
+            "threadgateRules": {
+              "type": "array",
+              "description": "Thread gate rules to control who can reply",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "app.bsky.feed.threadgate#mentionRule",
+                  "app.bsky.feed.threadgate#followerRule",
+                  "app.bsky.feed.threadgate#followingRule",
+                  "app.bsky.feed.threadgate#listRule"
+                ]
+              },
+              "maxLength": 5
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "post"
+          ],
+          "properties": {
+            "post": {
+              "type": "ref",
+              "ref": "app.chronosky.schedule.listPosts#scheduledPost"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "PostNotFound"
+        },
+        {
+          "name": "PostNotPending"
+        },
+        {
+          "name": "NoFieldsProvided"
+        }
+      ]
+    }
+  }
+}

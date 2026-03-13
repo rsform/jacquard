@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "download.darkworld.deltarune",
+  "defs": {
+    "locationElsewhere": {
+      "type": "object",
+      "properties": {}
+    },
+    "locationHome": {
+      "type": "object",
+      "properties": {}
+    },
+    "locationMathTextbook": {
+      "type": "object",
+      "properties": {}
+    },
+    "locationOnSkin": {
+      "type": "object",
+      "properties": {}
+    },
+    "locationSchool": {
+      "type": "object",
+      "properties": {}
+    },
+    "main": {
+      "type": "record",
+      "description": "Describes an instance of the user drawing the Delta Rune symbol from Undertale/Deltarune.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "time"
+        ],
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "tool": {
+            "type": "union",
+            "refs": [
+              "#toolPen",
+              "#toolPencil",
+              "#toolMarker",
+              "#toolFinger",
+              "#toolOther"
+            ]
+          },
+          "where": {
+            "type": "union",
+            "refs": [
+              "#locationSchool",
+              "#locationHome",
+              "#locationMathTextbook",
+              "#locationOnSkin",
+              "#locationElsewhere"
+            ]
+          }
+        }
+      }
+    },
+    "toolFinger": {
+      "type": "object",
+      "properties": {}
+    },
+    "toolMarker": {
+      "type": "object",
+      "properties": {}
+    },
+    "toolOther": {
+      "type": "object",
+      "properties": {}
+    },
+    "toolPen": {
+      "type": "object",
+      "properties": {}
+    },
+    "toolPencil": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+}

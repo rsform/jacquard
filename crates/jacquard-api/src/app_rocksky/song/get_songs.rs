@@ -15,7 +15,10 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetSongs {
+pub struct GetSongs<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(min: 1)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
@@ -44,63 +47,86 @@ pub mod get_songs_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetSongsBuilder<S: get_songs_state::State> {
+pub struct GetSongsBuilder<'a, S: get_songs_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl GetSongs {
+impl<'a> GetSongs<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetSongsBuilder<get_songs_state::Empty> {
+    pub fn new() -> GetSongsBuilder<'a, get_songs_state::Empty> {
         GetSongsBuilder::new()
     }
 }
 
-impl GetSongsBuilder<get_songs_state::Empty> {
+impl<'a> GetSongsBuilder<'a, get_songs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSongsBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
-impl<S: get_songs_state::State> GetSongsBuilder<S> {
-    /// Set the `limit` field (optional)
-    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<'a, S: get_songs_state::State> GetSongsBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
-    /// Set the `limit` field to an Option value (optional)
-    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
 }
 
-impl<S: get_songs_state::State> GetSongsBuilder<S> {
-    /// Set the `offset` field (optional)
-    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<'a, S: get_songs_state::State> GetSongsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
-    /// Set the `offset` field to an Option value (optional)
-    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
 }
 
-impl<S> GetSongsBuilder<S>
+impl<'a, S: get_songs_state::State> GetSongsBuilder<'a, S> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetSongsBuilder<'a, S>
 where
     S: get_songs_state::State,
 {
     /// Build the final struct
-    pub fn build(self) -> GetSongs {
+    pub fn build(self) -> GetSongs<'a> {
         GetSongs {
-            limit: self.__unsafe_private_named.0,
-            offset: self.__unsafe_private_named.1,
+            genre: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            offset: self.__unsafe_private_named.2,
         }
     }
 }
@@ -133,7 +159,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSongsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl jacquard_common::xrpc::XrpcRequest for GetSongs {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSongs<'a> {
     const NSID: &'static str = "app.rocksky.song.getSongs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSongsResponse;
@@ -145,6 +171,6 @@ pub struct GetSongsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSongsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.getSongs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSongs;
+    type Request<'de> = GetSongs<'de>;
     type Response = GetSongsResponse;
 }

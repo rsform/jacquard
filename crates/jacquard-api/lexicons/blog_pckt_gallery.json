@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.gallery",
+  "description": "A standalone image gallery that can be embedded in posts or other content.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "images"
+        ],
+        "properties": {
+          "caption": {
+            "type": "string",
+            "description": "Optional caption for the entire gallery",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "images": {
+            "type": "array",
+            "description": "Array of image blocks in display order",
+            "items": {
+              "type": "ref",
+              "ref": "blog.pckt.block.image#imageAttrs"
+            },
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "layout": {
+            "type": "string",
+            "description": "Layout style for rendering the gallery (e.g. grid, carousel, masonry, list)",
+            "maxLength": 50
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional title for the gallery",
+            "maxLength": 200
+          }
+        }
+      }
+    }
+  }
+}

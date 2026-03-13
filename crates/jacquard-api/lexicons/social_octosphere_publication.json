@@ -1,0 +1,123 @@
+{
+  "lexicon": 1,
+  "id": "social.octosphere.publication",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Scientific publication record bridged from Octopus.ac via Octosphere. Represents a single version of an Octopus publication.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "octopusId",
+          "versionId",
+          "publicationType",
+          "title",
+          "status",
+          "contentHtml",
+          "contentText",
+          "citations",
+          "linkedTo",
+          "linkedFrom",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "canonicalUrl": {
+            "type": "string",
+            "description": "Public Octopus URL for the publication version.",
+            "format": "uri"
+          },
+          "citations": {
+            "type": "array",
+            "description": "List of citation strings extracted from references.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contentHtml": {
+            "type": "string",
+            "description": "Raw HTML content body."
+          },
+          "contentText": {
+            "type": "string",
+            "description": "Plain text content for compact consumption."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO timestamp of when the publication was created in Octopus.",
+            "format": "datetime"
+          },
+          "doi": {
+            "type": "string",
+            "description": "Publication version DOI URL, if present.",
+            "format": "uri"
+          },
+          "linkedFrom": {
+            "type": "array",
+            "description": "Publication ids that link to this record.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "linkedTo": {
+            "type": "array",
+            "description": "Publication ids this record links to.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "octopusId": {
+            "type": "string",
+            "description": "Octopus publication id (UUID)."
+          },
+          "ownerOrcid": {
+            "type": "string",
+            "description": "ORCID of the publication owner (if available)."
+          },
+          "peerReviewOf": {
+            "type": "string",
+            "description": "Publication id this peer review references, if applicable."
+          },
+          "publicationType": {
+            "type": "string",
+            "description": "Octopus publication type.",
+            "knownValues": [
+              "RESEARCH_PROBLEM",
+              "HYPOTHESIS",
+              "PROTOCOL",
+              "ANALYSIS",
+              "INTERPRETATION",
+              "REAL_WORLD_APPLICATION",
+              "DATA",
+              "PEER_REVIEW"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Octopus publication status (expected LIVE).",
+            "knownValues": [
+              "LIVE",
+              "DRAFT",
+              "ARCHIVED"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Publication title.",
+            "maxLength": 1000
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "ISO timestamp of when the publication was last updated in Octopus.",
+            "format": "datetime"
+          },
+          "versionId": {
+            "type": "string",
+            "description": "Octopus publication version id (UUID)."
+          }
+        }
+      }
+    }
+  }
+}

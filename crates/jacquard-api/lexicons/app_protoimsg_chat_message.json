@@ -1,0 +1,339 @@
+{
+  "lexicon": 1,
+  "id": "app.protoimsg.chat.message",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "description": "Width and height for layout before media loads.",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "blockquote": {
+      "type": "object",
+      "description": "Facet feature for a block quotation.",
+      "properties": {}
+    },
+    "bold": {
+      "type": "object",
+      "description": "Facet feature for bold text.",
+      "properties": {}
+    },
+    "byteSlice": {
+      "type": "object",
+      "description": "Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text.",
+      "required": [
+        "byteStart",
+        "byteEnd"
+      ],
+      "properties": {
+        "byteEnd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "byteStart": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "codeBlock": {
+      "type": "object",
+      "description": "Facet feature for a code block. The text contains the code content.",
+      "properties": {
+        "lang": {
+          "type": "string",
+          "description": "Programming language for syntax highlighting.",
+          "maxLength": 50
+        }
+      }
+    },
+    "codeInline": {
+      "type": "object",
+      "description": "Facet feature for inline code.",
+      "properties": {}
+    },
+    "externalEmbed": {
+      "type": "object",
+      "description": "External link card.",
+      "required": [
+        "uri",
+        "title"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description or summary.",
+          "maxLength": 1000
+        },
+        "thumb": {
+          "type": "blob",
+          "description": "Thumbnail image for the link card.",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 1000000
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the external content.",
+          "maxLength": 300
+        },
+        "uri": {
+          "type": "string",
+          "description": "URL of the external content.",
+          "format": "uri"
+        }
+      }
+    },
+    "imageEmbed": {
+      "type": "object",
+      "description": "Embedded images.",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#imageItem"
+          },
+          "maxLength": 4
+        }
+      }
+    },
+    "imageItem": {
+      "type": "object",
+      "description": "A single embedded image.",
+      "required": [
+        "image",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility.",
+          "maxLength": 2000
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
+        "image": {
+          "type": "blob",
+          "description": "Image blob reference.",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp"
+          ],
+          "maxSize": 1000000
+        }
+      }
+    },
+    "italic": {
+      "type": "object",
+      "description": "Facet feature for italic text.",
+      "properties": {}
+    },
+    "link": {
+      "type": "object",
+      "description": "Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A chat message. Lives in the sender's repo, points to a channel.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "channel",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string",
+            "description": "AT-URI of the channel record this message belongs to.",
+            "format": "at-uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of message creation.",
+            "format": "datetime"
+          },
+          "embed": {
+            "type": "union",
+            "description": "Embedded media or link card.",
+            "refs": [
+              "#imageEmbed",
+              "#videoEmbed",
+              "#externalEmbed"
+            ]
+          },
+          "facets": {
+            "type": "array",
+            "description": "Rich text annotations (mentions, links, tags, formatting). Extends the Bluesky facet convention with additional formatting features.",
+            "items": {
+              "type": "ref",
+              "ref": "#richTextFacet"
+            }
+          },
+          "reply": {
+            "type": "ref",
+            "description": "Structured reply reference for threading.",
+            "ref": "#replyRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "Message text content.",
+            "maxLength": 3000,
+            "maxGraphemes": 1000
+          }
+        }
+      }
+    },
+    "mention": {
+      "type": "object",
+      "description": "Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "description": "Thread reply reference with root and parent for efficient deep thread traversal.",
+      "required": [
+        "root",
+        "parent"
+      ],
+      "properties": {
+        "parent": {
+          "type": "string",
+          "description": "AT-URI of the direct parent message being replied to.",
+          "format": "at-uri"
+        },
+        "root": {
+          "type": "string",
+          "description": "AT-URI of the root message in the thread.",
+          "format": "at-uri"
+        }
+      }
+    },
+    "richTextFacet": {
+      "type": "object",
+      "description": "Annotation of a sub-string within rich text.",
+      "required": [
+        "index",
+        "features"
+      ],
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#mention",
+              "#link",
+              "#tag",
+              "#bold",
+              "#italic",
+              "#strikethrough",
+              "#codeInline",
+              "#codeBlock",
+              "#blockquote"
+            ]
+          }
+        },
+        "index": {
+          "type": "ref",
+          "ref": "#byteSlice"
+        }
+      }
+    },
+    "strikethrough": {
+      "type": "object",
+      "description": "Facet feature for strikethrough text.",
+      "properties": {}
+    },
+    "tag": {
+      "type": "object",
+      "description": "Facet feature for a hashtag. The text usually includes a '#' prefix, but the facet reference should not.",
+      "required": [
+        "tag"
+      ],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        }
+      }
+    },
+    "videoEmbed": {
+      "type": "object",
+      "description": "Embedded video.",
+      "required": [
+        "video"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility.",
+          "maxLength": 2000
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
+        "thumbnail": {
+          "type": "blob",
+          "description": "Video thumbnail image.",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 1000000
+        },
+        "video": {
+          "type": "blob",
+          "description": "Video blob reference.",
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "maxSize": 50000000
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.exportUserData",
+  "defs": {
+    "crewExport": {
+      "type": "object",
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "tier": {
+          "type": "string",
+          "maxLength": 32
+        }
+      }
+    },
+    "layerExport": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "digest": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "manifest": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "mediaType": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "size": {
+          "type": "integer"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Export all user data from this hold (GDPR compliance). Returns all records stored on this hold's PDS that reference the authenticated user's DID.",
+      "parameters": {
+        "type": "params",
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "exportedAt",
+            "holdDid",
+            "userDid",
+            "isCaptain",
+            "layerRecords",
+            "statsRecords",
+            "blueskyPosts"
+          ],
+          "properties": {
+            "blueskyPosts": {
+              "type": "array",
+              "description": "Bluesky posts that mention the user",
+              "items": {
+                "type": "ref",
+                "ref": "#postExport"
+              }
+            },
+            "crewRecord": {
+              "type": "ref",
+              "description": "User's crew record (if they are a crew member)",
+              "ref": "#crewExport"
+            },
+            "exportedAt": {
+              "type": "string",
+              "description": "RFC3339 timestamp of when the export was generated",
+              "format": "datetime"
+            },
+            "holdDid": {
+              "type": "string",
+              "description": "DID of this hold service",
+              "format": "did"
+            },
+            "isCaptain": {
+              "type": "boolean",
+              "description": "Whether the user is the captain (owner) of this hold"
+            },
+            "layerRecords": {
+              "type": "array",
+              "description": "Layer records uploaded by the user",
+              "items": {
+                "type": "ref",
+                "ref": "#layerExport"
+              }
+            },
+            "statsRecords": {
+              "type": "array",
+              "description": "Repository stats records owned by the user",
+              "items": {
+                "type": "ref",
+                "ref": "#statsExport"
+              }
+            },
+            "userDid": {
+              "type": "string",
+              "description": "DID of the user whose data was exported",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "AuthRequired"
+        }
+      ]
+    },
+    "postExport": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 30000,
+          "maxGraphemes": 3000
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "statsExport": {
+      "type": "object",
+      "properties": {
+        "lastPull": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "lastPush": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "pullCount": {
+          "type": "integer"
+        },
+        "pushCount": {
+          "type": "integer"
+        },
+        "repository": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

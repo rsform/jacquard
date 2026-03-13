@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "some example cat lexicon",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "picture of the cat",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 2000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "cat name",
+            "minLength": 1,
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

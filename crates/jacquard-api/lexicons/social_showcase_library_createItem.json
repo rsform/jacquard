@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.library.createItem",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new item. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "title",
+            "tags",
+            "images",
+            "visibility"
+          ],
+          "properties": {
+            "category": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 3000
+            },
+            "externalLink": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 2048
+            },
+            "images": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#itemImage"
+              },
+              "maxLength": 6
+            },
+            "metadata": {
+              "type": "unknown"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "maxLength": 20
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 300
+            },
+            "visibility": {
+              "type": "string",
+              "maxLength": 10,
+              "knownValues": [
+                "public",
+                "unlisted",
+                "private"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#itemView"
+        }
+      }
+    }
+  }
+}

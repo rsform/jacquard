@@ -4,16 +4,25 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get a book's info. Requires authentication.",
+      "description": "Get a book's info. Does not require authentication.",
       "parameters": {
         "type": "params",
-        "required": [
-          "id"
-        ],
         "properties": {
+          "goodreadsId": {
+            "type": "string",
+            "description": "The Goodreads identifier for the book"
+          },
           "id": {
             "type": "string",
             "description": "The book's hive ID"
+          },
+          "isbn": {
+            "type": "string",
+            "description": "The book ISBN identifier"
+          },
+          "isbn13": {
+            "type": "string",
+            "description": "The book ISBN-13 identifier"
           }
         }
       },
@@ -38,7 +47,7 @@
             "book": {
               "type": "ref",
               "description": "The hive book's info",
-              "ref": "buzz.bookhive.hiveBook#record"
+              "ref": "buzz.bookhive.hiveBook#main"
             },
             "bookProgress": {
               "type": "ref",

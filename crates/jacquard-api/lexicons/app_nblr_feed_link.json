@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "app.nblr.feed.link",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record linking a resource to a collection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "uri",
+          "collection",
+          "createdAt"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string",
+            "description": "The AT URI of the collection being linked to",
+            "format": "at-uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "uri": {
+            "type": "string",
+            "description": "The URI of the linked resource; a web URL or AT URI",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

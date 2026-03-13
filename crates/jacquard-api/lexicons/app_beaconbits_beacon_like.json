@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "app.beaconbits.beacon.like",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A like on a beacon",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "bskyLikeUri": {
+            "type": "string",
+            "description": "Associated Bluesky like URI (if beacon has a post)",
+            "format": "at-uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the like was created",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "AT URI of the beacon being liked",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

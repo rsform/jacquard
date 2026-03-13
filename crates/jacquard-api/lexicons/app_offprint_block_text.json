@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.text",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "plaintext"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "description": "Facets for text formatting",
+          "items": {
+            "type": "ref",
+            "ref": "app.offprint.richtext.facet"
+          }
+        },
+        "plaintext": {
+          "type": "string",
+          "description": "The plain text content"
+        },
+        "textAlign": {
+          "type": "string",
+          "description": "Text alignment",
+          "enum": [
+            "left",
+            "center",
+            "right",
+            "justify"
+          ]
+        }
+      }
+    }
+  }
+}

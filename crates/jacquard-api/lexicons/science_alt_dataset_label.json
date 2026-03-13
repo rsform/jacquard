@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.label",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Named label pointing to a dataset entry. Multiple labels with the same name but different versions can coexist, enabling versioned references to immutable dataset entries.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "datasetUri",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this label was created",
+            "format": "datetime"
+          },
+          "datasetUri": {
+            "type": "string",
+            "description": "AT-URI pointing to the dataset entry this label refers to",
+            "format": "at-uri",
+            "maxLength": 500
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of this labeled version",
+            "maxLength": 5000
+          },
+          "name": {
+            "type": "string",
+            "description": "User-facing label name, e.g. 'mnist'",
+            "maxLength": 200
+          },
+          "version": {
+            "type": "string",
+            "description": "Semver or free-form version string, e.g. '1.0.1'. When omitted, the label is unversioned.",
+            "maxLength": 50
+          }
+        }
+      }
+    }
+  }
+}

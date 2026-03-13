@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "garden.goals.completion",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record of completing a goal on a specific day.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "goalId",
+          "year",
+          "month",
+          "day",
+          "completedAt"
+        ],
+        "properties": {
+          "completedAt": {
+            "type": "string",
+            "description": "Timestamp when the completion was recorded",
+            "format": "datetime"
+          },
+          "day": {
+            "type": "integer",
+            "description": "Day of the completion (1-31)",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "goalId": {
+            "type": "string",
+            "description": "UUID of the goal this completion belongs to",
+            "maxLength": 64
+          },
+          "goalUri": {
+            "type": "string",
+            "description": "AT Protocol URI reference to the goal record",
+            "format": "at-uri"
+          },
+          "month": {
+            "type": "integer",
+            "description": "Month of the completion (1-12)",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes for this completion",
+            "maxLength": 99
+          },
+          "photoBlob": {
+            "type": "blob",
+            "description": "Optional photo for this completion",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "sequenceNum": {
+            "type": "integer",
+            "description": "Sequence number for countable goals",
+            "minimum": 1
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year of the completion",
+            "minimum": 1970
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.actor.publishingOwner",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A songwriter, composer, or music publisher who owns the publishing rights to a song or musical work",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "collectingSociety": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "companyName": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "firstName": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "ipi": {
+            "type": "string",
+            "description": "Interested Party Information (IPI) number assigned to the publishing owner by a collecting society",
+            "maxLength": 11
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  }
+}

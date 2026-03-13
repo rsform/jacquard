@@ -1,0 +1,95 @@
+{
+  "lexicon": 1,
+  "id": "app.openmkt.marketplace.listing",
+  "defs": {
+    "locationObj": {
+      "type": "object",
+      "properties": {
+        "county": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zipPrefix": {
+          "type": "string"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "price",
+          "category",
+          "location",
+          "createdAt"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000
+          },
+          "externalUrl": {
+            "type": "string",
+            "description": "Optional external URL for purchasing the item (e.g., Amazon, eBay link)",
+            "maxLength": 2000
+          },
+          "hideFromFriends": {
+            "type": "boolean"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/*"
+              ],
+              "maxSize": 1000000
+            }
+          },
+          "location": {
+            "type": "ref",
+            "ref": "#locationObj"
+          },
+          "metadata": {
+            "type": "ref",
+            "ref": "#metadataObj"
+          },
+          "price": {
+            "type": "string",
+            "description": "String representation"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "metadataObj": {
+      "type": "object",
+      "properties": {
+        "subcategory": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.richtext.content",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "Array of content blocks",
+          "items": {
+            "type": "union",
+            "description": "Open union used to define the content. Each entry must specify a $type",
+            "refs": [
+              "fyi.questionable.richtext.text",
+              "fyi.questionable.richtext.blockquote",
+              "fyi.questionable.richtext.bskyPost",
+              "fyi.questionable.richtext.code",
+              "fyi.questionable.richtext.header",
+              "fyi.questionable.richtext.horizontalRule",
+              "fyi.questionable.richtext.image",
+              "fyi.questionable.richtext.math",
+              "fyi.questionable.richtext.text",
+              "fyi.questionable.richtext.list",
+              "fyi.questionable.richtext.website"
+            ],
+            "closed": false
+          },
+          "maxLength": 1000
+        }
+      }
+    }
+  }
+}

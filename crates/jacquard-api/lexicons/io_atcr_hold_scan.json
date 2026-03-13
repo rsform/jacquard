@@ -1,0 +1,92 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.scan",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Vulnerability scan results for a container manifest. Stored in the hold's embedded PDS. Record key is deterministic: the manifest digest hex without the 'sha256:' prefix, so re-scans upsert the existing record.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "manifest",
+          "repository",
+          "userDid",
+          "critical",
+          "high",
+          "medium",
+          "low",
+          "total",
+          "scannerVersion",
+          "scannedAt"
+        ],
+        "properties": {
+          "critical": {
+            "type": "integer",
+            "description": "Count of critical severity vulnerabilities",
+            "minimum": 0
+          },
+          "high": {
+            "type": "integer",
+            "description": "Count of high severity vulnerabilities",
+            "minimum": 0
+          },
+          "low": {
+            "type": "integer",
+            "description": "Count of low severity vulnerabilities",
+            "minimum": 0
+          },
+          "manifest": {
+            "type": "string",
+            "description": "AT-URI of the scanned manifest (e.g., at://did:plc:xyz/io.atcr.manifest/abc123...)",
+            "format": "at-uri"
+          },
+          "medium": {
+            "type": "integer",
+            "description": "Count of medium severity vulnerabilities",
+            "minimum": 0
+          },
+          "repository": {
+            "type": "string",
+            "description": "Repository name (e.g., myapp)",
+            "maxLength": 256
+          },
+          "sbomBlob": {
+            "type": "blob",
+            "description": "SBOM blob (SPDX JSON format) uploaded to the hold's blob storage",
+            "accept": [
+              "application/spdx+json"
+            ]
+          },
+          "scannedAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when the scan completed",
+            "format": "datetime"
+          },
+          "scannerVersion": {
+            "type": "string",
+            "description": "Version of the scanner that produced this result (e.g., atcr-scanner-v1.0.0)",
+            "maxLength": 64
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total vulnerability count",
+            "minimum": 0
+          },
+          "userDid": {
+            "type": "string",
+            "description": "DID of the image owner",
+            "format": "did"
+          },
+          "vulnReportBlob": {
+            "type": "blob",
+            "description": "Grype vulnerability report blob (JSON) with full CVE details",
+            "accept": [
+              "application/vnd.atcr.vulnerabilities+json"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

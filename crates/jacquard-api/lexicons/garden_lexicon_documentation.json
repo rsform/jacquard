@@ -1,0 +1,118 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.documentation",
+  "defs": {
+    "definitionDoc": {
+      "type": "object",
+      "description": "Documentation for a definition within a lexicon.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "array",
+          "description": "Localized descriptions for this definition.",
+          "items": {
+            "type": "ref",
+            "ref": "#localizedString"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the definition being documented (e.g., 'main', 'replyRef').",
+          "maxLength": 512
+        },
+        "properties": {
+          "type": "array",
+          "description": "Documentation for properties within this definition.",
+          "items": {
+            "type": "ref",
+            "ref": "#propertyDoc"
+          }
+        }
+      }
+    },
+    "localizedString": {
+      "type": "object",
+      "description": "A string with an associated language code.",
+      "required": [
+        "lang",
+        "value"
+      ],
+      "properties": {
+        "lang": {
+          "type": "string",
+          "description": "ISO 639 language code (e.g., 'en', 'es', 'ja').",
+          "format": "language"
+        },
+        "value": {
+          "type": "string",
+          "description": "The localized string value.",
+          "maxLength": 10000
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Auxiliary documentation for a lexicon schema, supporting localized descriptions for the lexicon and its properties.",
+      "key": "nsid",
+      "record": {
+        "type": "object",
+        "required": [
+          "lexicon",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this documentation was created.",
+            "format": "datetime"
+          },
+          "definitions": {
+            "type": "array",
+            "description": "Documentation for specific definitions within the lexicon (e.g., main, replyRef).",
+            "items": {
+              "type": "ref",
+              "ref": "#definitionDoc"
+            }
+          },
+          "description": {
+            "type": "array",
+            "description": "Localized descriptions for the lexicon.",
+            "items": {
+              "type": "ref",
+              "ref": "#localizedString"
+            }
+          },
+          "lexicon": {
+            "type": "string",
+            "description": "The NSID of the lexicon being documented.",
+            "format": "nsid"
+          }
+        }
+      }
+    },
+    "propertyDoc": {
+      "type": "object",
+      "description": "Documentation for a specific property within a definition.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "array",
+          "description": "Localized descriptions for this property.",
+          "items": {
+            "type": "ref",
+            "ref": "#localizedString"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "The property name being documented.",
+          "maxLength": 256
+        }
+      }
+    }
+  }
+}

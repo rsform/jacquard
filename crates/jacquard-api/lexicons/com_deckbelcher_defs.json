@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "com.deckbelcher.defs",
+  "defs": {
+    "cardRef": {
+      "type": "object",
+      "description": "Reference to a Magic: The Gathering card with printing and oracle identifiers.",
+      "required": [
+        "scryfallUri",
+        "oracleUri"
+      ],
+      "properties": {
+        "oracleUri": {
+          "type": "string",
+          "description": "Oracle card URI (oracle:<uuid>) - for external indexing.\nDerived from scryfallUri; on conflict, scryfallUri takes precedence.",
+          "format": "uri"
+        },
+        "scryfallUri": {
+          "type": "string",
+          "description": "Scryfall printing URI (scry:<uuid>) - authoritative identifier",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

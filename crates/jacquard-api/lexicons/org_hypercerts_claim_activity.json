@@ -1,0 +1,173 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.claim.activity",
+  "defs": {
+    "contributor": {
+      "type": "object",
+      "required": [
+        "contributorIdentity"
+      ],
+      "properties": {
+        "contributionDetails": {
+          "type": "union",
+          "description": "Inline contribution role object with a role string via org.hypercerts.claim.activity#contributorRole, or a strong reference to a contribution details record. The record referenced must conform with the lexicon org.hypercerts.claim.contribution.",
+          "refs": [
+            "#contributorRole",
+            "com.atproto.repo.strongRef"
+          ]
+        },
+        "contributionWeight": {
+          "type": "string",
+          "description": "The relative weight/importance of this contribution (stored as a string to avoid float precision issues). Must be a positive numeric value. Weights do not need to sum to a specific total; normalization can be performed by the consuming application as needed.",
+          "maxLength": 100
+        },
+        "contributorIdentity": {
+          "type": "union",
+          "description": "Inline contributor identity object with an identity string (DID or identifier) via org.hypercerts.claim.activity#contributorIdentity, or a strong reference to a contributor information record. The record referenced must conform with the lexicon org.hypercerts.claim.contributorInformation.",
+          "refs": [
+            "#contributorIdentity",
+            "com.atproto.repo.strongRef"
+          ]
+        }
+      }
+    },
+    "contributorIdentity": {
+      "type": "object",
+      "description": "Contributor information as a string (DID or identifier).",
+      "required": [
+        "identity"
+      ],
+      "properties": {
+        "identity": {
+          "type": "string",
+          "description": "The contributor identity string (DID or identifier).",
+          "maxLength": 1000,
+          "maxGraphemes": 100
+        }
+      }
+    },
+    "contributorRole": {
+      "type": "object",
+      "description": "Contribution details as a string.",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The contribution role or details.",
+          "maxLength": 1000,
+          "maxGraphemes": 100
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A hypercert record tracking impact work.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "shortDescription",
+          "createdAt"
+        ],
+        "properties": {
+          "contributors": {
+            "type": "array",
+            "description": "An array of contributor objects, each containing contributor information, weight, and contribution details.",
+            "items": {
+              "type": "ref",
+              "ref": "#contributor"
+            },
+            "maxLength": 1000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "ref",
+            "description": "Rich-text description, represented as a Leaflet linear document.",
+            "ref": "pub.leaflet.pages.linearDocument#main"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "When the work ended",
+            "format": "datetime"
+          },
+          "image": {
+            "type": "union",
+            "description": "The hypercert visual representation as a URI or image blob.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallImage"
+            ]
+          },
+          "locations": {
+            "type": "array",
+            "description": "An array of strong references to the location where activity was performed. The record referenced must conform with the lexicon app.certified.location.",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 1000
+          },
+          "rights": {
+            "type": "ref",
+            "description": "A strong reference to the rights that this hypercert has. The record referenced must conform with the lexicon org.hypercerts.claim.rights.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Short summary of this activity claim, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "shortDescriptionFacets": {
+            "type": "array",
+            "description": "Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "startDate": {
+            "type": "string",
+            "description": "When the work began",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "description": "Display title summarizing the impact work (e.g. 'Reforestation in Amazon Basin 2024')",
+            "maxLength": 256
+          },
+          "workScope": {
+            "type": "union",
+            "description": "Work scope definition. A CEL expression for structured, machine-evaluable scopes or a free-form string for simple and legacy scopes.",
+            "refs": [
+              "org.hypercerts.workscope.cel",
+              "#workScopeString"
+            ]
+          }
+        }
+      }
+    },
+    "workScopeString": {
+      "type": "object",
+      "description": "A free-form string describing the work scope for simple or legacy scopes.",
+      "required": [
+        "scope"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "description": "The work scope description string.",
+          "maxLength": 1000,
+          "maxGraphemes": 100
+        }
+      }
+    }
+  }
+}

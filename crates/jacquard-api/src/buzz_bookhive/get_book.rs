@@ -16,8 +16,18 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBook<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub goodreads_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub isbn: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub isbn13: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod get_book_state {
@@ -29,33 +39,25 @@ pub mod get_book_state {
         pub trait Sealed {}
     }
     /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Id;
-    }
+    pub trait State: sealed::Sealed {}
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Id = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-    }
+    impl State for Empty {}
     /// Marker types for field names
     #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-    }
+    pub mod members {}
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetBookBuilder<'a, S: get_book_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -71,40 +73,87 @@ impl<'a> GetBookBuilder<'a, get_book_state::Empty> {
     pub fn new() -> Self {
         GetBookBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
-impl<'a, S> GetBookBuilder<'a, S>
-where
-    S: get_book_state::State,
-    S::Id: get_book_state::IsUnset,
-{
-    /// Set the `id` field (required)
-    pub fn id(
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `goodreadsId` field (optional)
+    pub fn goodreads_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> GetBookBuilder<'a, get_book_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        GetBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `goodreadsId` field to an Option value (optional)
+    pub fn maybe_goodreads_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `id` field (optional)
+    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `id` field to an Option value (optional)
+    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `isbn` field (optional)
+    pub fn isbn(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `isbn` field to an Option value (optional)
+    pub fn maybe_isbn(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `isbn13` field (optional)
+    pub fn isbn13(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `isbn13` field to an Option value (optional)
+    pub fn maybe_isbn13(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
     }
 }
 
 impl<'a, S> GetBookBuilder<'a, S>
 where
     S: get_book_state::State,
-    S::Id: get_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetBook<'a> {
         GetBook {
-            id: self.__unsafe_private_named.0.unwrap(),
+            goodreads_id: self.__unsafe_private_named.0,
+            id: self.__unsafe_private_named.1,
+            isbn: self.__unsafe_private_named.2,
+            isbn13: self.__unsafe_private_named.3,
         }
     }
 }
@@ -127,7 +176,7 @@ pub struct GetBookOutput<'a> {
     pub activity: std::option::Option<Vec<crate::buzz_bookhive::Activity<'a>>>,
     /// The hive book's info
     #[serde(borrow)]
-    pub book: jacquard_common::types::value::Data<'a>,
+    pub book: crate::buzz_bookhive::hive_book::HiveBook<'a>,
     /// Reading progress for the user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

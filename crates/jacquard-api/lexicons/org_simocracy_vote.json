@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A quadratic vote allocation targeting a sim.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "sim",
+          "votes",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the vote was cast",
+            "format": "datetime"
+          },
+          "sim": {
+            "type": "ref",
+            "description": "Reference to the sim record being voted for",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "votes": {
+            "type": "integer",
+            "description": "Number of quadratic votes allocated"
+          }
+        }
+      }
+    }
+  }
+}

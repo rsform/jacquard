@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "st.lifepo.event",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Adds a new life event to the authenticated user's profile.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "title",
+            "startDate"
+          ],
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "endDate": {
+              "type": "string",
+              "format": "datetime"
+            },
+            "startDate": {
+              "type": "string",
+              "format": "datetime"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "AT URI of the created event record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

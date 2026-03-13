@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.actor.credit",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A relationship between a game and a profile.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "game",
+          "credits"
+        ],
+        "properties": {
+          "actor": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "credits": {
+            "type": "array",
+            "description": "The roles this profile played in the creation of the game.",
+            "items": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#creditEntry"
+            }
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The name to be used if there is no profile associated with this credit, or the profile is inaccessible.",
+            "maxLength": 640
+          },
+          "game": {
+            "type": "ref",
+            "description": "The game to which this profile is being credited.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

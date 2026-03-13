@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.recipe.review",
+  "description": "Record declaring a review (rating and optional comment) of a recipe. One review per user per recipe.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record key is the recipe's rkey for one-review-per-user-per-recipe; pass recipeId as rkey",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "rating",
+          "createdAt"
+        ],
+        "properties": {
+          "comment": {
+            "type": "string",
+            "description": "Optional review comment in GitHub-flavored markdown",
+            "maxLength": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When this review was created",
+            "format": "datetime"
+          },
+          "rating": {
+            "type": "integer",
+            "description": "Star rating as integer 1-5 (1=1 star, 5=5 stars)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Reference to the recipe being reviewed",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this review was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

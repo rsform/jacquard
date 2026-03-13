@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.schedule.retryFailedPosts",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Retry all failed posts for the authenticated user",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "retriedCount"
+          ],
+          "properties": {
+            "retriedCount": {
+              "type": "integer",
+              "description": "Number of posts that were retried"
+            }
+          }
+        }
+      }
+    }
+  }
+}

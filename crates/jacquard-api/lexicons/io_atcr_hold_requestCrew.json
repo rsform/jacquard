@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.requestCrew",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Request crew membership for the hold. Authorization depends on the captain record: if allowAllCrew is true, any authenticated user can join; otherwise, only the owner can join.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "permissions": {
+              "type": "array",
+              "description": "Requested permissions (default: ['blob:read', 'blob:write'])",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              }
+            },
+            "role": {
+              "type": "string",
+              "description": "Requested role (default: 'member')",
+              "default": "member",
+              "maxLength": 32
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the crew record",
+              "format": "cid"
+            },
+            "message": {
+              "type": "string",
+              "description": "Human-readable status message",
+              "maxLength": 256
+            },
+            "status": {
+              "type": "string",
+              "description": "Result status",
+              "maxLength": 32,
+              "knownValues": [
+                "created",
+                "already_member"
+              ]
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the crew record (if created or already exists)",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "AuthRequired"
+        },
+        {
+          "name": "RegistrationDisabled"
+        }
+      ]
+    }
+  }
+}

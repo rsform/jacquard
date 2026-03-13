@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.actor.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get profile of a user.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "Handle or DID of the user",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "type": "ref",
+              "ref": "org.passingreads.actor.defs#profileView"
+            }
+          }
+        }
+      }
+    }
+  }
+}

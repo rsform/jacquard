@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "org.hyperboards.contributor",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Per-contributor presentation defaults, reusable across boards.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "contributorRef",
+          "createdAt"
+        ],
+        "properties": {
+          "circularImage": {
+            "type": "boolean",
+            "description": "Whether to render the contributor image as circular (default true)"
+          },
+          "contributorRef": {
+            "type": "ref",
+            "description": "StrongRef to the contributorInformation record",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the contributor record was created",
+            "format": "datetime"
+          },
+          "hoverIframeUrl": {
+            "type": "string",
+            "description": "Iframe shown on hover",
+            "format": "uri"
+          },
+          "hoverImageUrl": {
+            "type": "string",
+            "description": "Image overlay shown on hover",
+            "format": "uri"
+          },
+          "url": {
+            "type": "string",
+            "description": "Link URL for this contributor",
+            "format": "uri"
+          },
+          "videoUrl": {
+            "type": "string",
+            "description": "Direct video or Instagram URL",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

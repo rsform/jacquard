@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Missing",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Signals missing data. Components return this when a required value is absent.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "type": "array",
+              "description": "Path segments identifying what is missing",
+              "items": {
+                "type": "string",
+                "maxLength": 256
+              },
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

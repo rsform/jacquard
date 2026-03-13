@@ -8,6 +8,7 @@
 pub mod create_song;
 pub mod get_song;
 pub mod get_songs;
+pub mod match_song;
 
 /// A declaration of a song.
 #[jacquard_derive::lexicon]
@@ -29,6 +30,10 @@ pub struct Song<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub album_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    /// The URL of the album art of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub album_art_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// The album artist of the song.
     #[serde(borrow)]
     pub album_artist: jacquard_common::CowStr<'a>,
@@ -39,6 +44,10 @@ pub struct Song<'a> {
     /// The artist of the song.
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
+    /// The artists of the song with MusicBrainz IDs.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artists: std::option::Option<Vec<crate::app_rocksky::artist::ArtistMbid<'a>>>,
     /// The composer of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -114,105 +123,105 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
         type AlbumArtist;
+        type Artist;
         type Duration;
-        type CreatedAt;
         type Title;
         type Album;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
         type AlbumArtist = Unset;
+        type Artist = Unset;
         type Duration = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
         type Album = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Album = S::Album;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `album_artist` field to Set
     pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
     impl<S: State> State for SetAlbumArtist<S> {
-        type Artist = S::Artist;
         type AlbumArtist = Set<members::album_artist>;
+        type Artist = S::Artist;
         type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type Album = S::Album;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type AlbumArtist = S::AlbumArtist;
+        type Artist = Set<members::artist>;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type Album = S::Album;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
-        type Artist = S::Artist;
         type AlbumArtist = S::AlbumArtist;
+        type Artist = S::Artist;
         type Duration = Set<members::duration>;
+        type Title = S::Title;
+        type Album = S::Album;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Album = S::Album;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Album = S::Album;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
         type AlbumArtist = S::AlbumArtist;
+        type Artist = S::Artist;
         type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type Album = S::Album;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `album` field to Set
     pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbum<S> {}
     impl<S: State> State for SetAlbum<S> {
-        type Artist = S::Artist;
         type AlbumArtist = S::AlbumArtist;
+        type Artist = S::Artist;
         type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type Album = Set<members::album>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AlbumArtist = S::AlbumArtist;
+        type Artist = S::Artist;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type Album = S::Album;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
         ///Marker type for the `album_artist` field
         pub struct album_artist(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
         ///Marker type for the `duration` field
         pub struct duration(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `album` field
         pub struct album(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -222,9 +231,11 @@ pub struct SongBuilder<'a, S: song_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::app_rocksky::artist::ArtistMbid<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -260,6 +271,8 @@ impl<'a> SongBuilder<'a, song_state::Empty> {
         SongBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
+                None,
                 None,
                 None,
                 None,
@@ -327,6 +340,25 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `albumArtUrl` field (optional)
+    pub fn album_art_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `albumArtUrl` field to an Option value (optional)
+    pub fn maybe_album_art_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
@@ -337,7 +369,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> SongBuilder<'a, song_state::SetAlbumArtist<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         SongBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -352,7 +384,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
@@ -360,7 +392,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -375,7 +407,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> SongBuilder<'a, song_state::SetArtist<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         SongBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -385,17 +417,36 @@ where
 }
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `artists` field (optional)
+    pub fn artists(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_rocksky::artist::ArtistMbid<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `artists` field to an Option value (optional)
+    pub fn maybe_artists(
+        mut self,
+        value: Option<Vec<crate::app_rocksky::artist::ArtistMbid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `composer` field (optional)
     pub fn composer(
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `composer` field to an Option value (optional)
     pub fn maybe_composer(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -406,7 +457,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `copyrightMessage` field to an Option value (optional)
@@ -414,7 +465,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -429,7 +480,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> SongBuilder<'a, song_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
         SongBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -441,12 +492,12 @@ where
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `discNumber` field (optional)
     pub fn disc_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `discNumber` field to an Option value (optional)
     pub fn maybe_disc_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -461,7 +512,7 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SongBuilder<'a, song_state::SetDuration<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
         SongBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -476,12 +527,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -492,12 +543,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `label` field to an Option value (optional)
     pub fn maybe_label(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.13 = value;
         self
     }
 }
@@ -508,12 +559,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `lyrics` field to an Option value (optional)
     pub fn maybe_lyrics(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self.__unsafe_private_named.14 = value;
         self
     }
 }
@@ -524,12 +575,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `mbid` field to an Option value (optional)
     pub fn maybe_mbid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self.__unsafe_private_named.15 = value;
         self
     }
 }
@@ -540,7 +591,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `releaseDate` field to an Option value (optional)
@@ -548,7 +599,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self.__unsafe_private_named.16 = value;
         self
     }
 }
@@ -559,7 +610,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self.__unsafe_private_named.17 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
@@ -567,7 +618,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self.__unsafe_private_named.17 = value;
         self
     }
 }
@@ -578,7 +629,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self.__unsafe_private_named.18 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
@@ -586,7 +637,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self.__unsafe_private_named.18 = value;
         self
     }
 }
@@ -597,7 +648,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
@@ -605,7 +656,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self.__unsafe_private_named.19 = value;
         self
     }
 }
@@ -620,7 +671,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> SongBuilder<'a, song_state::SetTitle<S>> {
-        self.__unsafe_private_named.18 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.20 = ::core::option::Option::Some(value.into());
         SongBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -632,12 +683,12 @@ where
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `trackNumber` field (optional)
     pub fn track_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `trackNumber` field to an Option value (optional)
     pub fn maybe_track_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self.__unsafe_private_named.21 = value;
         self
     }
 }
@@ -648,12 +699,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self.__unsafe_private_named.22 = value.into();
         self
     }
     /// Set the `wiki` field to an Option value (optional)
     pub fn maybe_wiki(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self.__unsafe_private_named.22 = value;
         self
     }
 }
@@ -661,12 +712,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `year` field to an Option value (optional)
     pub fn maybe_year(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self.__unsafe_private_named.23 = value;
         self
     }
 }
@@ -677,7 +728,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self.__unsafe_private_named.24 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
@@ -685,7 +736,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self.__unsafe_private_named.24 = value;
         self
     }
 }
@@ -693,39 +744,41 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Artist: song_state::IsSet,
     S::AlbumArtist: song_state::IsSet,
+    S::Artist: song_state::IsSet,
     S::Duration: song_state::IsSet,
-    S::CreatedAt: song_state::IsSet,
     S::Title: song_state::IsSet,
     S::Album: song_state::IsSet,
+    S::CreatedAt: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
         Song {
             album: self.__unsafe_private_named.0.unwrap(),
             album_art: self.__unsafe_private_named.1,
-            album_artist: self.__unsafe_private_named.2.unwrap(),
-            apple_music_link: self.__unsafe_private_named.3,
-            artist: self.__unsafe_private_named.4.unwrap(),
-            composer: self.__unsafe_private_named.5,
-            copyright_message: self.__unsafe_private_named.6,
-            created_at: self.__unsafe_private_named.7.unwrap(),
-            disc_number: self.__unsafe_private_named.8,
-            duration: self.__unsafe_private_named.9.unwrap(),
-            genre: self.__unsafe_private_named.10,
-            label: self.__unsafe_private_named.11,
-            lyrics: self.__unsafe_private_named.12,
-            mbid: self.__unsafe_private_named.13,
-            release_date: self.__unsafe_private_named.14,
-            spotify_link: self.__unsafe_private_named.15,
-            tags: self.__unsafe_private_named.16,
-            tidal_link: self.__unsafe_private_named.17,
-            title: self.__unsafe_private_named.18.unwrap(),
-            track_number: self.__unsafe_private_named.19,
-            wiki: self.__unsafe_private_named.20,
-            year: self.__unsafe_private_named.21,
-            youtube_link: self.__unsafe_private_named.22,
+            album_art_url: self.__unsafe_private_named.2,
+            album_artist: self.__unsafe_private_named.3.unwrap(),
+            apple_music_link: self.__unsafe_private_named.4,
+            artist: self.__unsafe_private_named.5.unwrap(),
+            artists: self.__unsafe_private_named.6,
+            composer: self.__unsafe_private_named.7,
+            copyright_message: self.__unsafe_private_named.8,
+            created_at: self.__unsafe_private_named.9.unwrap(),
+            disc_number: self.__unsafe_private_named.10,
+            duration: self.__unsafe_private_named.11.unwrap(),
+            genre: self.__unsafe_private_named.12,
+            label: self.__unsafe_private_named.13,
+            lyrics: self.__unsafe_private_named.14,
+            mbid: self.__unsafe_private_named.15,
+            release_date: self.__unsafe_private_named.16,
+            spotify_link: self.__unsafe_private_named.17,
+            tags: self.__unsafe_private_named.18,
+            tidal_link: self.__unsafe_private_named.19,
+            title: self.__unsafe_private_named.20.unwrap(),
+            track_number: self.__unsafe_private_named.21,
+            wiki: self.__unsafe_private_named.22,
+            year: self.__unsafe_private_named.23,
+            youtube_link: self.__unsafe_private_named.24,
             extra_data: Default::default(),
         }
     }
@@ -740,27 +793,29 @@ where
         Song {
             album: self.__unsafe_private_named.0.unwrap(),
             album_art: self.__unsafe_private_named.1,
-            album_artist: self.__unsafe_private_named.2.unwrap(),
-            apple_music_link: self.__unsafe_private_named.3,
-            artist: self.__unsafe_private_named.4.unwrap(),
-            composer: self.__unsafe_private_named.5,
-            copyright_message: self.__unsafe_private_named.6,
-            created_at: self.__unsafe_private_named.7.unwrap(),
-            disc_number: self.__unsafe_private_named.8,
-            duration: self.__unsafe_private_named.9.unwrap(),
-            genre: self.__unsafe_private_named.10,
-            label: self.__unsafe_private_named.11,
-            lyrics: self.__unsafe_private_named.12,
-            mbid: self.__unsafe_private_named.13,
-            release_date: self.__unsafe_private_named.14,
-            spotify_link: self.__unsafe_private_named.15,
-            tags: self.__unsafe_private_named.16,
-            tidal_link: self.__unsafe_private_named.17,
-            title: self.__unsafe_private_named.18.unwrap(),
-            track_number: self.__unsafe_private_named.19,
-            wiki: self.__unsafe_private_named.20,
-            year: self.__unsafe_private_named.21,
-            youtube_link: self.__unsafe_private_named.22,
+            album_art_url: self.__unsafe_private_named.2,
+            album_artist: self.__unsafe_private_named.3.unwrap(),
+            apple_music_link: self.__unsafe_private_named.4,
+            artist: self.__unsafe_private_named.5.unwrap(),
+            artists: self.__unsafe_private_named.6,
+            composer: self.__unsafe_private_named.7,
+            copyright_message: self.__unsafe_private_named.8,
+            created_at: self.__unsafe_private_named.9.unwrap(),
+            disc_number: self.__unsafe_private_named.10,
+            duration: self.__unsafe_private_named.11.unwrap(),
+            genre: self.__unsafe_private_named.12,
+            label: self.__unsafe_private_named.13,
+            lyrics: self.__unsafe_private_named.14,
+            mbid: self.__unsafe_private_named.15,
+            release_date: self.__unsafe_private_named.16,
+            spotify_link: self.__unsafe_private_named.17,
+            tags: self.__unsafe_private_named.18,
+            tidal_link: self.__unsafe_private_named.19,
+            title: self.__unsafe_private_named.20.unwrap(),
+            track_number: self.__unsafe_private_named.21,
+            wiki: self.__unsafe_private_named.22,
+            year: self.__unsafe_private_named.23,
+            youtube_link: self.__unsafe_private_named.24,
             extra_data: Some(extra_data),
         }
     }
@@ -1128,6 +1183,29 @@ fn lexicon_doc_app_rocksky_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "albumArtUrl",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The URL of the album art of the song.",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
                                     "albumArtist",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1187,6 +1265,24 @@ fn lexicon_doc_app_rocksky_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("artists"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The artists of the song with MusicBrainz IDs.",
+                                        ),
+                                    ),
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.rocksky.artist.defs#artistMbid",
+                                        ),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
                                 }),
                             );
                             map.insert(
@@ -1601,6 +1697,9 @@ pub struct SongViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The title of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -1856,6 +1955,26 @@ fn lexicon_doc_app_rocksky_song_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 r#enum: None,
                                 r#const: None,
                                 known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                                min_length: None,
+                                max_length: None,
                             }),
                         );
                         map.insert(
@@ -2160,6 +2279,26 @@ fn lexicon_doc_app_rocksky_song_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
@@ -2330,6 +2469,9 @@ pub struct SongViewDetailed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The title of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

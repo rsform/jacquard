@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.profile",
+  "description": "Profile record declaring that a repository uses the Kitchen app. This record acts as a declaration/signal for repository discovery.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this profile was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description or bio for this Kitchen profile",
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}

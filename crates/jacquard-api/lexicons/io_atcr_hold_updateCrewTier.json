@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.updateCrewTier",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update a crew member's tier. Only accepts requests from the trusted appview.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "userDid",
+            "tierRank"
+          ],
+          "properties": {
+            "tierRank": {
+              "type": "integer",
+              "description": "Tier rank index (0-based, maps to hold tier list by position).",
+              "minimum": 0
+            },
+            "userDid": {
+              "type": "string",
+              "description": "DID of the crew member whose tier is being updated.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "tierName"
+          ],
+          "properties": {
+            "tierName": {
+              "type": "string",
+              "description": "Resolved tier name on this hold.",
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Valid appview token required.",
+          "name": "AuthRequired"
+        },
+        {
+          "description": "User is not a crew member on this hold.",
+          "name": "UserNotFound"
+        }
+      ]
+    }
+  }
+}

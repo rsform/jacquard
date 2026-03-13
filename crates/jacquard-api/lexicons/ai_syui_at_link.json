@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "ai.syui.at.link",
+  "defs": {
+    "linkItem": {
+      "type": "object",
+      "required": [
+        "service",
+        "username"
+      ],
+      "properties": {
+        "service": {
+          "type": "string",
+          "description": "Service identifier.",
+          "knownValues": [
+            "github",
+            "youtube",
+            "x"
+          ]
+        },
+        "username": {
+          "type": "string",
+          "description": "Username or ID on the service.",
+          "maxLength": 300
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record containing links to external service profiles.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "links",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was created.",
+            "format": "datetime"
+          },
+          "links": {
+            "type": "array",
+            "description": "Array of external service links.",
+            "items": {
+              "type": "ref",
+              "ref": "#linkItem"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was last updated.",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

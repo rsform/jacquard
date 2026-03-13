@@ -1,0 +1,92 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.library.item",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Showcase item record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "tags",
+          "images",
+          "visibility",
+          "createdAt"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Category/type of item",
+            "maxLength": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Item description",
+            "maxLength": 3000
+          },
+          "externalLink": {
+            "type": "string",
+            "description": "Link to external site",
+            "format": "uri"
+          },
+          "images": {
+            "type": "array",
+            "description": "Embedded image blobs (max 6 images, 2000x2000px max, 5MB each)",
+            "items": {
+              "type": "ref",
+              "ref": "social.showcase.defs#itemImage"
+            },
+            "maxLength": 6
+          },
+          "metadata": {
+            "type": "unknown",
+            "description": "Freeform metadata (brand, model, condition, datePurchased, etc.)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Personal notes or story about the item",
+            "maxLength": 2000
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "description": "Schema version for migrations (defaults to 1 if missing)",
+            "default": 1
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for discovery (max 20)",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "maxLength": 20
+          },
+          "title": {
+            "type": "string",
+            "description": "Item title",
+            "maxLength": 300
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "visibility": {
+            "type": "string",
+            "maxLength": 10,
+            "knownValues": [
+              "public",
+              "unlisted",
+              "private"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

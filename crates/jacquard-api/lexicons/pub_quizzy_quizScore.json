@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.quizScore",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Final rankings for a completed quiz",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "quizBegin",
+          "results"
+        ],
+        "properties": {
+          "quizBegin": {
+            "type": "ref",
+            "description": "Reference to the quizBegin record",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "results": {
+            "type": "array",
+            "description": "Ordered list of team results (by ranking)",
+            "items": {
+              "type": "ref",
+              "ref": "#teamResult"
+            },
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "teamResult": {
+      "type": "object",
+      "description": "A team's final result",
+      "required": [
+        "teamScore",
+        "totalScore"
+      ],
+      "properties": {
+        "teamScore": {
+          "type": "ref",
+          "description": "Reference to the team's detailed score record",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "totalScore": {
+          "type": "integer",
+          "description": "Team's total score",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "zone.stratos.feed.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a private Stratos post with domain boundary restrictions. When stored on user's PDS as a stub, only 'source' and 'createdAt' are present. Full content is available from the hydration service.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "boundary": {
+            "type": "union",
+            "description": "Limit exposure to defined domains. Omitted in stub records.",
+            "refs": [
+              "zone.stratos.boundary.defs#Domains"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this post was originally created.",
+            "format": "datetime"
+          },
+          "embed": {
+            "type": "union",
+            "refs": [
+              "app.bsky.embed.images",
+              "app.bsky.embed.video",
+              "app.bsky.embed.external",
+              "app.bsky.embed.record",
+              "app.bsky.embed.recordWithMedia"
+            ]
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values for this post. Effectively content warnings.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "langs": {
+            "type": "array",
+            "description": "Indicates human language of post primary text content.",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "reply": {
+            "type": "ref",
+            "ref": "#replyRef"
+          },
+          "source": {
+            "type": "ref",
+            "description": "When present, indicates this is a stub record. Full content should be hydrated from the referenced service.",
+            "ref": "zone.stratos.defs#source"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Additional hashtags, in addition to any included in post text and facets.",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            },
+            "maxLength": 8
+          },
+          "text": {
+            "type": "string",
+            "description": "The primary post content. May be an empty string, if there are embeds. Omitted in stub records.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "description": "Reference to parent and root posts for replies. Must reference stratos posts only.",
+      "required": [
+        "root",
+        "parent"
+      ],
+      "properties": {
+        "parent": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "root": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

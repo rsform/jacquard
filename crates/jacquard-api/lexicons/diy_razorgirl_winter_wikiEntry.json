@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.wikiEntry",
+  "description": "Semantic wiki page with slug-based linking, version tracking, and cross-PDS [[wiki-link]] syntax.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug",
+          "content",
+          "createdAt",
+          "lastUpdated"
+        ],
+        "properties": {
+          "aliases": {
+            "type": "array",
+            "description": "Alternative names for [[alias]] resolution",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 20
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 100000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-safe identifier for [[slug]] linking",
+            "maxLength": 128
+          },
+          "status": {
+            "type": "string",
+            "default": "stable",
+            "knownValues": [
+              "draft",
+              "stable",
+              "deprecated"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "supersedes": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 20
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

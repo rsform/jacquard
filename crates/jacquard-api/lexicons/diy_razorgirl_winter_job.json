@@ -1,0 +1,96 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.job",
+  "description": "Scheduled task with natural-language instructions. Supports one-time and recurring schedules.",
+  "defs": {
+    "intervalSchedule": {
+      "type": "object",
+      "required": [
+        "type",
+        "seconds"
+      ],
+      "properties": {
+        "seconds": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string",
+          "const": "interval"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "instructions",
+          "schedule",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "failureCount": {
+            "type": "integer",
+            "default": 0
+          },
+          "instructions": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "lastRun": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "nextRun": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "schedule": {
+            "type": "union",
+            "refs": [
+              "#onceSchedule",
+              "#intervalSchedule"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "default": "pending",
+            "knownValues": [
+              "pending",
+              "running",
+              "completed",
+              "failed"
+            ]
+          }
+        }
+      }
+    },
+    "onceSchedule": {
+      "type": "object",
+      "required": [
+        "type",
+        "runAt"
+      ],
+      "properties": {
+        "runAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "type": {
+          "type": "string",
+          "const": "once"
+        }
+      }
+    }
+  }
+}

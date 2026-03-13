@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.richtext.header",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "plaintext",
+        "level"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "fyi.questionable.richtext.facet"
+          }
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "plaintext": {
+          "type": "string",
+          "maxLength": 2000,
+          "maxGraphemes": 1000
+        }
+      }
+    }
+  }
+}

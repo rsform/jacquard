@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "garden.goals.category",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A category for organizing goals.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "categoryId",
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "description": "Unique identifier for the category (UUID)",
+            "maxLength": 64
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the category was created",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the category",
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

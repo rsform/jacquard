@@ -1,0 +1,100 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.workscope.tag",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels. Tags are composed into structured expressions via CEL (Common Expression Language) on activity records.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "aliases": {
+            "type": "array",
+            "description": "Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxLength": 50
+          },
+          "category": {
+            "type": "string",
+            "description": "Category type of this scope.",
+            "maxLength": 50,
+            "knownValues": [
+              "topic",
+              "language",
+              "domain",
+              "method"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional longer description of this scope.",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "key": {
+            "type": "string",
+            "description": "Lowercase, underscore-separated machine-readable key for this scope (e.g., 'mangrove_restoration', 'biodiversity_monitoring'). Used as the canonical identifier in CEL expressions.",
+            "maxLength": 120
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for this scope.",
+            "maxLength": 200
+          },
+          "parent": {
+            "type": "ref",
+            "description": "Optional strong reference to a parent work scope tag record for taxonomy/hierarchy support. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "referenceDocument": {
+            "type": "union",
+            "description": "Link to a governance or reference document where this work scope tag is defined and further explained.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallBlob"
+            ]
+          },
+          "sameAs": {
+            "type": "array",
+            "description": "URIs to semantically equivalent concepts in external ontologies or taxonomies (e.g., Wikidata QIDs, ENVO terms, SDG targets). Used for interoperability, not as documentation.",
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 2048
+            },
+            "maxLength": 20
+          },
+          "status": {
+            "type": "string",
+            "description": "Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.",
+            "maxLength": 20,
+            "knownValues": [
+              "proposed",
+              "accepted",
+              "deprecated"
+            ]
+          },
+          "supersededBy": {
+            "type": "ref",
+            "description": "When status is 'deprecated', points to the replacement work scope tag record. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

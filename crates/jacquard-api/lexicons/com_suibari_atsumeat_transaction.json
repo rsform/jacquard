@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "com.suibari.atsumeat.transaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Definition of a transaction",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "isEasyExchange": {
+            "type": "boolean",
+            "description": "Flag to indicate if this is an Easy Exchange (random partner)."
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional message attached to the exchange offer or completion.",
+            "maxLength": 6400,
+            "maxGraphemes": 640
+          },
+          "partner": {
+            "type": "string",
+            "description": "The DID of the exchange partner.",
+            "format": "did"
+          },
+          "refPartner": {
+            "type": "string",
+            "description": "URI of the partner's profile, used for Constellation backlinking during the offer stage.",
+            "format": "uri"
+          },
+          "refTransaction": {
+            "type": "string",
+            "description": "URI of the referencing transaction (e.g., the original Offer) when completing or rejecting.",
+            "format": "uri"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the transaction.",
+            "maxLength": 64,
+            "knownValues": [
+              "offered",
+              "completed",
+              "rejected"
+            ]
+          },
+          "stickerIn": {
+            "type": "array",
+            "description": "URIs of the stickers received in this exchange (if completed).",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "stickerOut": {
+            "type": "array",
+            "description": "URIs of the stickers given in this exchange.",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

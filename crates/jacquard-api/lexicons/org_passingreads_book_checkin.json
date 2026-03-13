@@ -1,0 +1,10 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.checkin",
+  "defs": {
+    "main": {
+      "type": "token",
+      "description": "Represents a book being moved to a location, without changing hands."
+    }
+  }
+}

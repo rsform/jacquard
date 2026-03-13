@@ -1,0 +1,122 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.lens",
+  "defs": {
+    "codeReference": {
+      "type": "object",
+      "description": "Reference to code in an external repository (GitHub, tangled.org, etc.)",
+      "required": [
+        "repository",
+        "commit",
+        "path"
+      ],
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "Optional branch name (for reference, commit hash is authoritative)",
+          "maxLength": 100
+        },
+        "commit": {
+          "type": "string",
+          "description": "Git commit hash (ensures immutability)",
+          "maxLength": 40
+        },
+        "language": {
+          "type": "ref",
+          "description": "Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.",
+          "ref": "science.alt.dataset.programmingLanguage"
+        },
+        "path": {
+          "type": "string",
+          "description": "Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')",
+          "maxLength": 500
+        },
+        "repository": {
+          "type": "string",
+          "description": "Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')",
+          "maxLength": 500
+        }
+      }
+    },
+    "lensMetadata": {
+      "type": "object",
+      "description": "Open metadata object for lens records. Applications may extend with additional fields (author, performance notes, etc.).",
+      "properties": {}
+    },
+    "main": {
+      "type": "record",
+      "description": "Bidirectional transformation (Lens) between two sample types, with code stored in external repositories",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "sourceSchema",
+          "targetSchema",
+          "getterCode",
+          "putterCode",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this lens was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this transformation does",
+            "maxLength": 1000
+          },
+          "getterCode": {
+            "type": "ref",
+            "description": "Code reference for getter function (Source -> Target)",
+            "ref": "#codeReference"
+          },
+          "language": {
+            "type": "string",
+            "description": "(Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')",
+            "maxLength": 50
+          },
+          "metadata": {
+            "type": "ref",
+            "description": "Arbitrary metadata (author, performance notes, etc.)",
+            "ref": "#lensMetadata"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable lens name",
+            "maxLength": 100
+          },
+          "putterCode": {
+            "type": "ref",
+            "description": "Code reference for putter function (Target, Source -> Source)",
+            "ref": "#codeReference"
+          },
+          "sourceSchema": {
+            "type": "string",
+            "description": "AT-URI reference to source schema",
+            "format": "at-uri",
+            "maxLength": 500
+          },
+          "sourceSchemaVersion": {
+            "type": "string",
+            "description": "Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')",
+            "maxLength": 100
+          },
+          "targetSchema": {
+            "type": "string",
+            "description": "AT-URI reference to target schema",
+            "format": "at-uri",
+            "maxLength": 500
+          },
+          "targetSchemaVersion": {
+            "type": "string",
+            "description": "Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')",
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

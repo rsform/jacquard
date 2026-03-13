@@ -15,10 +15,16 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetArtists {
+pub struct GetArtists<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(min: 1)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub names: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(min: 0)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub offset: std::option::Option<i64>,
@@ -44,63 +50,104 @@ pub mod get_artists_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetArtistsBuilder<S: get_artists_state::State> {
+pub struct GetArtistsBuilder<'a, S: get_artists_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl GetArtists {
+impl<'a> GetArtists<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetArtistsBuilder<get_artists_state::Empty> {
+    pub fn new() -> GetArtistsBuilder<'a, get_artists_state::Empty> {
         GetArtistsBuilder::new()
     }
 }
 
-impl GetArtistsBuilder<get_artists_state::Empty> {
+impl<'a> GetArtistsBuilder<'a, get_artists_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArtistsBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
-impl<S: get_artists_state::State> GetArtistsBuilder<S> {
-    /// Set the `limit` field (optional)
-    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
-    /// Set the `limit` field to an Option value (optional)
-    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
 }
 
-impl<S: get_artists_state::State> GetArtistsBuilder<S> {
-    /// Set the `offset` field (optional)
-    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
-    /// Set the `offset` field to an Option value (optional)
-    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
 }
 
-impl<S> GetArtistsBuilder<S>
+impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
+    /// Set the `names` field (optional)
+    pub fn names(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `names` field to an Option value (optional)
+    pub fn maybe_names(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GetArtistsBuilder<'a, S>
 where
     S: get_artists_state::State,
 {
     /// Build the final struct
-    pub fn build(self) -> GetArtists {
+    pub fn build(self) -> GetArtists<'a> {
         GetArtists {
-            limit: self.__unsafe_private_named.0,
-            offset: self.__unsafe_private_named.1,
+            genre: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            names: self.__unsafe_private_named.2,
+            offset: self.__unsafe_private_named.3,
         }
     }
 }
@@ -135,7 +182,7 @@ impl jacquard_common::xrpc::XrpcResp for GetArtistsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl jacquard_common::xrpc::XrpcRequest for GetArtists {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtists<'a> {
     const NSID: &'static str = "app.rocksky.artist.getArtists";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetArtistsResponse;
@@ -147,6 +194,6 @@ pub struct GetArtistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtists";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetArtists;
+    type Request<'de> = GetArtists<'de>;
     type Response = GetArtistsResponse;
 }

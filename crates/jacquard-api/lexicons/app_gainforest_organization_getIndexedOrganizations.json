@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.organization.getIndexedOrganizations",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get all organizations to view initially on map",
+      "parameters": {
+        "type": "params",
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "organizations"
+          ],
+          "properties": {
+            "organizations": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "app.gainforest.common.defs#indexedOrganization"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

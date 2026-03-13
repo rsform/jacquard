@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.quizBegin",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Marks the start of a quiz session",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "league",
+          "quiz",
+          "startedAt",
+          "endsAt"
+        ],
+        "properties": {
+          "endsAt": {
+            "type": "string",
+            "description": "When the quiz ends",
+            "format": "datetime"
+          },
+          "league": {
+            "type": "ref",
+            "description": "Reference to the league running this quiz",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "quiz": {
+            "type": "ref",
+            "description": "Reference to the quiz being played",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "When the quiz starts",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

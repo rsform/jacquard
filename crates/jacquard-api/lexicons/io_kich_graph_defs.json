@@ -1,0 +1,12 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.graph.defs",
+  "description": "Shared definitions for the graph namespace (follows, etc.).",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Shared definitions for graph-related lexicons",
+      "properties": {}
+    }
+  }
+}

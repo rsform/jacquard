@@ -40,6 +40,11 @@
             "type": "string",
             "description": "The book's hive id, used to correlate user's books with the hive"
           },
+          "identifiers": {
+            "type": "ref",
+            "description": "External identifiers for the book",
+            "ref": "buzz.bookhive.defs#bookIdentifiers"
+          },
           "rating": {
             "type": "integer",
             "description": "Average rating (0-1000)",

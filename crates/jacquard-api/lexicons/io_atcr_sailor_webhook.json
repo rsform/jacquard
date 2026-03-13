@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.sailor.webhook",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Public webhook metadata stored in the user's PDS. Links to a private io.atcr.hold.webhook record on the hold where URL and secret are stored. Part of a two-record split: this record is visible via ATProto (Jetstream), the hold record is not.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "holdDid",
+          "triggers",
+          "privateCid",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when the webhook was created",
+            "format": "datetime"
+          },
+          "holdDid": {
+            "type": "string",
+            "description": "DID of the hold where the webhook is configured",
+            "format": "did"
+          },
+          "privateCid": {
+            "type": "string",
+            "description": "CID of the corresponding io.atcr.hold.webhook record on the hold",
+            "maxLength": 128
+          },
+          "triggers": {
+            "type": "integer",
+            "description": "Bitmask of trigger events: 0x01=scan:first, 0x02=scan:all, 0x04=scan:changed",
+            "minimum": 0
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when the webhook was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

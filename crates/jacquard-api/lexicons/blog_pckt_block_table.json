@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.table",
+  "description": "Table block for structured data. Contains table rows with cells.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "array",
+          "description": "Array of table rows",
+          "items": {
+            "type": "ref",
+            "ref": "blog.pckt.block.tableRow"
+          }
+        }
+      }
+    }
+  }
+}

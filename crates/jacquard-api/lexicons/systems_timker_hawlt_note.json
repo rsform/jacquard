@@ -1,0 +1,90 @@
+{
+  "lexicon": 1,
+  "id": "systems.timker.hawlt.note",
+  "defs": {
+    "attachment": {
+      "type": "object",
+      "description": "An image attachment with alt text.",
+      "required": [
+        "image",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for the image. Required for accessibility.",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        },
+        "image": {
+          "type": "blob",
+          "description": "The image blob. Max 5MB.",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 5000000
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record containing a Hawlt note.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "description": "Images attached to the note. Max 4 attachments, 5MB each",
+            "items": {
+              "type": "ref",
+              "ref": "#attachment"
+            },
+            "maxLength": 4
+          },
+          "content": {
+            "type": "string",
+            "description": "The primary note content. Max 3000 graphemes, 30000 bytes\nNote: large string limit is intentional for diary-style entries.",
+            "maxLength": 30000,
+            "maxGraphemes": 3000
+          },
+          "contentWarning": {
+            "type": "string",
+            "description": "Content warning label. When present, note content should be hidden by default. Max 100 graphemes, 1000 bytes",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this note was originally created.",
+            "format": "datetime"
+          },
+          "langs": {
+            "type": "array",
+            "description": "Indicates human language of note primary text content.",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "tags": {
+            "type": "array",
+            "description": "Array of string used to tags or categorize the note. Avoid prepending with hashtags.",
+            "items": {
+              "type": "string",
+              "description": "Tag to categorize the note. Max 128 graphemes, 1280 bytes",
+              "maxLength": 1280,
+              "maxGraphemes": 128
+            },
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

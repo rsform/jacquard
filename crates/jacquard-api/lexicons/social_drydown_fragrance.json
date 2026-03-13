@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "social.drydown.fragrance",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An individual fragrance with house reference",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "house",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when fragrance was created",
+            "format": "datetime"
+          },
+          "house": {
+            "type": "string",
+            "description": "AT URI reference to house record (at://did/social.drydown.house/rkey)",
+            "format": "at-uri"
+          },
+          "name": {
+            "type": "string",
+            "description": "Fragrance name",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of last update",
+            "format": "datetime"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year of release (optional)",
+            "minimum": 1000,
+            "maximum": 2100
+          }
+        }
+      }
+    }
+  }
+}

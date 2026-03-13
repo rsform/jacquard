@@ -1,0 +1,88 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.interview",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An interview transcript for a sim — captures voice answers and value positions to derive the sim's constitution and speaking style.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "sim",
+          "openAnswers",
+          "yesNoAnswers",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the interview was completed",
+            "format": "datetime"
+          },
+          "openAnswers": {
+            "type": "array",
+            "description": "Open-ended question answers, transcribed from voice recordings.",
+            "items": {
+              "type": "ref",
+              "ref": "#openAnswer"
+            }
+          },
+          "sim": {
+            "type": "ref",
+            "description": "Reference to the sim record this interview is about",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "yesNoAnswers": {
+            "type": "array",
+            "description": "Yes/no value statement responses.",
+            "items": {
+              "type": "ref",
+              "ref": "#valueResponse"
+            }
+          }
+        }
+      }
+    },
+    "openAnswer": {
+      "type": "object",
+      "description": "A single open-ended interview answer.",
+      "required": [
+        "question",
+        "answer"
+      ],
+      "properties": {
+        "answer": {
+          "type": "string",
+          "description": "The transcribed voice answer",
+          "maxLength": 30000,
+          "maxGraphemes": 3000
+        },
+        "question": {
+          "type": "string",
+          "description": "The interview question that was asked",
+          "maxLength": 1000
+        }
+      }
+    },
+    "valueResponse": {
+      "type": "object",
+      "description": "A yes/no response to a value statement.",
+      "required": [
+        "statement",
+        "answer"
+      ],
+      "properties": {
+        "answer": {
+          "type": "boolean",
+          "description": "Whether the interviewee agreed (true) or disagreed (false)"
+        },
+        "statement": {
+          "type": "string",
+          "description": "The value statement presented",
+          "maxLength": 1000
+        }
+      }
+    }
+  }
+}

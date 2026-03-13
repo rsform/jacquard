@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.getPartUploadUrl",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Get a presigned URL or endpoint info for uploading a specific part of a multipart upload.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uploadId",
+            "partNumber"
+          ],
+          "properties": {
+            "partNumber": {
+              "type": "integer",
+              "description": "Part sequence number (1-indexed)",
+              "minimum": 1
+            },
+            "uploadId": {
+              "type": "string",
+              "description": "Upload session ID from initiateUpload",
+              "maxLength": 256
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "headers": {
+              "type": "unknown",
+              "description": "Additional headers required for the request (e.g., content-type)"
+            },
+            "method": {
+              "type": "string",
+              "description": "HTTP method to use (usually PUT)",
+              "default": "PUT",
+              "maxLength": 16
+            },
+            "url": {
+              "type": "string",
+              "description": "URL to PUT the part data to",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidUploadId"
+        },
+        {
+          "name": "InvalidPartNumber"
+        }
+      ]
+    }
+  }
+}

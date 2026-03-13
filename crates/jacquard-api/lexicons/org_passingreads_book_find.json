@@ -1,0 +1,10 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.find",
+  "defs": {
+    "main": {
+      "type": "token",
+      "description": "Represents a book being found at a location."
+    }
+  }
+}

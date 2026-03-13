@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "download.darkworld.state",
+  "defs": {
+    "favorite": {
+      "type": "object",
+      "required": [
+        "game",
+        "artist",
+        "album",
+        "deltaruneCharacter"
+      ],
+      "properties": {
+        "album": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "artist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deltaruneCharacter": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "game": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "The record used by darkworld.download to determine the website's content.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "site",
+          "favorite"
+        ],
+        "properties": {
+          "favorite": {
+            "type": "union",
+            "description": "The user's favorites/likes/preferences.",
+            "refs": [
+              "#favorite"
+            ],
+            "closed": true
+          },
+          "site": {
+            "type": "union",
+            "description": "Describe the site's content/look.",
+            "refs": [
+              "#site"
+            ],
+            "closed": true
+          }
+        }
+      }
+    },
+    "site": {
+      "type": "object",
+      "required": [
+        "susieProphecy"
+      ],
+      "properties": {
+        "susieProphecy": {
+          "type": "boolean",
+          "description": "Swap out Kris with Susie in the prophecy panel."
+        },
+        "titleColors": {
+          "type": "string",
+          "description": "TBD",
+          "knownValues": [
+            "enby",
+            "trans",
+            "pan",
+            "latvia"
+          ]
+        }
+      }
+    }
+  }
+}

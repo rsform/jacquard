@@ -1,0 +1,466 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.dwc.occurrence",
+  "description": "A single biodiversity occurrence record aligned with Simple Darwin Core (TDWG Standard 450, version 2023-09-13). Represents one organism or group of organisms at a particular place and time.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A biodiversity occurrence record following the Simple Darwin Core standard. Each record represents one occurrence of an organism at a location and time.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "basisOfRecord",
+          "scientificName",
+          "eventDate",
+          "createdAt"
+        ],
+        "properties": {
+          "associatedMedia": {
+            "type": "string",
+            "description": "Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.",
+            "maxGraphemes": 2048
+          },
+          "associatedOccurrences": {
+            "type": "string",
+            "description": "Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.",
+            "maxGraphemes": 2048
+          },
+          "associatedReferences": {
+            "type": "string",
+            "description": "Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.",
+            "maxGraphemes": 2048
+          },
+          "associatedSequences": {
+            "type": "string",
+            "description": "Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.",
+            "maxGraphemes": 2048
+          },
+          "audioEvidence": {
+            "type": "ref",
+            "description": "Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).",
+            "ref": "app.gainforest.common.defs#audio"
+          },
+          "basisOfRecord": {
+            "type": "string",
+            "description": "The specific nature of the data record. Must be one of the Darwin Core class names.",
+            "maxGraphemes": 64,
+            "enum": [
+              "HumanObservation",
+              "MachineObservation",
+              "PreservedSpecimen",
+              "LivingSpecimen",
+              "FossilSpecimen",
+              "MaterialSample",
+              "MaterialEntity",
+              "MaterialCitation"
+            ]
+          },
+          "behavior": {
+            "type": "string",
+            "description": "The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').",
+            "maxGraphemes": 256
+          },
+          "class": {
+            "type": "string",
+            "description": "The full scientific name of the class.",
+            "maxGraphemes": 128
+          },
+          "collectionCode": {
+            "type": "string",
+            "description": "The name, acronym, or code identifying the collection or dataset from which the record was derived.",
+            "maxGraphemes": 256
+          },
+          "coordinateUncertaintyInMeters": {
+            "type": "integer",
+            "description": "Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.",
+            "minimum": 1
+          },
+          "country": {
+            "type": "string",
+            "description": "The name of the country or major administrative unit.",
+            "maxGraphemes": 128
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "The standard code for the country (ISO 3166-1 alpha-2).",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "county": {
+            "type": "string",
+            "description": "The full, unabbreviated name of the next smaller administrative region than stateProvince.",
+            "maxGraphemes": 256
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of record creation in the ATProto PDS.",
+            "format": "datetime"
+          },
+          "dataGeneralizations": {
+            "type": "string",
+            "description": "A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').",
+            "maxGraphemes": 1024
+          },
+          "datasetName": {
+            "type": "string",
+            "description": "The name identifying the dataset from which the record was derived.",
+            "maxGraphemes": 256
+          },
+          "dateIdentified": {
+            "type": "string",
+            "description": "The date on which the identification was made. ISO 8601 format.",
+            "maxGraphemes": 64
+          },
+          "dcType": {
+            "type": "string",
+            "description": "The Dublin Core type class that best describes the resource (dc:type).",
+            "maxGraphemes": 64,
+            "enum": [
+              "PhysicalObject",
+              "StillImage",
+              "MovingImage",
+              "Sound",
+              "Text",
+              "Event",
+              "Dataset"
+            ]
+          },
+          "decimalLatitude": {
+            "type": "string",
+            "description": "Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.",
+            "maxGraphemes": 32
+          },
+          "decimalLongitude": {
+            "type": "string",
+            "description": "Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.",
+            "maxGraphemes": 32
+          },
+          "dynamicProperties": {
+            "type": "string",
+            "description": "Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{\"iucnStatus\":\"vulnerable\",\"canopyCover\":\"85%\"}'. Should be flattened to a single line with no non-printing characters.",
+            "maxGraphemes": 10000
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').",
+            "maxGraphemes": 64
+          },
+          "eventID": {
+            "type": "string",
+            "description": "Identifier for the sampling event. Can be used to group occurrences from the same event.",
+            "maxGraphemes": 256
+          },
+          "eventRef": {
+            "type": "string",
+            "description": "AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).",
+            "format": "at-uri"
+          },
+          "eventTime": {
+            "type": "string",
+            "description": "The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').",
+            "maxGraphemes": 64
+          },
+          "family": {
+            "type": "string",
+            "description": "The full scientific name of the family.",
+            "maxGraphemes": 128
+          },
+          "fieldNotes": {
+            "type": "string",
+            "description": "Notes or reference to notes taken in the field about the event.",
+            "maxGraphemes": 10000
+          },
+          "gbifTaxonKey": {
+            "type": "string",
+            "description": "GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.",
+            "maxGraphemes": 64
+          },
+          "genus": {
+            "type": "string",
+            "description": "The full scientific name of the genus.",
+            "maxGraphemes": 128
+          },
+          "geodeticDatum": {
+            "type": "string",
+            "description": "The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).",
+            "maxGraphemes": 64
+          },
+          "habitat": {
+            "type": "string",
+            "description": "A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').",
+            "maxGraphemes": 512
+          },
+          "higherClassification": {
+            "type": "string",
+            "description": "A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').",
+            "maxGraphemes": 1024
+          },
+          "identificationQualifier": {
+            "type": "string",
+            "description": "A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').",
+            "maxGraphemes": 256
+          },
+          "identificationRemarks": {
+            "type": "string",
+            "description": "Comments or notes about the identification.",
+            "maxGraphemes": 2048
+          },
+          "identifiedBy": {
+            "type": "string",
+            "description": "Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.",
+            "maxGraphemes": 512
+          },
+          "identifiedByID": {
+            "type": "string",
+            "description": "Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.",
+            "maxGraphemes": 512
+          },
+          "imageEvidence": {
+            "type": "ref",
+            "description": "Image evidence (photo, camera trap, drone still, scanned specimen, etc.).",
+            "ref": "app.gainforest.common.defs#image"
+          },
+          "individualCount": {
+            "type": "integer",
+            "description": "The number of individuals present at the time of the occurrence.",
+            "minimum": 0
+          },
+          "informationWithheld": {
+            "type": "string",
+            "description": "A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').",
+            "maxGraphemes": 1024
+          },
+          "infraspecificEpithet": {
+            "type": "string",
+            "description": "The name of the lowest or terminal infraspecific epithet.",
+            "maxGraphemes": 128
+          },
+          "institutionCode": {
+            "type": "string",
+            "description": "The name or acronym of the institution having custody of the object(s) or information in the record.",
+            "maxGraphemes": 256
+          },
+          "kingdom": {
+            "type": "string",
+            "description": "The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').",
+            "maxGraphemes": 128
+          },
+          "license": {
+            "type": "string",
+            "description": "A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').",
+            "maxGraphemes": 512
+          },
+          "lifeStage": {
+            "type": "string",
+            "description": "The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').",
+            "maxGraphemes": 128
+          },
+          "locality": {
+            "type": "string",
+            "description": "The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').",
+            "maxGraphemes": 1024
+          },
+          "locationID": {
+            "type": "string",
+            "description": "Identifier for the location (e.g., a reference to a named site).",
+            "maxGraphemes": 256
+          },
+          "locationRemarks": {
+            "type": "string",
+            "description": "Comments about the location.",
+            "maxGraphemes": 2048
+          },
+          "maximumDepthInMeters": {
+            "type": "integer",
+            "description": "The greater depth of a range of depth below the local surface (in meters).",
+            "minimum": 0
+          },
+          "maximumElevationInMeters": {
+            "type": "integer",
+            "description": "The upper limit of the range of elevation (in meters above sea level)."
+          },
+          "minimumDepthInMeters": {
+            "type": "integer",
+            "description": "The lesser depth of a range of depth below the local surface (in meters).",
+            "minimum": 0
+          },
+          "minimumElevationInMeters": {
+            "type": "integer",
+            "description": "The lower limit of the range of elevation (in meters above sea level)."
+          },
+          "municipality": {
+            "type": "string",
+            "description": "The full, unabbreviated name of the next smaller administrative region than county.",
+            "maxGraphemes": 256
+          },
+          "nomenclaturalCode": {
+            "type": "string",
+            "description": "The nomenclatural code under which the scientificName is constructed.",
+            "maxGraphemes": 64,
+            "enum": [
+              "ICZN",
+              "ICN",
+              "ICNP",
+              "ICTV",
+              "BioCode"
+            ]
+          },
+          "occurrenceID": {
+            "type": "string",
+            "description": "A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).",
+            "maxGraphemes": 256
+          },
+          "occurrenceRemarks": {
+            "type": "string",
+            "description": "Comments or notes about the occurrence.",
+            "maxGraphemes": 5000
+          },
+          "occurrenceStatus": {
+            "type": "string",
+            "description": "Statement about the presence or absence of a taxon at a location.",
+            "maxGraphemes": 64,
+            "enum": [
+              "present",
+              "absent"
+            ]
+          },
+          "order": {
+            "type": "string",
+            "description": "The full scientific name of the order.",
+            "maxGraphemes": 128
+          },
+          "organismQuantity": {
+            "type": "string",
+            "description": "A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').",
+            "maxGraphemes": 64
+          },
+          "organismQuantityType": {
+            "type": "string",
+            "description": "The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').",
+            "maxGraphemes": 128
+          },
+          "phylum": {
+            "type": "string",
+            "description": "The full scientific name of the phylum or division.",
+            "maxGraphemes": 128
+          },
+          "previousIdentifications": {
+            "type": "string",
+            "description": "Previous assignments of names to the occurrence. Pipe-delimited.",
+            "maxGraphemes": 2048
+          },
+          "recordedBy": {
+            "type": "string",
+            "description": "Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').",
+            "maxGraphemes": 512
+          },
+          "recordedByID": {
+            "type": "string",
+            "description": "Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.",
+            "maxGraphemes": 512
+          },
+          "references": {
+            "type": "string",
+            "description": "A related resource that is referenced, cited, or otherwise pointed to by the record (URL).",
+            "format": "uri"
+          },
+          "reproductiveCondition": {
+            "type": "string",
+            "description": "The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').",
+            "maxGraphemes": 128
+          },
+          "rightsHolder": {
+            "type": "string",
+            "description": "Person or organization owning or managing rights over the resource.",
+            "maxGraphemes": 256
+          },
+          "samplingEffort": {
+            "type": "string",
+            "description": "The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').",
+            "maxGraphemes": 256
+          },
+          "samplingProtocol": {
+            "type": "string",
+            "description": "The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').",
+            "maxGraphemes": 1024
+          },
+          "scientificName": {
+            "type": "string",
+            "description": "The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').",
+            "maxGraphemes": 512
+          },
+          "scientificNameAuthorship": {
+            "type": "string",
+            "description": "The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').",
+            "maxGraphemes": 256
+          },
+          "sex": {
+            "type": "string",
+            "description": "The sex of the biological individual(s).",
+            "maxGraphemes": 64,
+            "enum": [
+              "male",
+              "female",
+              "hermaphrodite"
+            ]
+          },
+          "specificEpithet": {
+            "type": "string",
+            "description": "The name of the species epithet of the scientificName.",
+            "maxGraphemes": 128
+          },
+          "spectrogramEvidence": {
+            "type": "ref",
+            "description": "Spectrogram image showing frequency analysis of audio recording.",
+            "ref": "app.gainforest.common.defs#spectrogram"
+          },
+          "stateProvince": {
+            "type": "string",
+            "description": "The name of the next smaller administrative region than country.",
+            "maxGraphemes": 256
+          },
+          "taxonRank": {
+            "type": "string",
+            "description": "The taxonomic rank of the most specific name in scientificName.",
+            "maxGraphemes": 64,
+            "enum": [
+              "kingdom",
+              "phylum",
+              "class",
+              "order",
+              "family",
+              "subfamily",
+              "genus",
+              "subgenus",
+              "species",
+              "subspecies",
+              "variety",
+              "form"
+            ]
+          },
+          "taxonomicStatus": {
+            "type": "string",
+            "description": "The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').",
+            "maxGraphemes": 64
+          },
+          "verbatimLocality": {
+            "type": "string",
+            "description": "The original textual description of the place as provided by the recorder.",
+            "maxGraphemes": 1024
+          },
+          "vernacularName": {
+            "type": "string",
+            "description": "A common or vernacular name for the taxon.",
+            "maxGraphemes": 256
+          },
+          "videoEvidence": {
+            "type": "ref",
+            "description": "Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).",
+            "ref": "app.gainforest.common.defs#video"
+          }
+        }
+      }
+    }
+  }
+}

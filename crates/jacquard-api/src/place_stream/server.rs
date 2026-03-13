@@ -531,85 +531,85 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Active;
         type Id;
-        type Events;
         type CreatedAt;
+        type Events;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Active = Unset;
         type Id = Unset;
-        type Events = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Active = S::Active;
-        type Id = S::Id;
-        type Events = S::Events;
-        type CreatedAt = S::CreatedAt;
+        type Events = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type Url = S::Url;
         type Active = Set<members::active>;
         type Id = S::Id;
-        type Events = S::Events;
         type CreatedAt = S::CreatedAt;
+        type Events = S::Events;
+        type Url = S::Url;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Url = S::Url;
         type Active = S::Active;
         type Id = Set<members::id>;
+        type CreatedAt = S::CreatedAt;
         type Events = S::Events;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `events` field to Set
-    pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvents<S> {}
-    impl<S: State> State for SetEvents<S> {
         type Url = S::Url;
-        type Active = S::Active;
-        type Id = S::Id;
-        type Events = Set<members::events>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
         type Active = S::Active;
         type Id = S::Id;
-        type Events = S::Events;
         type CreatedAt = Set<members::created_at>;
+        type Events = S::Events;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `events` field to Set
+    pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvents<S> {}
+    impl<S: State> State for SetEvents<S> {
+        type Active = S::Active;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Events = Set<members::events>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Active = S::Active;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Events = S::Events;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `active` field
         pub struct active(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `events` field
-        pub struct events(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `events` field
+        pub struct events(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -922,11 +922,11 @@ where
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
-    S::Url: webhook_state::IsSet,
     S::Active: webhook_state::IsSet,
     S::Id: webhook_state::IsSet,
-    S::Events: webhook_state::IsSet,
     S::CreatedAt: webhook_state::IsSet,
+    S::Events: webhook_state::IsSet,
+    S::Url: webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Webhook<'a> {

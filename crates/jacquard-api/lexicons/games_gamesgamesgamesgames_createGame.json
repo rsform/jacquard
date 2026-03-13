@@ -1,0 +1,166 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.createGame",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new game record in the authenticated user's repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "ageRatings": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#ageRating"
+              }
+            },
+            "alternativeNames": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#alternativeName"
+              }
+            },
+            "applicationType": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#applicationType"
+            },
+            "engines": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "at-uri"
+              }
+            },
+            "genres": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#genre"
+              }
+            },
+            "keywords": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "languageSupports": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#languageSupport"
+              }
+            },
+            "media": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#mediaItem"
+              }
+            },
+            "modes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#mode"
+              }
+            },
+            "multiplayerModes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#multiplayerMode"
+              }
+            },
+            "name": {
+              "type": "string"
+            },
+            "parent": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "playerPerspectives": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#playerPerspective"
+              }
+            },
+            "releases": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#release"
+              }
+            },
+            "shouldPublish": {
+              "type": "boolean"
+            },
+            "slug": {
+              "type": "string",
+              "description": "URL-friendly identifier for the game.",
+              "maxLength": 640
+            },
+            "storyline": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "themes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#theme"
+              }
+            },
+            "timeToBeat": {
+              "type": "ref",
+              "ref": "games.gamesgamesgamesgames.defs#timeToBeat"
+            },
+            "videos": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#externalVideo"
+              }
+            },
+            "websites": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#website"
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

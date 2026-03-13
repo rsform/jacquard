@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.tableCell",
+  "description": "Regular table cell containing text and inline content.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "colspan": {
+          "type": "integer",
+          "description": "Number of columns this cell spans",
+          "minimum": 1
+        },
+        "content": {
+          "type": "array",
+          "description": "Array of block content (typically text)",
+          "items": {
+            "type": "union",
+            "refs": [
+              "blog.pckt.block.text"
+            ],
+            "closed": false
+          }
+        },
+        "rowspan": {
+          "type": "integer",
+          "description": "Number of rows this cell spans",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

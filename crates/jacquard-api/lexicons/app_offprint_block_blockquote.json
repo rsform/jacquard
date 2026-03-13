@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.blockquote",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "array",
+          "description": "Nested content blocks within the blockquote",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.offprint.block.text",
+              "app.offprint.block.heading"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

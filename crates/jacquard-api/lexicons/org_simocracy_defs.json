@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.defs",
+  "defs": {
+    "spriteSettings": {
+      "type": "object",
+      "required": [
+        "selectedOptions"
+      ],
+      "properties": {
+        "currentAnimDirection": {
+          "type": "integer",
+          "description": "0=right, 1=back, 2=left, 3=front"
+        },
+        "partColorSettings": {
+          "type": "unknown",
+          "description": "Map of part name -> {red, green, blue, alpha}"
+        },
+        "selectedOptions": {
+          "type": "unknown",
+          "description": "Map of part name -> sprite path"
+        }
+      }
+    }
+  }
+}

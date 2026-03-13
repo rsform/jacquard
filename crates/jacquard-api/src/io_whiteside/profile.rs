@@ -38,49 +38,49 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Content;
+        type UpdatedAt;
         type Heading;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Content = Unset;
+        type UpdatedAt = Unset;
         type Heading = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Content = S::Content;
-        type Heading = S::Heading;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Content = Set<members::content>;
+        type UpdatedAt = S::UpdatedAt;
+        type Heading = S::Heading;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Content = S::Content;
+        type UpdatedAt = Set<members::updated_at>;
         type Heading = S::Heading;
     }
     ///State transition - sets the `heading` field to Set
     pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeading<S> {}
     impl<S: State> State for SetHeading<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Content = S::Content;
+        type UpdatedAt = S::UpdatedAt;
         type Heading = Set<members::heading>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `heading` field
         pub struct heading(());
     }
@@ -175,8 +175,8 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::UpdatedAt: profile_state::IsSet,
     S::Content: profile_state::IsSet,
+    S::UpdatedAt: profile_state::IsSet,
     S::Heading: profile_state::IsSet,
 {
     /// Build the final struct

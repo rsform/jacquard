@@ -1,0 +1,10 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.drop",
+  "defs": {
+    "main": {
+      "type": "token",
+      "description": "Represents a book being dropped at a location."
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.collection.updateCollection",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update/reorder a collection. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "coverImage": {
+              "type": "blob"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#collectionItem"
+              },
+              "maxLength": 500
+            },
+            "name": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "maxLength": 10
+            },
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the collection",
+              "format": "at-uri"
+            },
+            "visibility": {
+              "type": "string",
+              "maxLength": 10,
+              "knownValues": [
+                "public",
+                "private"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#collectionView"
+        }
+      }
+    }
+  }
+}

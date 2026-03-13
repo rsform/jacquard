@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.claim.rights",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Describes the rights that a contributor and/or an owner has, such as whether the hypercert can be sold, transferred, and under what conditions.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "rightsName",
+          "rightsType",
+          "rightsDescription",
+          "createdAt"
+        ],
+        "properties": {
+          "attachment": {
+            "type": "union",
+            "description": "An attachment to define the rights further, e.g. a legal document.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallBlob"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "rightsDescription": {
+            "type": "string",
+            "description": "Detailed explanation of the rights holders' permissions, restrictions, and conditions",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "rightsName": {
+            "type": "string",
+            "description": "Human-readable name for these rights (e.g. 'All Rights Reserved', 'CC BY-SA 4.0')",
+            "maxLength": 100
+          },
+          "rightsType": {
+            "type": "string",
+            "description": "Short identifier code for this rights type (e.g. 'ARR', 'CC-BY-SA') to facilitate filtering and search",
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

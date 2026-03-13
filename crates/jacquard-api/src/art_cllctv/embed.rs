@@ -259,7 +259,7 @@ fn lexicon_doc_art_cllctv_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
-                                "focalLenth",
+                                "focalLength",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
@@ -415,7 +415,7 @@ pub struct TombstoneLens<'a> {
     pub fnumber: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub focal_lenth: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub focal_length: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub iso: std::option::Option<jacquard_common::CowStr<'a>>,

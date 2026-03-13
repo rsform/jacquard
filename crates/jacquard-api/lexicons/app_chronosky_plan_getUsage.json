@@ -1,0 +1,186 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.plan.getUsage",
+  "defs": {
+    "currentPlan": {
+      "type": "object",
+      "description": "Current plan information.",
+      "required": [
+        "id",
+        "tier",
+        "name",
+        "displayName",
+        "isActive"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "unknown",
+          "description": "Localized plan display names"
+        },
+        "id": {
+          "type": "string",
+          "description": "Plan ID",
+          "maxLength": 100
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Whether the plan is currently active"
+        },
+        "name": {
+          "type": "string",
+          "description": "Internal plan name",
+          "maxLength": 200
+        },
+        "tier": {
+          "type": "string",
+          "description": "Plan tier (FREE, BASIC, STANDARD, PREMIUM)",
+          "maxLength": 50
+        },
+        "validUntil": {
+          "type": "string",
+          "description": "Plan expiration date (ISO 8601)",
+          "format": "datetime",
+          "maxLength": 100
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get the authenticated user's plan information and usage statistics",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "currentPlan",
+            "limits",
+            "usage"
+          ],
+          "properties": {
+            "currentPlan": {
+              "type": "ref",
+              "ref": "#currentPlan"
+            },
+            "limits": {
+              "type": "ref",
+              "ref": "#planLimits"
+            },
+            "usage": {
+              "type": "ref",
+              "ref": "#usageStats"
+            }
+          }
+        }
+      }
+    },
+    "planLimits": {
+      "type": "object",
+      "description": "Plan limits.",
+      "required": [
+        "monthlyPostsLimit",
+        "pendingPostsLimit",
+        "maxScheduleDays",
+        "scheduleIntervalMinutes",
+        "maxImagesPerPost",
+        "threadPostsLimit"
+      ],
+      "properties": {
+        "markdownSupport": {
+          "type": "boolean",
+          "description": "Whether markdown formatting is supported"
+        },
+        "maxImageSizeMb": {
+          "type": "integer",
+          "description": "Maximum image size (MB)"
+        },
+        "maxImagesPerPost": {
+          "type": "integer",
+          "description": "Maximum images per post"
+        },
+        "maxScheduleDays": {
+          "type": "integer",
+          "description": "Maximum days in advance to schedule"
+        },
+        "maxVideoSizeMb": {
+          "type": "integer",
+          "description": "Maximum video size (MB)"
+        },
+        "monthlyPostsLimit": {
+          "type": "integer",
+          "description": "Maximum posts per month"
+        },
+        "pendingPostsLimit": {
+          "type": "integer",
+          "description": "Maximum concurrent pending posts"
+        },
+        "scheduleIntervalMinutes": {
+          "type": "integer",
+          "description": "Minimum interval between scheduled posts (minutes)"
+        },
+        "threadPosts": {
+          "type": "boolean",
+          "description": "Whether thread posts are enabled"
+        },
+        "threadPostsLimit": {
+          "type": "integer",
+          "description": "Maximum posts per thread"
+        },
+        "videoProcessingMinutesMonthly": {
+          "type": "integer",
+          "description": "Monthly video processing minutes"
+        },
+        "videoUpload": {
+          "type": "boolean",
+          "description": "Whether video uploads are enabled"
+        }
+      }
+    },
+    "usageStats": {
+      "type": "object",
+      "description": "Usage statistics.",
+      "required": [
+        "pendingPostsCount",
+        "monthlyPostsCount",
+        "monthlyPeriodStart",
+        "monthlyPeriodEnd",
+        "lastUpdated"
+      ],
+      "properties": {
+        "apiRequestsThisHour": {
+          "type": "integer",
+          "description": "API requests in current hour"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "Last time usage was updated (ISO 8601)",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "monthlyPeriodEnd": {
+          "type": "string",
+          "description": "End of current monthly period (ISO 8601)",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "monthlyPeriodStart": {
+          "type": "string",
+          "description": "Start of current monthly period (ISO 8601)",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "monthlyPostsCount": {
+          "type": "integer",
+          "description": "Number of posts this month"
+        },
+        "pendingPostsCount": {
+          "type": "integer",
+          "description": "Current number of pending posts"
+        },
+        "storageUsedMb": {
+          "type": "integer",
+          "description": "Storage used (MB)"
+        }
+      }
+    }
+  }
+}

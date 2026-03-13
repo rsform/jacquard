@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.feed.getTimeline",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get personalized timeline feed (items from followed users + your own items). Requires authentication.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor for infinite scroll",
+            "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items to load",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "feed"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#itemView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

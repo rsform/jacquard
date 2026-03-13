@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "net.mimonelu.klearsky.repostMutes",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Klearsky client-specific record that stores a list of DIDs whose reposts should be muted.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "subjects",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this record was created (or last rewritten).",
+            "format": "datetime"
+          },
+          "subjects": {
+            "type": "array",
+            "description": "List of subjects (DIDs) whose reposts are muted in this client. Each entry includes when it was added.",
+            "items": {
+              "type": "ref",
+              "ref": "#subject"
+            }
+          }
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "description": "A DID added to repost-mute list and the timestamp when it was added.",
+      "required": [
+        "did",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when this DID was added to the mute list.",
+          "format": "datetime"
+        },
+        "did": {
+          "type": "string",
+          "description": "DID of the user whose reposts are muted.",
+          "format": "did"
+        }
+      }
+    }
+  }
+}

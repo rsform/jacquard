@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.thought",
+  "description": "Stream of consciousness entry. Thoughts are the raw trace of agent cognition — insights, questions, plans, reflections, errors.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "kind",
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "durationMs": {
+            "type": "integer",
+            "description": "Duration for tool_call thoughts"
+          },
+          "kind": {
+            "type": "string",
+            "knownValues": [
+              "insight",
+              "question",
+              "plan",
+              "reflection",
+              "error",
+              "response",
+              "tool_call"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 20
+          },
+          "trigger": {
+            "type": "string",
+            "description": "What prompted this thought"
+          }
+        }
+      }
+    }
+  }
+}

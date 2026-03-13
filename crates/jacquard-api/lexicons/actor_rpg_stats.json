@@ -1,0 +1,1735 @@
+{
+  "lexicon": 1,
+  "id": "actor.rpg.stats",
+  "revision": 4,
+  "description": "RPG character statistics for multiple game systems. Revision 4: Added Dungeon Crawl Classics (DCC) RPG support with Zocchi dice, funnel characters, deed die, spellburn, mercurial magic, corruption, and disapproval systems.",
+  "defs": {
+    "abilities": {
+      "type": "object",
+      "description": "The six ability scores (1-30 per SRD)",
+      "properties": {
+        "cha": {
+          "type": "integer",
+          "description": "Charisma",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "con": {
+          "type": "integer",
+          "description": "Constitution",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "dex": {
+          "type": "integer",
+          "description": "Dexterity",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "int": {
+          "type": "integer",
+          "description": "Intelligence",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "str": {
+          "type": "integer",
+          "description": "Strength",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "wis": {
+          "type": "integer",
+          "description": "Wisdom",
+          "minimum": 1,
+          "maximum": 30
+        }
+      }
+    },
+    "attack": {
+      "type": "object",
+      "description": "An attack action",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "bonus": {
+          "type": "string",
+          "description": "Attack bonus (e.g., +5)",
+          "maxLength": 20
+        },
+        "damage": {
+          "type": "string",
+          "description": "Damage dice (e.g., 1d8)",
+          "maxLength": 20
+        },
+        "damageBonus": {
+          "type": "integer",
+          "description": "Damage bonus"
+        },
+        "damageType": {
+          "type": "string",
+          "description": "Damage type",
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Attack name",
+          "maxLength": 100
+        }
+      }
+    },
+    "coinage": {
+      "type": "object",
+      "description": "Currency",
+      "properties": {
+        "cp": {
+          "type": "integer",
+          "description": "Copper pieces",
+          "minimum": 0
+        },
+        "ep": {
+          "type": "integer",
+          "description": "Electrum pieces",
+          "minimum": 0
+        },
+        "gp": {
+          "type": "integer",
+          "description": "Gold pieces",
+          "minimum": 0
+        },
+        "pp": {
+          "type": "integer",
+          "description": "Platinum pieces",
+          "minimum": 0
+        },
+        "sp": {
+          "type": "integer",
+          "description": "Silver pieces",
+          "minimum": 0
+        }
+      }
+    },
+    "combat": {
+      "type": "object",
+      "description": "Combat and defensive stats",
+      "properties": {
+        "ac": {
+          "type": "integer",
+          "description": "Armor Class",
+          "minimum": 0
+        },
+        "hitDice": {
+          "type": "string",
+          "description": "Hit dice (e.g., 5d10)",
+          "maxLength": 20
+        },
+        "hitDiceUsed": {
+          "type": "integer",
+          "description": "Hit dice expended",
+          "minimum": 0
+        },
+        "initiative": {
+          "type": "integer",
+          "description": "Initiative modifier"
+        },
+        "speed": {
+          "type": "integer",
+          "description": "Speed in feet",
+          "minimum": 0
+        }
+      }
+    },
+    "conditions": {
+      "type": "object",
+      "description": "Status conditions and effects",
+      "properties": {
+        "deathSaves": {
+          "type": "ref",
+          "description": "Death saving throw progress",
+          "ref": "#deathSaves"
+        },
+        "exhaustion": {
+          "type": "integer",
+          "description": "Exhaustion level (0-6)",
+          "minimum": 0,
+          "maximum": 6
+        },
+        "inspiration": {
+          "type": "boolean",
+          "description": "Has inspiration"
+        }
+      }
+    },
+    "customStat": {
+      "type": "object",
+      "description": "A custom stat",
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Category (optional)",
+          "maxLength": 50
+        },
+        "max": {
+          "type": "integer",
+          "description": "Maximum (optional)"
+        },
+        "min": {
+          "type": "integer",
+          "description": "Minimum (optional)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Stat name",
+          "maxLength": 50
+        },
+        "value": {
+          "type": "integer",
+          "description": "Value"
+        }
+      }
+    },
+    "customStats": {
+      "type": "object",
+      "description": "User-defined custom stat system",
+      "properties": {
+        "stats": {
+          "type": "array",
+          "description": "Custom stat entries",
+          "items": {
+            "type": "ref",
+            "ref": "#customStat"
+          }
+        },
+        "systemName": {
+          "type": "string",
+          "description": "System name",
+          "maxLength": 100
+        },
+        "systemVersion": {
+          "type": "string",
+          "description": "Version",
+          "maxLength": 50
+        }
+      }
+    },
+    "dccAbilities": {
+      "type": "object",
+      "description": "DCC ability scores (3-18 standard, can be modified by corruption/spellburn)",
+      "properties": {
+        "agi": {
+          "type": "integer",
+          "description": "Agility",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "agiBase": {
+          "type": "integer",
+          "description": "Agility base (before spellburn)",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "int": {
+          "type": "integer",
+          "description": "Intelligence",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "luk": {
+          "type": "integer",
+          "description": "Luck (can be permanently burned)",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "per": {
+          "type": "integer",
+          "description": "Personality",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "sta": {
+          "type": "integer",
+          "description": "Stamina",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "staBase": {
+          "type": "integer",
+          "description": "Stamina base (before spellburn)",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "str": {
+          "type": "integer",
+          "description": "Strength",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "strBase": {
+          "type": "integer",
+          "description": "Strength base (before spellburn)",
+          "minimum": 1,
+          "maximum": 24
+        }
+      }
+    },
+    "dccAttack": {
+      "type": "object",
+      "description": "A weapon attack (includes deed die for warriors)",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "attackMod": {
+          "type": "string",
+          "description": "Attack modifier (e.g., +2, d16+2 for deed die)",
+          "maxLength": 30
+        },
+        "damage": {
+          "type": "string",
+          "description": "Damage dice (e.g., 1d8+2, 1d6+d3)",
+          "maxLength": 30
+        },
+        "damageBonus": {
+          "type": "string",
+          "description": "Damage bonus (e.g., +2, +d3 for deed die)",
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Weapon name",
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Special properties (backstab, trained weapon, etc.)",
+          "maxLength": 200
+        },
+        "range": {
+          "type": "string",
+          "description": "Range (melee or distance)",
+          "maxLength": 30
+        },
+        "type": {
+          "type": "string",
+          "description": "Attack type (melee, ranged, etc.)",
+          "maxLength": 20
+        }
+      }
+    },
+    "dccCleric": {
+      "type": "object",
+      "description": "Cleric spellcasting features",
+      "properties": {
+        "deity": {
+          "type": "string",
+          "description": "Deity or supernatural patron",
+          "maxLength": 100
+        },
+        "disapprovalRange": {
+          "type": "integer",
+          "description": "Current disapproval range (starts at 1, accumulates)",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "disapprovalTable": {
+          "type": "string",
+          "description": "Deity-specific disapproval table if any",
+          "maxLength": 100
+        },
+        "holySymbol": {
+          "type": "string",
+          "description": "Holy symbol description",
+          "maxLength": 100
+        },
+        "knownSpells": {
+          "type": "array",
+          "description": "Known cleric spells",
+          "items": {
+            "type": "ref",
+            "ref": "#dccClericSpell"
+          },
+          "maxLength": 50
+        },
+        "layOnHandsDie": {
+          "type": "string",
+          "description": "Lay on hands die (e.g., d14, d16)",
+          "maxLength": 10
+        },
+        "maxSpellLevel": {
+          "type": "integer",
+          "description": "Highest spell level accessible",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "spellCheckMod": {
+          "type": "integer",
+          "description": "Spell check modifier (PER mod + level)"
+        },
+        "turnUnholyDie": {
+          "type": "string",
+          "description": "Turn unholy die (e.g., d14, d16)",
+          "maxLength": 10
+        },
+        "unholy": {
+          "type": "boolean",
+          "description": "Serves a Chaotic deity (unholy instead of holy)"
+        }
+      }
+    },
+    "dccClericSpell": {
+      "type": "object",
+      "description": "A cleric spell",
+      "required": [
+        "name",
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "Spell level",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "name": {
+          "type": "string",
+          "description": "Spell name",
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional spell notes",
+          "maxLength": 500
+        },
+        "sinful": {
+          "type": "boolean",
+          "description": "Casting may cause additional disapproval"
+        }
+      }
+    },
+    "dccCoinage": {
+      "type": "object",
+      "description": "DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)",
+      "properties": {
+        "cp": {
+          "type": "integer",
+          "description": "Copper pieces",
+          "minimum": 0
+        },
+        "gp": {
+          "type": "integer",
+          "description": "Gold pieces",
+          "minimum": 0
+        },
+        "sp": {
+          "type": "integer",
+          "description": "Silver pieces",
+          "minimum": 0
+        }
+      }
+    },
+    "dccCombat": {
+      "type": "object",
+      "description": "Combat statistics",
+      "properties": {
+        "ac": {
+          "type": "integer",
+          "description": "Armor Class (10 + armor + AGI mod + shield)",
+          "minimum": 0
+        },
+        "actionDie": {
+          "type": "string",
+          "description": "Primary action die (e.g., d20, d20+d14)",
+          "maxLength": 20
+        },
+        "attackMod": {
+          "type": "integer",
+          "description": "Base attack modifier (level-based for non-warriors)"
+        },
+        "critDie": {
+          "type": "string",
+          "description": "Critical hit die (e.g., d8, d12, d14)",
+          "maxLength": 10
+        },
+        "critTable": {
+          "type": "string",
+          "description": "Critical hit table (I, II, III, IV, V)",
+          "maxLength": 20
+        },
+        "fumbleDie": {
+          "type": "string",
+          "description": "Fumble die (typically d4 for 0-level, varies by armor)",
+          "maxLength": 10
+        },
+        "initiative": {
+          "type": "integer",
+          "description": "Initiative modifier (AGI mod)"
+        },
+        "speed": {
+          "type": "integer",
+          "description": "Speed in feet (typically 30, Dwarves 20)",
+          "minimum": 0
+        }
+      }
+    },
+    "dccCorruption": {
+      "type": "object",
+      "description": "A corruption effect from failed spell checks",
+      "properties": {
+        "effect": {
+          "type": "string",
+          "description": "Description of the corruption",
+          "maxLength": 500
+        },
+        "permanent": {
+          "type": "boolean",
+          "description": "Whether this corruption is permanent"
+        },
+        "source": {
+          "type": "string",
+          "description": "What spell caused this corruption",
+          "maxLength": 100
+        },
+        "type": {
+          "type": "string",
+          "description": "Corruption severity (minor, major, greater)",
+          "maxLength": 20
+        }
+      }
+    },
+    "dccEquipment": {
+      "type": "object",
+      "description": "Equipment and inventory",
+      "properties": {
+        "armor": {
+          "type": "string",
+          "description": "Armor worn (affects fumble die)",
+          "maxLength": 200
+        },
+        "armorCheckPenalty": {
+          "type": "integer",
+          "description": "Armor check penalty (affects skills)",
+          "minimum": 0
+        },
+        "gear": {
+          "type": "string",
+          "description": "Other equipment",
+          "maxLength": 2000
+        },
+        "shield": {
+          "type": "string",
+          "description": "Shield (if any)",
+          "maxLength": 100
+        },
+        "tradeGoods": {
+          "type": "string",
+          "description": "Trade goods from occupation",
+          "maxLength": 500
+        },
+        "treasure": {
+          "type": "string",
+          "description": "Valuables and treasure",
+          "maxLength": 1000
+        },
+        "weapons": {
+          "type": "string",
+          "description": "Weapons carried",
+          "maxLength": 500
+        }
+      }
+    },
+    "dccHalfling": {
+      "type": "object",
+      "description": "Halfling class features",
+      "properties": {
+        "goodLuckCharm": {
+          "type": "boolean",
+          "description": "Can spend luck to aid nearby allies"
+        },
+        "infravision": {
+          "type": "integer",
+          "description": "Infravision range in feet (30)",
+          "minimum": 0
+        },
+        "luckSpentOnAllies": {
+          "type": "integer",
+          "description": "Total luck points spent helping allies",
+          "minimum": 0
+        },
+        "luckyWeapon": {
+          "type": "string",
+          "description": "Weapon type luck modifier applies to",
+          "maxLength": 100
+        },
+        "sneakAndHide": {
+          "type": "integer",
+          "description": "Bonus to sneak/hide when in natural environment"
+        },
+        "twoWeaponFighting": {
+          "type": "boolean",
+          "description": "Can dual-wield without penalty"
+        }
+      }
+    },
+    "dccHp": {
+      "type": "object",
+      "description": "Hit points (0-level characters use 1d4 + STA mod)",
+      "properties": {
+        "current": {
+          "type": "integer",
+          "description": "Current HP",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer",
+          "description": "Maximum HP",
+          "minimum": 1
+        }
+      }
+    },
+    "dccIdentity": {
+      "type": "object",
+      "description": "DCC character identity and progression",
+      "properties": {
+        "alignment": {
+          "type": "string",
+          "description": "Alignment (Lawful, Neutral, Chaotic)",
+          "maxLength": 20
+        },
+        "class": {
+          "type": "string",
+          "description": "Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)",
+          "maxLength": 100
+        },
+        "level": {
+          "type": "integer",
+          "description": "Character level (0 for funnel characters)",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "occupation": {
+          "type": "string",
+          "description": "0-level occupation (e.g., Blacksmith, Farmer)",
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "description": "Level title (e.g., Squire, Cutpurse, Acolyte)",
+          "maxLength": 100
+        },
+        "xp": {
+          "type": "integer",
+          "description": "Experience points",
+          "minimum": 0
+        }
+      }
+    },
+    "dccLuck": {
+      "type": "object",
+      "description": "Birth augur and luck mechanics",
+      "properties": {
+        "birthAugur": {
+          "type": "string",
+          "description": "Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)",
+          "maxLength": 100
+        },
+        "birthAugurEffect": {
+          "type": "string",
+          "description": "What the luck modifier applies to",
+          "maxLength": 200
+        },
+        "luckyWeapon": {
+          "type": "string",
+          "description": "Weapon type that luck applies to (Dwarves/Halflings)",
+          "maxLength": 100
+        },
+        "startingLuck": {
+          "type": "integer",
+          "description": "Starting luck score (for tracking burned luck)",
+          "minimum": 1,
+          "maximum": 24
+        }
+      }
+    },
+    "dccSaves": {
+      "type": "object",
+      "description": "DCC saving throws (3 saves, not 6)",
+      "properties": {
+        "fort": {
+          "type": "integer",
+          "description": "Fortitude save modifier"
+        },
+        "ref": {
+          "type": "integer",
+          "description": "Reflex save modifier"
+        },
+        "will": {
+          "type": "integer",
+          "description": "Willpower save modifier"
+        }
+      }
+    },
+    "dccSpellburn": {
+      "type": "object",
+      "description": "Current spellburn (temporary ability score sacrifice)",
+      "properties": {
+        "agiBurned": {
+          "type": "integer",
+          "description": "Agility points currently burned",
+          "minimum": 0
+        },
+        "recoveryRate": {
+          "type": "integer",
+          "description": "Points recovered per day",
+          "minimum": 0
+        },
+        "staBurned": {
+          "type": "integer",
+          "description": "Stamina points currently burned",
+          "minimum": 0
+        },
+        "strBurned": {
+          "type": "integer",
+          "description": "Strength points currently burned",
+          "minimum": 0
+        }
+      }
+    },
+    "dccStats": {
+      "type": "object",
+      "description": "Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.",
+      "properties": {
+        "abilities": {
+          "type": "ref",
+          "description": "The six ability scores (STR, AGI, STA, INT, PER, LUK)",
+          "ref": "#dccAbilities"
+        },
+        "abilitiesNotes": {
+          "type": "string",
+          "description": "Notes about special abilities, class features, and racial traits",
+          "maxLength": 1000
+        },
+        "attacks": {
+          "type": "array",
+          "description": "Weapon attacks",
+          "items": {
+            "type": "ref",
+            "ref": "#dccAttack"
+          },
+          "maxLength": 20
+        },
+        "cleric": {
+          "type": "ref",
+          "description": "Cleric spellcasting (disapproval, turn unholy, lay on hands)",
+          "ref": "#dccCleric"
+        },
+        "coinage": {
+          "type": "ref",
+          "description": "Currency (cp, sp, gp)",
+          "ref": "#dccCoinage"
+        },
+        "combat": {
+          "type": "ref",
+          "description": "Combat stats (AC, speed, action die, initiative, crit die/table)",
+          "ref": "#dccCombat"
+        },
+        "equipment": {
+          "type": "ref",
+          "description": "Gear, treasure, and trade goods",
+          "ref": "#dccEquipment"
+        },
+        "halfling": {
+          "type": "ref",
+          "description": "Halfling luck-sharing and dual wielding",
+          "ref": "#dccHalfling"
+        },
+        "hp": {
+          "type": "ref",
+          "description": "Hit points",
+          "ref": "#dccHp"
+        },
+        "identity": {
+          "type": "ref",
+          "description": "Character identity (occupation, class, level, alignment)",
+          "ref": "#dccIdentity"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Languages known",
+          "maxLength": 500
+        },
+        "luck": {
+          "type": "ref",
+          "description": "Birth augur and luck tracking",
+          "ref": "#dccLuck"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Character notes, backstory, and special abilities",
+          "maxLength": 5000
+        },
+        "saves": {
+          "type": "ref",
+          "description": "Saving throws (Reflex, Fortitude, Willpower)",
+          "ref": "#dccSaves"
+        },
+        "thief": {
+          "type": "ref",
+          "description": "Thief skills and abilities",
+          "ref": "#dccThief"
+        },
+        "warrior": {
+          "type": "ref",
+          "description": "Warrior/Dwarf class features (deed die, mighty deeds)",
+          "ref": "#dccWarrior"
+        },
+        "wizard": {
+          "type": "ref",
+          "description": "Wizard/Elf spellcasting (spellburn, corruption, mercurial magic)",
+          "ref": "#dccWizard"
+        }
+      }
+    },
+    "dccThief": {
+      "type": "object",
+      "description": "Thief class features and skills",
+      "properties": {
+        "alignment": {
+          "type": "string",
+          "description": "Alignment (affects some skill targets)",
+          "maxLength": 20
+        },
+        "backstab": {
+          "type": "integer",
+          "description": "Backstab damage die level (+1, +2, etc.)",
+          "minimum": 0
+        },
+        "luckyWeapon": {
+          "type": "string",
+          "description": "Weapon type that luck applies to (one type only)",
+          "maxLength": 100
+        },
+        "skills": {
+          "type": "ref",
+          "description": "Thief skill modifiers",
+          "ref": "#dccThiefSkills"
+        }
+      }
+    },
+    "dccThiefSkills": {
+      "type": "object",
+      "description": "Thief skill bonuses (roll d20 + skill vs target)",
+      "properties": {
+        "backstab": {
+          "type": "integer",
+          "description": "Backstab attack bonus"
+        },
+        "castSpellFromScroll": {
+          "type": "integer",
+          "description": "Cast spell from scroll bonus"
+        },
+        "climbSheerSurfaces": {
+          "type": "integer",
+          "description": "Climb sheer surfaces bonus"
+        },
+        "disableTrap": {
+          "type": "integer",
+          "description": "Disable trap bonus"
+        },
+        "disguiseSelf": {
+          "type": "integer",
+          "description": "Disguise self bonus"
+        },
+        "findTrap": {
+          "type": "integer",
+          "description": "Find trap bonus"
+        },
+        "forgeDocument": {
+          "type": "integer",
+          "description": "Forge document bonus"
+        },
+        "handlePoison": {
+          "type": "integer",
+          "description": "Handle poison bonus"
+        },
+        "hideInShadows": {
+          "type": "integer",
+          "description": "Hide in shadows bonus"
+        },
+        "pickLock": {
+          "type": "integer",
+          "description": "Pick lock bonus"
+        },
+        "pickPocket": {
+          "type": "integer",
+          "description": "Pick pocket bonus"
+        },
+        "readLanguages": {
+          "type": "integer",
+          "description": "Read languages bonus"
+        },
+        "sneakSilently": {
+          "type": "integer",
+          "description": "Sneak silently bonus"
+        }
+      }
+    },
+    "dccWarrior": {
+      "type": "object",
+      "description": "Warrior and Dwarf class features",
+      "properties": {
+        "deedDie": {
+          "type": "string",
+          "description": "Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)",
+          "maxLength": 10
+        },
+        "infravision": {
+          "type": "integer",
+          "description": "Infravision range in feet (Dwarves: 60)",
+          "minimum": 0
+        },
+        "luckyWeapon": {
+          "type": "string",
+          "description": "Weapon type luck modifier applies to",
+          "maxLength": 100
+        },
+        "mightyDeeds": {
+          "type": "array",
+          "description": "Signature mighty deeds of arms",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "maxLength": 20
+        },
+        "shieldBash": {
+          "type": "boolean",
+          "description": "Can use shield bash (Dwarves)"
+        },
+        "smellGold": {
+          "type": "boolean",
+          "description": "Can smell gold/gems (Dwarves)"
+        },
+        "undergroundSkills": {
+          "type": "integer",
+          "description": "Underground detection bonus (Dwarves: equal to level)",
+          "minimum": 0
+        }
+      }
+    },
+    "dccWizard": {
+      "type": "object",
+      "description": "Wizard and Elf spellcasting features",
+      "properties": {
+        "corruption": {
+          "type": "array",
+          "description": "Corruption effects suffered (structured)",
+          "items": {
+            "type": "ref",
+            "ref": "#dccCorruption"
+          },
+          "maxLength": 20
+        },
+        "corruptionText": {
+          "type": "string",
+          "description": "Corruption effects as free-form text",
+          "maxLength": 2000
+        },
+        "knownSpells": {
+          "type": "array",
+          "description": "Known spells with mercurial magic effects",
+          "items": {
+            "type": "ref",
+            "ref": "#dccWizardSpell"
+          },
+          "maxLength": 50
+        },
+        "maxSpellLevel": {
+          "type": "integer",
+          "description": "Highest spell level accessible",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "patron": {
+          "type": "string",
+          "description": "Supernatural patron (if any)",
+          "maxLength": 100
+        },
+        "patronBond": {
+          "type": "string",
+          "description": "Patron bond description and effects",
+          "maxLength": 500
+        },
+        "spellCheckMod": {
+          "type": "integer",
+          "description": "Spell check modifier (INT mod + level)"
+        },
+        "spellburn": {
+          "type": "ref",
+          "description": "Current spellburn status",
+          "ref": "#dccSpellburn"
+        }
+      }
+    },
+    "dccWizardSpell": {
+      "type": "object",
+      "description": "A wizard spell with mercurial magic effect",
+      "required": [
+        "name",
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "Spell level",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "lost": {
+          "type": "boolean",
+          "description": "Spell is currently lost (must be re-learned)"
+        },
+        "mercurialMagic": {
+          "type": "string",
+          "description": "Unique mercurial magic effect (d100 roll result)",
+          "maxLength": 500
+        },
+        "mercurialRoll": {
+          "type": "integer",
+          "description": "The d100 roll for mercurial magic",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "name": {
+          "type": "string",
+          "description": "Spell name",
+          "maxLength": 100
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional spell notes",
+          "maxLength": 500
+        }
+      }
+    },
+    "deathSaves": {
+      "type": "object",
+      "description": "Death saving throw successes and failures",
+      "properties": {
+        "failures": {
+          "type": "integer",
+          "description": "Failures (0-3)",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "successes": {
+          "type": "integer",
+          "description": "Successes (0-3)",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "dndStats": {
+      "type": "object",
+      "description": "D&D 5e character sheet. All sub-objects are optional.",
+      "properties": {
+        "abilities": {
+          "type": "ref",
+          "description": "The six ability scores (STR, DEX, CON, INT, WIS, CHA)",
+          "ref": "#abilities"
+        },
+        "attacks": {
+          "type": "array",
+          "description": "Attack actions",
+          "items": {
+            "type": "ref",
+            "ref": "#attack"
+          },
+          "maxLength": 20
+        },
+        "coinage": {
+          "type": "ref",
+          "description": "Currency (cp, sp, ep, gp, pp)",
+          "ref": "#coinage"
+        },
+        "combat": {
+          "type": "ref",
+          "description": "Combat stats (AC, speed, initiative, hit dice)",
+          "ref": "#combat"
+        },
+        "conditions": {
+          "type": "ref",
+          "description": "Status conditions (inspiration, exhaustion, death saves)",
+          "ref": "#conditions"
+        },
+        "equipment": {
+          "type": "ref",
+          "description": "Gear and inventory",
+          "ref": "#equipment"
+        },
+        "features": {
+          "type": "string",
+          "description": "Class features, racial traits, and feats",
+          "maxLength": 5000
+        },
+        "hp": {
+          "type": "ref",
+          "description": "Hit points (current, max, temp)",
+          "ref": "#hp"
+        },
+        "identity": {
+          "type": "ref",
+          "description": "Character identity (race, class, level, background)",
+          "ref": "#identity"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Languages known",
+          "maxLength": 500
+        },
+        "passives": {
+          "type": "ref",
+          "description": "Passive scores (Perception, Investigation, Insight)",
+          "ref": "#passives"
+        },
+        "personality": {
+          "type": "ref",
+          "description": "Traits, ideals, bonds, flaws, backstory",
+          "ref": "#personality"
+        },
+        "proficiencies": {
+          "type": "string",
+          "description": "Armor, weapon, and tool proficiencies",
+          "maxLength": 1000
+        },
+        "saves": {
+          "type": "ref",
+          "description": "Saving throw modifiers",
+          "ref": "#saves"
+        },
+        "skills": {
+          "type": "ref",
+          "description": "Skill modifiers",
+          "ref": "#skills"
+        },
+        "spellcasting": {
+          "type": "ref",
+          "description": "Spellcasting details (for casters)",
+          "ref": "#spellcasting"
+        }
+      }
+    },
+    "equipment": {
+      "type": "object",
+      "description": "Gear and inventory",
+      "properties": {
+        "armor": {
+          "type": "string",
+          "description": "Armor",
+          "maxLength": 200
+        },
+        "gear": {
+          "type": "string",
+          "description": "Other equipment",
+          "maxLength": 2000
+        },
+        "treasure": {
+          "type": "string",
+          "description": "Valuables and treasure",
+          "maxLength": 1000
+        },
+        "weapons": {
+          "type": "string",
+          "description": "Weapons",
+          "maxLength": 500
+        }
+      }
+    },
+    "hp": {
+      "type": "object",
+      "description": "Hit point tracking",
+      "properties": {
+        "current": {
+          "type": "integer",
+          "description": "Current HP",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer",
+          "description": "Maximum HP",
+          "minimum": 1
+        },
+        "temp": {
+          "type": "integer",
+          "description": "Temporary HP",
+          "minimum": 0
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "description": "Character identity and progression",
+      "properties": {
+        "alignment": {
+          "type": "string",
+          "description": "Alignment (e.g., Lawful Good)",
+          "maxLength": 50
+        },
+        "background": {
+          "type": "string",
+          "description": "Background (e.g., Soldier, Sage)",
+          "maxLength": 100
+        },
+        "class": {
+          "type": "string",
+          "description": "Class and subclass (e.g., Fighter (Champion))",
+          "maxLength": 100
+        },
+        "level": {
+          "type": "integer",
+          "description": "Character level",
+          "minimum": 1
+        },
+        "proficiency": {
+          "type": "integer",
+          "description": "Proficiency bonus",
+          "minimum": 0
+        },
+        "race": {
+          "type": "string",
+          "description": "Race (e.g., Human, Elf, Dwarf)",
+          "maxLength": 100
+        },
+        "xp": {
+          "type": "integer",
+          "description": "Experience points",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A user's RPG character statistics. One record per user (rkey: self).",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this record was created",
+            "format": "datetime"
+          },
+          "custom": {
+            "type": "ref",
+            "description": "User-defined custom stat system",
+            "ref": "#customStats"
+          },
+          "dcc": {
+            "type": "ref",
+            "description": "Dungeon Crawl Classics RPG character sheet",
+            "ref": "#dccStats"
+          },
+          "dnd": {
+            "type": "ref",
+            "description": "Dungeons & Dragons 5th Edition character sheet",
+            "ref": "#dndStats"
+          },
+          "reverie": {
+            "type": "ref",
+            "description": "Reverie House philosophical alignment",
+            "ref": "#reverieStats"
+          },
+          "rmmz": {
+            "type": "ref",
+            "description": "RPG Maker MZ engine character parameters",
+            "ref": "#rmmzStats"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when this record was last modified",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "passives": {
+      "type": "object",
+      "description": "Passive scores (10 + skill modifier)",
+      "properties": {
+        "insight": {
+          "type": "integer",
+          "description": "Passive Insight"
+        },
+        "investigation": {
+          "type": "integer",
+          "description": "Passive Investigation"
+        },
+        "perception": {
+          "type": "integer",
+          "description": "Passive Perception"
+        }
+      }
+    },
+    "personality": {
+      "type": "object",
+      "description": "Personality and backstory",
+      "properties": {
+        "backstory": {
+          "type": "string",
+          "description": "Backstory",
+          "maxLength": 5000
+        },
+        "bonds": {
+          "type": "string",
+          "description": "Bonds",
+          "maxLength": 500
+        },
+        "flaws": {
+          "type": "string",
+          "description": "Flaws",
+          "maxLength": 500
+        },
+        "ideals": {
+          "type": "string",
+          "description": "Ideals",
+          "maxLength": 500
+        },
+        "traits": {
+          "type": "string",
+          "description": "Personality traits",
+          "maxLength": 1000
+        }
+      }
+    },
+    "reverieStats": {
+      "type": "object",
+      "description": "Reverie House philosophical alignment",
+      "properties": {
+        "authority": {
+          "type": "integer",
+          "description": "Authority (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "entropy": {
+          "type": "integer",
+          "description": "Entropy (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "liberty": {
+          "type": "integer",
+          "description": "Liberty (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "oblivion": {
+          "type": "integer",
+          "description": "Oblivion (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "octant": {
+          "type": "string",
+          "description": "Philosophical octant",
+          "knownValues": [
+            "adaptive",
+            "chaotic",
+            "prepared",
+            "intended",
+            "contented",
+            "assertive",
+            "ordered",
+            "guarded",
+            "equilibrium",
+            "singling",
+            "confused"
+          ]
+        },
+        "receptive": {
+          "type": "integer",
+          "description": "Receptive (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "skeptic": {
+          "type": "integer",
+          "description": "Skeptic (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "rmmzStats": {
+      "type": "object",
+      "description": "RPG Maker MZ character parameters",
+      "properties": {
+        "agi": {
+          "type": "integer",
+          "description": "Agility",
+          "minimum": 1
+        },
+        "atk": {
+          "type": "integer",
+          "description": "Attack",
+          "minimum": 1
+        },
+        "class": {
+          "type": "string",
+          "description": "Class",
+          "maxLength": 100
+        },
+        "cri": {
+          "type": "integer",
+          "description": "Critical %",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "def": {
+          "type": "integer",
+          "description": "Defense",
+          "minimum": 1
+        },
+        "eva": {
+          "type": "integer",
+          "description": "Evasion %",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "hit": {
+          "type": "integer",
+          "description": "Hit Rate %",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "hp": {
+          "type": "integer",
+          "description": "Current HP",
+          "minimum": 0
+        },
+        "level": {
+          "type": "integer",
+          "description": "Level",
+          "minimum": 1
+        },
+        "luk": {
+          "type": "integer",
+          "description": "Luck",
+          "minimum": 1
+        },
+        "mat": {
+          "type": "integer",
+          "description": "Magic Attack",
+          "minimum": 1
+        },
+        "maxHp": {
+          "type": "integer",
+          "description": "Max HP",
+          "minimum": 1
+        },
+        "maxMp": {
+          "type": "integer",
+          "description": "Max MP",
+          "minimum": 0
+        },
+        "maxTp": {
+          "type": "integer",
+          "description": "Max TP",
+          "minimum": 0
+        },
+        "mdf": {
+          "type": "integer",
+          "description": "Magic Defense",
+          "minimum": 1
+        },
+        "mp": {
+          "type": "integer",
+          "description": "Current MP",
+          "minimum": 0
+        },
+        "tp": {
+          "type": "integer",
+          "description": "Current TP",
+          "minimum": 0
+        },
+        "xp": {
+          "type": "integer",
+          "description": "Experience",
+          "minimum": 0
+        }
+      }
+    },
+    "saves": {
+      "type": "object",
+      "description": "Saving throw modifiers (actual values, not proficiency flags)",
+      "properties": {
+        "cha": {
+          "type": "integer",
+          "description": "Charisma save modifier"
+        },
+        "con": {
+          "type": "integer",
+          "description": "Constitution save modifier"
+        },
+        "dex": {
+          "type": "integer",
+          "description": "Dexterity save modifier"
+        },
+        "int": {
+          "type": "integer",
+          "description": "Intelligence save modifier"
+        },
+        "str": {
+          "type": "integer",
+          "description": "Strength save modifier"
+        },
+        "wis": {
+          "type": "integer",
+          "description": "Wisdom save modifier"
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "description": "Skill modifiers (actual values, not proficiency flags)",
+      "properties": {
+        "acrobatics": {
+          "type": "integer",
+          "description": "Acrobatics (DEX)"
+        },
+        "animalHandling": {
+          "type": "integer",
+          "description": "Animal Handling (WIS)"
+        },
+        "arcana": {
+          "type": "integer",
+          "description": "Arcana (INT)"
+        },
+        "athletics": {
+          "type": "integer",
+          "description": "Athletics (STR)"
+        },
+        "deception": {
+          "type": "integer",
+          "description": "Deception (CHA)"
+        },
+        "history": {
+          "type": "integer",
+          "description": "History (INT)"
+        },
+        "insight": {
+          "type": "integer",
+          "description": "Insight (WIS)"
+        },
+        "intimidation": {
+          "type": "integer",
+          "description": "Intimidation (CHA)"
+        },
+        "investigation": {
+          "type": "integer",
+          "description": "Investigation (INT)"
+        },
+        "medicine": {
+          "type": "integer",
+          "description": "Medicine (WIS)"
+        },
+        "nature": {
+          "type": "integer",
+          "description": "Nature (INT)"
+        },
+        "perception": {
+          "type": "integer",
+          "description": "Perception (WIS)"
+        },
+        "performance": {
+          "type": "integer",
+          "description": "Performance (CHA)"
+        },
+        "persuasion": {
+          "type": "integer",
+          "description": "Persuasion (CHA)"
+        },
+        "religion": {
+          "type": "integer",
+          "description": "Religion (INT)"
+        },
+        "sleightOfHand": {
+          "type": "integer",
+          "description": "Sleight of Hand (DEX)"
+        },
+        "stealth": {
+          "type": "integer",
+          "description": "Stealth (DEX)"
+        },
+        "survival": {
+          "type": "integer",
+          "description": "Survival (WIS)"
+        }
+      }
+    },
+    "spellList": {
+      "type": "object",
+      "description": "Spells organized by level",
+      "properties": {
+        "cantrips": {
+          "type": "array",
+          "description": "Cantrips (at-will)",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 20
+        },
+        "l1": {
+          "type": "array",
+          "description": "1st-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 30
+        },
+        "l2": {
+          "type": "array",
+          "description": "2nd-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 30
+        },
+        "l3": {
+          "type": "array",
+          "description": "3rd-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 30
+        },
+        "l4": {
+          "type": "array",
+          "description": "4th-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 30
+        },
+        "l5": {
+          "type": "array",
+          "description": "5th-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 30
+        },
+        "l6": {
+          "type": "array",
+          "description": "6th-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 20
+        },
+        "l7": {
+          "type": "array",
+          "description": "7th-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 20
+        },
+        "l8": {
+          "type": "array",
+          "description": "8th-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 20
+        },
+        "l9": {
+          "type": "array",
+          "description": "9th-level spells",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "maxLength": 20
+        }
+      }
+    },
+    "spellcasting": {
+      "type": "object",
+      "description": "Spellcasting details",
+      "properties": {
+        "ability": {
+          "type": "string",
+          "description": "Spellcasting ability (INT, WIS, CHA)",
+          "maxLength": 3
+        },
+        "attack": {
+          "type": "integer",
+          "description": "Spell attack bonus"
+        },
+        "dc": {
+          "type": "integer",
+          "description": "Spell save DC",
+          "minimum": 1
+        },
+        "slots": {
+          "type": "array",
+          "description": "Spell slots by level",
+          "items": {
+            "type": "ref",
+            "ref": "#spellslot"
+          },
+          "maxLength": 9
+        },
+        "spells": {
+          "type": "ref",
+          "description": "Known/prepared spells by level",
+          "ref": "#spellList"
+        }
+      }
+    },
+    "spellslot": {
+      "type": "object",
+      "description": "Spell slot entry",
+      "required": [
+        "level",
+        "total"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "Spell level",
+          "minimum": 1,
+          "maximum": 9
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total slots",
+          "minimum": 0
+        },
+        "used": {
+          "type": "integer",
+          "description": "Slots used",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

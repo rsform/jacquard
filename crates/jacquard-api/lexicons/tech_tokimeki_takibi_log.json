@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.takibi.log",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A log record - adding wood to the fire. Implicitly records visible sparks as a form of 'silent appreciation'.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "visibleSparks": {
+            "type": "array",
+            "description": "Sparks visible at the moment of adding wood, with elapsed time for decay scoring",
+            "items": {
+              "type": "ref",
+              "ref": "#sparkRef"
+            },
+            "maxLength": 20
+          }
+        }
+      }
+    },
+    "sparkRef": {
+      "type": "object",
+      "description": "Reference to a visible spark with timing information",
+      "required": [
+        "spark",
+        "elapsed"
+      ],
+      "properties": {
+        "elapsed": {
+          "type": "integer",
+          "description": "Milliseconds since the spark appeared on screen (0-10000)",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "spark": {
+          "type": "ref",
+          "description": "Strong reference to the spark record",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

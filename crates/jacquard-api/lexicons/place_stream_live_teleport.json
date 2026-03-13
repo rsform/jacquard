@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.live.teleport",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record defining a 'teleport', that is active during a certain time.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "streamer",
+          "startsAt"
+        ],
+        "properties": {
+          "durationSeconds": {
+            "type": "integer",
+            "description": "The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).",
+            "minimum": 60,
+            "maximum": 32400
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "The time the teleport becomes active.",
+            "format": "datetime"
+          },
+          "streamer": {
+            "type": "string",
+            "description": "The DID of the streamer to teleport to.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

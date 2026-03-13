@@ -1,0 +1,187 @@
+{
+  "lexicon": 1,
+  "id": "org.atpodcasting.episode",
+  "defs": {
+    "chaptersRef": {
+      "type": "object",
+      "description": "Reference to an externally hosted chapters file.",
+      "required": [
+        "url",
+        "mimeType"
+      ],
+      "properties": {
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the chapters file (e.g. application/json+chapters)."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the chapters file.",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A podcast episode. Record key is a UUIDv5 derived from the podcast GUID (as namespace) and the episode's feedItemGuid (as name), enabling deterministic lookup from RSS feed metadata.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "podcast",
+          "title",
+          "media",
+          "publishedAt",
+          "duration",
+          "feedItemGuid",
+          "createdAt"
+        ],
+        "properties": {
+          "alternateMedia": {
+            "type": "array",
+            "description": "Alternate versions of the episode media (e.g. different formats or audio-only versions of video episodes).",
+            "items": {
+              "type": "ref",
+              "ref": "#mediaRef"
+            },
+            "maxLength": 10
+          },
+          "artwork": {
+            "type": "blob",
+            "description": "Episode-specific artwork. Overrides the podcast artwork when set. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 5000000
+          },
+          "chapters": {
+            "type": "ref",
+            "description": "Reference to an externally hosted chapters file.",
+            "ref": "#chaptersRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the episode record was created.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description or show notes for the episode.",
+            "maxLength": 10000
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration of the episode in seconds.",
+            "minimum": 1
+          },
+          "episodeNumber": {
+            "type": "integer",
+            "description": "Episode number within its season or the overall series.",
+            "minimum": 1
+          },
+          "episodeType": {
+            "type": "string",
+            "description": "The type of episode. Defaults to full.",
+            "knownValues": [
+              "full",
+              "trailer",
+              "bonus"
+            ]
+          },
+          "explicit": {
+            "type": "boolean",
+            "description": "Whether the episode contains explicit content. Overrides the podcast-level setting when set."
+          },
+          "feedItemGuid": {
+            "type": "string",
+            "description": "The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item. The record key (rkey) is derived from this value as uuid5(<podcast:guid>, feedItemGuid).",
+            "maxLength": 2000
+          },
+          "link": {
+            "type": "string",
+            "description": "URL of a companion webpage or show notes page for the episode.",
+            "format": "uri"
+          },
+          "media": {
+            "type": "ref",
+            "description": "The primary media file for the episode.",
+            "ref": "#mediaRef"
+          },
+          "podcast": {
+            "type": "ref",
+            "description": "Identifies the parent podcast. Since episodes live in the same repository as their podcast, the AT URI is always derivable from the episode's DID and the podcastGuid.",
+            "ref": "org.atpodcasting.defs#podcastRef"
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "When the episode was published.",
+            "format": "datetime"
+          },
+          "seasonNumber": {
+            "type": "integer",
+            "description": "Season number of the episode.",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the episode.",
+            "maxLength": 500
+          },
+          "transcript": {
+            "type": "array",
+            "description": "References to externally hosted transcript files (e.g. VTT, SRT, JSON). Multiple entries allow providing transcripts in different formats.",
+            "items": {
+              "type": "ref",
+              "ref": "#transcriptRef"
+            },
+            "maxLength": 10
+          }
+        }
+      }
+    },
+    "mediaRef": {
+      "type": "object",
+      "description": "Reference to an externally hosted media file.",
+      "required": [
+        "url",
+        "mimeType"
+      ],
+      "properties": {
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the media file (e.g. audio/mpeg, video/mp4)."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the media file.",
+          "format": "uri"
+        }
+      }
+    },
+    "transcriptRef": {
+      "type": "object",
+      "description": "Reference to an externally hosted transcript file.",
+      "required": [
+        "url",
+        "mimeType"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').",
+          "format": "language"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the transcript file (e.g. text/vtt, application/x-subrip, application/json)."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the transcript file.",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

@@ -215,6 +215,24 @@
         }
       }
     },
+    "liveEventPreferences": {
+      "type": "object",
+      "description": "Preferences for live events.",
+      "properties": {
+        "hiddenFeedIds": {
+          "type": "array",
+          "description": "A list of feed IDs that the user has hidden from live events.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hideAllFeeds": {
+          "type": "boolean",
+          "description": "Whether to hide all feeds from live events.",
+          "default": false
+        }
+      }
+    },
     "mutedWord": {
       "type": "object",
       "description": "A word that the account owner has muted.",
@@ -371,7 +389,8 @@
           "#bskyAppStatePref",
           "#labelersPref",
           "#postInteractionSettingsPref",
-          "#verificationPrefs"
+          "#verificationPrefs",
+          "#liveEventPreferences"
         ]
       }
     },
@@ -388,6 +407,10 @@
         },
         "feedgens": {
           "type": "integer"
+        },
+        "germ": {
+          "type": "ref",
+          "ref": "#profileAssociatedGerm"
         },
         "labeler": {
           "type": "boolean"
@@ -428,6 +451,26 @@
             "all",
             "none",
             "following"
+          ]
+        }
+      }
+    },
+    "profileAssociatedGerm": {
+      "type": "object",
+      "required": [
+        "showButtonTo",
+        "messageMeUrl"
+      ],
+      "properties": {
+        "messageMeUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "showButtonTo": {
+          "type": "string",
+          "knownValues": [
+            "usersIFollow",
+            "everyone"
           ]
         }
       }

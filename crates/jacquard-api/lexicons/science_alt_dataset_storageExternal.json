@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.storageExternal",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "(Deprecated: use storageHttp or storageS3 instead.) External storage via URLs for WebDataset tar archives. URLs support brace notation for sharding (e.g., 'data-{000000..000099}.tar').",
+      "required": [
+        "urls"
+      ],
+      "properties": {
+        "urls": {
+          "type": "array",
+          "description": "WebDataset URLs with optional brace notation for sharded tar files",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 1000
+          },
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

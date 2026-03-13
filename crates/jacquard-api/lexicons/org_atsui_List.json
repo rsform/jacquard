@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.List",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Scrollable vertical list with paginated data source.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "query",
+            "did"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID of the service that implements the query.",
+              "format": "did"
+            },
+            "input": {
+              "type": "unknown",
+              "description": "Parameters to pass to the query."
+            },
+            "query": {
+              "type": "string",
+              "description": "XRPC query to call for pages of items.",
+              "format": "nsid"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "description": "Response shape from a List data source query.",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "description": "Opaque pagination token. Absent means no more items.",
+          "maxLength": 512
+        },
+        "items": {
+          "type": "array",
+          "description": "Elements to render as list rows.",
+          "items": {
+            "type": "ref",
+            "ref": "at.inlay.defs#element"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "lexicon": 1,
+  "id": "net.mimonelu.klearsky.extraFeed",
+  "defs": {
+    "main": {
+      "type": "string",
+      "description": "Extra feed type for Klearsky. Used as an extension in app.bsky.actor.defs#savedFeedsPrefV2 items.",
+      "knownValues": [
+        "trending",
+        "globalline"
+      ]
+    }
+  }
+}

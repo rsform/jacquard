@@ -5,8 +5,10 @@
 
 pub mod blocks;
 pub mod comment;
+pub mod content;
 pub mod document;
 pub mod graph;
+pub mod interactions;
 pub mod pages;
 pub mod poll;
 pub mod publication;

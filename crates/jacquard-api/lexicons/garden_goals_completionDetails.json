@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "garden.goals.completionDetails",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Additional details (notes, photo) for a goal completion day.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "goalId",
+          "year",
+          "month",
+          "day",
+          "updatedAt"
+        ],
+        "properties": {
+          "day": {
+            "type": "integer",
+            "description": "Day of the completion (1-31)",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "goalId": {
+            "type": "string",
+            "description": "UUID of the goal this details record belongs to",
+            "maxLength": 64
+          },
+          "goalUri": {
+            "type": "string",
+            "description": "AT Protocol URI reference to the goal record",
+            "format": "at-uri"
+          },
+          "month": {
+            "type": "integer",
+            "description": "Month of the completion (1-12)",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes for this day",
+            "maxLength": 99
+          },
+          "photoAlt": {
+            "type": "string",
+            "description": "Alt text for the photo",
+            "maxLength": 1000
+          },
+          "photoBlob": {
+            "type": "blob",
+            "description": "Optional photo for this day",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when this details record was last updated",
+            "format": "datetime"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year of the completion",
+            "minimum": 1970
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.quiz",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A quiz containing one or more rounds of questions",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "rounds",
+          "locales",
+          "timestamp"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "A short description about the quiz, and what to expect from it",
+            "maxLength": 300,
+            "maxGraphemes": 3000
+          },
+          "hasAudio": {
+            "type": "boolean",
+            "description": "This quiz includes questions with audio, eg. a music round",
+            "default": false
+          },
+          "hasVisuals": {
+            "type": "boolean",
+            "description": "This quiz includes questions with visuals, eg. a picture round",
+            "default": false
+          },
+          "locales": {
+            "type": "array",
+            "description": "Dominant language(s) of the quiz",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "revisionOf": {
+            "type": "ref",
+            "description": "If this is an edit or revision of a previous quiz, link that previous version here.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "rounds": {
+            "type": "array",
+            "description": "Ordered list of rounds in this quiz",
+            "items": {
+              "type": "ref",
+              "ref": "#round"
+            },
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When this quiz was created",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "description": "A title for the quiz"
+          }
+        }
+      }
+    },
+    "questionRef": {
+      "type": "object",
+      "description": "Reference to a question with its point value",
+      "required": [
+        "question"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A custom name for this question, as opposed to its number",
+          "maxLength": 16,
+          "maxGraphemes": 160
+        },
+        "points": {
+          "type": "integer",
+          "description": "Points awarded for complete correctness",
+          "default": 1,
+          "minimum": 1
+        },
+        "question": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "round": {
+      "type": "object",
+      "description": "A round within a quiz",
+      "required": [
+        "questions"
+      ],
+      "properties": {
+        "questions": {
+          "type": "array",
+          "description": "Ordered list of questions in this round",
+          "items": {
+            "type": "ref",
+            "ref": "#questionRef"
+          },
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "description": "Optional title for this round (requires locale if set)",
+          "maxLength": 1000,
+          "maxGraphemes": 100
+        }
+      }
+    }
+  }
+}

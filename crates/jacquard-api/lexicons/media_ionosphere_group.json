@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "media.ionosphere.group",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Represents a grouping of subgroups or programmes",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "ionosphere",
+          "name",
+          "language"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#genre"
+            }
+          },
+          "icon": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ]
+          },
+          "ionosphere": {
+            "type": "string",
+            "description": "Version identifier",
+            "maxLength": 128
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          "kind": {
+            "type": "string",
+            "description": "Type of group, see Table 30 of DAB SPI for idea",
+            "maxLength": 128,
+            "knownValues": [
+              "series",
+              "show",
+              "concept",
+              "magazine",
+              "topic",
+              "otherCollection",
+              "otherChoice"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the string values in this record. NOT the language of the content",
+            "format": "language"
+          },
+          "memberOf": {
+            "type": "array",
+            "description": "A list of groups this record is a member of",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#membership"
+            }
+          },
+          "name": {
+            "type": "string",
+            "maxGraphemes": 128
+          }
+        }
+      }
+    }
+  }
+}

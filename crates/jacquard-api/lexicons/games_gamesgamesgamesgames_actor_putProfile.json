@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.actor.putProfile",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create or update the authenticated user's actor profile.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "avatar": {
+              "type": "blob",
+              "accept": [
+                "image/png",
+                "image/jpeg"
+              ],
+              "maxSize": 10000000
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "datetime"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 3000
+            },
+            "descriptionFacets": {
+              "type": "array",
+              "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+              "items": {
+                "type": "ref",
+                "ref": "app.bsky.richtext.facet"
+              }
+            },
+            "displayName": {
+              "type": "string",
+              "maxLength": 640
+            },
+            "pronouns": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "websites": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "games.gamesgamesgamesgames.defs#website"
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

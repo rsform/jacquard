@@ -34,51 +34,51 @@ pub mod validate_supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Supporter;
-        type Signer;
         type Subject;
+        type Signer;
+        type Supporter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Supporter = Unset;
-        type Signer = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `supporter` field to Set
-    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSupporter<S> {}
-    impl<S: State> State for SetSupporter<S> {
-        type Supporter = Set<members::supporter>;
-        type Signer = S::Signer;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `signer` field to Set
-    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigner<S> {}
-    impl<S: State> State for SetSigner<S> {
-        type Supporter = S::Supporter;
-        type Signer = Set<members::signer>;
-        type Subject = S::Subject;
+        type Signer = Unset;
+        type Supporter = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Supporter = S::Supporter;
-        type Signer = S::Signer;
         type Subject = Set<members::subject>;
+        type Signer = S::Signer;
+        type Supporter = S::Supporter;
+    }
+    ///State transition - sets the `signer` field to Set
+    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigner<S> {}
+    impl<S: State> State for SetSigner<S> {
+        type Subject = S::Subject;
+        type Signer = Set<members::signer>;
+        type Supporter = S::Supporter;
+    }
+    ///State transition - sets the `supporter` field to Set
+    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSupporter<S> {}
+    impl<S: State> State for SetSupporter<S> {
+        type Subject = S::Subject;
+        type Signer = S::Signer;
+        type Supporter = Set<members::supporter>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `supporter` field
-        pub struct supporter(());
-        ///Marker type for the `signer` field
-        pub struct signer(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `signer` field
+        pub struct signer(());
+        ///Marker type for the `supporter` field
+        pub struct supporter(());
     }
 }
 
@@ -171,9 +171,9 @@ where
 impl<'a, S> ValidateSupporterBuilder<'a, S>
 where
     S: validate_supporter_state::State,
-    S::Supporter: validate_supporter_state::IsSet,
-    S::Signer: validate_supporter_state::IsSet,
     S::Subject: validate_supporter_state::IsSet,
+    S::Signer: validate_supporter_state::IsSet,
+    S::Supporter: validate_supporter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ValidateSupporter<'a> {

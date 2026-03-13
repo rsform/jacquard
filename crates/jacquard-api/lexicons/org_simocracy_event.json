@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "org.simocracy.event",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Tracks user interactions — chat messages, senate hearings launched, and individual sim comments during hearings.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "type",
+          "actorDid",
+          "simNames",
+          "createdAt"
+        ],
+        "properties": {
+          "actorDid": {
+            "type": "string",
+            "description": "DID of the user who triggered the event"
+          },
+          "content": {
+            "type": "string",
+            "description": "The actual content — sim response for chat, sim opinion for comment",
+            "maxGraphemes": 5000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "proposalTitle": {
+            "type": "string",
+            "description": "Title of the proposal (for hearing/comment events)",
+            "maxGraphemes": 500
+          },
+          "round": {
+            "type": "integer",
+            "description": "Hearing round: 1=evaluation, 2=response, 3=summary (for comment events)"
+          },
+          "simNames": {
+            "type": "array",
+            "description": "Names of sims involved",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 10
+          },
+          "simUris": {
+            "type": "array",
+            "description": "AT-URIs of sims involved",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 10
+          },
+          "type": {
+            "type": "string",
+            "description": "Event type: chat, hearing, or comment"
+          },
+          "userMessage": {
+            "type": "string",
+            "description": "User's message that prompted the response (for chat events)",
+            "maxGraphemes": 2000
+          }
+        }
+      }
+    }
+  }
+}

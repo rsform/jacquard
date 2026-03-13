@@ -58,6 +58,12 @@
           "type": "string",
           "description": "The SHA256 hash of the song."
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "title": {
           "type": "string",
           "description": "The title of the song."
@@ -133,6 +139,12 @@
         "sha256": {
           "type": "string",
           "description": "The SHA256 hash of the song."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "title": {
           "type": "string",

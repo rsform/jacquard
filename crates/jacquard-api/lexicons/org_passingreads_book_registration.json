@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.registration",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A book that has been registered on PassingReads",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "bookId",
+          "title",
+          "authors",
+          "publicationId",
+          "occurredAt",
+          "bookPub",
+          "bookSig"
+        ],
+        "properties": {
+          "aspectRatio": {
+            "type": "ref",
+            "description": "Aspect ratio of the cover image",
+            "ref": "org.passingreads.defs#aspectRatio"
+          },
+          "authors": {
+            "type": "array",
+            "description": "Authors of this book, in order of credit. An empty array implies a book of anonymous or unknown authorship.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "bookId": {
+            "type": "string",
+            "description": "The book's ID (as defined on its QR Code)"
+          },
+          "bookPub": {
+            "type": "bytes",
+            "description": "The MultiFormat public key of the book."
+          },
+          "bookSig": {
+            "type": "bytes",
+            "description": "The MultiFormat signature of this record, without this attribute, as created by the private key associated with the book."
+          },
+          "cover": {
+            "type": "blob",
+            "description": "Cover image of the book",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "did": {
+            "type": "string",
+            "description": "The DID of the person who registered the book. Included here, so it's verifiable with the bookSig.",
+            "format": "did"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "publicationId": {
+            "type": "string",
+            "description": "The book's Open Library Edition ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the book",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        }
+      }
+    }
+  }
+}

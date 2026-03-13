@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.getLocationBooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get books at a specific H3 location.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "h3"
+        ],
+        "properties": {
+          "h3": {
+            "type": "string",
+            "description": "H3 cell index"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books"
+          ],
+          "properties": {
+            "books": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "org.passingreads.book.defs#statefulBook"
+              }
+            },
+            "locationName": {
+              "type": "string",
+              "description": "Human-readable name of the requested location"
+            }
+          }
+        }
+      }
+    }
+  }
+}

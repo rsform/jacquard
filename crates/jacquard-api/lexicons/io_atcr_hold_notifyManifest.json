@@ -1,0 +1,199 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.notifyManifest",
+  "defs": {
+    "blobInfo": {
+      "type": "object",
+      "properties": {
+        "digest": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "size": {
+          "type": "integer"
+        }
+      }
+    },
+    "childManifestInfo": {
+      "type": "object",
+      "properties": {
+        "digest": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "mediaType": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "platform": {
+          "type": "ref",
+          "ref": "#platformInfo"
+        },
+        "size": {
+          "type": "integer"
+        }
+      }
+    },
+    "layerInfo": {
+      "type": "object",
+      "properties": {
+        "digest": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "mediaType": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "size": {
+          "type": "integer"
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Notify hold about a manifest push or pull operation. For pushes: creates layer records and optionally posts to Bluesky. For pulls: just increments stats. Always increments pull/push counts.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repository",
+            "userDid",
+            "manifestDigest",
+            "manifest"
+          ],
+          "properties": {
+            "manifest": {
+              "type": "ref",
+              "ref": "#manifestInfo"
+            },
+            "manifestDigest": {
+              "type": "string",
+              "description": "Manifest digest for building layer record AT-URIs",
+              "maxLength": 128
+            },
+            "operation": {
+              "type": "string",
+              "description": "Operation type (defaults to 'push' for backward compatibility)",
+              "default": "push",
+              "maxLength": 16,
+              "knownValues": [
+                "push",
+                "pull"
+              ]
+            },
+            "repository": {
+              "type": "string",
+              "description": "Image repository name",
+              "maxLength": 256
+            },
+            "tag": {
+              "type": "string",
+              "description": "Image tag (optional, required for Bluesky posts)",
+              "maxLength": 128
+            },
+            "userDid": {
+              "type": "string",
+              "description": "DID of the image owner",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success",
+            "operation",
+            "statsUpdated"
+          ],
+          "properties": {
+            "layersCreated": {
+              "type": "integer",
+              "description": "Number of layer records created (push only)"
+            },
+            "operation": {
+              "type": "string",
+              "description": "The operation that was performed ('push' or 'pull')",
+              "maxLength": 16
+            },
+            "postCreated": {
+              "type": "boolean",
+              "description": "Whether a Bluesky post was created (push only)"
+            },
+            "postUri": {
+              "type": "string",
+              "description": "AT-URI of the created Bluesky post (if postCreated is true)",
+              "format": "at-uri"
+            },
+            "statsUpdated": {
+              "type": "boolean",
+              "description": "Whether stats were successfully updated"
+            },
+            "success": {
+              "type": "boolean",
+              "description": "Whether the operation completed successfully"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidOperation"
+        },
+        {
+          "name": "UserMismatch"
+        },
+        {
+          "name": "QuotaExceeded"
+        }
+      ]
+    },
+    "manifestInfo": {
+      "type": "object",
+      "description": "OCI manifest information",
+      "properties": {
+        "config": {
+          "type": "ref",
+          "ref": "#blobInfo"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#layerInfo"
+          }
+        },
+        "manifests": {
+          "type": "array",
+          "description": "Child manifests for multi-arch images",
+          "items": {
+            "type": "ref",
+            "ref": "#childManifestInfo"
+          }
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "OCI media type",
+          "maxLength": 256
+        }
+      }
+    },
+    "platformInfo": {
+      "type": "object",
+      "properties": {
+        "architecture": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "os": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    }
+  }
+}

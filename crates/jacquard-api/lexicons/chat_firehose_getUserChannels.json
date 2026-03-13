@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "chat.firehose.getUserChannels",
+  "defs": {
+    "channel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get channels for the authenticated user.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "channels": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#channel"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

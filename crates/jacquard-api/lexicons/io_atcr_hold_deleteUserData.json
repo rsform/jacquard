@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.deleteUserData",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete all user data from this hold (GDPR compliance). Deletes crew record (if not captain), layer records, and stats records. Does NOT delete actual blob data from S3 - only PDS records.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success",
+            "crewDeleted",
+            "layersDeleted",
+            "statsDeleted"
+          ],
+          "properties": {
+            "crewDeleted": {
+              "type": "boolean",
+              "description": "Whether the user's crew record was deleted (false if user is captain)"
+            },
+            "layersDeleted": {
+              "type": "integer",
+              "description": "Number of layer records deleted"
+            },
+            "statsDeleted": {
+              "type": "integer",
+              "description": "Number of stats records deleted"
+            },
+            "success": {
+              "type": "boolean",
+              "description": "Whether the deletion completed successfully"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "AuthRequired"
+        },
+        {
+          "name": "DeletionFailed"
+        }
+      ]
+    }
+  }
+}

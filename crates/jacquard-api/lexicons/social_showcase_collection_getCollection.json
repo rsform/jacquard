@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.collection.getCollection",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a specific collection. Authentication optional - returns personalized view when authenticated (e.g., private collections you own).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "The AT-URI of the collection",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#collectionView"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.resolveSchema",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Resolve a schema by its permanent NSID identifier. When version is omitted, resolves to the most recently created schema with the given NSID.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "handle",
+          "schemaId"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "DID or handle of the schema owner"
+          },
+          "schemaId": {
+            "type": "string",
+            "description": "The permanent NSID identifier for the schema (the {NSID} part of the rkey {NSID}@{semver})",
+            "maxLength": 500
+          },
+          "version": {
+            "type": "string",
+            "description": "Specific version to resolve. If omitted, resolves to latest.",
+            "maxLength": 20
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "record"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the resolved schema record"
+            },
+            "record": {
+              "type": "ref",
+              "description": "The full schema record",
+              "ref": "science.alt.dataset.schema"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the resolved schema record",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "No schema found with the given NSID",
+          "name": "SchemaNotFound"
+        }
+      ]
+    }
+  }
+}

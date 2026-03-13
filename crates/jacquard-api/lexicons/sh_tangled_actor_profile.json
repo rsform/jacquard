@@ -12,6 +12,15 @@
           "bluesky"
         ],
         "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed next to posts from account. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
           "bluesky": {
             "type": "boolean",
             "description": "Include link to this account on Bluesky."
@@ -64,7 +73,8 @@
                 "open-pull-request-count",
                 "open-issue-count",
                 "closed-issue-count",
-                "repository-count"
+                "repository-count",
+                "star-count"
               ]
             },
             "minLength": 0,

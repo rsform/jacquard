@@ -4,13 +4,15 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Find books matching the search criteria. Requires authentication.",
+      "description": "Find books matching the search criteria. Does not require authentication.",
       "parameters": {
         "type": "params",
-        "required": [
-          "q"
-        ],
+        "required": [],
         "properties": {
+          "genre": {
+            "type": "string",
+            "description": "Filter by genre. Returns books in that genre. Can be used with or without q."
+          },
           "id": {
             "type": "string",
             "description": "The ID of the book within the hive."
@@ -43,7 +45,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "buzz.bookhive.hiveBook#record"
+                "ref": "buzz.bookhive.hiveBook#main"
               }
             },
             "offset": {

@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "social.drydown.settings",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User preferences for fragrance review scoring",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "complexityPreference": {
+            "type": "integer",
+            "description": "Preference for fragrance complexity (1=simple, 5=intricate)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when settings were first created",
+            "format": "datetime"
+          },
+          "longevityPriority": {
+            "type": "integer",
+            "description": "How important all-day longevity is (1=not important, 5=essential)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "presenceStyle": {
+            "type": "integer",
+            "description": "How the user prefers to be noticed (1=skin scent, 5=bold presence)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "scoreLens": {
+            "type": "string",
+            "description": "When viewing others' reviews: show their score or recalculate with your preferences",
+            "maxLength": 10,
+            "knownValues": [
+              "theirs",
+              "mine"
+            ]
+          },
+          "scoringApproach": {
+            "type": "integer",
+            "description": "How user evaluates fragrances (1=instinct, 5=analytical)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when settings were last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

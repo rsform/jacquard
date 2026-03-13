@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "app.greengale.blog.entry",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A markdown blog post with extended theme and LaTeX support.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "blobs": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "app.greengale.blog.defs#blobMetadata"
+            }
+          },
+          "content": {
+            "type": "string",
+            "description": "Markdown content of the blog post",
+            "maxLength": 100000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "latex": {
+            "type": "boolean",
+            "description": "Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility.",
+            "default": false
+          },
+          "ogp": {
+            "type": "ref",
+            "ref": "app.greengale.blog.defs#ogp"
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "theme": {
+            "type": "ref",
+            "ref": "app.greengale.blog.defs#theme"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Controls who can view this entry",
+            "default": "public",
+            "maxLength": 16,
+            "enum": [
+              "public",
+              "url",
+              "author"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

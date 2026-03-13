@@ -18,6 +18,10 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Thread<'a> {
+    /// Optional attached media (image or audio)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blobs: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     /// The channel this thread belongs to
     #[serde(borrow)]
     pub channel_id: jacquard_common::CowStr<'a>,
@@ -94,6 +98,7 @@ pub mod thread_state {
 pub struct ThreadBuilder<'a, S: thread_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -114,9 +119,28 @@ impl<'a> ThreadBuilder<'a, thread_state::Empty> {
     pub fn new() -> Self {
         ThreadBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
+    /// Set the `blobs` field (optional)
+    pub fn blobs(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `blobs` field to an Option value (optional)
+    pub fn maybe_blobs(
+        mut self,
+        value: Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -130,7 +154,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> ThreadBuilder<'a, thread_state::SetChannelId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ThreadBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -149,7 +173,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> ThreadBuilder<'a, thread_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         ThreadBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -164,12 +188,12 @@ impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -184,7 +208,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> ThreadBuilder<'a, thread_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         ThreadBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -203,10 +227,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Thread<'a> {
         Thread {
-            channel_id: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3.unwrap(),
+            blobs: self.__unsafe_private_named.0,
+            channel_id: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            text: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -219,10 +244,11 @@ where
         >,
     ) -> Thread<'a> {
         Thread {
-            channel_id: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3.unwrap(),
+            blobs: self.__unsafe_private_named.0,
+            channel_id: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            text: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -302,6 +328,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thread<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.blobs {
+            #[allow(unused_comparisons)]
+            if value.len() > 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blobs",
+                    ),
+                    max: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4000usize {
@@ -398,6 +436,23 @@ fn lexicon_doc_blue_skytalk_talk_thread() -> ::jacquard_lexicon::lexicon::Lexico
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("blobs"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional attached media (image or audio)",
+                                        ),
+                                    ),
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                        description: None,
+                                        accept: None,
+                                        max_size: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: Some(1usize),
+                                }),
+                            );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "channelId",

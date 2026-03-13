@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "pink.vase.pod.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A comment on a podcast episode, optionally threaded.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "episode",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "episode": {
+            "type": "ref",
+            "description": "The episode being commented on.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "parent": {
+            "type": "ref",
+            "description": "If replying to another comment, reference it here.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        }
+      }
+    }
+  }
+}

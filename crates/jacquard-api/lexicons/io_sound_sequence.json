@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "io.sound.sequence",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "bskyPostRef": {
+            "type": "ref",
+            "description": "Strong reference to a Bluesky post. Useful to keep track of comments off-platform.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "credits": {
+            "type": "array",
+            "description": "Attribution for composers, arrangers, etc",
+            "items": {
+              "type": "ref",
+              "ref": "io.sound.credit"
+            },
+            "maxLength": 60
+          },
+          "events": {
+            "type": "bytes",
+            "description": "Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.",
+            "maxLength": 524288
+          },
+          "id": {
+            "type": "integer",
+            "description": "Identifies this sequence for playback by a \"sequence\" event.",
+            "maximum": 65535
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the sequence",
+            "maxLength": 1280,
+            "maxGraphemes": 640
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Timestamp of the time of publication.",
+            "format": "datetime"
+          },
+          "sequences": {
+            "type": "array",
+            "description": "A collection of sequences that may be played back by \"sequence\" events.",
+            "items": {
+              "type": "ref",
+              "ref": "io.sound.sequence"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Array of strings used to tag the sequence.",
+            "items": {
+              "type": "string",
+              "maxLength": 1280,
+              "maxGraphemes": 128
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of the time of last edit.",
+            "format": "datetime"
+          },
+          "url": {
+            "type": "string",
+            "description": "Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.",
+            "format": "uri"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Version number for the byte array encoding of the events field."
+          }
+        }
+      }
+    }
+  }
+}

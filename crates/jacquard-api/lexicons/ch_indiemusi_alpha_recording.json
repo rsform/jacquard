@@ -1,0 +1,91 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.recording",
+  "defs": {
+    "artist": {
+      "type": "object",
+      "description": "Information about an artist contributing to the recording",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "artist": {
+          "type": "ref",
+          "ref": "ch.indiemusi.alpha.actor.artist"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A recording of a song or musical work: the performance captured in a specific format",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "artists"
+        ],
+        "properties": {
+          "artists": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#artist"
+            },
+            "minLength": 1
+          },
+          "audioFile": {
+            "type": "blob"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration of the recording in seconds"
+          },
+          "isrc": {
+            "type": "string",
+            "description": "ISRC (International Standard Recording Code) with which the recording is registered",
+            "maxLength": 12
+          },
+          "masterOwner": {
+            "type": "ref",
+            "ref": "#masterOwnerInfo"
+          },
+          "song": {
+            "type": "ref",
+            "ref": "ch.indiemusi.alpha.song"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    },
+    "masterOwnerInfo": {
+      "type": "object",
+      "description": "Information about the master owner",
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "masterOwner": {
+          "type": "ref",
+          "ref": "ch.indiemusi.alpha.actor.masterOwner"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        }
+      }
+    }
+  }
+}

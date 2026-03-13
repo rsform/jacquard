@@ -1,0 +1,144 @@
+{
+  "lexicon": 1,
+  "id": "space.remanso.note",
+  "defs": {
+    "image": {
+      "type": "object",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for the image.",
+          "maxLength": 2000
+        },
+        "image": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 2000000
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A markdown blog post with LaTeX, GitHub notes, Mermaid, YouTube and Bluesky extensions.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Markdown content. Local image paths are replaced with blob CIDs at publish time.",
+            "maxLength": 30000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "discoverable": {
+            "type": "boolean",
+            "description": "Whether the note can be discovered by others in public listings. Defaults to true."
+          },
+          "fontFamily": {
+            "type": "string",
+            "description": "Font family name available from Coollabs.",
+            "maxLength": 200
+          },
+          "fontSize": {
+            "type": "integer",
+            "description": "Font size in points. Recommended range: 9–21, but clients may allow larger sizes for accessibility."
+          },
+          "images": {
+            "type": "array",
+            "description": "Blob references for images embedded in the markdown content.",
+            "items": {
+              "type": "ref",
+              "ref": "#image"
+            },
+            "maxLength": 20
+          },
+          "language": {
+            "type": "string",
+            "description": "Most used language in the note. In ISO 639-3 code.",
+            "maxLength": 10,
+            "knownValues": [
+              "afr",
+              "ara",
+              "aze",
+              "bel",
+              "ben",
+              "bul",
+              "cat",
+              "ces",
+              "ckb",
+              "cmn",
+              "dan",
+              "deu",
+              "ell",
+              "eng",
+              "est",
+              "eus",
+              "fin",
+              "fra",
+              "hau",
+              "heb",
+              "hin",
+              "hrv",
+              "hun",
+              "hye",
+              "ind",
+              "isl",
+              "ita",
+              "jpn",
+              "kat",
+              "kaz",
+              "kor",
+              "lit",
+              "mar",
+              "mkd",
+              "nld",
+              "nob",
+              "pes",
+              "pol",
+              "por",
+              "ron",
+              "run",
+              "rus",
+              "slk",
+              "spa",
+              "srp",
+              "swe",
+              "tgl",
+              "tur",
+              "ukr",
+              "vie"
+            ]
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "theme": {
+            "type": "string",
+            "description": "Display theme for the note.",
+            "knownValues": [
+              "light",
+              "dark"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      }
+    }
+  }
+}

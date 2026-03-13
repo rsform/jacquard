@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.putRecord",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Creates or updates a private record in your hidden repository. Requires auth.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "collection",
+            "rkey",
+            "strategy",
+            "record"
+          ],
+          "properties": {
+            "collection": {
+              "type": "string",
+              "description": "The NSID of the record collection.",
+              "format": "nsid"
+            },
+            "record": {
+              "type": "unknown",
+              "description": "The private record value to store."
+            },
+            "rkey": {
+              "type": "string",
+              "description": "The Record Key.",
+              "format": "record-key"
+            },
+            "strategy": {
+              "type": "ref",
+              "description": "The strategy used to authenticate fetch requests for this record.",
+              "ref": "ooo.bsky.authfetch.strategy"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "The AT URI of the stored record.",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

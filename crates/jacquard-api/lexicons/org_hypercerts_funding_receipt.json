@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.funding.receipt",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Records a funding receipt for a payment from one user to another user. It may be recorded by the recipient, by the sender, or by a third party. The sender may remain anonymous.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "amount",
+          "currency",
+          "createdAt"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Amount of funding received as a numeric string (e.g. '1000.50').",
+            "maxLength": 50
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this receipt record was created.",
+            "format": "datetime"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency of the payment (e.g. EUR, USD, ETH).",
+            "maxLength": 10
+          },
+          "for": {
+            "type": "string",
+            "description": "Optional reference to the activity, project, or organization this funding relates to.",
+            "format": "at-uri"
+          },
+          "from": {
+            "type": "ref",
+            "description": "DID of the sender who transferred the funds. Leave empty if sender wants to stay anonymous.",
+            "ref": "app.certified.defs#did"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes or additional context for this funding receipt.",
+            "maxLength": 500
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "Timestamp when the payment occurred.",
+            "format": "datetime"
+          },
+          "paymentNetwork": {
+            "type": "string",
+            "description": "Optional network within the payment rail (e.g. arbitrum, ethereum, sepa, visa, paypal).",
+            "maxLength": 50
+          },
+          "paymentRail": {
+            "type": "string",
+            "description": "How the funds were transferred (e.g. bank_transfer, credit_card, onchain, cash, check, payment_processor).",
+            "maxLength": 50
+          },
+          "to": {
+            "type": "string",
+            "description": "The recipient of the funds. Can be identified by DID or a clear-text name.",
+            "maxLength": 2048
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Identifier of the underlying payment transaction (e.g. bank reference, onchain transaction hash, or processor-specific ID). Use paymentNetwork to specify the network where applicable.",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

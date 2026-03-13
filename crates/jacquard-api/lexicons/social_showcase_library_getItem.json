@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.library.getItem",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a specific item. Authentication optional - returns personalized view when authenticated (e.g., private items you own).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "The AT-URI of the item",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#itemView"
+        }
+      }
+    }
+  }
+}

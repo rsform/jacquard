@@ -1,0 +1,150 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.search",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Search across all entity types (games, profiles, platforms, collections, engines).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "ageRatings": {
+            "type": "array",
+            "description": "Filter game results by age rating in 'organization:rating' format (e.g. esrb:M, pegi:Eighteen).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicationTypes": {
+            "type": "array",
+            "description": "Filter game results by application type (e.g. game, dlc, bundle). Only applies when types includes game.",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "addon",
+                "bundle",
+                "dlc",
+                "episode",
+                "expandedGame",
+                "expansion",
+                "fork",
+                "game",
+                "mod",
+                "pack",
+                "port",
+                "remake",
+                "remaster",
+                "season",
+                "standaloneExpansion",
+                "update"
+              ]
+            }
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeCancelled": {
+            "type": "boolean",
+            "default": false
+          },
+          "includeUnrated": {
+            "type": "boolean",
+            "description": "When age rating filters are active, also include games with no age ratings.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "playerPerspectives": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "q": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "sort": {
+            "type": "string",
+            "knownValues": [
+              "name_asc",
+              "name_desc",
+              "published_asc",
+              "published_desc"
+            ]
+          },
+          "themes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "game",
+                "profile",
+                "platform",
+                "collection",
+                "engine"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "results"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "games.gamesgamesgamesgames.defs#gameSummaryView",
+                  "games.gamesgamesgamesgames.defs#profileSummaryView",
+                  "games.gamesgamesgamesgames.defs#platformSummaryView",
+                  "games.gamesgamesgamesgames.defs#collectionSummaryView",
+                  "games.gamesgamesgamesgames.defs#engineSummaryView"
+                ]
+              }
+            },
+            "totalResults": {
+              "type": "integer",
+              "description": "Total number of results matching the query above the relevance threshold."
+            }
+          }
+        }
+      }
+    }
+  }
+}

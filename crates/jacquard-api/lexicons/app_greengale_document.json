@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "app.greengale.document",
+  "defs": {
+    "contentRef": {
+      "type": "object",
+      "description": "Reference to external content via AT-URI. Used in site.standard.document content union.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "AT-URI pointing to the full document content",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A markdown document with extended theme and LaTeX support.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "url",
+          "path",
+          "title",
+          "publishedAt"
+        ],
+        "properties": {
+          "blobs": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "app.greengale.blog.defs#blobMetadata"
+            }
+          },
+          "content": {
+            "type": "string",
+            "description": "Markdown content of the document",
+            "maxLength": 100000
+          },
+          "latex": {
+            "type": "boolean",
+            "description": "Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility.",
+            "default": false
+          },
+          "ogp": {
+            "type": "ref",
+            "ref": "app.greengale.blog.defs#ogp"
+          },
+          "path": {
+            "type": "string",
+            "description": "Document path relative to the publication URL (e.g., /handle/rkey)",
+            "maxLength": 500
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Publication timestamp",
+            "format": "datetime"
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "tags": {
+            "type": "array",
+            "description": "Optional array of strings to tag/categorize the document. Avoid prepending with hashtags.",
+            "items": {
+              "type": "string",
+              "maxLength": 100,
+              "maxGraphemes": 50
+            },
+            "maxLength": 100
+          },
+          "theme": {
+            "type": "ref",
+            "ref": "app.greengale.blog.defs#theme"
+          },
+          "title": {
+            "type": "string",
+            "description": "Document title",
+            "maxLength": 1000
+          },
+          "url": {
+            "type": "string",
+            "description": "Base publication URL (e.g., https://greengale.app)",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Controls who can view this document",
+            "default": "public",
+            "maxLength": 16,
+            "enum": [
+              "public",
+              "url",
+              "author"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.quality",
+  "defs": {
+    "good": {
+      "type": "token",
+      "description": "Observation passed QC checks."
+    },
+    "missing": {
+      "type": "token",
+      "description": "Expected observation was not recorded."
+    },
+    "suspect": {
+      "type": "token",
+      "description": "Observation flagged as potentially unreliable."
+    }
+  }
+}

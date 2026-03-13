@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "bond.biblio.book",
+  "description": "A minimal book record for reading attestation. For rich metadata (ratings, reviews, covers), see buzz.bookhive.book.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A book in the user's library",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "authors",
+          "createdAt"
+        ],
+        "properties": {
+          "authors": {
+            "type": "string",
+            "description": "Author name(s). For multiple authors, use tab-separation for cross-lexicon compatibility with buzz.bookhive.book",
+            "maxLength": 2048
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When this record was created",
+            "format": "datetime"
+          },
+          "lists": {
+            "type": "array",
+            "description": "AT-URIs of reading lists this book is applied to",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "The book's title",
+            "maxLength": 500,
+            "maxGraphemes": 200
+          }
+        }
+      }
+    }
+  }
+}

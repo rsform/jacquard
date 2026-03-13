@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Editor",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Template editor for component records.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the component record to edit",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

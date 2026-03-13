@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.getLibrary",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get books currently in a user's library.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "Handle or DID of the user",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books"
+          ],
+          "properties": {
+            "books": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "org.passingreads.book.defs#statefulBook"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

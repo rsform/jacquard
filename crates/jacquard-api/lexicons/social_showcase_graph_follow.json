@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.graph.follow",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Follow record - who follows who (mirrors app.bsky.graph.follow)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of user being followed",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

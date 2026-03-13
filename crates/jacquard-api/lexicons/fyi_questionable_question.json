@@ -10,25 +10,18 @@
         "type": "object",
         "required": [
           "summary",
-          "text",
+          "content",
           "createdAt"
         ],
         "properties": {
-          "answers": {
-            "type": "array",
-            "description": "The answers selected by the author of the question as answering the question",
-            "items": {
-              "type": "ref",
-              "ref": "com.atproto.repo.strongRef"
-            },
-            "maxLength": 10
+          "content": {
+            "type": "ref",
+            "ref": "fyi.questionable.richtext.content"
           },
-          "context": {
-            "type": "union",
-            "refs": [
-              "fyi.questionable.actor.profile"
-            ],
-            "closed": false
+          "contextRef": {
+            "type": "ref",
+            "description": "Indicates the context in which this question was asked. Currently only fyi.questionable.actor.profile",
+            "ref": "com.atproto.repo.strongRef"
           },
           "createdAt": {
             "type": "string",
@@ -49,13 +42,6 @@
             "minLength": 1,
             "maxLength": 3000,
             "maxGraphemes": 300
-          },
-          "text": {
-            "type": "string",
-            "description": "The full text of the question",
-            "minLength": 1,
-            "maxLength": 10000,
-            "maxGraphemes": 10000
           }
         }
       }

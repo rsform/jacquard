@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "network.cosmik.collectionLink",
+  "description": "A record that links a card to a collection.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record representing the relationship between a card and a collection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "collection",
+          "card",
+          "addedBy",
+          "addedAt"
+        ],
+        "properties": {
+          "addedAt": {
+            "type": "string",
+            "description": "Timestamp when the card was added to the collection.",
+            "format": "datetime"
+          },
+          "addedBy": {
+            "type": "string",
+            "description": "DID of the user who added the card to the collection"
+          },
+          "card": {
+            "type": "ref",
+            "description": "Strong reference to the card record in the users library.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "collection": {
+            "type": "ref",
+            "description": "Strong reference to the collection record.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this link record was created (usually set by PDS).",
+            "format": "datetime"
+          },
+          "originalCard": {
+            "type": "ref",
+            "description": "Strong reference to the original card record (may be in another library).",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "provenance": {
+            "type": "ref",
+            "description": "Optional provenance information for this link.",
+            "ref": "network.cosmik.defs#provenance"
+          }
+        }
+      }
+    }
+  }
+}

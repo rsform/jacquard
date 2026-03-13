@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "store.88x31.button",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing an 88x31 button.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "blob",
+          "postedAt"
+        ],
+        "properties": {
+          "alt": {
+            "type": "string",
+            "description": "Alt text description of the button, for accessibility.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "blob": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "href": {
+            "type": "string",
+            "description": "Hypertext reference (link) for the button.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "postedAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this button was originally created.",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title text description of the button, for flavor.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

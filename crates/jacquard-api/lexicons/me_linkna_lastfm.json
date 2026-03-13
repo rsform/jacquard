@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "me.linkna.lastfm",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A Last.fm scrobble play record written by Linkname.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "trackName",
+          "artistNames",
+          "createdAt"
+        ],
+        "properties": {
+          "artistNames": {
+            "type": "array",
+            "description": "Artist name(s).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "coverArtUrl": {
+            "type": "string",
+            "description": "URL to the album cover art."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When this record was created.",
+            "format": "datetime"
+          },
+          "originUrl": {
+            "type": "string",
+            "description": "URL to the track on Last.fm.",
+            "format": "uri"
+          },
+          "playedTime": {
+            "type": "string",
+            "description": "When the track was played on Last.fm.",
+            "format": "datetime"
+          },
+          "releaseName": {
+            "type": "string",
+            "description": "Album/release name."
+          },
+          "trackName": {
+            "type": "string",
+            "description": "Track/song name."
+          }
+        }
+      }
+    }
+  }
+}

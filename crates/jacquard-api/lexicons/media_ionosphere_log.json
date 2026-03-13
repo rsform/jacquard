@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "media.ionosphere.log",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Represents information about what was played",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "ionosphere",
+          "createdAt",
+          "item"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "ionosphere": {
+            "type": "string",
+            "description": "Version identifier",
+            "maxLength": 128
+          },
+          "item": {
+            "type": "union",
+            "refs": [
+              "media.ionosphere.defs#track"
+            ]
+          },
+          "programme": {
+            "type": "string",
+            "description": "The programme this log is a part of",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

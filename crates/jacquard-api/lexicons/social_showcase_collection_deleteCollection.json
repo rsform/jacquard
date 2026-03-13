@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.collection.deleteCollection",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a collection. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "The AT-URI of the collection to delete",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json"
+      }
+    }
+  }
+}

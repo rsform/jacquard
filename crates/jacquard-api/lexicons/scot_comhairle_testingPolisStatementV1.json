@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "scot.comhairle.testingPolisStatementV1",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A statement in the Polis-style deliberation system",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "poll",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the statement was created",
+            "format": "datetime"
+          },
+          "poll": {
+            "type": "ref",
+            "description": "Reference to the poll this statement belongs to",
+            "ref": "#pollRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "The text content of the statement",
+            "maxLength": 3000
+          }
+        }
+      }
+    },
+    "pollRef": {
+      "type": "object",
+      "description": "Reference to a poll record",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "Content identifier of the poll record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the poll record",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

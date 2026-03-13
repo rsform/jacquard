@@ -1,0 +1,14 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.exportRepo",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Exports the entire hidden repository as a CAR file. Requires auth.\nEach block in the CAR file is a CBOR-encoded record entry containing the collection, record key, strategy, and record value.\nThis can be used to migrate your hidden repository to another HDS instance.",
+      "output": {
+        "encoding": "application/vnd.ipld.car"
+      }
+    }
+  }
+}

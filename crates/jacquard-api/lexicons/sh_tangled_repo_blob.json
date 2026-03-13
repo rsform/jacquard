@@ -22,10 +22,6 @@
           "type": "string",
           "description": "Commit message"
         },
-        "shortHash": {
-          "type": "string",
-          "description": "Short commit hash"
-        },
         "when": {
           "type": "string",
           "description": "Commit timestamp",

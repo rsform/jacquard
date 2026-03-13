@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "app.fitsky.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A FitSky-specific user profile with custom banner and bio",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "banner": {
+            "type": "blob",
+            "description": "Custom FitSky banner image. Falls back to Bluesky banner if not set.",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "bio": {
+            "type": "string",
+            "description": "FitSky-specific bio text",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "User's date of birth (ISO 8601). Used for max HR calculation.",
+            "format": "datetime"
+          },
+          "heightCm": {
+            "type": "integer",
+            "description": "Height in centimeters",
+            "minimum": 0
+          },
+          "publicProfile": {
+            "type": "boolean",
+            "description": "Whether workout detail pages are publicly viewable without authentication"
+          },
+          "unitSystem": {
+            "type": "string",
+            "description": "User's preferred unit system",
+            "maxLength": 64,
+            "knownValues": [
+              "metric",
+              "imperial"
+            ]
+          },
+          "weightGrams": {
+            "type": "integer",
+            "description": "Weight in grams",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

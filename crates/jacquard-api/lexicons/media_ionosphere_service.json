@@ -1,0 +1,77 @@
+{
+  "lexicon": 1,
+  "id": "media.ionosphere.service",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Represents the service belonging to this PDS",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "ionosphere",
+          "name",
+          "language"
+        ],
+        "properties": {
+          "broadcast": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#broadcast"
+            }
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "media.ionosphere.defs#genre"
+            }
+          },
+          "geolocation": {
+            "type": "union",
+            "refs": [
+              "media.ionosphere.defs#geocoordinates"
+            ]
+          },
+          "icon": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ]
+          },
+          "ionosphere": {
+            "type": "string",
+            "description": "Version identifier",
+            "maxLength": 128
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the string values in this record. NOT the language of the content",
+            "format": "language"
+          },
+          "name": {
+            "type": "string",
+            "maxGraphemes": 128
+          },
+          "presentationLanguage": {
+            "type": "string",
+            "description": "This is the language that the content is actually presented in. If multiple, choose to omit this.",
+            "format": "language"
+          }
+        }
+      }
+    }
+  }
+}

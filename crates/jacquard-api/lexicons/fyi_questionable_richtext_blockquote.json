@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.richtext.blockquote",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "plaintext"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "fyi.questionable.richtext.facet"
+          }
+        },
+        "plaintext": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

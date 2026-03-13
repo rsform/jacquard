@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.tableRow",
+  "description": "Table row containing table cells or header cells.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "array",
+          "description": "Array of table cells or header cells",
+          "items": {
+            "type": "union",
+            "refs": [
+              "blog.pckt.block.tableCell",
+              "blog.pckt.block.tableHeader"
+            ],
+            "closed": false
+          }
+        }
+      }
+    }
+  }
+}

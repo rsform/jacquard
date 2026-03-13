@@ -1,0 +1,107 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.plan.redeemTicket",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Redeem a ticket code and assign a plan to the authenticated user",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Ticket redemption code",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "assignment",
+            "message"
+          ],
+          "properties": {
+            "assignment": {
+              "type": "ref",
+              "ref": "#redeemedAssignment"
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message",
+              "maxLength": 1000
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Ticket code not found",
+          "name": "TicketNotFound"
+        },
+        {
+          "description": "Ticket has already been redeemed",
+          "name": "TicketAlreadyRedeemed"
+        },
+        {
+          "description": "Ticket has expired",
+          "name": "TicketExpired"
+        }
+      ]
+    },
+    "redeemedAssignment": {
+      "type": "object",
+      "description": "Redeemed plan assignment.",
+      "required": [
+        "id",
+        "planId",
+        "activatedAt",
+        "expiresAt",
+        "status"
+      ],
+      "properties": {
+        "activatedAt": {
+          "type": "string",
+          "description": "Plan activation timestamp",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "Plan expiration timestamp",
+          "format": "datetime",
+          "maxLength": 100
+        },
+        "id": {
+          "type": "string",
+          "description": "Plan assignment ID",
+          "maxLength": 100
+        },
+        "planId": {
+          "type": "string",
+          "description": "Plan ID",
+          "maxLength": 100
+        },
+        "status": {
+          "type": "string",
+          "description": "Plan assignment status",
+          "maxLength": 20,
+          "enum": [
+            "ACTIVE",
+            "EXPIRED",
+            "CANCELLED"
+          ]
+        }
+      }
+    }
+  }
+}

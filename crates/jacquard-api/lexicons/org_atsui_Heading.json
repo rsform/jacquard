@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Heading",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "A section label or secondary heading.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

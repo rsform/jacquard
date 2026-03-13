@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "haus.opn.mic.show.episode.favorite",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An entry marking an episode as a favorite.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "The AT-URI of the haus.opn.mic.show.episode record.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

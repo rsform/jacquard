@@ -1,0 +1,160 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.dwc.defs",
+  "description": "Shared type definitions for Darwin Core aligned biodiversity records",
+  "defs": {
+    "basisOfRecordEnum": {
+      "type": "string",
+      "description": "The specific nature of the data record. Controlled vocabulary per Darwin Core.",
+      "maxGraphemes": 64,
+      "knownValues": [
+        "HumanObservation",
+        "MachineObservation",
+        "PreservedSpecimen",
+        "LivingSpecimen",
+        "FossilSpecimen",
+        "MaterialSample",
+        "MaterialEntity",
+        "MaterialCitation"
+      ]
+    },
+    "dublinCoreTypeEnum": {
+      "type": "string",
+      "description": "Dublin Core type vocabulary for the nature of the resource.",
+      "maxGraphemes": 64,
+      "knownValues": [
+        "PhysicalObject",
+        "StillImage",
+        "MovingImage",
+        "Sound",
+        "Text",
+        "Event",
+        "Dataset"
+      ]
+    },
+    "geolocation": {
+      "type": "object",
+      "description": "A geographic point with uncertainty, following Darwin Core Location class",
+      "required": [
+        "decimalLatitude",
+        "decimalLongitude"
+      ],
+      "properties": {
+        "coordinateUncertaintyInMeters": {
+          "type": "integer",
+          "description": "Horizontal distance from the coordinates describing the smallest circle containing the whole location. Zero is not valid.",
+          "minimum": 1
+        },
+        "decimalLatitude": {
+          "type": "string",
+          "description": "Geographic latitude in decimal degrees (WGS84). Positive values north of the Equator, negative south. Range: -90 to 90.",
+          "maxGraphemes": 32
+        },
+        "decimalLongitude": {
+          "type": "string",
+          "description": "Geographic longitude in decimal degrees (WGS84). Positive values east of the Greenwich Meridian, negative west. Range: -180 to 180.",
+          "maxGraphemes": 32
+        },
+        "geodeticDatum": {
+          "type": "string",
+          "description": "The ellipsoid, geodetic datum, or spatial reference system. Recommended: 'EPSG:4326' (WGS84)",
+          "maxGraphemes": 64
+        }
+      }
+    },
+    "nomenclaturalCodeEnum": {
+      "type": "string",
+      "description": "The nomenclatural code under which the scientific name is constructed.",
+      "maxGraphemes": 64,
+      "knownValues": [
+        "ICZN",
+        "ICN",
+        "ICNP",
+        "ICTV",
+        "BioCode"
+      ]
+    },
+    "occurrenceStatusEnum": {
+      "type": "string",
+      "description": "Statement about the presence or absence of a taxon at a location.",
+      "maxGraphemes": 64,
+      "knownValues": [
+        "present",
+        "absent"
+      ]
+    },
+    "sexEnum": {
+      "type": "string",
+      "description": "The sex of the biological individual(s) represented in the occurrence.",
+      "maxGraphemes": 64,
+      "knownValues": [
+        "male",
+        "female",
+        "hermaphrodite"
+      ]
+    },
+    "taxonIdentification": {
+      "type": "object",
+      "description": "A taxonomic identification with provenance metadata",
+      "required": [
+        "scientificName"
+      ],
+      "properties": {
+        "dateIdentified": {
+          "type": "string",
+          "description": "Date the identification was made (ISO 8601)",
+          "maxGraphemes": 64
+        },
+        "gbifTaxonKey": {
+          "type": "string",
+          "description": "GBIF backbone taxonomy key for the identified taxon",
+          "maxGraphemes": 64
+        },
+        "identificationQualifier": {
+          "type": "string",
+          "description": "Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')",
+          "maxGraphemes": 256
+        },
+        "identificationRemarks": {
+          "type": "string",
+          "description": "Notes or comments about the identification",
+          "maxGraphemes": 2048
+        },
+        "identifiedBy": {
+          "type": "string",
+          "description": "Person(s) who made the identification (pipe-delimited for multiple)",
+          "maxGraphemes": 512
+        },
+        "identifiedByID": {
+          "type": "string",
+          "description": "ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)",
+          "maxGraphemes": 512
+        },
+        "scientificName": {
+          "type": "string",
+          "description": "The full scientific name including authorship and date",
+          "maxGraphemes": 512
+        }
+      }
+    },
+    "taxonRankEnum": {
+      "type": "string",
+      "description": "The taxonomic rank of the most specific name in the scientificName.",
+      "maxGraphemes": 64,
+      "knownValues": [
+        "kingdom",
+        "phylum",
+        "class",
+        "order",
+        "family",
+        "subfamily",
+        "genus",
+        "subgenus",
+        "species",
+        "subspecies",
+        "variety",
+        "form"
+      ]
+    }
+  }
+}

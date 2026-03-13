@@ -1,7 +1,6 @@
 {
   "lexicon": 1,
   "id": "app.dropanchor.like",
-  "description": "A like record for check-ins in the Anchor app",
   "defs": {
     "main": {
       "type": "record",

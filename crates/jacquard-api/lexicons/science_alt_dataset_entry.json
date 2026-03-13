@@ -1,0 +1,127 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.entry",
+  "defs": {
+    "datasetSize": {
+      "type": "object",
+      "description": "Information about dataset size",
+      "properties": {
+        "bytes": {
+          "type": "integer",
+          "description": "Total size in bytes",
+          "minimum": 0
+        },
+        "samples": {
+          "type": "integer",
+          "description": "Total number of samples in the dataset",
+          "minimum": 0
+        },
+        "shards": {
+          "type": "integer",
+          "description": "Number of WebDataset shards",
+          "minimum": 1
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Index entry for a WebDataset-backed dataset with references to storage location and sample schema",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "schemaRef",
+          "storage",
+          "createdAt"
+        ],
+        "properties": {
+          "contentMetadata": {
+            "type": "unknown",
+            "description": "Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this dataset entry was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the dataset",
+            "maxLength": 5000
+          },
+          "license": {
+            "type": "string",
+            "description": "License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.",
+            "maxLength": 200
+          },
+          "metadata": {
+            "type": "bytes",
+            "description": "Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.",
+            "maxLength": 100000
+          },
+          "metadataSchemaRef": {
+            "type": "string",
+            "description": "Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.",
+            "format": "at-uri",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable dataset name",
+            "maxLength": 200
+          },
+          "schemaRef": {
+            "type": "string",
+            "description": "AT-URI reference to the schema record for this dataset's samples",
+            "format": "at-uri",
+            "maxLength": 500
+          },
+          "size": {
+            "type": "ref",
+            "description": "Dataset size information (optional)",
+            "ref": "#datasetSize"
+          },
+          "storage": {
+            "type": "union",
+            "description": "Storage location for dataset files (WebDataset tar archives)",
+            "refs": [
+              "science.alt.dataset.storageHttp",
+              "science.alt.dataset.storageS3",
+              "science.alt.dataset.storageBlobs"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "description": "Searchable tags for dataset discovery. Aligns with Schema.org keywords property.",
+            "items": {
+              "type": "string",
+              "maxLength": 150
+            },
+            "maxLength": 30
+          }
+        }
+      }
+    },
+    "shardChecksum": {
+      "type": "object",
+      "description": "Content hash for shard integrity verification. Algorithm is flexible to allow SHA-256, BLAKE3, or other hash functions.",
+      "required": [
+        "algorithm",
+        "digest"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "description": "Hash algorithm identifier (e.g., 'sha256', 'blake3')",
+          "maxLength": 20
+        },
+        "digest": {
+          "type": "string",
+          "description": "Hex-encoded hash digest",
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

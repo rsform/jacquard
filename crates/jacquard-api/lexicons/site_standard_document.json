@@ -4,7 +4,6 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A document record representing a published article, blog post, or other content. Documents can belong to a publication or exist independently.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -16,18 +15,17 @@
         "properties": {
           "bskyPostRef": {
             "type": "ref",
-            "description": "Strong reference to a Bluesky post. Useful to keep track of comments off-platform.",
             "ref": "com.atproto.repo.strongRef"
           },
           "content": {
             "type": "union",
-            "description": "Open union used to define the record's content. Each entry must specify a $type and may be extended with other lexicons to support additional content formats.",
-            "refs": [],
+            "refs": [
+              "pub.leaflet.content"
+            ],
             "closed": false
           },
           "coverImage": {
             "type": "blob",
-            "description": "Image to used for thumbnail or cover image. Less than 1MB is size.",
             "accept": [
               "image/*"
             ],
@@ -35,27 +33,31 @@
           },
           "description": {
             "type": "string",
-            "description": "A brief description or excerpt from the document.",
-            "maxLength": 3000,
-            "maxGraphemes": 300
+            "maxLength": 30000,
+            "maxGraphemes": 3000
           },
           "path": {
             "type": "string",
-            "description": "Combine with site or publication url to construct a canonical URL to the document. Prepend with a leading slash."
+            "description": "combine with the publication url or the document site to construct a full url to the document"
+          },
+          "preferences": {
+            "type": "union",
+            "refs": [
+              "pub.leaflet.publication#preferences"
+            ],
+            "closed": false
           },
           "publishedAt": {
             "type": "string",
-            "description": "Timestamp of the documents publish time.",
             "format": "datetime"
           },
           "site": {
             "type": "string",
-            "description": "Points to a publication record (at://) or a publication url (https://) for loose documents. Avoid trailing slashes.",
+            "description": "URI to the site or publication this document belongs to. Supports both AT-URIs (at://did/collection/rkey) for publication references and HTTPS URLs (https://example.com) for standalone documents or external sites.",
             "format": "uri"
           },
           "tags": {
             "type": "array",
-            "description": "Array of strings used to tag or categorize the document. Avoid prepending tags with hashtags.",
             "items": {
               "type": "string",
               "maxLength": 100,
@@ -63,18 +65,20 @@
             }
           },
           "textContent": {
-            "type": "string",
-            "description": "Plaintext representation of the documents contents. Should not contain markdown or other formatting."
+            "type": "string"
+          },
+          "theme": {
+            "type": "ref",
+            "description": "Theme for standalone documents. For documents in publications, theme is inherited from the publication.",
+            "ref": "pub.leaflet.publication#theme"
           },
           "title": {
             "type": "string",
-            "description": "Title of the document.",
-            "maxLength": 1280,
-            "maxGraphemes": 128
+            "maxLength": 5000,
+            "maxGraphemes": 500
           },
           "updatedAt": {
             "type": "string",
-            "description": "Timestamp of the documents last edit.",
             "format": "datetime"
           }
         }

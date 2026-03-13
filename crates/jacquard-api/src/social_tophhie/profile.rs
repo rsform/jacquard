@@ -191,6 +191,7 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                         required: Some(
                             vec![
                                 ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("pdsPreferences"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("communicationPreferences")
                             ],
                         ),
@@ -279,7 +280,12 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                             "Granular PDS preference consent flags.",
                         ),
                     ),
-                    required: Some(vec![]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("showOnHomepage"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("accessibilityScoring")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
@@ -350,11 +356,8 @@ pub struct Profile<'a> {
     /// ISO 8601 timestamp when this profile record was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// User's opt-in/out preferences for PDS features.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pds_preferences: std::option::Option<
-        crate::social_tophhie::profile::PdsPreferences<'a>,
-    >,
+    pub pds_preferences: crate::social_tophhie::profile::PdsPreferences<'a>,
     /// ISO 8601 timestamp when this profile record was updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -372,6 +375,7 @@ pub mod profile_state {
     pub trait State: sealed::Sealed {
         type CommunicationPreferences;
         type CreatedAt;
+        type PdsPreferences;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -379,6 +383,7 @@ pub mod profile_state {
     impl State for Empty {
         type CommunicationPreferences = Unset;
         type CreatedAt = Unset;
+        type PdsPreferences = Unset;
     }
     ///State transition - sets the `communication_preferences` field to Set
     pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
@@ -386,6 +391,7 @@ pub mod profile_state {
     impl<S: State> State for SetCommunicationPreferences<S> {
         type CommunicationPreferences = Set<members::communication_preferences>;
         type CreatedAt = S::CreatedAt;
+        type PdsPreferences = S::PdsPreferences;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -393,6 +399,15 @@ pub mod profile_state {
     impl<S: State> State for SetCreatedAt<S> {
         type CommunicationPreferences = S::CommunicationPreferences;
         type CreatedAt = Set<members::created_at>;
+        type PdsPreferences = S::PdsPreferences;
+    }
+    ///State transition - sets the `pds_preferences` field to Set
+    pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
+    impl<S: State> State for SetPdsPreferences<S> {
+        type CommunicationPreferences = S::CommunicationPreferences;
+        type CreatedAt = S::CreatedAt;
+        type PdsPreferences = Set<members::pds_preferences>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -401,6 +416,8 @@ pub mod profile_state {
         pub struct communication_preferences(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `pds_preferences` field
+        pub struct pds_preferences(());
     }
 }
 
@@ -474,22 +491,22 @@ where
     }
 }
 
-impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
-    /// Set the `pdsPreferences` field (optional)
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::PdsPreferences: profile_state::IsUnset,
+{
+    /// Set the `pdsPreferences` field (required)
     pub fn pds_preferences(
         mut self,
-        value: impl Into<Option<crate::social_tophhie::profile::PdsPreferences<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `pdsPreferences` field to an Option value (optional)
-    pub fn maybe_pds_preferences(
-        mut self,
-        value: Option<crate::social_tophhie::profile::PdsPreferences<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
+        value: impl Into<crate::social_tophhie::profile::PdsPreferences<'a>>,
+    ) -> ProfileBuilder<'a, profile_state::SetPdsPreferences<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
 }
 
@@ -517,13 +534,14 @@ where
     S: profile_state::State,
     S::CommunicationPreferences: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
+    S::PdsPreferences: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
             communication_preferences: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            pds_preferences: self.__unsafe_private_named.2,
+            pds_preferences: self.__unsafe_private_named.2.unwrap(),
             updated_at: self.__unsafe_private_named.3,
             extra_data: Default::default(),
         }
@@ -539,7 +557,7 @@ where
         Profile {
             communication_preferences: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            pds_preferences: self.__unsafe_private_named.2,
+            pds_preferences: self.__unsafe_private_named.2.unwrap(),
             updated_at: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
@@ -633,17 +651,151 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    Default
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PdsPreferences<'a> {
     /// True if the user participates in accessibility scoring.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accessibility_scoring: std::option::Option<bool>,
+    pub accessibility_scoring: bool,
     /// True if the user is shown on the Tophhie Social homepage.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_on_homepage: std::option::Option<bool>,
+    pub show_on_homepage: bool,
+}
+
+pub mod pds_preferences_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ShowOnHomepage;
+        type AccessibilityScoring;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ShowOnHomepage = Unset;
+        type AccessibilityScoring = Unset;
+    }
+    ///State transition - sets the `show_on_homepage` field to Set
+    pub struct SetShowOnHomepage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowOnHomepage<S> {}
+    impl<S: State> State for SetShowOnHomepage<S> {
+        type ShowOnHomepage = Set<members::show_on_homepage>;
+        type AccessibilityScoring = S::AccessibilityScoring;
+    }
+    ///State transition - sets the `accessibility_scoring` field to Set
+    pub struct SetAccessibilityScoring<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccessibilityScoring<S> {}
+    impl<S: State> State for SetAccessibilityScoring<S> {
+        type ShowOnHomepage = S::ShowOnHomepage;
+        type AccessibilityScoring = Set<members::accessibility_scoring>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `show_on_homepage` field
+        pub struct show_on_homepage(());
+        ///Marker type for the `accessibility_scoring` field
+        pub struct accessibility_scoring(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PdsPreferencesBuilder<'a, S: pds_preferences_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PdsPreferences<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PdsPreferencesBuilder<'a, pds_preferences_state::Empty> {
+        PdsPreferencesBuilder::new()
+    }
+}
+
+impl<'a> PdsPreferencesBuilder<'a, pds_preferences_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PdsPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PdsPreferencesBuilder<'a, S>
+where
+    S: pds_preferences_state::State,
+    S::AccessibilityScoring: pds_preferences_state::IsUnset,
+{
+    /// Set the `accessibilityScoring` field (required)
+    pub fn accessibility_scoring(
+        mut self,
+        value: impl Into<bool>,
+    ) -> PdsPreferencesBuilder<'a, pds_preferences_state::SetAccessibilityScoring<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PdsPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PdsPreferencesBuilder<'a, S>
+where
+    S: pds_preferences_state::State,
+    S::ShowOnHomepage: pds_preferences_state::IsUnset,
+{
+    /// Set the `showOnHomepage` field (required)
+    pub fn show_on_homepage(
+        mut self,
+        value: impl Into<bool>,
+    ) -> PdsPreferencesBuilder<'a, pds_preferences_state::SetShowOnHomepage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PdsPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PdsPreferencesBuilder<'a, S>
+where
+    S: pds_preferences_state::State,
+    S::ShowOnHomepage: pds_preferences_state::IsSet,
+    S::AccessibilityScoring: pds_preferences_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PdsPreferences<'a> {
+        PdsPreferences {
+            accessibility_scoring: self.__unsafe_private_named.0.unwrap(),
+            show_on_homepage: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PdsPreferences<'a> {
+        PdsPreferences {
+            accessibility_scoring: self.__unsafe_private_named.0.unwrap(),
+            show_on_homepage: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PdsPreferences<'a> {

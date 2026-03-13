@@ -1,0 +1,77 @@
+{
+  "lexicon": 1,
+  "id": "app.protoimsg.chat.community",
+  "defs": {
+    "communityGroup": {
+      "type": "object",
+      "description": "A named group of community members.",
+      "required": [
+        "name",
+        "members"
+      ],
+      "properties": {
+        "isInnerCircle": {
+          "type": "boolean",
+          "description": "Whether this is an inner circle group for presence visibility.",
+          "default": false
+        },
+        "members": {
+          "type": "array",
+          "description": "DIDs of group members.",
+          "items": {
+            "type": "ref",
+            "ref": "#communityMember"
+          },
+          "maxLength": 500
+        },
+        "name": {
+          "type": "string",
+          "description": "Group label.",
+          "maxLength": 100
+        }
+      }
+    },
+    "communityMember": {
+      "type": "object",
+      "description": "A member in a community group.",
+      "required": [
+        "did",
+        "addedAt"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "description": "When this member was added.",
+          "format": "datetime"
+        },
+        "did": {
+          "type": "string",
+          "description": "The member's DID.",
+          "format": "did"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "The user's community list. Portable across any app implementing the Lexicon.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "groups"
+        ],
+        "properties": {
+          "groups": {
+            "type": "array",
+            "description": "Named groups of community members, like AIM's buddy list categories.",
+            "items": {
+              "type": "ref",
+              "ref": "#communityGroup"
+            },
+            "maxLength": 50
+          }
+        }
+      }
+    }
+  }
+}

@@ -47,66 +47,66 @@ pub mod auth_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
+        type Handle;
         type AccessJwt;
         type RefreshJwt;
-        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
+        type Handle = Unset;
         type AccessJwt = Unset;
         type RefreshJwt = Unset;
-        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Did = Set<members::did>;
+        type Handle = S::Handle;
         type AccessJwt = S::AccessJwt;
         type RefreshJwt = S::RefreshJwt;
-        type Handle = S::Handle;
-    }
-    ///State transition - sets the `access_jwt` field to Set
-    pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
-    impl<S: State> State for SetAccessJwt<S> {
-        type Did = S::Did;
-        type AccessJwt = Set<members::access_jwt>;
-        type RefreshJwt = S::RefreshJwt;
-        type Handle = S::Handle;
-    }
-    ///State transition - sets the `refresh_jwt` field to Set
-    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
-    impl<S: State> State for SetRefreshJwt<S> {
-        type Did = S::Did;
-        type AccessJwt = S::AccessJwt;
-        type RefreshJwt = Set<members::refresh_jwt>;
-        type Handle = S::Handle;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Did = S::Did;
+        type Handle = Set<members::handle>;
         type AccessJwt = S::AccessJwt;
         type RefreshJwt = S::RefreshJwt;
-        type Handle = Set<members::handle>;
+    }
+    ///State transition - sets the `access_jwt` field to Set
+    pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
+    impl<S: State> State for SetAccessJwt<S> {
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type AccessJwt = Set<members::access_jwt>;
+        type RefreshJwt = S::RefreshJwt;
+    }
+    ///State transition - sets the `refresh_jwt` field to Set
+    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
+    impl<S: State> State for SetRefreshJwt<S> {
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type AccessJwt = S::AccessJwt;
+        type RefreshJwt = Set<members::refresh_jwt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
         ///Marker type for the `access_jwt` field
         pub struct access_jwt(());
         ///Marker type for the `refresh_jwt` field
         pub struct refresh_jwt(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
     }
 }
 
@@ -220,9 +220,9 @@ impl<'a, S> AuthCallbackBuilder<'a, S>
 where
     S: auth_callback_state::State,
     S::Did: auth_callback_state::IsSet,
+    S::Handle: auth_callback_state::IsSet,
     S::AccessJwt: auth_callback_state::IsSet,
     S::RefreshJwt: auth_callback_state::IsSet,
-    S::Handle: auth_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthCallback<'a> {

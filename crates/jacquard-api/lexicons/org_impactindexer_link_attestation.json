@@ -1,0 +1,100 @@
+{
+  "lexicon": 1,
+  "id": "org.impactindexer.link.attestation",
+  "defs": {
+    "eip712Message": {
+      "type": "object",
+      "description": "The EIP-712 typed data message structure",
+      "required": [
+        "did",
+        "evmAddress",
+        "chainId",
+        "timestamp",
+        "nonce"
+      ],
+      "properties": {
+        "chainId": {
+          "type": "string",
+          "description": "The chain ID as a string (for bigint compatibility, max uint256)",
+          "maxLength": 78
+        },
+        "did": {
+          "type": "string",
+          "description": "The ATProto DID being linked",
+          "maxLength": 2048
+        },
+        "evmAddress": {
+          "type": "string",
+          "description": "The EVM address being linked (0x-prefixed)",
+          "minLength": 42,
+          "maxLength": 42
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Replay protection nonce as a string (for bigint compatibility)",
+          "maxLength": 78
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Unix timestamp as a string (for bigint compatibility)",
+          "maxLength": 78
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "An attestation linking an ATProto DID to an EVM wallet address, signed with EIP-712.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "address",
+          "chainId",
+          "signature",
+          "message",
+          "signatureType",
+          "createdAt"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "The EVM wallet address (checksummed or lowercase, 0x-prefixed)",
+            "minLength": 42,
+            "maxLength": 42
+          },
+          "chainId": {
+            "type": "integer",
+            "description": "The EVM chain ID where the signature was created",
+            "minimum": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the attestation was created",
+            "format": "datetime"
+          },
+          "message": {
+            "type": "ref",
+            "description": "The EIP-712 typed data message that was signed",
+            "ref": "#eip712Message"
+          },
+          "signature": {
+            "type": "string",
+            "description": "The EIP-712 signature in hex format (0x-prefixed, 65 bytes for ECDSA, longer for smart contract sigs)",
+            "minLength": 132,
+            "maxLength": 1000
+          },
+          "signatureType": {
+            "type": "string",
+            "description": "The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)",
+            "maxLength": 10,
+            "knownValues": [
+              "eoa",
+              "erc1271",
+              "erc6492"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

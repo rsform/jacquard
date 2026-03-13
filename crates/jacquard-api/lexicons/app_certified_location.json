@@ -1,0 +1,90 @@
+{
+  "lexicon": 1,
+  "id": "app.certified.location",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A location reference",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "lpVersion",
+          "srs",
+          "locationType",
+          "location",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Additional context about this location, such as its significance to the work or specific boundaries",
+            "maxLength": 2000,
+            "maxGraphemes": 500
+          },
+          "location": {
+            "type": "union",
+            "description": "The location of where the work was performed as a URI, blob, or inline string.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallBlob",
+              "#string"
+            ]
+          },
+          "locationType": {
+            "type": "string",
+            "description": "An identifier for the format of the location data (e.g., coordinate-decimal, geojson-point). See the Location Protocol spec for the full registry: https://spec.decentralizedgeo.org/specification/location-types/#location-type-registry",
+            "maxLength": 20,
+            "knownValues": [
+              "coordinate-decimal",
+              "geojson-point",
+              "geojson",
+              "h3",
+              "geohash",
+              "wkt",
+              "address",
+              "scaledCoordinates"
+            ]
+          },
+          "lpVersion": {
+            "type": "string",
+            "description": "The version of the Location Protocol",
+            "maxLength": 10
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for this location (e.g. 'Golden Gate Park', 'San Francisco Bay Area')",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "srs": {
+            "type": "string",
+            "description": "The Spatial Reference System URI (e.g., http://www.opengis.net/def/crs/OGC/1.3/CRS84) that defines the coordinate system.",
+            "format": "uri",
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "string": {
+      "type": "object",
+      "description": "A location represented as a string, e.g. coordinates or a small GeoJSON string.",
+      "required": [
+        "string"
+      ],
+      "properties": {
+        "string": {
+          "type": "string",
+          "description": "The location string value",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.team",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A quiz team",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "members"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed near the team name",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1500000
+          },
+          "avatarAlt": {
+            "type": "string",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "members": {
+            "type": "array",
+            "description": "DIDs of team members",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "name": {
+            "type": "string",
+            "description": "Team name",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          }
+        }
+      }
+    }
+  }
+}

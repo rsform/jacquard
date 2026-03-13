@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes.
+/// A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes. Subject is an AT URI pointing to the repo page record being starred.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -20,9 +20,9 @@
 pub struct Star<'a> {
     /// Star creation timestamp
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The repository being starred
+    /// AT URI of the repository page being starred (e.g., at://did:plc:abc/io.atcr.repo.page/myapp)
     #[serde(borrow)]
-    pub subject: crate::io_atcr::sailor::star::Subject<'a>,
+    pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod star_state {
@@ -74,7 +74,7 @@ pub struct StarBuilder<'a, S: star_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::io_atcr::sailor::star::Subject<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -124,7 +124,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<crate::io_atcr::sailor::star::Subject<'a>>,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
     ) -> StarBuilder<'a, star_state::SetSubject<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         StarBuilder {
@@ -258,7 +258,7 @@ fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
-                            "A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes.",
+                            "A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes. Subject is an AT URI pointing to the repo page record being starred.",
                         ),
                     ),
                     key: Some(::jacquard_common::CowStr::new_static("any")),
@@ -299,9 +299,23 @@ fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#subject"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "AT URI of the repository page being starred (e.g., at://did:plc:abc/io.atcr.repo.page/myapp)",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
                                 }),
                             );
                             map
@@ -309,262 +323,7 @@ fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     }),
                 }),
             );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Reference to a repository owned by a user",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("repository")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the repository owner",
-                                    ),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "repository",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Repository name (e.g., 'myapp')",
-                                    ),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(255usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
             map
         },
-    }
-}
-
-/// Reference to a repository owned by a user
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Subject<'a> {
-    /// DID of the repository owner
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    /// Repository name (e.g., 'myapp')
-    #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
-}
-
-pub mod subject_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Repository;
-        type Did;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Repository = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Repository = S::Repository;
-        type Did = Set<members::did>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
-        ///Marker type for the `did` field
-        pub struct did(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct SubjectBuilder<'a, S: subject_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Subject<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubjectBuilder<'a, subject_state::Empty> {
-        SubjectBuilder::new()
-    }
-}
-
-impl<'a> SubjectBuilder<'a, subject_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        SubjectBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> SubjectBuilder<'a, S>
-where
-    S: subject_state::State,
-    S::Did: subject_state::IsUnset,
-{
-    /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> SubjectBuilder<'a, subject_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        SubjectBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> SubjectBuilder<'a, S>
-where
-    S: subject_state::State,
-    S::Repository: subject_state::IsUnset,
-{
-    /// Set the `repository` field (required)
-    pub fn repository(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> SubjectBuilder<'a, subject_state::SetRepository<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        SubjectBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> SubjectBuilder<'a, S>
-where
-    S: subject_state::State,
-    S::Repository: subject_state::IsSet,
-    S::Did: subject_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Subject<'a> {
-        Subject {
-            did: self.__unsafe_private_named.0.unwrap(),
-            repository: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Subject<'a> {
-        Subject {
-            did: self.__unsafe_private_named.0.unwrap(),
-            repository: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subject<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.sailor.star"
-    }
-    fn def_name() -> &'static str {
-        "subject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_sailor_star()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.repository;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

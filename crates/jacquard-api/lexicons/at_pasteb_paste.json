@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "at.pasteb.paste",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A paste",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "blob",
+            "accept": [
+              "*/*"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the paste",
+            "maxLength": 2048,
+            "maxGraphemes": 1024
+          },
+          "lang": {
+            "type": "string",
+            "description": "Language/syntax identifier for highlighting",
+            "maxLength": 32
+          },
+          "thumbnail": {
+            "type": "blob",
+            "accept": [
+              "image/webp"
+            ],
+            "maxSize": 102400
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

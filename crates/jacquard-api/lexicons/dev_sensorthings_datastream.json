@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.datastream",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Groups Observations of one ObservedProperty by one Sensor on one Thing. Carries all context needed to interpret observation results.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "thing",
+          "sensor",
+          "observedProperty",
+          "unitOfMeasurement",
+          "observationType",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "observationType": {
+            "type": "string",
+            "description": "O&M observation type URI, e.g. http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+            "format": "uri"
+          },
+          "observedArea": {
+            "type": "ref",
+            "description": "Representative location for the datastream",
+            "ref": "dev.sensorthings.thing#geoPoint"
+          },
+          "observedProperty": {
+            "type": "string",
+            "description": "AT-URI of the dev.sensorthings.observedProperty record",
+            "format": "at-uri"
+          },
+          "resultScaleFactor": {
+            "type": "integer",
+            "description": "10^n divisor for numeric results. E.g. 2 means observation integers are in centi-units (÷100). Default 0. Only meaningful for numericResult and arrayResult types."
+          },
+          "sensor": {
+            "type": "string",
+            "description": "AT-URI of the dev.sensorthings.sensor record",
+            "format": "at-uri"
+          },
+          "thing": {
+            "type": "string",
+            "description": "AT-URI of the dev.sensorthings.thing record",
+            "format": "at-uri"
+          },
+          "unitOfMeasurement": {
+            "type": "ref",
+            "ref": "#unitOfMeasurement"
+          },
+          "verticalDatum": {
+            "type": "string",
+            "description": "Vertical datum reference for water level or elevation measurements. Either a URI (e.g. http://www.opengis.net/def/crs/EPSG/0/5731 for Malin Head) or a human-readable identifier (e.g. 'Chart Datum', 'local-gauge-zero'). Absent for non-vertical measurements.",
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    "unitOfMeasurement": {
+      "type": "object",
+      "description": "UCUM-compatible unit description.",
+      "required": [
+        "name",
+        "symbol"
+      ],
+      "properties": {
+        "definition": {
+          "type": "string",
+          "description": "URI from QUDT, UCUM, or similar unit ontology",
+          "format": "uri"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "symbol": {
+          "type": "string",
+          "maxLength": 32
+        }
+      }
+    }
+  }
+}

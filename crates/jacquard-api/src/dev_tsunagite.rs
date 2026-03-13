@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod chart;
 pub mod difficulty;
 pub mod game;
 pub mod song;

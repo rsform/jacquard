@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "mov.danabra.Greeting",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "A greeting component that displays a personalized hello message.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name to greet.",
+              "maxLength": 640
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

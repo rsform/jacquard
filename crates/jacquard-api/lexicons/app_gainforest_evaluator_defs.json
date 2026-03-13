@@ -1,0 +1,310 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.evaluator.defs",
+  "description": "Shared type definitions for decentralized evaluator services. Evaluators attach structured, typed evaluation data to records (a more sophisticated evolution of the labeler pattern).",
+  "defs": {
+    "candidateTaxon": {
+      "type": "object",
+      "description": "A candidate taxon identification with confidence score and rank.",
+      "required": [
+        "scientificName",
+        "confidence",
+        "rank"
+      ],
+      "properties": {
+        "confidence": {
+          "type": "integer",
+          "description": "Confidence score (0-1000, where 1000 = 100.0%).",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "family": {
+          "type": "string",
+          "description": "Family of the candidate taxon.",
+          "maxGraphemes": 128
+        },
+        "gbifTaxonKey": {
+          "type": "string",
+          "description": "GBIF backbone taxonomy key for the candidate.",
+          "maxGraphemes": 64
+        },
+        "genus": {
+          "type": "string",
+          "description": "Genus of the candidate taxon.",
+          "maxGraphemes": 128
+        },
+        "kingdom": {
+          "type": "string",
+          "description": "Kingdom of the candidate taxon.",
+          "maxGraphemes": 128
+        },
+        "rank": {
+          "type": "integer",
+          "description": "Rank position among candidates (1 = best match).",
+          "minimum": 1
+        },
+        "scientificName": {
+          "type": "string",
+          "description": "Full scientific name of the candidate taxon.",
+          "maxGraphemes": 512
+        }
+      }
+    },
+    "classificationResult": {
+      "type": "object",
+      "description": "Generic categorical classification result (e.g., conservation priority, habitat type).",
+      "required": [
+        "category",
+        "value"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "The classification category (e.g., 'conservation-priority', 'habitat-type').",
+          "maxGraphemes": 128
+        },
+        "remarks": {
+          "type": "string",
+          "description": "Additional notes about the classification.",
+          "maxGraphemes": 2048
+        },
+        "value": {
+          "type": "string",
+          "description": "The assigned classification value (e.g., 'critical', 'tropical-rainforest').",
+          "maxGraphemes": 256
+        }
+      }
+    },
+    "dataQualityResult": {
+      "type": "object",
+      "description": "Data quality assessment result with per-field quality flags.",
+      "required": [
+        "flags"
+      ],
+      "properties": {
+        "completenessScore": {
+          "type": "integer",
+          "description": "Overall completeness score (0-1000, where 1000 = 100.0%).",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "flags": {
+          "type": "array",
+          "description": "List of quality issues found in the record.",
+          "items": {
+            "type": "ref",
+            "ref": "#qualityFlag"
+          },
+          "maxLength": 50
+        },
+        "remarks": {
+          "type": "string",
+          "description": "Additional notes about the quality assessment.",
+          "maxGraphemes": 2048
+        }
+      }
+    },
+    "derivedMeasurement": {
+      "type": "object",
+      "description": "A single measurement derived by an evaluator from source data.",
+      "required": [
+        "measurementType",
+        "measurementValue"
+      ],
+      "properties": {
+        "measurementMethod": {
+          "type": "string",
+          "description": "Description of the method used to obtain the measurement.",
+          "maxGraphemes": 1024
+        },
+        "measurementType": {
+          "type": "string",
+          "description": "The nature of the measurement (e.g., 'canopy cover', 'NDVI', 'tree height').",
+          "maxGraphemes": 256
+        },
+        "measurementUnit": {
+          "type": "string",
+          "description": "The units for the measurement value (e.g., '%', 'm', 'kg').",
+          "maxGraphemes": 64
+        },
+        "measurementValue": {
+          "type": "string",
+          "description": "The value of the measurement.",
+          "maxGraphemes": 1024
+        }
+      }
+    },
+    "measurementResult": {
+      "type": "object",
+      "description": "Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).",
+      "required": [
+        "measurements"
+      ],
+      "properties": {
+        "measurements": {
+          "type": "array",
+          "description": "List of derived measurements.",
+          "items": {
+            "type": "ref",
+            "ref": "#derivedMeasurement"
+          },
+          "maxLength": 20
+        },
+        "remarks": {
+          "type": "string",
+          "description": "Additional notes about the measurements.",
+          "maxGraphemes": 2048
+        }
+      }
+    },
+    "methodInfo": {
+      "type": "object",
+      "description": "Provenance metadata describing the method used to produce an evaluation.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "modelCheckpoint": {
+          "type": "string",
+          "description": "Identifier for the specific model checkpoint used (e.g., date or hash).",
+          "maxGraphemes": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the method or model (e.g., 'GainForest BioClassifier').",
+          "maxGraphemes": 256
+        },
+        "references": {
+          "type": "array",
+          "description": "URIs to papers, documentation, or repositories describing this method.",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxLength": 10
+        },
+        "version": {
+          "type": "string",
+          "description": "Version string of the method or model (e.g., '2.1.0').",
+          "maxGraphemes": 64
+        }
+      }
+    },
+    "qualityFlag": {
+      "type": "object",
+      "description": "A single data quality flag indicating an issue with a specific field.",
+      "required": [
+        "field",
+        "issue"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The field name that has the quality issue.",
+          "maxGraphemes": 64
+        },
+        "issue": {
+          "type": "string",
+          "description": "Description of the quality issue.",
+          "maxGraphemes": 256
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity level of the quality issue.",
+          "maxGraphemes": 64,
+          "knownValues": [
+            "error",
+            "warning",
+            "info"
+          ]
+        }
+      }
+    },
+    "speciesIdResult": {
+      "type": "object",
+      "description": "AI or human species recognition result with ranked candidate identifications.",
+      "required": [
+        "candidates"
+      ],
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "description": "Ranked list of candidate species identifications.",
+          "items": {
+            "type": "ref",
+            "ref": "#candidateTaxon"
+          },
+          "maxLength": 20
+        },
+        "inputFeature": {
+          "type": "string",
+          "description": "Which feature of the subject record was used as input (e.g., 'mediaEvidence').",
+          "maxGraphemes": 64
+        },
+        "remarks": {
+          "type": "string",
+          "description": "Additional notes about the species identification.",
+          "maxGraphemes": 2048
+        }
+      }
+    },
+    "subjectRef": {
+      "type": "object",
+      "description": "Reference to a target record that is being evaluated.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "CID pinning the exact version of the target record.",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the target record.",
+          "format": "at-uri"
+        }
+      }
+    },
+    "verificationResult": {
+      "type": "object",
+      "description": "Expert verification result for a previous identification or evaluation.",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "remarks": {
+          "type": "string",
+          "description": "Notes about the verification decision.",
+          "maxGraphemes": 2048
+        },
+        "status": {
+          "type": "string",
+          "description": "Verification status: confirmed, rejected, or uncertain.",
+          "maxGraphemes": 64,
+          "knownValues": [
+            "confirmed",
+            "rejected",
+            "uncertain"
+          ]
+        },
+        "suggestedCorrections": {
+          "type": "string",
+          "description": "Suggested corrections if the original identification was rejected or uncertain.",
+          "maxGraphemes": 5000
+        },
+        "verifiedBy": {
+          "type": "string",
+          "description": "Name of the person who performed the verification.",
+          "maxGraphemes": 256
+        },
+        "verifiedByID": {
+          "type": "string",
+          "description": "Persistent identifier (e.g., ORCID) of the verifier.",
+          "maxGraphemes": 256
+        }
+      }
+    }
+  }
+}

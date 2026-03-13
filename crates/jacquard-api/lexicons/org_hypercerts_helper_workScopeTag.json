@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "org.hypercerts.helper.workScopeTag",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "key",
+          "label"
+        ],
+        "properties": {
+          "aliases": {
+            "type": "array",
+            "description": "Optional array of alternative names or identifiers for this scope.",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxLength": 50
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional longer description of this scope.",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "externalReference": {
+            "type": "union",
+            "description": "Optional external reference for this scope as a URI or blob.",
+            "refs": [
+              "org.hypercerts.defs#uri",
+              "org.hypercerts.defs#smallBlob"
+            ]
+          },
+          "key": {
+            "type": "string",
+            "description": "Lowercase, hyphenated machine-readable key for this scope (e.g., 'ipfs', 'go-lang', 'filecoin').",
+            "maxLength": 120
+          },
+          "kind": {
+            "type": "string",
+            "description": "Category type of this scope. Recommended values: topic, language, domain, method, tag.",
+            "maxLength": 50
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for this scope.",
+            "maxLength": 200
+          },
+          "parent": {
+            "type": "ref",
+            "description": "Optional strong reference to a parent scope record for taxonomy/hierarchy support.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

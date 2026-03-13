@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.strategy",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "The strategy used to authenticate fetch requests for private records in a hidden repository.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name that identifies the strategy. The following strategies are supported:\n1. `nobody` - Only the author\n2. `author-follows` - Accounts the author follows\n3. `following-author` - Accounts following the author\n4. `mutuals` - Accounts that both the author follows and are following the author\n5. `mentioned` - The author, along with any accounts \"mentioned\", including in-text or via reply/embed/etc. links\n6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility\n7. `circle` - Implementation-defined, generally a configurable per-author list of accounts\n8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record\n\nWhen fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.\n\nOf course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.\n",
+          "enum": [
+            "nobody",
+            "author-follows",
+            "following-author",
+            "mutuals",
+            "threadgate",
+            "mentioned",
+            "circle",
+            "inherit"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.graph.follow",
+  "description": "A social follow. Record declaring that the repository owner follows another user.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this follow was created",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "The DID of the user being followed",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

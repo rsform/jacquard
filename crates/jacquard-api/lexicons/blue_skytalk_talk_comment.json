@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "blue.skytalk.talk.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A post (response) in a thread",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "threadUri",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "blobs": {
+            "type": "array",
+            "description": "Optional attached media (image or audio)",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/*",
+                "audio/*"
+              ],
+              "maxSize": 10000000
+            },
+            "maxLength": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of post creation",
+            "format": "datetime"
+          },
+          "text": {
+            "type": "string",
+            "description": "The content of the post",
+            "maxLength": 4000,
+            "maxGraphemes": 40000
+          },
+          "threadUri": {
+            "type": "string",
+            "description": "AT URI of the thread this post belongs to",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

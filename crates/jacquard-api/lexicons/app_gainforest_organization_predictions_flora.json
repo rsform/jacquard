@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.organization.predictions.flora",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "DEPRECATED: Use app.gainforest.dwc.occurrence with basisOfRecord='MachineObservation' instead. A declaration of a flora prediction for an organization.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "gbifTaxonKeys",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time of the creation of the record",
+            "format": "datetime"
+          },
+          "gbifTaxonKeys": {
+            "type": "array",
+            "description": "An array of GBIF taxon keys for each flora prediction",
+            "items": {
+              "type": "string",
+              "description": "The GBIF taxon key of the flora prediction"
+            }
+          }
+        }
+      }
+    }
+  }
+}

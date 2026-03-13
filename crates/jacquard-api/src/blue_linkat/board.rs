@@ -26,7 +26,7 @@ pub struct Card<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URL of the link
+    /// URL of the card
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -87,7 +87,7 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("URL of the link"),
+                                    ::jacquard_common::CowStr::new_static("URL of the card"),
                                 ),
                                 format: None,
                                 default: None,

@@ -4,7 +4,9 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod conquering_wolfhound;
+pub mod documentation;
 pub mod example;
+pub mod exultant_zebra;
 pub mod joyous_grackle;
 pub mod lawyerlike_deangelo;
 pub mod ngerakines;

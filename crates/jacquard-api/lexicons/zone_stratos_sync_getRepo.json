@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "zone.stratos.sync.getRepo",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Export the full repository as a CAR file. Returns all record blocks, MST nodes, and the signed commit.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did"
+        ],
+        "properties": {
+          "did": {
+            "type": "string",
+            "description": "The DID of the repo to export.",
+            "format": "did"
+          },
+          "since": {
+            "type": "string",
+            "description": "Optional revision cursor. If provided, only blocks newer than this revision are included.",
+            "format": "tid"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/vnd.ipld.car"
+      },
+      "errors": [
+        {
+          "description": "The requested repo does not exist or has no commits.",
+          "name": "RepoNotFound"
+        }
+      ]
+    }
+  }
+}

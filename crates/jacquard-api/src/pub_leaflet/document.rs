@@ -35,6 +35,11 @@ pub struct Document<'a> {
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    pub preferences: std::option::Option<
+        crate::pub_leaflet::publication::Preferences<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
     pub publication: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -58,51 +63,51 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Author;
         type Title;
         type Pages;
-        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Author = Unset;
         type Title = Unset;
         type Pages = Unset;
-        type Author = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Pages = S::Pages;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `pages` field to Set
-    pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPages<S> {}
-    impl<S: State> State for SetPages<S> {
-        type Title = S::Title;
-        type Pages = Set<members::pages>;
-        type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
+        type Author = Set<members::author>;
         type Title = S::Title;
         type Pages = S::Pages;
-        type Author = Set<members::author>;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Author = S::Author;
+        type Title = Set<members::title>;
+        type Pages = S::Pages;
+    }
+    ///State transition - sets the `pages` field to Set
+    pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPages<S> {}
+    impl<S: State> State for SetPages<S> {
+        type Author = S::Author;
+        type Title = S::Title;
+        type Pages = Set<members::pages>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `pages` field
         pub struct pages(());
-        ///Marker type for the `author` field
-        pub struct author(());
     }
 }
 
@@ -115,6 +120,7 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<DocumentPagesItem<'a>>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<crate::pub_leaflet::publication::Preferences<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -137,6 +143,7 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
         DocumentBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
                 None,
                 None,
                 None,
@@ -249,12 +256,31 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 }
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+    /// Set the `preferences` field (optional)
+    pub fn preferences(
+        mut self,
+        value: impl Into<Option<crate::pub_leaflet::publication::Preferences<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `preferences` field to an Option value (optional)
+    pub fn maybe_preferences(
+        mut self,
+        value: Option<crate::pub_leaflet::publication::Preferences<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `publication` field (optional)
     pub fn publication(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
@@ -262,7 +288,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -273,7 +299,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
@@ -281,7 +307,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -292,7 +318,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
@@ -300,7 +326,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -311,7 +337,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::pub_leaflet::publication::Theme<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
@@ -319,7 +345,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
         mut self,
         value: Option<crate::pub_leaflet::publication::Theme<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -334,7 +360,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
         DocumentBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -346,9 +372,9 @@ where
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
+    S::Author: document_state::IsSet,
     S::Title: document_state::IsSet,
     S::Pages: document_state::IsSet,
-    S::Author: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -358,11 +384,12 @@ where
             description: self.__unsafe_private_named.2,
             pages: self.__unsafe_private_named.3.unwrap(),
             post_ref: self.__unsafe_private_named.4,
-            publication: self.__unsafe_private_named.5,
-            published_at: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            theme: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            preferences: self.__unsafe_private_named.5,
+            publication: self.__unsafe_private_named.6,
+            published_at: self.__unsafe_private_named.7,
+            tags: self.__unsafe_private_named.8,
+            theme: self.__unsafe_private_named.9,
+            title: self.__unsafe_private_named.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -380,11 +407,12 @@ where
             description: self.__unsafe_private_named.2,
             pages: self.__unsafe_private_named.3.unwrap(),
             post_ref: self.__unsafe_private_named.4,
-            publication: self.__unsafe_private_named.5,
-            published_at: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            theme: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            preferences: self.__unsafe_private_named.5,
+            publication: self.__unsafe_private_named.6,
+            published_at: self.__unsafe_private_named.7,
+            tags: self.__unsafe_private_named.8,
+            theme: self.__unsafe_private_named.9,
+            title: self.__unsafe_private_named.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -485,12 +513,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
+            if <str>::len(value.as_ref()) > 30000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
                     path: ::jacquard_lexicon::validation::ValidationPath::from_field(
                         "description",
                     ),
-                    max: 3000usize,
+                    max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -502,12 +530,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
                         true,
                     )
                     .count();
-                if count > 300usize {
+                if count > 3000usize {
                     return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
                         path: ::jacquard_lexicon::validation::ValidationPath::from_field(
                             "description",
                         ),
-                        max: 300usize,
+                        max: 3000usize,
                         actual: count,
                     });
                 }
@@ -516,12 +544,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
         {
             let value = &self.title;
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1280usize {
+            if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
                     path: ::jacquard_lexicon::validation::ValidationPath::from_field(
                         "title",
                     ),
-                    max: 1280usize,
+                    max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -534,12 +562,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
                         true,
                     )
                     .count();
-                if count > 128usize {
+                if count > 500usize {
                     return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
                         path: ::jacquard_lexicon::validation::ValidationPath::from_field(
                             "title",
                         ),
-                        max: 128usize,
+                        max: 500usize,
                         actual: count,
                     });
                 }
@@ -617,9 +645,9 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     format: None,
                                     default: None,
                                     min_length: None,
-                                    max_length: Some(3000usize),
+                                    max_length: Some(30000usize),
                                     min_graphemes: None,
-                                    max_graphemes: Some(300usize),
+                                    max_graphemes: Some(3000usize),
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
@@ -647,6 +675,17 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
                                         "com.atproto.repo.strongRef",
+                                    ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "preferences",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "pub.leaflet.publication#preferences",
                                     ),
                                 }),
                             );
@@ -724,9 +763,9 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     format: None,
                                     default: None,
                                     min_length: None,
-                                    max_length: Some(1280usize),
+                                    max_length: Some(5000usize),
                                     min_graphemes: None,
-                                    max_graphemes: Some(128usize),
+                                    max_graphemes: Some(500usize),
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,

@@ -12,6 +12,7 @@ pub mod horizontal_rule;
 pub mod iframe;
 pub mod image;
 pub mod math;
+pub mod ordered_list;
 pub mod page;
 pub mod poll;
 pub mod text;

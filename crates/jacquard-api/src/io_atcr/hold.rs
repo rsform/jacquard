@@ -3,7 +3,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod abort_upload;
 pub mod captain;
+pub mod complete_upload;
 pub mod crew;
+pub mod delete_user_data;
+pub mod export_user_data;
+pub mod get_part_upload_url;
+pub mod get_quota;
+pub mod initiate_upload;
 pub mod layer;
+pub mod notify_manifest;
+pub mod request_crew;
+pub mod scan;
+pub mod set_stats;
 pub mod stats;
+
+#[cfg(feature = "streaming")]
+pub mod subscribe_scan_jobs;
+pub mod update_crew_tier;
+pub mod upload_part;

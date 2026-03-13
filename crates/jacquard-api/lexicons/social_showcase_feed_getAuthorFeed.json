@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.feed.getAuthorFeed",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a specific user's items. Authentication optional - returns personalized view when authenticated.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "The DID or handle of the user",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor",
+            "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "feed"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#itemView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

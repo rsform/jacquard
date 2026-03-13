@@ -1,0 +1,166 @@
+{
+  "lexicon": 1,
+  "id": "com.deckbelcher.deck.list",
+  "defs": {
+    "card": {
+      "type": "object",
+      "description": "A card entry in a decklist.",
+      "required": [
+        "ref",
+        "quantity",
+        "section"
+      ],
+      "properties": {
+        "quantity": {
+          "type": "integer",
+          "description": "Number of copies in the deck.",
+          "minimum": 1
+        },
+        "ref": {
+          "type": "ref",
+          "description": "Reference to the card (scryfall printing + oracle card).",
+          "ref": "com.deckbelcher.defs#cardRef"
+        },
+        "section": {
+          "type": "ref",
+          "description": "Which section of the deck this card belongs to. Extensible to support format-specific sections.",
+          "ref": "#section"
+        },
+        "tags": {
+          "type": "array",
+          "description": "User annotations for this card in this deck (e.g., \"removal\", \"wincon\", \"ramp\").",
+          "items": {
+            "type": "string",
+            "description": "A tag annotation for a card.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "maxLength": 128
+        }
+      }
+    },
+    "format": {
+      "type": "string",
+      "description": "Game format for a deck.",
+      "maxLength": 320,
+      "maxGraphemes": 32,
+      "knownValues": [
+        "standard",
+        "pioneer",
+        "modern",
+        "legacy",
+        "vintage",
+        "pauper",
+        "commander",
+        "duel",
+        "paupercommander",
+        "predh",
+        "oathbreaker",
+        "brawl",
+        "standardbrawl",
+        "historic",
+        "timeless",
+        "alchemy",
+        "gladiator",
+        "premodern",
+        "oldschool",
+        "draft",
+        "penny",
+        "cube",
+        "kitchentable"
+      ]
+    },
+    "main": {
+      "type": "record",
+      "description": "A Magic: The Gathering decklist.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "cards",
+          "createdAt"
+        ],
+        "properties": {
+          "cards": {
+            "type": "array",
+            "description": "Array of cards in the decklist.",
+            "items": {
+              "type": "ref",
+              "ref": "#card"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the decklist was created.",
+            "format": "datetime"
+          },
+          "format": {
+            "type": "ref",
+            "description": "Format of the deck.",
+            "ref": "#format"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the decklist.",
+            "maxLength": 1280,
+            "maxGraphemes": 128
+          },
+          "primer": {
+            "type": "union",
+            "description": "Deck primer with strategy, combos, and card choices.",
+            "refs": [
+              "com.deckbelcher.richtext#document",
+              "#primerUri",
+              "#primerRef"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp when the decklist was last updated.",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "primerRef": {
+      "type": "object",
+      "description": "Primer in a separate ATProto record. For use with any longform writing lexicon.",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "primerUri": {
+      "type": "object",
+      "description": "External primer content. Typically a URL, but any valid URI scheme.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        }
+      }
+    },
+    "section": {
+      "type": "string",
+      "description": "Which section of the deck this card belongs to. Extensible to support format-specific sections.",
+      "maxLength": 640,
+      "maxGraphemes": 64,
+      "knownValues": [
+        "mainboard",
+        "sideboard",
+        "maybeboard",
+        "commander"
+      ]
+    }
+  }
+}

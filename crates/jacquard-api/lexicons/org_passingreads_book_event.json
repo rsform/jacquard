@@ -1,0 +1,92 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.book.event",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The status of a book has changed.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "book",
+          "occurredAt",
+          "location",
+          "bookPub",
+          "bookSig"
+        ],
+        "properties": {
+          "book": {
+            "type": "ref",
+            "description": "The book that was dropped (a org.passingreads.book.registration)",
+            "ref": "com.atproto.repo.strongRef#main"
+          },
+          "bookPub": {
+            "type": "bytes",
+            "description": "The multicodec public key of the book."
+          },
+          "bookSig": {
+            "type": "bytes",
+            "description": "The signature of this record, without this attribute, as created by the private key associated with the book"
+          },
+          "did": {
+            "type": "string",
+            "description": "The DID of the person who registered the book. Included here, so it's verifiable with the bookSig.",
+            "format": "did"
+          },
+          "event": {
+            "type": "string",
+            "description": "What event has occurred",
+            "knownValues": [
+              "org.passingreads.book.checkin",
+              "org.passingreads.book.drop",
+              "org.passingreads.book.find"
+            ]
+          },
+          "location": {
+            "type": "union",
+            "description": "Where this event occurred (an h3 cell, an OSM place, or a link to an outpost — org.passingreads.outpost.registration)",
+            "refs": [
+              "com.atproto.repo.strongRef#main",
+              "community.lexicon.location.hthree#main",
+              "#osmLocation"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "Client-declared timestamp of when the book was dropped",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "osmLocation": {
+      "type": "object",
+      "description": "A physical location from OpenStreetMap.",
+      "required": [
+        "osmId",
+        "name",
+        "value"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "The type of place (e.g., cafe, library, park)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the place from OpenStreetMap."
+        },
+        "osmId": {
+          "type": "string",
+          "description": "The OpenStreetMap element ID in interoperable format: N (node), W (way), or R (relation) prefix followed by numeric ID. Example: N123456789"
+        },
+        "value": {
+          "type": "string",
+          "description": "The H3 cell index for proximity queries."
+        }
+      }
+    }
+  }
+}

@@ -23,20 +23,17 @@ pub struct Layer<'a> {
     /// Layer digest (e.g., sha256:abc123...)
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
+    /// AT-URI of the manifest that included this layer (e.g., at://did:plc:xyz/io.atcr.manifest/abc123)
+    #[serde(borrow)]
+    pub manifest: jacquard_common::types::string::AtUri<'a>,
     /// Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)
     #[serde(borrow)]
     pub media_type: jacquard_common::CowStr<'a>,
-    /// Repository this layer belongs to
-    #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
     /// Size in bytes
     pub size: i64,
     /// DID of user who uploaded this layer
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
-    /// Handle of user (for display purposes)
-    #[serde(borrow)]
-    pub user_handle: jacquard_common::types::string::Handle<'a>,
 }
 
 pub mod layer_state {
@@ -49,115 +46,95 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
+        type Manifest;
         type CreatedAt;
         type Size;
         type MediaType;
         type UserDid;
-        type Repository;
-        type UserHandle;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
+        type Manifest = Unset;
         type CreatedAt = Unset;
         type Size = Unset;
         type MediaType = Unset;
         type UserDid = Unset;
-        type Repository = Unset;
-        type UserHandle = Unset;
+        type Digest = Unset;
     }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetManifest<S> {}
+    impl<S: State> State for SetManifest<S> {
+        type Manifest = Set<members::manifest>;
         type CreatedAt = S::CreatedAt;
         type Size = S::Size;
         type MediaType = S::MediaType;
         type UserDid = S::UserDid;
-        type Repository = S::Repository;
-        type UserHandle = S::UserHandle;
+        type Digest = S::Digest;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Digest = S::Digest;
+        type Manifest = S::Manifest;
         type CreatedAt = Set<members::created_at>;
         type Size = S::Size;
         type MediaType = S::MediaType;
         type UserDid = S::UserDid;
-        type Repository = S::Repository;
-        type UserHandle = S::UserHandle;
+        type Digest = S::Digest;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Digest = S::Digest;
+        type Manifest = S::Manifest;
         type CreatedAt = S::CreatedAt;
         type Size = Set<members::size>;
         type MediaType = S::MediaType;
         type UserDid = S::UserDid;
-        type Repository = S::Repository;
-        type UserHandle = S::UserHandle;
+        type Digest = S::Digest;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
+        type Manifest = S::Manifest;
         type CreatedAt = S::CreatedAt;
         type Size = S::Size;
         type MediaType = Set<members::media_type>;
         type UserDid = S::UserDid;
-        type Repository = S::Repository;
-        type UserHandle = S::UserHandle;
+        type Digest = S::Digest;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
-        type Digest = S::Digest;
+        type Manifest = S::Manifest;
         type CreatedAt = S::CreatedAt;
         type Size = S::Size;
         type MediaType = S::MediaType;
         type UserDid = Set<members::user_did>;
-        type Repository = S::Repository;
-        type UserHandle = S::UserHandle;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
         type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type Manifest = S::Manifest;
         type CreatedAt = S::CreatedAt;
         type Size = S::Size;
         type MediaType = S::MediaType;
         type UserDid = S::UserDid;
-        type Repository = Set<members::repository>;
-        type UserHandle = S::UserHandle;
-    }
-    ///State transition - sets the `user_handle` field to Set
-    pub struct SetUserHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserHandle<S> {}
-    impl<S: State> State for SetUserHandle<S> {
-        type Digest = S::Digest;
-        type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
-        type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
-        type Repository = S::Repository;
-        type UserHandle = Set<members::user_handle>;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `size` field
@@ -166,10 +143,8 @@ pub mod layer_state {
         pub struct media_type(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
-        ///Marker type for the `user_handle` field
-        pub struct user_handle(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
@@ -179,11 +154,10 @@ pub struct LayerBuilder<'a, S: layer_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -200,7 +174,7 @@ impl<'a> LayerBuilder<'a, layer_state::Empty> {
     pub fn new() -> Self {
         LayerBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -247,13 +221,13 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::MediaType: layer_state::IsUnset,
+    S::Manifest: layer_state::IsUnset,
 {
-    /// Set the `mediaType` field (required)
-    pub fn media_type(
+    /// Set the `manifest` field (required)
+    pub fn manifest(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> LayerBuilder<'a, layer_state::SetMediaType<S>> {
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> LayerBuilder<'a, layer_state::SetManifest<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         LayerBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -266,13 +240,13 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Repository: layer_state::IsUnset,
+    S::MediaType: layer_state::IsUnset,
 {
-    /// Set the `repository` field (required)
-    pub fn repository(
+    /// Set the `mediaType` field (required)
+    pub fn media_type(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> LayerBuilder<'a, layer_state::SetRepository<S>> {
+    ) -> LayerBuilder<'a, layer_state::SetMediaType<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         LayerBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -323,43 +297,22 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::UserHandle: layer_state::IsUnset,
-{
-    /// Set the `userHandle` field (required)
-    pub fn user_handle(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Handle<'a>>,
-    ) -> LayerBuilder<'a, layer_state::SetUserHandle<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
-        LayerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> LayerBuilder<'a, S>
-where
-    S: layer_state::State,
-    S::Digest: layer_state::IsSet,
+    S::Manifest: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
     S::Size: layer_state::IsSet,
     S::MediaType: layer_state::IsSet,
     S::UserDid: layer_state::IsSet,
-    S::Repository: layer_state::IsSet,
-    S::UserHandle: layer_state::IsSet,
+    S::Digest: layer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layer<'a> {
         Layer {
             created_at: self.__unsafe_private_named.0.unwrap(),
             digest: self.__unsafe_private_named.1.unwrap(),
-            media_type: self.__unsafe_private_named.2.unwrap(),
-            repository: self.__unsafe_private_named.3.unwrap(),
+            manifest: self.__unsafe_private_named.2.unwrap(),
+            media_type: self.__unsafe_private_named.3.unwrap(),
             size: self.__unsafe_private_named.4.unwrap(),
             user_did: self.__unsafe_private_named.5.unwrap(),
-            user_handle: self.__unsafe_private_named.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -374,11 +327,10 @@ where
         Layer {
             created_at: self.__unsafe_private_named.0.unwrap(),
             digest: self.__unsafe_private_named.1.unwrap(),
-            media_type: self.__unsafe_private_named.2.unwrap(),
-            repository: self.__unsafe_private_named.3.unwrap(),
+            manifest: self.__unsafe_private_named.2.unwrap(),
+            media_type: self.__unsafe_private_named.3.unwrap(),
             size: self.__unsafe_private_named.4.unwrap(),
             user_did: self.__unsafe_private_named.5.unwrap(),
-            user_handle: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -484,19 +436,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layer<'a> {
                 });
             }
         }
-        {
-            let value = &self.repository;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -525,9 +464,8 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 ::jacquard_common::smol_str::SmolStr::new_static("digest"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("size"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("mediaType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("repository"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("manifest"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("userHandle"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
@@ -579,6 +517,29 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "manifest",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "AT-URI of the manifest that included this layer (e.g., at://did:plc:xyz/io.atcr.manifest/abc123)",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
                                     "mediaType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -591,27 +552,6 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                     default: None,
                                     min_length: None,
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "repository",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Repository this layer belongs to",
-                                        ),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(255usize),
                                     min_graphemes: None,
                                     max_graphemes: None,
                                     r#enum: None,
@@ -640,29 +580,6 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                     ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "userHandle",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Handle of user (for display purposes)",
-                                        ),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                     ),
                                     default: None,
                                     min_length: None,

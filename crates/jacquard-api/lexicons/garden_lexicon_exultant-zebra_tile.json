@@ -1,0 +1,153 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.exultant-zebra.tile",
+  "description": "A Web Tile record for DASL.",
+  "defs": {
+    "interactions": {
+      "type": "object",
+      "description": "Declares the AT Protocol interactions a tile performs. Methods listed here gate which XRPC calls the tile is allowed to attempt (the user must still grant per-method consent). Collections and services are informational metadata for display and auditing.",
+      "properties": {
+        "collections": {
+          "type": "array",
+          "description": "Repository collection NSIDs this tile reads from or writes to.",
+          "items": {
+            "type": "string",
+            "format": "nsid"
+          }
+        },
+        "methods": {
+          "type": "array",
+          "description": "XRPC method NSIDs this tile may call. When present, the tile runtime restricts XRPC calls to only these methods. When absent, all server-allowed methods may be called (with user consent).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "services": {
+          "type": "array",
+          "description": "AT Protocol service proxy targets this tile interacts with, identified by DID and service endpoint fragment.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A tile with a name and associated resource or bundle.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "content"
+        ],
+        "properties": {
+          "aspectRatio": {
+            "type": "string",
+            "description": "Declared aspect ratio for tile rendering.",
+            "knownValues": [
+              "1:1",
+              "2:1",
+              "3:1",
+              "1:2",
+              "1:3"
+            ]
+          },
+          "content": {
+            "type": "union",
+            "description": "The tile content, either a single resource or a bundle.",
+            "refs": [
+              "garden.lexicon.exultant-zebra.masl#resource",
+              "garden.lexicon.exultant-zebra.masl#main"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional rich text description of the tile.",
+            "maxLength": 3000
+          },
+          "facets": {
+            "type": "array",
+            "description": "Rich text facets for the description (links, mentions, hashtags).",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "icon": {
+            "type": "blob",
+            "description": "Optional icon image for the tile.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1048576
+          },
+          "interactions": {
+            "type": "ref",
+            "description": "Declaration of the XRPC methods, collections, and services this tile interacts with.",
+            "ref": "#interactions"
+          },
+          "loadingImage": {
+            "type": "blob",
+            "description": "Optional loading screen image for the tile.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1048576
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the tile."
+          },
+          "params": {
+            "type": "array",
+            "description": "Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.",
+            "items": {
+              "type": "ref",
+              "ref": "#param"
+            }
+          }
+        }
+      }
+    },
+    "param": {
+      "type": "object",
+      "description": "Declares an input parameter for a tile, similar to XRPC query parameters.",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "default": {
+          "type": "string",
+          "description": "Default value for this parameter, encoded as a string."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this parameter.",
+          "maxLength": 1000
+        },
+        "name": {
+          "type": "string",
+          "description": "Parameter name, used as a URL search param key. Must not start with an underscore.",
+          "maxLength": 64
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether this parameter must be provided before loading the tile."
+        },
+        "type": {
+          "type": "string",
+          "description": "Parameter value type.",
+          "knownValues": [
+            "string",
+            "integer",
+            "boolean"
+          ]
+        }
+      }
+    }
+  }
+}

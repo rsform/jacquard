@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "app.gainforest.evaluator.evaluation",
+  "description": "An evaluation record published by an evaluator in their own repo. Contains structured, typed results about a target record (or batch of records). Discovered by AppViews via the atproto-accept-evaluators HTTP header pattern.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A single evaluation produced by an evaluator service. Exactly one of 'subject' (single target) or 'subjects' (batch) must be provided.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "evaluationType",
+          "createdAt"
+        ],
+        "properties": {
+          "confidence": {
+            "type": "integer",
+            "description": "Overall confidence in this evaluation (0-1000, where 1000 = 100.0%).",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of when this evaluation was produced.",
+            "format": "datetime"
+          },
+          "dynamicProperties": {
+            "type": "string",
+            "description": "Additional structured data as a JSON string. Escape hatch for experimental result types before they are formalized into the union.",
+            "maxGraphemes": 10000
+          },
+          "evaluationType": {
+            "type": "string",
+            "description": "Identifier for the type of evaluation (must match one declared in the evaluator's service record).",
+            "maxGraphemes": 64
+          },
+          "method": {
+            "type": "ref",
+            "description": "Method/model provenance for this specific evaluation (overrides service-level method if set).",
+            "ref": "app.gainforest.evaluator.defs#methodInfo"
+          },
+          "neg": {
+            "type": "boolean",
+            "description": "If true, this is a negation/withdrawal of a previous evaluation (like label negation)."
+          },
+          "result": {
+            "type": "union",
+            "description": "The typed evaluation result. The $type field determines which result schema is used.",
+            "refs": [
+              "app.gainforest.evaluator.defs#speciesIdResult",
+              "app.gainforest.evaluator.defs#dataQualityResult",
+              "app.gainforest.evaluator.defs#verificationResult",
+              "app.gainforest.evaluator.defs#classificationResult",
+              "app.gainforest.evaluator.defs#measurementResult"
+            ]
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Single target record being evaluated. Use this OR subjects, not both.",
+            "ref": "app.gainforest.evaluator.defs#subjectRef"
+          },
+          "subjects": {
+            "type": "array",
+            "description": "Batch evaluation: multiple target records sharing the same result. Use this OR subject, not both.",
+            "items": {
+              "type": "ref",
+              "ref": "app.gainforest.evaluator.defs#subjectRef"
+            },
+            "maxLength": 100
+          },
+          "supersedes": {
+            "type": "string",
+            "description": "AT-URI of a previous evaluation record that this one supersedes (e.g., model re-run with improved version).",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

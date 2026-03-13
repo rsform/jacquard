@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.getQuota",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get storage quota information for a user. Calculates total unique blob storage by iterating layer records and deduplicating by digest.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "userDid"
+        ],
+        "properties": {
+          "userDid": {
+            "type": "string",
+            "description": "DID of the user to get quota for",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "userDid",
+            "uniqueBlobs",
+            "totalSize"
+          ],
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Storage limit in bytes (absent if unlimited)"
+            },
+            "tier": {
+              "type": "string",
+              "description": "Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')",
+              "maxLength": 32
+            },
+            "totalSize": {
+              "type": "integer",
+              "description": "Total size in bytes of unique blobs"
+            },
+            "uniqueBlobs": {
+              "type": "integer",
+              "description": "Number of unique blob digests"
+            },
+            "userDid": {
+              "type": "string",
+              "description": "DID of the user",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidUserDid"
+        }
+      ]
+    }
+  }
+}

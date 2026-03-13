@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "lol.gayfamicom.hi.hello",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Hi",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "hello": {
+            "type": "string",
+            "description": "Hi"
+          }
+        }
+      }
+    }
+  }
+}

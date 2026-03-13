@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.observedProperty",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The phenomenon being observed (e.g. air temperature, PM2.5 concentration).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "definition",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "definition": {
+            "type": "string",
+            "description": "URI identifying the property from a controlled vocabulary (CF Standard Names, QUDT quantity kinds, etc.)",
+            "format": "uri"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

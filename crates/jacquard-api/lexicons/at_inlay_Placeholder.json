@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Placeholder",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Shows fallback content while children are loading.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "children",
+            "fallback"
+          ],
+          "properties": {
+            "children": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "at.inlay.defs#element"
+              }
+            },
+            "fallback": {
+              "type": "ref",
+              "ref": "at.inlay.defs#element"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

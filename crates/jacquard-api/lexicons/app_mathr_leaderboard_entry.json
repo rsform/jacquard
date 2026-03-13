@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "app.mathr.leaderboard.entry",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A verified leaderboard entry stored in the mathr.app official repository",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "playerDid",
+          "level",
+          "totalSuccesses",
+          "totalChallenges",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the score was verified and added to the leaderboard",
+            "format": "datetime"
+          },
+          "level": {
+            "type": "integer",
+            "description": "The highest level reached by the player",
+            "minimum": 1
+          },
+          "percentage": {
+            "type": "integer",
+            "description": "Success rate as a percentage (0-100)",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "playerAvatar": {
+            "type": "string",
+            "description": "URL to the player's avatar at the time of submission",
+            "format": "uri"
+          },
+          "playerDid": {
+            "type": "string",
+            "description": "The DID of the player who achieved this score",
+            "format": "did"
+          },
+          "playerDisplayName": {
+            "type": "string",
+            "description": "The player's display name at the time of submission"
+          },
+          "playerHandle": {
+            "type": "string",
+            "description": "The player's handle at the time of submission"
+          },
+          "postUri": {
+            "type": "string",
+            "description": "Optional AT URI to the player's Bluesky post announcing the score",
+            "format": "at-uri"
+          },
+          "totalChallenges": {
+            "type": "integer",
+            "description": "Total number of challenges attempted",
+            "minimum": 1
+          },
+          "totalSuccesses": {
+            "type": "integer",
+            "description": "Total number of correct answers",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

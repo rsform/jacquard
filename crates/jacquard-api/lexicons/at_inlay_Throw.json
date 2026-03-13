@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.Throw",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Error node produced when component resolution fails. The host decides how to render it.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "Human-readable error message",
+              "maxLength": 10000
+            },
+            "stack": {
+              "type": "string",
+              "description": "Stack trace, if available",
+              "maxLength": 10000
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

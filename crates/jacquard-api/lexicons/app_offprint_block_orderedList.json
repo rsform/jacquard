@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.orderedList",
+  "defs": {
+    "listItem": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "children": {
+          "type": "array",
+          "description": "Nested list items",
+          "items": {
+            "type": "ref",
+            "ref": "#listItem"
+          }
+        },
+        "content": {
+          "type": "ref",
+          "description": "Text content of the list item",
+          "ref": "app.offprint.block.text"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "children"
+      ],
+      "properties": {
+        "children": {
+          "type": "array",
+          "description": "List items",
+          "items": {
+            "type": "ref",
+            "ref": "#listItem"
+          }
+        },
+        "start": {
+          "type": "integer",
+          "description": "Starting number for the list",
+          "default": 1
+        }
+      }
+    }
+  }
+}

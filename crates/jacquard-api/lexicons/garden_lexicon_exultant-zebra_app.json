@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.exultant-zebra.app",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An application record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "distributions"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "An optional description of the application."
+          },
+          "distributions": {
+            "type": "array",
+            "description": "A list of strong references to distribution records.",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the application."
+          }
+        }
+      }
+    }
+  }
+}

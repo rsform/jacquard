@@ -4,3 +4,5 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod daily;
+pub mod feed;
+pub mod goal;

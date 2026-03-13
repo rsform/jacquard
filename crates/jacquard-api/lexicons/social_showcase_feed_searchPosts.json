@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.feed.searchPosts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Search items, collections, and profiles (public content only). Authentication optional.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor",
+            "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "q": {
+            "type": "string",
+            "description": "Search query string",
+            "maxLength": 300
+          },
+          "type": {
+            "type": "string",
+            "description": "Filter by content type",
+            "maxLength": 20,
+            "knownValues": [
+              "items",
+              "collections",
+              "profiles"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "results"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "social.showcase.defs#itemView",
+                  "social.showcase.defs#collectionView",
+                  "social.showcase.defs#profileView"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

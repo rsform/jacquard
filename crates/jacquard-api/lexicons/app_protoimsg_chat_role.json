@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "app.protoimsg.chat.role",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Assign a moderator role to a user for a specific room.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "room",
+          "subject",
+          "role",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of role assignment.",
+            "format": "datetime"
+          },
+          "role": {
+            "type": "string",
+            "description": "The role being assigned.",
+            "knownValues": [
+              "moderator",
+              "owner"
+            ]
+          },
+          "room": {
+            "type": "string",
+            "description": "AT-URI of the room.",
+            "format": "at-uri"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the user being assigned the role.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

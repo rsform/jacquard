@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.graph.block",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Block record - block users from interacting (mirrors app.bsky.graph.block)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of blocked user",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.richtext.code",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "plaintext"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "maxGraphemes": 500
+        },
+        "plaintext": {
+          "type": "string"
+        },
+        "syntaxHighlightingTheme": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "maxGraphemes": 500
+        }
+      }
+    }
+  }
+}

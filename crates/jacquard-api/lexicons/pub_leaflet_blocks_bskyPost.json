@@ -8,6 +8,9 @@
         "postRef"
       ],
       "properties": {
+        "clientHost": {
+          "type": "string"
+        },
         "postRef": {
           "type": "ref",
           "ref": "com.atproto.repo.strongRef"

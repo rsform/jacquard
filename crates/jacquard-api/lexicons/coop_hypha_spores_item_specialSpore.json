@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "coop.hypha.spores.item.specialSpore",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A special spore capture record. Each steal creates a new record with a TID key. Current holder is determined by the most recent createdAt timestamp across all backlinked records for a given origin (subject).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this capture occurred.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Origin garden DID. Used for backlink indexing to find all captures of this spore.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

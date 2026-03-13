@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.teamScore",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A team's scored answers for a quiz",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "quizBegin",
+          "team",
+          "answers"
+        ],
+        "properties": {
+          "answers": {
+            "type": "array",
+            "description": "Scored answers for this team",
+            "items": {
+              "type": "ref",
+              "ref": "#scoredAnswer"
+            },
+            "maxLength": 500
+          },
+          "quizBegin": {
+            "type": "ref",
+            "description": "Reference to the quizBegin record",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "team": {
+            "type": "ref",
+            "description": "Reference to the team",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    },
+    "scoredAnswer": {
+      "type": "object",
+      "description": "An answer with scores for each expected answer",
+      "required": [
+        "answer",
+        "scores"
+      ],
+      "properties": {
+        "answer": {
+          "type": "ref",
+          "description": "Reference to the answer record",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "commentary": {
+          "type": "string",
+          "description": "Optional commentary from the quiz master",
+          "maxLength": 5000,
+          "maxGraphemes": 500
+        },
+        "scores": {
+          "type": "array",
+          "description": "Points awarded for each expected answer in the question",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minLength": 1,
+          "maxLength": 10
+        }
+      }
+    }
+  }
+}

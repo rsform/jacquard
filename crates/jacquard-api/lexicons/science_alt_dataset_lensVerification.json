@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "science.alt.dataset.lensVerification",
+  "defs": {
+    "codeHash": {
+      "type": "object",
+      "description": "Content hash for code integrity verification",
+      "required": [
+        "algorithm",
+        "digest"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "description": "Hash algorithm identifier (e.g., 'sha256', 'blake3')",
+          "maxLength": 20
+        },
+        "digest": {
+          "type": "string",
+          "description": "Hex-encoded hash digest",
+          "maxLength": 128
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Verification record for a lens transformation. The verifier's identity is implicit — the DID of the repo owner who writes this record. Follows the ATProto pattern where verification records live in the verifier's own PDS.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "lens",
+          "lensCommit",
+          "verificationMethod",
+          "createdAt"
+        ],
+        "properties": {
+          "codeHash": {
+            "type": "ref",
+            "description": "Hash of the code at the referenced commit. Required for signedHash method.",
+            "ref": "#codeHash"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this verification was issued",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what was verified",
+            "maxLength": 1000
+          },
+          "lens": {
+            "type": "string",
+            "description": "AT-URI of the lens record being verified",
+            "format": "at-uri",
+            "maxLength": 500
+          },
+          "lensCommit": {
+            "type": "string",
+            "description": "CID of the specific lens record version. Ensures immutability — if the lens is updated, old verifications do not carry over.",
+            "maxLength": 128
+          },
+          "proofRef": {
+            "type": "ref",
+            "description": "Link to proof artifact (Coq/Lean proof, test suite, etc.). Used with formalProof or automatedTest methods.",
+            "ref": "science.alt.dataset.lens#codeReference"
+          },
+          "verificationMethod": {
+            "type": "ref",
+            "description": "What kind of verification was performed",
+            "ref": "science.alt.dataset.verificationMethod"
+          }
+        }
+      }
+    }
+  }
+}

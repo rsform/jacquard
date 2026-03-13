@@ -18,16 +18,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Question<'a> {
-    /// The answers selected by the author of the question as answering the question
+    #[serde(borrow)]
+    pub content: crate::fyi_questionable::richtext::content::Content<'a>,
+    /// Indicates the context in which this question was asked. Currently only fyi.questionable.actor.profile
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub answers: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub context: std::option::Option<
-        crate::fyi_questionable::actor::profile::Profile<'a>,
+    pub context_ref: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     pub created_at: jacquard_common::types::string::Datetime,
     /// Indicates human language of the primary text content.
@@ -36,9 +33,6 @@ pub struct Question<'a> {
     /// A short summary of the question
     #[serde(borrow)]
     pub summary: jacquard_common::CowStr<'a>,
-    /// The full text of the question
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
 }
 
 pub mod question_state {
@@ -51,51 +45,51 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type CreatedAt;
         type Summary;
+        type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type CreatedAt = Unset;
         type Summary = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
-        type Summary = S::Summary;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type CreatedAt = Set<members::created_at>;
-        type Summary = S::Summary;
+        type CreatedAt = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
         type Summary = Set<members::summary>;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Summary = S::Summary;
+        type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Summary = S::Summary;
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -103,11 +97,10 @@ pub mod question_state {
 pub struct QuestionBuilder<'a, S: question_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<crate::fyi_questionable::actor::profile::Profile<'a>>,
+        ::core::option::Option<crate::fyi_questionable::richtext::content::Content<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -125,46 +118,44 @@ impl<'a> QuestionBuilder<'a, question_state::Empty> {
     pub fn new() -> Self {
         QuestionBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> QuestionBuilder<'a, S>
+where
+    S: question_state::State,
+    S::Content: question_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<crate::fyi_questionable::richtext::content::Content<'a>>,
+    ) -> QuestionBuilder<'a, question_state::SetContent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        QuestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
 impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
-    /// Set the `answers` field (optional)
-    pub fn answers(
+    /// Set the `contextRef` field (optional)
+    pub fn context_ref(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `answers` field to an Option value (optional)
-    pub fn maybe_answers(
-        mut self,
-        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
-    /// Set the `context` field (optional)
-    pub fn context(
-        mut self,
-        value: impl Into<Option<crate::fyi_questionable::actor::profile::Profile<'a>>>,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
-    /// Set the `context` field to an Option value (optional)
-    pub fn maybe_context(
+    /// Set the `contextRef` field to an Option value (optional)
+    pub fn maybe_context_ref(
         mut self,
-        value: Option<crate::fyi_questionable::actor::profile::Profile<'a>>,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -231,38 +222,18 @@ where
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::Text: question_state::IsUnset,
-{
-    /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> QuestionBuilder<'a, question_state::SetText<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
-        QuestionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> QuestionBuilder<'a, S>
-where
-    S: question_state::State,
-    S::Text: question_state::IsSet,
-    S::CreatedAt: question_state::IsSet,
     S::Summary: question_state::IsSet,
+    S::CreatedAt: question_state::IsSet,
+    S::Content: question_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Question<'a> {
         Question {
-            answers: self.__unsafe_private_named.0,
-            context: self.__unsafe_private_named.1,
+            content: self.__unsafe_private_named.0.unwrap(),
+            context_ref: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2.unwrap(),
             languages: self.__unsafe_private_named.3,
             summary: self.__unsafe_private_named.4.unwrap(),
-            text: self.__unsafe_private_named.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -275,12 +246,11 @@ where
         >,
     ) -> Question<'a> {
         Question {
-            answers: self.__unsafe_private_named.0,
-            context: self.__unsafe_private_named.1,
+            content: self.__unsafe_private_named.0.unwrap(),
+            context_ref: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2.unwrap(),
             languages: self.__unsafe_private_named.3,
             summary: self.__unsafe_private_named.4.unwrap(),
-            text: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -360,18 +330,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.answers {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answers",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
@@ -429,51 +387,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
                 }
             }
         }
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 10000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -502,7 +415,7 @@ fn lexicon_doc_fyi_questionable_question() -> ::jacquard_lexicon::lexicon::Lexic
                         required: Some(
                             vec![
                                 ::jacquard_common::smol_str::SmolStr::new_static("summary"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
@@ -511,31 +424,23 @@ fn lexicon_doc_fyi_questionable_question() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("answers"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The answers selected by the author of the question as answering the question",
-                                        ),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "fyi.questionable.richtext.content",
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
-                                    }),
-                                    min_length: None,
-                                    max_length: Some(10usize),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("context"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contextRef",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.actor.profile")
-                                    ],
-                                    closed: Some(false),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
@@ -599,25 +504,6 @@ fn lexicon_doc_fyi_questionable_question() -> ::jacquard_lexicon::lexicon::Lexic
                                     max_length: Some(3000usize),
                                     min_graphemes: None,
                                     max_graphemes: Some(300usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The full text of the question",
-                                        ),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: Some(1usize),
-                                    max_length: Some(10000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(10000usize),
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,

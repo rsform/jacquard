@@ -17,7 +17,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
-    /// Required array of `app.offprint.block.*` unions.
+    /// Array of content blocks
     #[serde(borrow)]
     pub items: Vec<ContentItemsItem<'a>>,
 }
@@ -137,7 +137,33 @@ where
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ContentItemsItem<'a> {}
+pub enum ContentItemsItem<'a> {
+    #[serde(rename = "app.offprint.block.text")]
+    Text(Box<crate::app_offprint::block::text::Text<'a>>),
+    #[serde(rename = "app.offprint.block.heading")]
+    Heading(Box<crate::app_offprint::block::heading::Heading<'a>>),
+    #[serde(rename = "app.offprint.block.blockquote")]
+    Blockquote(Box<crate::app_offprint::block::blockquote::Blockquote<'a>>),
+    #[serde(rename = "app.offprint.block.callout")]
+    Callout(Box<crate::app_offprint::block::callout::Callout<'a>>),
+    #[serde(rename = "app.offprint.block.bulletList")]
+    BulletList(Box<crate::app_offprint::block::bullet_list::BulletList<'a>>),
+    #[serde(rename = "app.offprint.block.orderedList")]
+    OrderedList(Box<crate::app_offprint::block::ordered_list::OrderedList<'a>>),
+    #[serde(rename = "app.offprint.block.taskList")]
+    TaskList(Box<crate::app_offprint::block::task_list::TaskList<'a>>),
+    #[serde(rename = "app.offprint.block.codeBlock")]
+    CodeBlock(Box<crate::app_offprint::block::code_block::CodeBlock<'a>>),
+    #[serde(rename = "app.offprint.block.image")]
+    Image(Box<crate::app_offprint::block::image::Image<'a>>),
+    #[serde(rename = "app.offprint.block.imageGrid")]
+    ImageGrid(Box<crate::app_offprint::block::image_grid::ImageGrid<'a>>),
+    #[serde(rename = "app.offprint.block.imageCarousel")]
+    ImageCarousel(Box<crate::app_offprint::block::image_carousel::ImageCarousel<'a>>),
+    #[serde(rename = "app.offprint.block.imageDiff")]
+    ImageDiff(Box<crate::app_offprint::block::image_diff::ImageDiff<'a>>),
+}
+
 fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -164,7 +190,7 @@ fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Required array of `app.offprint.block.*` unions.",
+                                        "Array of content blocks",
                                     ),
                                 ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -174,17 +200,15 @@ fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                         ::jacquard_common::CowStr::new_static("app.offprint.block.heading"),
                                         ::jacquard_common::CowStr::new_static("app.offprint.block.blockquote"),
                                         ::jacquard_common::CowStr::new_static("app.offprint.block.callout"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.unorderedList"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.bulletList"),
                                         ::jacquard_common::CowStr::new_static("app.offprint.block.orderedList"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.todoList"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.image"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageGrid"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.button"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.taskList"),
                                         ::jacquard_common::CowStr::new_static("app.offprint.block.codeBlock"),
                                         ::jacquard_common::CowStr::new_static("app.offprint.block.horizontalRule"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.bskyPost"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.iframeEmbed"),
-                                        ::jacquard_common::CowStr::new_static("app.offprint.block.linkEmbed")
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.image"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageGrid"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageCarousel"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageDiff")
                                     ],
                                     closed: None,
                                 }),

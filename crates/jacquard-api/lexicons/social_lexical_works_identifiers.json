@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "social.lexical.works.identifiers",
+  "defs": {
+    "identifier": {
+      "type": "object",
+      "required": [
+        "provider",
+        "providerId"
+      ],
+      "nullable": [
+        "url"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "",
+          "knownValues": [
+            "tmdb",
+            "imdb",
+            "wikidata"
+          ]
+        },
+        "providerId": {
+          "type": "string",
+          "description": ""
+        },
+        "url": {
+          "type": "string",
+          "description": "",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "work",
+          "identifiers"
+        ],
+        "properties": {
+          "identifiers": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "description": "",
+              "refs": [
+                "#identifier"
+              ],
+              "closed": false
+            },
+            "minLength": 1
+          },
+          "work": {
+            "type": "string",
+            "description": "",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

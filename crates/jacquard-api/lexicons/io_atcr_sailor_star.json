@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes.",
+      "description": "A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes. Subject is an AT URI pointing to the repo page record being starred.",
       "key": "any",
       "record": {
         "type": "object",
@@ -19,30 +19,10 @@
             "format": "datetime"
           },
           "subject": {
-            "type": "ref",
-            "description": "The repository being starred",
-            "ref": "#subject"
+            "type": "string",
+            "description": "AT URI of the repository page being starred (e.g., at://did:plc:abc/io.atcr.repo.page/myapp)",
+            "format": "at-uri"
           }
-        }
-      }
-    },
-    "subject": {
-      "type": "object",
-      "description": "Reference to a repository owned by a user",
-      "required": [
-        "did",
-        "repository"
-      ],
-      "properties": {
-        "did": {
-          "type": "string",
-          "description": "DID of the repository owner",
-          "format": "did"
-        },
-        "repository": {
-          "type": "string",
-          "description": "Repository name (e.g., 'myapp')",
-          "maxLength": 255
         }
       }
     }

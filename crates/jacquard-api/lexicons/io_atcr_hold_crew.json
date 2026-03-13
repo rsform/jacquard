@@ -43,6 +43,11 @@
               "write",
               "read"
             ]
+          },
+          "tier": {
+            "type": "string",
+            "description": "Optional tier for quota limits (e.g., 'deckhand', 'bosun', 'quartermaster'). If empty, uses defaults.new_crew_tier from quotas.yaml.",
+            "maxLength": 32
           }
         }
       }

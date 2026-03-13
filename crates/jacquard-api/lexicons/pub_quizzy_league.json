@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "pub.quizzy.league",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A quiz league with quiz masters and teams",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "quizMasters",
+          "teams"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the league",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "quizMasters": {
+            "type": "array",
+            "description": "DIDs of quiz masters who can run quizzes for this league",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "minLength": 1,
+            "maxLength": 5
+          },
+          "teams": {
+            "type": "array",
+            "description": "Teams participating in this league",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

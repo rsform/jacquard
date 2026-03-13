@@ -1,0 +1,176 @@
+{
+  "lexicon": 1,
+  "id": "at.inlay.component",
+  "defs": {
+    "bodyExternal": {
+      "type": "object",
+      "description": "Component rendered by calling a remote XRPC endpoint",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "DID of the service hosting this component",
+          "format": "did"
+        }
+      }
+    },
+    "bodyTemplate": {
+      "type": "object",
+      "description": "Component rendered by the host from a serialized element tree",
+      "required": [
+        "node"
+      ],
+      "properties": {
+        "node": {
+          "type": "unknown",
+          "description": "Serialized element tree with bindings"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Component record - declares an implementation of a type",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "body": {
+            "type": "union",
+            "description": "How this component is rendered. Omit for primitives rendered by the host.",
+            "refs": [
+              "#bodyExternal",
+              "#bodyTemplate"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "imports": {
+            "type": "array",
+            "description": "Ordered list of pack URIs (import stack). First pack that exports an NSID wins.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "type": {
+            "type": "string",
+            "description": "NSID this component implements (also the XRPC procedure)",
+            "format": "nsid"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last update timestamp. Set by the publish flow to bust cached responses.",
+            "format": "datetime"
+          },
+          "via": {
+            "type": "union",
+            "description": "Platform-managed deployment metadata",
+            "refs": [
+              "at.inlay.defs#viaValtown"
+            ]
+          },
+          "view": {
+            "type": "ref",
+            "description": "What data this component views and which prop receives it",
+            "ref": "#view"
+          }
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "description": "Declares what data this component views and which prop receives it.",
+      "required": [
+        "prop",
+        "accepts"
+      ],
+      "properties": {
+        "accepts": {
+          "type": "array",
+          "description": "Data types this view accepts.",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#viewRecord",
+              "#viewPrimitive"
+            ]
+          },
+          "minLength": 1
+        },
+        "prop": {
+          "type": "string",
+          "description": "Which component prop receives the view data.",
+          "maxLength": 256
+        }
+      }
+    },
+    "viewPrimitive": {
+      "type": "object",
+      "description": "View accepts a primitive value type.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "format": {
+          "type": "string",
+          "description": "String format constraint. Only applies when type is 'string'.",
+          "maxLength": 64,
+          "knownValues": [
+            "at-uri",
+            "did",
+            "datetime",
+            "uri",
+            "handle",
+            "at-identifier",
+            "nsid",
+            "cid",
+            "language",
+            "record-key",
+            "tid"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "description": "Lexicon primitive type.",
+          "maxLength": 128,
+          "knownValues": [
+            "string",
+            "integer",
+            "boolean",
+            "blob",
+            "cid-link",
+            "bytes"
+          ]
+        }
+      }
+    },
+    "viewRecord": {
+      "type": "object",
+      "description": "View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.",
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "The collection this component views. Omit for any-collection.",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "description": "The record key, baked from the collection's lexicon at authoring time. Presence enables DID expansion and identity page routing.",
+          "maxLength": 512
+        }
+      }
+    }
+  }
+}

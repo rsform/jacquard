@@ -1,0 +1,128 @@
+{
+  "lexicon": 1,
+  "id": "com.deckbelcher.richtext.facet",
+  "defs": {
+    "bold": {
+      "type": "object",
+      "description": "Facet feature for bold text formatting.\nTypically rendered as `<strong>` in HTML.",
+      "properties": {}
+    },
+    "byteSlice": {
+      "type": "object",
+      "description": "Specifies the sub-string range a facet feature applies to.\nStart index is inclusive, end index is exclusive.\nIndices are zero-indexed, counting bytes of the UTF-8 encoded text.",
+      "required": [
+        "byteStart",
+        "byteEnd"
+      ],
+      "properties": {
+        "byteEnd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "byteStart": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "cardRef": {
+      "type": "object",
+      "description": "Facet feature for a card reference.\nLinks to a Magic: The Gathering card.\nThe text is usually the card name.",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "description": "Reference to the card (scryfall printing + oracle card).",
+          "ref": "com.deckbelcher.defs#cardRef"
+        }
+      }
+    },
+    "code": {
+      "type": "object",
+      "description": "Facet feature for inline code.\nTypically rendered as `<code>` in HTML.",
+      "properties": {}
+    },
+    "codeBlock": {
+      "type": "object",
+      "description": "Facet feature for code blocks.\nTypically rendered as `<pre><code>` in HTML.",
+      "properties": {}
+    },
+    "italic": {
+      "type": "object",
+      "description": "Facet feature for italic text formatting.\nTypically rendered as `<em>` in HTML.",
+      "properties": {}
+    },
+    "link": {
+      "type": "object",
+      "description": "Facet feature for a URL.\nThe text URL may have been simplified or truncated, but the facet reference should be a complete URL.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "description": "Annotation of a sub-string within rich text.\nExtends Bluesky's facet system to support DeckBelcher-specific features.",
+      "required": [
+        "index",
+        "features"
+      ],
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#mention",
+              "#link",
+              "#tag",
+              "#bold",
+              "#italic",
+              "#code",
+              "#codeBlock",
+              "#cardRef"
+            ]
+          }
+        },
+        "index": {
+          "type": "ref",
+          "ref": "#byteSlice"
+        }
+      }
+    },
+    "mention": {
+      "type": "object",
+      "description": "Facet feature for mention of another account.\nThe text is usually a handle, including an `@` prefix, but the facet reference is a DID.",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "description": "Facet feature for a hashtag.\nThe text usually includes a '#' prefix, but the facet reference should not.",
+      "required": [
+        "tag"
+      ],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        }
+      }
+    }
+  }
+}

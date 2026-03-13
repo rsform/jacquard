@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "bond.biblio.defs",
+  "description": "Shared definitions for the biblio.bond reading attestation system",
+  "defs": {
+    "bookRequirement": {
+      "type": "object",
+      "description": "A required book for a reading list, specified by title and authors for fuzzy matching",
+      "required": [
+        "title",
+        "authors"
+      ],
+      "properties": {
+        "authors": {
+          "type": "string",
+          "description": "Author name(s), tab-separated for multiple",
+          "maxLength": 500,
+          "maxGraphemes": 200
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 500,
+          "maxGraphemes": 200
+        }
+      }
+    }
+  }
+}

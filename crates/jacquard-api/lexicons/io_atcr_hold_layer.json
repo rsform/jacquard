@@ -12,9 +12,8 @@
           "digest",
           "size",
           "mediaType",
-          "repository",
+          "manifest",
           "userDid",
-          "userHandle",
           "createdAt"
         ],
         "properties": {
@@ -28,15 +27,15 @@
             "description": "Layer digest (e.g., sha256:abc123...)",
             "maxLength": 128
           },
+          "manifest": {
+            "type": "string",
+            "description": "AT-URI of the manifest that included this layer (e.g., at://did:plc:xyz/io.atcr.manifest/abc123)",
+            "format": "at-uri"
+          },
           "mediaType": {
             "type": "string",
             "description": "Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)",
             "maxLength": 128
-          },
-          "repository": {
-            "type": "string",
-            "description": "Repository this layer belongs to",
-            "maxLength": 255
           },
           "size": {
             "type": "integer",
@@ -46,11 +45,6 @@
             "type": "string",
             "description": "DID of user who uploaded this layer",
             "format": "did"
-          },
-          "userHandle": {
-            "type": "string",
-            "description": "Handle of user (for display purposes)",
-            "format": "handle"
           }
         }
       }

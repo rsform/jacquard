@@ -1,0 +1,119 @@
+{
+  "lexicon": 1,
+  "id": "dev.sensorthings.multiObservation",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A composite observation bundling multiple co-produced results from a single act of sensing. Each entry carries its own ObservedProperty, unit, and scale metadata. Use this instead of separate Observations when the results are genuinely co-produced (e.g. wave statistics from spectral processing) and have no independent existence.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "thing",
+          "sensor",
+          "phenomenonTime",
+          "entries"
+        ],
+        "properties": {
+          "derivedFrom": {
+            "type": "array",
+            "description": "AT-URIs of source observations or datastreams",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 16
+          },
+          "entries": {
+            "type": "array",
+            "description": "Array of co-produced result entries",
+            "items": {
+              "type": "ref",
+              "ref": "#multiObservationEntry"
+            },
+            "maxLength": 32
+          },
+          "phenomenonTime": {
+            "type": "string",
+            "description": "Time the phenomenon was observed. Start of interval if phenomenonTimeEnd is present.",
+            "format": "datetime"
+          },
+          "phenomenonTimeEnd": {
+            "type": "string",
+            "description": "End of observation interval. For wave statistics, this is the end of the burst window.",
+            "format": "datetime"
+          },
+          "resultQuality": {
+            "type": "string",
+            "description": "Quality flag applying to the composite observation as a whole",
+            "maxLength": 64,
+            "knownValues": [
+              "dev.sensorthings.quality#good",
+              "dev.sensorthings.quality#suspect",
+              "dev.sensorthings.quality#missing"
+            ]
+          },
+          "resultTime": {
+            "type": "string",
+            "description": "Time the results became available",
+            "format": "datetime"
+          },
+          "sensor": {
+            "type": "string",
+            "description": "AT-URI of the dev.sensorthings.sensor record (the instrument or process that co-produced these results)",
+            "format": "at-uri"
+          },
+          "thing": {
+            "type": "string",
+            "description": "AT-URI of the dev.sensorthings.thing record",
+            "format": "at-uri"
+          }
+        }
+      }
+    },
+    "multiObservationEntry": {
+      "type": "object",
+      "description": "A single result within a composite observation, fully self-describing.",
+      "required": [
+        "observedProperty",
+        "unitOfMeasurement",
+        "result"
+      ],
+      "properties": {
+        "observedProperty": {
+          "type": "string",
+          "description": "AT-URI of the dev.sensorthings.observedProperty record",
+          "format": "at-uri"
+        },
+        "result": {
+          "type": "union",
+          "refs": [
+            "dev.sensorthings.observation#numericResult",
+            "dev.sensorthings.observation#categoryResult",
+            "dev.sensorthings.observation#booleanResult",
+            "dev.sensorthings.observation#arrayResult",
+            "dev.sensorthings.observation#geoPointResult"
+          ]
+        },
+        "resultQuality": {
+          "type": "string",
+          "description": "Quality flag for this specific entry, if different from the composite quality",
+          "maxLength": 64,
+          "knownValues": [
+            "dev.sensorthings.quality#good",
+            "dev.sensorthings.quality#suspect",
+            "dev.sensorthings.quality#missing"
+          ]
+        },
+        "resultScaleFactor": {
+          "type": "integer",
+          "description": "Scale factor for this entry's numeric result. Default 0."
+        },
+        "unitOfMeasurement": {
+          "type": "ref",
+          "ref": "dev.sensorthings.datastream#unitOfMeasurement"
+        }
+      }
+    }
+  }
+}

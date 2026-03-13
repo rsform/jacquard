@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "app.chronosky.media.uploadBlob",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Upload an image blob for scheduled posts. The blob is temporarily stored in Chronosky's storage and will be uploaded to Bluesky PDS when the scheduled post is published.",
+      "input": {
+        "description": "Binary image data. Supported formats: JPEG, PNG, WebP, GIF. Maximum size: 1MB (1,000,000 bytes).",
+        "encoding": "image/jpeg,image/png,image/webp,image/gif"
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "blob"
+          ],
+          "properties": {
+            "blob": {
+              "type": "blob",
+              "description": "Blob reference object that can be used in post embeds (app.bsky.embed.images)."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidContentType"
+        },
+        {
+          "name": "BlobTooLarge"
+        },
+        {
+          "name": "UploadFailed"
+        },
+        {
+          "name": "NoActiveSession"
+        }
+      ]
+    }
+  }
+}

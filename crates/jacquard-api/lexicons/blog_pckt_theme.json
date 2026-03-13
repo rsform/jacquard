@@ -25,6 +25,12 @@
           "type": "ref",
           "description": "Light mode color palette",
           "ref": "#palette"
+        },
+        "transparency": {
+          "type": "integer",
+          "description": "Content background transparency percentage (optional)",
+          "minimum": 0,
+          "maximum": 100
         }
       }
     },

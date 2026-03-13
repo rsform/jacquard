@@ -1,0 +1,106 @@
+{
+  "lexicon": 1,
+  "id": "com.suibari.atsumeat.sticker",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Definition of a sticker",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "image",
+          "originalOwner",
+          "model",
+          "obtainedAt",
+          "signature",
+          "signedPayload"
+        ],
+        "properties": {
+          "image": {
+            "type": "unknown",
+            "description": "The image content, either a string URL (for CDN/Blob) or a BlobRef."
+          },
+          "imageType": {
+            "type": "string",
+            "description": "Type of the image source.",
+            "maxLength": 64,
+            "knownValues": [
+              "avatar",
+              "custom"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 6400,
+            "maxGraphemes": 640
+          },
+          "model": {
+            "type": "string",
+            "description": "Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.",
+            "maxLength": 64
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "obtainedAt": {
+            "type": "string",
+            "description": "The timestamp when this sticker was obtained.",
+            "format": "datetime"
+          },
+          "obtainedFrom": {
+            "type": "string",
+            "description": "The DID of the user from whom this sticker was obtained (for provenance).",
+            "format": "did"
+          },
+          "originalOwner": {
+            "type": "string",
+            "description": "The DID of the original creator/minter of this sticker.",
+            "format": "did"
+          },
+          "shape": {
+            "type": "string",
+            "description": "The shape of the sticker canvas.",
+            "maxLength": 64,
+            "knownValues": [
+              "circle",
+              "square",
+              "rectangle",
+              "star",
+              "heart",
+              "diamond",
+              "butterfly",
+              "transparent"
+            ]
+          },
+          "signature": {
+            "type": "string",
+            "description": "Cryptographic signature from the server verifying the sticker's authenticity/provenance.",
+            "maxLength": 2048
+          },
+          "signedPayload": {
+            "type": "string",
+            "description": "The original JSON payload that was signed by the server.",
+            "maxLength": 10000
+          },
+          "subjectDid": {
+            "type": "string",
+            "description": "The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).",
+            "format": "did"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            },
+            "maxLength": 8
+          }
+        }
+      }
+    }
+  }
+}

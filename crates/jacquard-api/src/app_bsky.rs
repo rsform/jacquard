@@ -7,6 +7,7 @@ pub mod actor;
 pub mod ageassurance;
 pub mod bookmark;
 pub mod contact;
+pub mod draft;
 pub mod embed;
 pub mod feed;
 pub mod graph;

@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "app.beaconbits.bookmark.item",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A saved venue bookmark",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "venueUri",
+          "venueName",
+          "createdAt"
+        ],
+        "properties": {
+          "addressDetails": {
+            "type": "ref",
+            "description": "Structured address using community lexicon",
+            "ref": "community.lexicon.location.address"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the bookmark was created",
+            "format": "datetime"
+          },
+          "folderUri": {
+            "type": "string",
+            "description": "Reference to a bookmark folder",
+            "format": "at-uri"
+          },
+          "location": {
+            "type": "ref",
+            "description": "Structured location using community lexicon",
+            "ref": "community.lexicon.location.geo"
+          },
+          "notes": {
+            "type": "string",
+            "description": "User notes about the bookmark",
+            "maxGraphemes": 280
+          },
+          "venueAddress": {
+            "type": "string",
+            "description": "Human-readable address",
+            "maxGraphemes": 256
+          },
+          "venueCategory": {
+            "type": "string",
+            "description": "Category classification",
+            "maxGraphemes": 64
+          },
+          "venueName": {
+            "type": "string",
+            "description": "Display name of the venue",
+            "maxGraphemes": 128
+          },
+          "venueUri": {
+            "type": "string",
+            "description": "URI identifier for the venue (typically OSM URI)",
+            "maxGraphemes": 512
+          }
+        }
+      }
+    }
+  }
+}

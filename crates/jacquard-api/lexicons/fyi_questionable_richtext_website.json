@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.richtext.website",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 3000
+        },
+        "previewImage": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

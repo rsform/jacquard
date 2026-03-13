@@ -6,6 +6,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod get_scrobbles_chart;
+pub mod get_top_artists;
+pub mod get_top_tracks;
 
 #[jacquard_derive::lexicon]
 #[derive(

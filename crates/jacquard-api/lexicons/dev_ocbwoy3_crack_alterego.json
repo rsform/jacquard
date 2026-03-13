@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "dev.ocbwoy3.crack.alterego",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An alter ego profile record for use on \"Bluesky on Crack\".",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "New profile picture",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1048576
+          },
+          "banner": {
+            "type": "blob",
+            "description": "New profile banner",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1048576
+          },
+          "description": {
+            "type": "string",
+            "description": "New profile bio (e.g. [[#1 Rated Salesman1997]])",
+            "maxLength": 3000
+          },
+          "displayName": {
+            "type": "string",
+            "description": "New display name (e.g. Spamton G. Spamton)",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "handle": {
+            "type": "string",
+            "description": "New profile handle (e.g. spamton.bigshot), can have ANY DOMAIN.",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        }
+      }
+    }
+  }
+}

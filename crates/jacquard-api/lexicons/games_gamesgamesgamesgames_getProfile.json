@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a Pentaract profile by handle or DID.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "The handle or DID of the user whose profile to fetch."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "handle": {
+              "type": "string",
+              "description": "The resolved ATProto handle for display."
+            },
+            "profile": {
+              "type": "union",
+              "refs": [
+                "games.gamesgamesgamesgames.defs#actorProfileDetailView",
+                "games.gamesgamesgamesgames.defs#orgProfileDetailView"
+              ]
+            },
+            "profileType": {
+              "type": "string",
+              "knownValues": [
+                "actor",
+                "org"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "org.atsui.Timestamp",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Displays a datetime value.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "type": "string",
+              "format": "datetime"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "at.inlay.defs#response"
+        }
+      }
+    }
+  }
+}

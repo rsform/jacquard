@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "scot.comhairle.testingPolisPollV1",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A poll/topic for deliberation in the Polis-style system",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "topic",
+          "createdAt"
+        ],
+        "properties": {
+          "closedAt": {
+            "type": "string",
+            "description": "Optional timestamp when the poll was closed to new submissions",
+            "format": "datetime"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the poll was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional longer description of the poll",
+            "maxLength": 3000
+          },
+          "topic": {
+            "type": "string",
+            "description": "The topic or question being discussed",
+            "maxLength": 300
+          }
+        }
+      }
+    }
+  }
+}

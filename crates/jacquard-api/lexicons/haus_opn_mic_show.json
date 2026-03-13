@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "haus.opn.mic.show",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A recurring open mic show series.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "artist",
+          "schedule",
+          "createdAt"
+        ],
+        "properties": {
+          "artist": {
+            "type": "string",
+            "description": "The AT-URI of the haus.opn.mic.artist record.",
+            "format": "at-uri"
+          },
+          "coverArt": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000
+          },
+          "schedule": {
+            "type": "string",
+            "knownValues": [
+              "daily",
+              "weekly",
+              "biweekly",
+              "monthly",
+              "irregular"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

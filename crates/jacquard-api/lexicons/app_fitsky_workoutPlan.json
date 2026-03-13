@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "app.fitsky.workoutPlan",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reusable workout plan template",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "exercises",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#planExercise"
+            }
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "ogImage": {
+            "type": "blob",
+            "description": "Open Graph preview image for social sharing",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "weightlifting",
+              "bodyweight",
+              "yoga",
+              "hiit"
+            ]
+          }
+        }
+      }
+    },
+    "planExercise": {
+      "type": "object",
+      "required": [
+        "name",
+        "targetSets",
+        "targetReps"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "targetReps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "targetSets": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

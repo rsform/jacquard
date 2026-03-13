@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "app.certified.actor.organization",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Extended metadata for an organization actor. Complements the base actor profile with organization-specific fields like legal structure and reference links.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this record was originally created.",
+            "format": "datetime"
+          },
+          "foundedDate": {
+            "type": "string",
+            "description": "When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.",
+            "format": "datetime"
+          },
+          "location": {
+            "type": "ref",
+            "description": "A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "organizationType": {
+            "type": "array",
+            "description": "Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').",
+            "items": {
+              "type": "string",
+              "maxLength": 128,
+              "maxGraphemes": 100
+            },
+            "maxLength": 10
+          },
+          "urls": {
+            "type": "array",
+            "description": "Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.",
+            "items": {
+              "type": "ref",
+              "ref": "#urlItem"
+            }
+          }
+        }
+      }
+    },
+    "urlItem": {
+      "type": "object",
+      "description": "A labeled URL reference.",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL.",
+          "format": "uri",
+          "maxLength": 10000,
+          "maxGraphemes": 2048
+        }
+      }
+    }
+  }
+}

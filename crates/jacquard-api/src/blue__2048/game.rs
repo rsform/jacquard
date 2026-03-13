@@ -43,105 +43,105 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Completed;
-        type CurrentScore;
-        type SyncStatus;
-        type SeededRecording;
         type Won;
         type CreatedAt;
+        type Completed;
+        type CurrentScore;
+        type SeededRecording;
+        type SyncStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Completed = Unset;
-        type CurrentScore = Unset;
-        type SyncStatus = Unset;
-        type SeededRecording = Unset;
         type Won = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `completed` field to Set
-    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCompleted<S> {}
-    impl<S: State> State for SetCompleted<S> {
-        type Completed = Set<members::completed>;
-        type CurrentScore = S::CurrentScore;
-        type SyncStatus = S::SyncStatus;
-        type SeededRecording = S::SeededRecording;
-        type Won = S::Won;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `current_score` field to Set
-    pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
-    impl<S: State> State for SetCurrentScore<S> {
-        type Completed = S::Completed;
-        type CurrentScore = Set<members::current_score>;
-        type SyncStatus = S::SyncStatus;
-        type SeededRecording = S::SeededRecording;
-        type Won = S::Won;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
-    impl<S: State> State for SetSyncStatus<S> {
-        type Completed = S::Completed;
-        type CurrentScore = S::CurrentScore;
-        type SyncStatus = Set<members::sync_status>;
-        type SeededRecording = S::SeededRecording;
-        type Won = S::Won;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `seeded_recording` field to Set
-    pub struct SetSeededRecording<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeededRecording<S> {}
-    impl<S: State> State for SetSeededRecording<S> {
-        type Completed = S::Completed;
-        type CurrentScore = S::CurrentScore;
-        type SyncStatus = S::SyncStatus;
-        type SeededRecording = Set<members::seeded_recording>;
-        type Won = S::Won;
-        type CreatedAt = S::CreatedAt;
+        type Completed = Unset;
+        type CurrentScore = Unset;
+        type SeededRecording = Unset;
+        type SyncStatus = Unset;
     }
     ///State transition - sets the `won` field to Set
     pub struct SetWon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWon<S> {}
     impl<S: State> State for SetWon<S> {
-        type Completed = S::Completed;
-        type CurrentScore = S::CurrentScore;
-        type SyncStatus = S::SyncStatus;
-        type SeededRecording = S::SeededRecording;
         type Won = Set<members::won>;
         type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = S::SyncStatus;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Completed = S::Completed;
-        type CurrentScore = S::CurrentScore;
-        type SyncStatus = S::SyncStatus;
-        type SeededRecording = S::SeededRecording;
         type Won = S::Won;
         type CreatedAt = Set<members::created_at>;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `completed` field to Set
+    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCompleted<S> {}
+    impl<S: State> State for SetCompleted<S> {
+        type Won = S::Won;
+        type CreatedAt = S::CreatedAt;
+        type Completed = Set<members::completed>;
+        type CurrentScore = S::CurrentScore;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `current_score` field to Set
+    pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
+    impl<S: State> State for SetCurrentScore<S> {
+        type Won = S::Won;
+        type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+        type CurrentScore = Set<members::current_score>;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `seeded_recording` field to Set
+    pub struct SetSeededRecording<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeededRecording<S> {}
+    impl<S: State> State for SetSeededRecording<S> {
+        type Won = S::Won;
+        type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type SeededRecording = Set<members::seeded_recording>;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type Won = S::Won;
+        type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = Set<members::sync_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `completed` field
-        pub struct completed(());
-        ///Marker type for the `current_score` field
-        pub struct current_score(());
-        ///Marker type for the `sync_status` field
-        pub struct sync_status(());
-        ///Marker type for the `seeded_recording` field
-        pub struct seeded_recording(());
         ///Marker type for the `won` field
         pub struct won(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `completed` field
+        pub struct completed(());
+        ///Marker type for the `current_score` field
+        pub struct current_score(());
+        ///Marker type for the `seeded_recording` field
+        pub struct seeded_recording(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
     }
 }
 
@@ -294,12 +294,12 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Completed: game_state::IsSet,
-    S::CurrentScore: game_state::IsSet,
-    S::SyncStatus: game_state::IsSet,
-    S::SeededRecording: game_state::IsSet,
     S::Won: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
+    S::Completed: game_state::IsSet,
+    S::CurrentScore: game_state::IsSet,
+    S::SeededRecording: game_state::IsSet,
+    S::SyncStatus: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {

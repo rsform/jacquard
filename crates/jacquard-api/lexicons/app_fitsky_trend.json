@@ -1,0 +1,134 @@
+{
+  "lexicon": 1,
+  "id": "app.fitsky.trend",
+  "defs": {
+    "dataPoint": {
+      "type": "object",
+      "required": [
+        "date",
+        "value"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "value": {
+          "type": "integer",
+          "description": "Value in base units (meters, seconds, calories, count, bpm)"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A shared fitness trend or dashboard snapshot",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "widgetType",
+          "metric",
+          "period",
+          "summary",
+          "createdAt"
+        ],
+        "properties": {
+          "caption": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "chartStyle": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "line",
+              "bar"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "dataPoints": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#dataPoint"
+            }
+          },
+          "image": {
+            "type": "blob",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "metric": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "distance",
+              "duration",
+              "pace",
+              "steps",
+              "calories",
+              "heartRate",
+              "workoutCount"
+            ]
+          },
+          "period": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "1d",
+              "7d",
+              "30d",
+              "90d",
+              "1y"
+            ]
+          },
+          "summary": {
+            "type": "ref",
+            "ref": "#trendSummary"
+          },
+          "widgetType": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "today-summary",
+              "weekly-progress",
+              "goal-progress",
+              "recent-workouts",
+              "custom-trend"
+            ]
+          }
+        }
+      }
+    },
+    "trendSummary": {
+      "type": "object",
+      "properties": {
+        "average": {
+          "type": "integer",
+          "description": "Average value in base units"
+        },
+        "best": {
+          "type": "integer",
+          "description": "Best value in base units"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total value in base units"
+        },
+        "worst": {
+          "type": "integer",
+          "description": "Worst value in base units"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.defs",
+  "defs": {
+    "actor": {
+      "type": "object",
+      "description": "Basic actor information for embedding in responses",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        }
+      }
+    },
+    "aspectRatio": {
+      "type": "object",
+      "description": "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any unit.",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "bookIdEntry": {
+      "type": "object",
+      "description": "Book ID entry for SSG",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "locationEntry": {
+      "type": "object",
+      "description": "Location entry with book count for SSG",
+      "required": [
+        "h3",
+        "bookCount"
+      ],
+      "properties": {
+        "bookCount": {
+          "type": "integer"
+        },
+        "h3": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

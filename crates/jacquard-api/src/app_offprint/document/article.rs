@@ -17,9 +17,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Article<'a> {
-    /// Required AT-URI to a `site.standard.document` compatible record. Used to display articles with-in a publication.
+    /// Strong reference to a `site.standard.document` compatible record.
     #[serde(borrow)]
-    pub document: jacquard_common::types::string::AtUri<'a>,
+    pub document: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod article_state {
@@ -58,7 +58,7 @@ pub mod article_state {
 pub struct ArticleBuilder<'a, S: article_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -89,7 +89,7 @@ where
     /// Set the `document` field (required)
     pub fn document(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> ArticleBuilder<'a, article_state::SetDocument<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ArticleBuilder {
@@ -235,23 +235,11 @@ fn lexicon_doc_app_offprint_document_article() -> ::jacquard_lexicon::lexicon::L
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "document",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Required AT-URI to a `site.standard.document` compatible record. Used to display articles with-in a publication.",
-                                        ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
                                 }),
                             );
                             map

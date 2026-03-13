@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "diy.razorgirl.winter.fact",
+  "description": "Atomic knowledge unit. A predicate applied to arguments, optionally with confidence, expiration, source tracking, tags, and supersession.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "predicate",
+          "args",
+          "createdAt"
+        ],
+        "properties": {
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 10
+          },
+          "confidence": {
+            "type": "string",
+            "description": "0.0-1.0 as string (Soufflé compat)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "predicate": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "source": {
+            "type": "string",
+            "description": "CID of source record"
+          },
+          "supersedes": {
+            "type": "string",
+            "description": "CID of superseded fact"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 20
+          }
+        }
+      }
+    }
+  }
+}

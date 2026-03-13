@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "bond.biblio.list",
+  "description": "A curated reading challenge. Librarians define book requirements with a deadline; readers apply books; librarians issue stamps for verified completion.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reading list curated by a librarian",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "librarians",
+          "books",
+          "duedate",
+          "createdAt"
+        ],
+        "properties": {
+          "books": {
+            "type": "array",
+            "description": "Required books for this reading challenge",
+            "items": {
+              "type": "ref",
+              "ref": "bond.biblio.defs#bookRequirement"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When this list was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the reading challenge",
+            "maxLength": 2000,
+            "maxGraphemes": 1000
+          },
+          "duedate": {
+            "type": "string",
+            "description": "Deadline for completing the reading challenge",
+            "format": "datetime"
+          },
+          "librarians": {
+            "type": "array",
+            "description": "DIDs of users who can issue stamps for this list",
+            "items": {
+              "type": "string",
+              "format": "did"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "Display name for the reading list",
+            "maxLength": 200,
+            "maxGraphemes": 100
+          }
+        }
+      }
+    }
+  }
+}

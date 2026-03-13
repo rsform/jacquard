@@ -1,0 +1,77 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.song",
+  "defs": {
+    "interestedParty": {
+      "type": "object",
+      "description": "An interested party associated with the song (author, composer, publisher)",
+      "properties": {
+        "collectingSociety": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "ipi": {
+          "type": "string",
+          "maxLength": 11
+        },
+        "mechanicalRoyaltiesPercentage": {
+          "type": "integer",
+          "description": "Percentage of mechanical royalties allocated to this interested party, 10000 = 100%"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "performanceRoyaltiesPercentage": {
+          "type": "integer",
+          "description": "Percentage of performance royalties allocated to this interested party, 10000 = 100%"
+        },
+        "publishingOwner": {
+          "type": "ref",
+          "ref": "ch.indiemusi.alpha.actor.publishingOwner"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the interested party (e.g., 'author', 'composer', 'publisher')",
+          "maxLength": 255
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A song or musical work: the melody, lyrics, and arrangement created by composers and authors",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "interestedParties"
+        ],
+        "properties": {
+          "interestedParties": {
+            "type": "array",
+            "description": "List of interested parties (authors, composers, publishers) associated with this song",
+            "items": {
+              "type": "ref",
+              "ref": "#interestedParty"
+            },
+            "minLength": 1
+          },
+          "iswc": {
+            "type": "string",
+            "description": "ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society",
+            "maxLength": 13
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  }
+}

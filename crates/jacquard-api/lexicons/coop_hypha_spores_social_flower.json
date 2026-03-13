@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "coop.hypha.spores.social.flower",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A flower planted in another user's garden, representing a 'like' or 'follow'.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when the flower was planted.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the garden owner receiving the flower.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

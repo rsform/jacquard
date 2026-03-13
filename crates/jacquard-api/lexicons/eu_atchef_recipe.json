@@ -1,0 +1,79 @@
+{
+  "lexicon": 1,
+  "id": "eu.atchef.recipe",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cooking recipe with ingredients, instructions, and metadata",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Recipe content in Cooklang format",
+            "maxLength": 15000,
+            "maxGraphemes": 3000
+          },
+          "cookTime": {
+            "type": "integer",
+            "description": "Cooking time in minutes",
+            "minimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the recipe was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Brief recipe description or summary",
+            "maxLength": 500,
+            "maxGraphemes": 200
+          },
+          "image": {
+            "type": "blob",
+            "description": "Cover image",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "name": {
+            "type": "string",
+            "description": "Recipe title",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "portions": {
+            "type": "integer",
+            "description": "Number of servings",
+            "minimum": 1
+          },
+          "prepTime": {
+            "type": "integer",
+            "description": "Preparation time in minutes",
+            "minimum": 0
+          },
+          "time": {
+            "type": "integer",
+            "description": "Total time in minutes",
+            "minimum": 1
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the recipe was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

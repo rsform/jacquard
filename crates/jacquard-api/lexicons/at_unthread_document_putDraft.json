@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "at.unthread.document.putDraft",
+  "defs": {
+    "draftView": {
+      "type": "object",
+      "required": [
+        "tid",
+        "content",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "tid": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Create or update a draft document.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "content"
+          ],
+          "properties": {
+            "content": {
+              "type": "string",
+              "description": "Markdown content of the draft."
+            },
+            "tid": {
+              "type": "string",
+              "description": "TID of an existing draft to update. Omit to create a new draft."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "#defs/draftView"
+        }
+      },
+      "errors": [
+        {
+          "name": "DraftNotFound"
+        }
+      ]
+    }
+  }
+}

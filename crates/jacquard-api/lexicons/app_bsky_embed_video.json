@@ -47,6 +47,14 @@
           },
           "maxLength": 20
         },
+        "presentation": {
+          "type": "string",
+          "description": "A hint to the client about how to present the video.",
+          "knownValues": [
+            "default",
+            "gif"
+          ]
+        },
         "video": {
           "type": "blob",
           "description": "The mp4 video file. May be up to 100mb, formerly limited to 50mb.",
@@ -80,6 +88,14 @@
         "playlist": {
           "type": "string",
           "format": "uri"
+        },
+        "presentation": {
+          "type": "string",
+          "description": "A hint to the client about how to present the video.",
+          "knownValues": [
+            "default",
+            "gif"
+          ]
         },
         "thumbnail": {
           "type": "string",

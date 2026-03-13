@@ -1,0 +1,144 @@
+{
+  "lexicon": 1,
+  "id": "network.cosmik.card",
+  "description": "A single record type for all cards.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record representing a card with content.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "type",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "union",
+            "description": "The specific content of the card, determined by the card type.",
+            "refs": [
+              "#urlContent",
+              "#noteContent"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this card was created (usually set by PDS).",
+            "format": "datetime"
+          },
+          "originalCard": {
+            "type": "ref",
+            "description": "Optional strong reference to the original card (for NOTE cards).",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "parentCard": {
+            "type": "ref",
+            "description": "Optional strong reference to a parent card (for NOTE cards).",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "provenance": {
+            "type": "ref",
+            "description": "Optional provenance information for this card.",
+            "ref": "network.cosmik.defs#provenance"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of card",
+            "knownValues": [
+              "URL",
+              "NOTE"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "Optional URL associated with the card. Required for URL cards, optional for NOTE cards.",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "noteContent": {
+      "type": "object",
+      "description": "Content structure for a note card.",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The note text content",
+          "maxLength": 10000
+        }
+      }
+    },
+    "urlContent": {
+      "type": "object",
+      "description": "Content structure for a URL card.",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "metadata": {
+          "type": "ref",
+          "description": "Optional metadata about the URL",
+          "ref": "#urlMetadata"
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL being saved",
+          "format": "uri"
+        }
+      }
+    },
+    "urlMetadata": {
+      "type": "object",
+      "description": "Metadata about a URL.",
+      "properties": {
+        "author": {
+          "type": "string",
+          "description": "Author of the content"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the page"
+        },
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier (DOI) for academic content"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of a representative image",
+          "format": "uri"
+        },
+        "isbn": {
+          "type": "string",
+          "description": "International Standard Book Number (ISBN) for books"
+        },
+        "publishedDate": {
+          "type": "string",
+          "description": "When the content was published",
+          "format": "datetime"
+        },
+        "retrievedAt": {
+          "type": "string",
+          "description": "When the metadata was retrieved",
+          "format": "datetime"
+        },
+        "siteName": {
+          "type": "string",
+          "description": "Name of the site"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the page"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of content (e.g., 'video', 'article')"
+        }
+      }
+    }
+  }
+}

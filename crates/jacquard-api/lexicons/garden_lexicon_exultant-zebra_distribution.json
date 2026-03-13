@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "garden.lexicon.exultant-zebra.distribution",
+  "defs": {
+    "artifact": {
+      "type": "object",
+      "description": "A downloadable artifact within a distribution.",
+      "required": [
+        "download"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "An optional description of this artifact."
+        },
+        "download": {
+          "type": "blob",
+          "description": "The downloadable binary.",
+          "accept": [
+            "*/*"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "description": "Optional tags describing this artifact, e.g. 'aarch64', 'apple-darwin', 'linux'.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A distribution of an application.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "version",
+          "artifacts"
+        ],
+        "properties": {
+          "artifacts": {
+            "type": "array",
+            "description": "The list of downloadable artifacts for this distribution.",
+            "items": {
+              "type": "ref",
+              "ref": "#artifact"
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "An optional description of this distribution."
+          },
+          "version": {
+            "type": "string",
+            "description": "The version of this distribution, e.g. '0.14.0'."
+          }
+        }
+      }
+    }
+  }
+}

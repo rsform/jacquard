@@ -26,10 +26,6 @@ pub struct LastCommit<'a> {
     /// Commit message
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
-    /// Short commit hash
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Commit timestamp
     pub when: jacquard_common::types::string::Datetime,
 }
@@ -44,49 +40,49 @@ pub mod last_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Hash;
+        type When;
         type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Hash = Unset;
+        type When = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Hash = S::Hash;
-        type Message = S::Message;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
-        type When = S::When;
         type Hash = Set<members::hash>;
+        type When = S::When;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Hash = S::Hash;
+        type When = Set<members::when>;
         type Message = S::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type When = S::When;
         type Hash = S::Hash;
+        type When = S::When;
         type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `hash` field
         pub struct hash(());
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `message` field
         pub struct message(());
     }
@@ -97,7 +93,6 @@ pub struct LastCommitBuilder<'a, S: last_commit_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<crate::sh_tangled::repo::blob::Signature<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -117,7 +112,7 @@ impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
     pub fn new() -> Self {
         LastCommitBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -180,25 +175,6 @@ where
     }
 }
 
-impl<'a, S: last_commit_state::State> LastCommitBuilder<'a, S> {
-    /// Set the `shortHash` field (optional)
-    pub fn short_hash(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `shortHash` field to an Option value (optional)
-    pub fn maybe_short_hash(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
@@ -209,7 +185,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetWhen<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         LastCommitBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -221,8 +197,8 @@ where
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
-    S::When: last_commit_state::IsSet,
     S::Hash: last_commit_state::IsSet,
+    S::When: last_commit_state::IsSet,
     S::Message: last_commit_state::IsSet,
 {
     /// Build the final struct
@@ -231,8 +207,7 @@ where
             author: self.__unsafe_private_named.0,
             hash: self.__unsafe_private_named.1.unwrap(),
             message: self.__unsafe_private_named.2.unwrap(),
-            short_hash: self.__unsafe_private_named.3,
-            when: self.__unsafe_private_named.4.unwrap(),
+            when: self.__unsafe_private_named.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -248,8 +223,7 @@ where
             author: self.__unsafe_private_named.0,
             hash: self.__unsafe_private_named.1.unwrap(),
             message: self.__unsafe_private_named.2.unwrap(),
-            short_hash: self.__unsafe_private_named.3,
-            when: self.__unsafe_private_named.4.unwrap(),
+            when: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -309,25 +283,6 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Commit message"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "shortHash",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Short commit hash"),
                                 ),
                                 format: None,
                                 default: None,
@@ -652,51 +607,51 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Path;
         type Repo;
         type Ref;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Path = Unset;
         type Repo = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Path = Set<members::path>;
-        type Repo = S::Repo;
-        type Ref = S::Ref;
+        type Path = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Path = S::Path;
         type Repo = Set<members::repo>;
         type Ref = S::Ref;
+        type Path = S::Path;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Path = S::Path;
         type Repo = S::Repo;
         type Ref = Set<members::r#ref>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Ref = S::Ref;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
@@ -803,9 +758,9 @@ where
 impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
-    S::Path: blob_state::IsSet,
     S::Repo: blob_state::IsSet,
     S::Ref: blob_state::IsSet,
+    S::Path: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
@@ -987,51 +942,51 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Email;
         type When;
+        type Email;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Email = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Email = S::Email;
-        type When = S::When;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Name = S::Name;
-        type Email = Set<members::email>;
-        type When = S::When;
+        type Email = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Name = S::Name;
-        type Email = S::Email;
         type When = Set<members::when>;
+        type Email = S::Email;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type When = S::When;
+        type Email = Set<members::email>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type When = S::When;
+        type Email = S::Email;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `email` field
+        pub struct email(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1124,9 +1079,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::Name: signature_state::IsSet,
-    S::Email: signature_state::IsSet,
     S::When: signature_state::IsSet,
+    S::Email: signature_state::IsSet,
+    S::Name: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {

@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.actor.masterOwner",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The entity (person or company) that owns the master recording rights",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  }
+}

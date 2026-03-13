@@ -1,0 +1,179 @@
+{
+  "lexicon": 1,
+  "id": "media.ionosphere.defs",
+  "defs": {
+    "bearer": {
+      "type": "string",
+      "description": "BearerURI as specified in ETSI TS 103 270",
+      "format": "uri"
+    },
+    "broadcast": {
+      "type": "object",
+      "description": "Represents the method of accessing a broadcast; i.e. live",
+      "required": [
+        "bearer"
+      ],
+      "properties": {
+        "bearer": {
+          "type": "ref",
+          "ref": "media.ionosphere.defs#bearer"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "When used in a list, this can be used to sort the attempted connections or preferred methods",
+          "default": 0
+        },
+        "from": {
+          "type": "string",
+          "description": "The datetime from which this method is available",
+          "format": "datetime"
+        },
+        "offset": {
+          "type": "integer",
+          "description": "Offset in milliseconds compared to other bearers",
+          "default": 0
+        },
+        "until": {
+          "type": "string",
+          "description": "The datetime where this method is no longer available",
+          "format": "datetime"
+        }
+      }
+    },
+    "credit": {
+      "type": "object",
+      "required": [
+        "entity",
+        "role"
+      ],
+      "properties": {
+        "entity": {
+          "type": "ref",
+          "ref": "media.ionosphere.defs#entity"
+        },
+        "role": {
+          "type": "string",
+          "description": "Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)",
+          "maxLength": 128,
+          "knownValues": [
+            "creator",
+            "contributor",
+            "guest"
+          ]
+        }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxGraphemes": 128
+        },
+        "type": {
+          "type": "string",
+          "maxLength": 128,
+          "enum": [
+            "organization",
+            "person"
+          ]
+        }
+      }
+    },
+    "genre": {
+      "type": "string",
+      "description": "TV-Anytime classification scheme URIs permitted by ETSI TS 102 818 section 5.3",
+      "format": "uri"
+    },
+    "geocoordinates": {
+      "type": "object",
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "properties": {
+        "latitude": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "longitude": {
+          "type": "string",
+          "maxLength": 128
+        }
+      }
+    },
+    "membership": {
+      "type": "object",
+      "description": "Represents membership to a group, optionally with an index",
+      "required": [
+        "group"
+      ],
+      "properties": {
+        "group": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "index": {
+          "type": "integer"
+        }
+      }
+    },
+    "recording": {
+      "type": "object",
+      "description": "Represents the method of accessing a recording",
+      "required": [
+        "bearer"
+      ],
+      "properties": {
+        "bearer": {
+          "type": "ref",
+          "ref": "media.ionosphere.defs#bearer"
+        },
+        "cost": {
+          "type": "integer",
+          "description": "When used in a list, this can be used to sort the attempted connections or preferred methods",
+          "default": 0
+        },
+        "from": {
+          "type": "string",
+          "description": "The datetime from which this method is available",
+          "format": "datetime"
+        },
+        "until": {
+          "type": "string",
+          "description": "The datetime where this method is no longer available",
+          "format": "datetime"
+        }
+      }
+    },
+    "track": {
+      "type": "object",
+      "required": [
+        "title",
+        "artists"
+      ],
+      "properties": {
+        "album": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "artists": {
+          "type": "array",
+          "description": "Artists in order of importance to the track",
+          "items": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 256
+        }
+      }
+    }
+  }
+}

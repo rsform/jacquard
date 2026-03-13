@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.profile.updateProfile",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update user profile. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "avatar": {
+              "type": "blob"
+            },
+            "banner": {
+              "type": "blob"
+            },
+            "bio": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "displayName": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "showcase": {
+              "type": "array",
+              "description": "Featured showcase items",
+              "items": {
+                "type": "ref",
+                "ref": "social.showcase.defs#showcaseItem"
+              },
+              "maxLength": 4
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "maxLength": 10
+            },
+            "website": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 2048
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#profileView"
+        }
+      }
+    }
+  }
+}

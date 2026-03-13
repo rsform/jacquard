@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "org.passingreads.actor.defs",
+  "defs": {
+    "profileView": {
+      "type": "object",
+      "description": "Profile view of a user for API responses. Based on the actor.profile record but with resolved avatar URL.",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatarAlt": {
+          "type": "string",
+          "description": "Alt text for the avatar image",
+          "maxLength": 1000
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "Resolved URL to the avatar image",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2560
+        },
+        "descriptionFacets": {
+          "type": "array",
+          "description": "Rich text facets for the description",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "coop.hypha.spores.social.takenFlower",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A flower taken from another user's garden, representing a bookmark or collection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when the flower was taken.",
+            "format": "datetime"
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note or reason for taking this flower",
+            "maxLength": 5000,
+            "maxGraphemes": 500
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the garden the flower was taken from.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

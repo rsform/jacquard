@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "dev.vielle.dnd.power",
+  "description": "Tokens for all dev.vielle.dnd.astral powers",
+  "defs": {
+    "acursed": {
+      "type": "token"
+    },
+    "bind": {
+      "type": "token"
+    },
+    "bond": {
+      "type": "token"
+    },
+    "claw": {
+      "type": "token"
+    },
+    "darksight": {
+      "type": "token"
+    },
+    "eldritchAdaptability": {
+      "type": "token"
+    },
+    "eldritchAssault": {
+      "type": "token"
+    },
+    "eldritchEnchantment": {
+      "type": "token"
+    },
+    "eldritchVisage": {
+      "type": "token"
+    },
+    "faceless": {
+      "type": "token"
+    },
+    "fateScriber": {
+      "type": "token"
+    },
+    "instil": {
+      "type": "token"
+    },
+    "invalid": {
+      "type": "token"
+    },
+    "locked": {
+      "type": "token",
+      "description": "This power should not be obtainable as an astral power."
+    },
+    "regenerate": {
+      "type": "token"
+    },
+    "runeSeeker": {
+      "type": "token"
+    },
+    "spray": {
+      "type": "token"
+    },
+    "whisper": {
+      "type": "token"
+    }
+  }
+}

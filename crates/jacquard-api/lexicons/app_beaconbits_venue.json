@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "app.beaconbits.venue",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user-created venue definition",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Human-readable address",
+            "maxGraphemes": 256
+          },
+          "addressDetails": {
+            "type": "ref",
+            "description": "Structured address using community lexicon",
+            "ref": "community.lexicon.location.address"
+          },
+          "category": {
+            "type": "string",
+            "description": "Venue category (bar, cafe, restaurant, etc.)",
+            "maxGraphemes": 64
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the venue was created",
+            "format": "datetime"
+          },
+          "location": {
+            "type": "ref",
+            "description": "Structured location using community lexicon",
+            "ref": "community.lexicon.location.geo"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the venue",
+            "maxGraphemes": 64
+          },
+          "osmUri": {
+            "type": "string",
+            "description": "Link to underlying OpenStreetMap entity (osm://node/123)",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

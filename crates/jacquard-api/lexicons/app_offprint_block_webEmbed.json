@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.webEmbed",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "alignment": {
+          "type": "string",
+          "description": "Horizontal alignment",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Page description/excerpt",
+          "maxGraphemes": 1000
+        },
+        "embedHeight": {
+          "type": "integer",
+          "description": "Native embed height in pixels",
+          "minimum": 1
+        },
+        "embedUrl": {
+          "type": "string",
+          "description": "oEmbed URL for iframe embedding",
+          "format": "uri"
+        },
+        "embedWidth": {
+          "type": "integer",
+          "description": "Native embed width in pixels",
+          "minimum": 1
+        },
+        "href": {
+          "type": "string",
+          "description": "The URL of the embedded page",
+          "format": "uri"
+        },
+        "preview": {
+          "type": "blob",
+          "description": "Screenshot of the embedded content (1280×720px)",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        },
+        "siteName": {
+          "type": "string",
+          "description": "Name of the website",
+          "maxGraphemes": 100
+        },
+        "title": {
+          "type": "string",
+          "description": "Page title",
+          "maxGraphemes": 300
+        },
+        "width": {
+          "type": "string",
+          "description": "CSS width value (e.g., \"100%\", \"75%\". \"50%\" minimum)"
+        }
+      }
+    }
+  }
+}

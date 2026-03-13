@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "social.showcase.profile.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a user's profile. Authentication optional.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "The DID or handle of the user",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "social.showcase.defs#profileView"
+        }
+      }
+    }
+  }
+}

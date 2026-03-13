@@ -18,6 +18,10 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
+    /// Small image to be displayed next to posts from account. AKA, 'profile picture'
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Include link to this account on Bluesky.
     pub bluesky: bool,
     /// Free-form profile description text.
@@ -82,6 +86,7 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
@@ -105,9 +110,28 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     pub fn new() -> Self {
         ProfileBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `avatar` field (optional)
+    pub fn avatar(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `avatar` field to an Option value (optional)
+    pub fn maybe_avatar(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -121,7 +145,7 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ProfileBuilder<'a, profile_state::SetBluesky<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ProfileBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -136,7 +160,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -144,7 +168,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -155,7 +179,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `links` field to an Option value (optional)
@@ -163,7 +187,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -174,12 +198,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -190,7 +214,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `pinnedRepositories` field to an Option value (optional)
@@ -198,7 +222,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -209,12 +233,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -225,7 +249,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
@@ -233,7 +257,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -246,13 +270,14 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            bluesky: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            links: self.__unsafe_private_named.2,
-            location: self.__unsafe_private_named.3,
-            pinned_repositories: self.__unsafe_private_named.4,
-            pronouns: self.__unsafe_private_named.5,
-            stats: self.__unsafe_private_named.6,
+            avatar: self.__unsafe_private_named.0,
+            bluesky: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            links: self.__unsafe_private_named.3,
+            location: self.__unsafe_private_named.4,
+            pinned_repositories: self.__unsafe_private_named.5,
+            pronouns: self.__unsafe_private_named.6,
+            stats: self.__unsafe_private_named.7,
             extra_data: Default::default(),
         }
     }
@@ -265,13 +290,14 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            bluesky: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            links: self.__unsafe_private_named.2,
-            location: self.__unsafe_private_named.3,
-            pinned_repositories: self.__unsafe_private_named.4,
-            pronouns: self.__unsafe_private_named.5,
-            stats: self.__unsafe_private_named.6,
+            avatar: self.__unsafe_private_named.0,
+            bluesky: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            links: self.__unsafe_private_named.3,
+            location: self.__unsafe_private_named.4,
+            pinned_repositories: self.__unsafe_private_named.5,
+            pronouns: self.__unsafe_private_named.6,
+            stats: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
     }
@@ -529,6 +555,14 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                    description: None,
+                                    accept: None,
+                                    max_size: None,
+                                }),
+                            );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("bluesky"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {

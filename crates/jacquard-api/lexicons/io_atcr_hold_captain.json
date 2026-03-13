@@ -34,11 +34,6 @@
             "description": "DID of the hold owner",
             "format": "did"
           },
-          "provider": {
-            "type": "string",
-            "description": "Deployment provider (e.g., fly.io, aws, etc.)",
-            "maxLength": 64
-          },
           "public": {
             "type": "boolean",
             "description": "Whether this hold allows public blob reads (pulls) without authentication"
@@ -47,6 +42,19 @@
             "type": "string",
             "description": "S3 region where blobs are stored",
             "maxLength": 64
+          },
+          "successor": {
+            "type": "string",
+            "description": "DID of successor hold for migration redirect",
+            "format": "did"
+          },
+          "supporterBadgeTiers": {
+            "type": "array",
+            "description": "Tier names that earn a supporter badge on user profiles",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            }
           }
         }
       }

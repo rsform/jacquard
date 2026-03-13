@@ -10,6 +10,10 @@
         "when"
       ],
       "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#signature"
+        },
         "hash": {
           "type": "string",
           "description": "Commit hash"
@@ -69,6 +73,10 @@
                 "ref": "#treeEntry"
               }
             },
+            "lastCommit": {
+              "type": "ref",
+              "ref": "#lastCommit"
+            },
             "parent": {
               "type": "string",
               "description": "The parent path in the tree"
@@ -118,6 +126,29 @@
         "filename": {
           "type": "string",
           "description": "Name of the readme file"
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "name",
+        "email",
+        "when"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Author email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Author name"
+        },
+        "when": {
+          "type": "string",
+          "description": "Author timestamp",
+          "format": "datetime"
         }
       }
     },

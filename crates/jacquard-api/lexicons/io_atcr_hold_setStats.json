@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.setStats",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Set absolute stats values for a repository. Used for migration/admin purposes to set specific pull/push counts.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "ownerDid",
+            "repository"
+          ],
+          "properties": {
+            "lastPull": {
+              "type": "string",
+              "description": "RFC3339 timestamp of last pull",
+              "format": "datetime"
+            },
+            "lastPush": {
+              "type": "string",
+              "description": "RFC3339 timestamp of last push",
+              "format": "datetime"
+            },
+            "ownerDid": {
+              "type": "string",
+              "description": "DID of the repository owner",
+              "format": "did"
+            },
+            "pullCount": {
+              "type": "integer",
+              "description": "Absolute pull count to set",
+              "minimum": 0
+            },
+            "pushCount": {
+              "type": "integer",
+              "description": "Absolute push count to set",
+              "minimum": 0
+            },
+            "repository": {
+              "type": "string",
+              "description": "Repository name",
+              "maxLength": 256
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the stats were successfully updated"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidOwner"
+        },
+        {
+          "name": "InvalidRepository"
+        }
+      ]
+    }
+  }
+}

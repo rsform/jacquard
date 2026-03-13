@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "app.offprint.block.webBookmark",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "href",
+        "title"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Page description/excerpt",
+          "maxGraphemes": 1000
+        },
+        "href": {
+          "type": "string",
+          "description": "The URL of the bookmarked page",
+          "format": "uri"
+        },
+        "preview": {
+          "type": "blob",
+          "description": "Open Graph image for the page",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        },
+        "siteName": {
+          "type": "string",
+          "description": "Name of the website",
+          "maxGraphemes": 100
+        },
+        "title": {
+          "type": "string",
+          "description": "Page title",
+          "maxGraphemes": 300
+        }
+      }
+    }
+  }
+}

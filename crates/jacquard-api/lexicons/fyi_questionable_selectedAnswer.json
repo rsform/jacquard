@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.selectedAnswer",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Marks an answer as answering a given question",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "questionRef",
+          "answerRef",
+          "createdAt"
+        ],
+        "properties": {
+          "answerRef": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this vote was originally created.",
+            "format": "datetime"
+          },
+          "questionRef": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

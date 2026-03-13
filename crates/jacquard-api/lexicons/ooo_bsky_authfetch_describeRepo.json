@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "ooo.bsky.authfetch.describeRepo",
+  "revision": 1,
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Gets information about your account and its associated hidden repository, including the list of collections. Requires auth.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "collections"
+          ],
+          "properties": {
+            "collections": {
+              "type": "array",
+              "description": "The list of collection NSIDs in the hidden repository.",
+              "items": {
+                "type": "string",
+                "format": "nsid"
+              }
+            },
+            "did": {
+              "type": "string",
+              "description": "The DID of the repository owner.",
+              "format": "did"
+            }
+          }
+        }
+      }
+    }
+  }
+}

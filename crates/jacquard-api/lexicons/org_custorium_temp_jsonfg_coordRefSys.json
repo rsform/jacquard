@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "org.custorium.temp.jsonfg.coordRefSys",
+  "description": "WIP, A straitforward translation from OGC Features and Geometries Json (https://portal.ogc.org/files/107269#schema-coordrefsys) to ATProto lexicon, following the draft lexicon styleguide. The most distinct change is addition of a decimals property to higher level objects",
+  "defs": {
+    "multiRefSys": {
+      "type": "object",
+      "properties": {
+        "refSys": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#singleRefSys"
+          },
+          "minLength": 2
+        }
+      }
+    },
+    "refSysByRef": {
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "epoch": {
+          "type": "integer"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "refSysCustom": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Value should not be reference"
+        }
+      }
+    },
+    "refSysSimpleRef": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The value is either a URI or a CURIE."
+        }
+      }
+    },
+    "singleRefSys": {
+      "type": "object",
+      "required": [
+        "refSys"
+      ],
+      "properties": {
+        "refSys": {
+          "type": "union",
+          "refs": [
+            "#refSysSimpleRef",
+            "#refSysByRef",
+            "#refSysCustom"
+          ]
+        }
+      }
+    }
+  }
+}
