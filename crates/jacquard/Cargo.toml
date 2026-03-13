@@ -100,16 +100,6 @@ required-features = ["api_bluesky"]
 
 
 [[example]]
-name = "streaming_upload"
-path = "../../examples/streaming_upload.rs"
-required-features = ["api_bluesky", "streaming"]
-
-[[example]]
-name = "streaming_download"
-path = "../../examples/streaming_download.rs"
-required-features = ["api_bluesky", "streaming"]
-
-[[example]]
 name = "app_password_create_post"
 path = "../../examples/app_password_create_post.rs"
 required-features = ["api_bluesky"]

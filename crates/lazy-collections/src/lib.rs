@@ -1,5 +1,3 @@
-#![feature(maybe_uninit_slice)]
-#![feature(maybe_uninit_write_slice)]
 #![cfg_attr(target_os = "none", no_std)]
 
 #[cfg(all(not(feature = "std"), feature = "alloc"))]

@@ -21,4 +21,8 @@ steps:
 
   - name: run tests
     command: |
-      cargo test --workspace --exclude mini-moka-wasm
+      cargo nextest run --workspace --exclude mini-moka-wasm
+
+  - name: run tests
+    command: |
+      cargo test --doc --exclude lazy-collections,mini-moka-wasm
