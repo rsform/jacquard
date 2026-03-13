@@ -2628,6 +2628,7 @@ dependencies = [
  "ed25519-dalek",
  "hex",
  "iroh-car",
+ "jacquard-api",
  "jacquard-common",
  "jacquard-derive",
  "k256",

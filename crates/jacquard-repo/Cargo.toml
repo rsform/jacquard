@@ -18,6 +18,7 @@ default = []
 # Internal
 jacquard-common = { path = "../jacquard-common", version = "0.9", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
 jacquard-derive = { path = "../jacquard-derive", version = "0.9" }
+jacquard-api = { path = "../jacquard-api", version = "0.9", features = ["streaming"] }
 
 # Serialization
 serde.workspace = true

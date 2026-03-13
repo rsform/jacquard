@@ -170,6 +170,7 @@ impl MstDiff {
                 path: key.as_str().into(),
                 cid: Some(CidLink::from(*cid)),
                 prev: None,
+                extra_data: None,
             });
         }
 
@@ -180,6 +181,7 @@ impl MstDiff {
                 path: key.as_str().into(),
                 cid: Some(CidLink::from(*new_cid)),
                 prev: Some(CidLink::from(*old_cid)),
+                extra_data: None,
             });
         }
 
@@ -190,6 +192,7 @@ impl MstDiff {
                 path: key.as_str().into(),
                 cid: None, // null for deletes
                 prev: Some(CidLink::from(*old_cid)),
+                extra_data: None,
             });
         }
 
@@ -220,12 +223,17 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         // Remove duplicate blocks: nodes that appear in both new_mst_blocks and removed_mst_blocks
         // are unchanged nodes that were traversed during the diff but shouldn't be counted as created/deleted.
         // This happens when we step into subtrees with different parent CIDs but encounter identical child nodes.
-        let created_set: std::collections::HashSet<_> = diff.new_mst_blocks.keys().copied().collect();
-        let removed_set: std::collections::HashSet<_> = diff.removed_mst_blocks.iter().copied().collect();
-        let duplicates: std::collections::HashSet<_> = created_set.intersection(&removed_set).copied().collect();
+        let created_set: std::collections::HashSet<_> =
+            diff.new_mst_blocks.keys().copied().collect();
+        let removed_set: std::collections::HashSet<_> =
+            diff.removed_mst_blocks.iter().copied().collect();
+        let duplicates: std::collections::HashSet<_> =
+            created_set.intersection(&removed_set).copied().collect();
 
-        diff.new_mst_blocks.retain(|cid, _| !duplicates.contains(cid));
-        diff.removed_mst_blocks.retain(|cid| !duplicates.contains(cid));
+        diff.new_mst_blocks
+            .retain(|cid, _| !duplicates.contains(cid));
+        diff.removed_mst_blocks
+            .retain(|cid| !duplicates.contains(cid));
 
         Ok(diff)
     }
@@ -420,8 +428,12 @@ async fn serialize_and_track_mst<S: BlockStore + Sync + 'static>(
     // Serialize the MST node
     let entries = tree.get_entries().await?;
     let node_data = serialize_node_data(&entries).await?;
-    let cbor = serde_ipld_dagcbor::to_vec(&node_data)
-        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing MST node for diff tracking: {}", tree_cid)))?;
+    let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| {
+        RepoError::serialization(e).with_context(format!(
+            "serializing MST node for diff tracking: {}",
+            tree_cid
+        ))
+    })?;
 
     // Track the serialized block
     diff.new_mst_blocks.insert(tree_cid, Bytes::from(cbor));

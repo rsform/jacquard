@@ -10,6 +10,7 @@ use jacquard_common::types::tid::Ticker;
 use jacquard_common::types::value::RawData;
 use jacquard_repo::Repository;
 use jacquard_repo::car::read_car_header;
+use jacquard_repo::commit::firehose::validate_v1_1;
 use jacquard_repo::mst::RecordWriteOp;
 use jacquard_repo::storage::{BlockStore, MemoryBlockStore};
 use rand::Rng;
@@ -224,8 +225,7 @@ async fn test_stress_random_operations() {
         .await
         .unwrap();
 
-    firehose_commit
-        .validate_v1_1(&pubkey)
+    validate_v1_1(&firehose_commit, &pubkey)
         .await
         .expect("Initial batch should validate");
 
@@ -266,8 +266,7 @@ async fn test_stress_random_operations() {
             .await
             .unwrap();
 
-        firehose_commit
-            .validate_v1_1(&pubkey)
+        validate_v1_1(&firehose_commit, &pubkey)
             .await
             .unwrap_or_else(|e| {
                 eprintln!(
@@ -336,7 +335,7 @@ async fn test_stress_large_batches() {
         .await
         .unwrap();
 
-    firehose_commit.validate_v1_1(&pubkey).await.unwrap();
+    validate_v1_1(&firehose_commit, &pubkey).await.unwrap();
 
     for batch_num in 1..=5000 {
         let batch_size = rng.gen_range(1..=20);
@@ -355,8 +354,7 @@ async fn test_stress_large_batches() {
             .await
             .unwrap();
 
-        firehose_commit
-            .validate_v1_1(&pubkey)
+        validate_v1_1(&firehose_commit, &pubkey)
             .await
             .unwrap_or_else(|e| {
                 panic!(
@@ -441,8 +439,7 @@ async fn test_stress_with_fixture() {
             .await
             .unwrap();
 
-        firehose_commit
-            .validate_v1_1(&pubkey)
+        validate_v1_1(&firehose_commit, &pubkey)
             .await
             .unwrap_or_else(|e| panic!("Fixture validation failed at batch {}: {}", batch_num, e));
     }

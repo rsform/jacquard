@@ -82,7 +82,7 @@ impl CommitData {
             repo: repo.clone().into_static(),
             rev: self.rev.clone(),
             seq,
-            since: self.since.clone().unwrap_or_else(|| self.rev.clone()),
+            since: Some(self.since.clone().unwrap_or_else(|| self.rev.clone())),
             time,
             commit: CidLink::from(self.cid),
             blocks: blocks_car.into(),
@@ -91,6 +91,7 @@ impl CommitData {
             blobs,
             too_big: false,
             rebase: false,
+            extra_data: None,
         })
     }
 }
