@@ -16,7 +16,7 @@ steps:
       rustup target add wasm32-unknown-unknown
       cargo build -p jacquard-common \
         --target wasm32-unknown-unknown \
-        --features websocket, reqwest-client \
+        --features=websocket,reqwest-client \
         --no-default-features
 
   - name: run tests
