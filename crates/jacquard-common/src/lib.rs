@@ -227,20 +227,16 @@ pub mod cowstr;
 /// Trait for taking ownership of most borrowed types in jacquard.
 pub mod into_static;
 pub mod error;
-/// HTTP client abstraction used by jacquard crates.
 pub mod http_client;
 pub mod macros;
-/// Service authentication JWT parsing and verification.
 #[cfg(feature = "service-auth")]
 pub mod service_auth;
-/// Generic session storage traits and utilities.
 pub mod session;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
 // XRPC protocol types and traits
 pub mod opt_serde_bytes_helper;
 pub mod serde_bytes_helper;
-/// Stream abstractions for HTTP request/response bodies.
 #[cfg(feature = "streaming")]
 pub mod stream;
 pub mod xrpc;

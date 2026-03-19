@@ -11,7 +11,6 @@ pub mod blob;
 pub mod cid;
 /// Repository collection trait for records
 pub mod collection;
-/// Crypto helpers for keys (Multikey decoding, conversions)
 pub mod crypto;
 /// AT Protocol datetime string type
 pub mod datetime;
@@ -23,7 +22,6 @@ pub mod did_doc;
 pub mod handle;
 /// AT Protocol identifier types (handle or DID)
 pub mod ident;
-/// Integer type with validation
 pub mod integer;
 /// Language tag types per BCP 47
 pub mod language;

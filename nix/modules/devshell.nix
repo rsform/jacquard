@@ -23,6 +23,7 @@
         cargo-dist
         cargo-nextest
         zip
+        atproto-goat
       ];
     };
     apps = {

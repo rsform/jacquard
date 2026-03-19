@@ -43,16 +43,11 @@
 #![warn(clippy::all)]
 #![deny(unsafe_code)]
 
-/// CAR (Content Addressable aRchive) utilities
 pub mod car;
-/// Commit structures and signature verification
 pub mod commit;
 pub mod error;
-/// Merkle Search Tree implementation
 pub mod mst;
-/// High-level repository operations
 pub mod repo;
-/// Block storage abstraction
 pub mod storage;
 
 pub use error::{RepoError, RepoErrorKind, Result};

@@ -1,4 +1,3 @@
-use crate::IntoStatic;
 use crate::types::cid::CidLink;
 use crate::types::{
     DataModelType,
@@ -6,6 +5,7 @@ use crate::types::{
     string::AtprotoStr,
     value::{Array, Data, Object, RawData, parsing},
 };
+use crate::{CowStr, IntoStatic};
 use alloc::borrow::ToOwned;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
@@ -15,6 +15,7 @@ use alloc::vec::Vec;
 use bytes::Bytes;
 use core::any::TypeId;
 use smol_str::SmolStr;
+use std::borrow::Cow;
 
 /// Error used for converting from and into [`crate::types::value::Data`].
 #[derive(Clone, Debug, thiserror::Error, miette::Diagnostic)]
@@ -134,15 +135,39 @@ impl From<String> for Data<'_> {
     }
 }
 
-impl From<&str> for Data<'_> {
-    fn from(t: &str) -> Self {
-        Data::String(AtprotoStr::new_owned(t))
+impl<'a> From<&'a str> for Data<'a> {
+    fn from(t: &'a str) -> Self {
+        Data::String(AtprotoStr::new(t))
     }
 }
 
 impl From<&[u8]> for Data<'_> {
     fn from(t: &[u8]) -> Self {
         Data::Bytes(Bytes::copy_from_slice(t))
+    }
+}
+
+impl<'s> From<CowStr<'s>> for Data<'s> {
+    fn from(t: CowStr<'s>) -> Self {
+        match t {
+            CowStr::Borrowed(s) => Data::String(AtprotoStr::new(s)),
+            CowStr::Owned(s) => Data::String(AtprotoStr::new_owned(s)),
+        }
+    }
+}
+
+impl From<SmolStr> for Data<'_> {
+    fn from(t: SmolStr) -> Self {
+        Data::String(AtprotoStr::new_owned(t))
+    }
+}
+
+impl<'s> From<Cow<'s, str>> for Data<'s> {
+    fn from(t: Cow<'s, str>) -> Self {
+        match t {
+            Cow::Borrowed(s) => Data::String(AtprotoStr::new(s)),
+            Cow::Owned(s) => Data::String(AtprotoStr::new_owned(s)),
+        }
     }
 }
 

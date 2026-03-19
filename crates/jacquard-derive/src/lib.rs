@@ -148,6 +148,7 @@
 //! }
 //! ```
 
+#![crate_type = "proc-macro"]
 use proc_macro::TokenStream;
 
 /// Attribute macro that adds an `extra_data` field to structs to capture unknown fields
