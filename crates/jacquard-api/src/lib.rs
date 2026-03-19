@@ -22,6 +22,9 @@ pub mod app_bsky;
 #[cfg(feature = "app_certified")]
 pub mod app_certified;
 
+#[cfg(feature = "app_chronosky")]
+pub mod app_chronosky;
+
 #[cfg(feature = "app_dropanchor")]
 pub mod app_dropanchor;
 

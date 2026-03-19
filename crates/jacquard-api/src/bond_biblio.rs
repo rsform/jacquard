@@ -39,7 +39,9 @@ fn lexicon_doc_bond_biblio_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("bookRequirement"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "bookRequirement",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -48,8 +50,8 @@ fn lexicon_doc_bond_biblio_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("authors")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("authors")
                         ],
                     ),
                     nullable: None,
@@ -57,7 +59,9 @@ fn lexicon_doc_bond_biblio_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("authors"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "authors",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -76,7 +80,9 @@ fn lexicon_doc_bond_biblio_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -128,7 +134,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
         {
             let value = &self.authors;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -160,7 +166,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
         {
             let value = &self.title;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

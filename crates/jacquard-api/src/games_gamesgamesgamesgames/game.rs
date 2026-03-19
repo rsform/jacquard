@@ -140,49 +140,49 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type ApplicationType;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type ApplicationType = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type ApplicationType = S::ApplicationType;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `application_type` field to Set
     pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetApplicationType<S> {}
     impl<S: State> State for SetApplicationType<S> {
-        type Name = S::Name;
         type ApplicationType = Set<members::application_type>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type ApplicationType = S::ApplicationType;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type ApplicationType = S::ApplicationType;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -810,8 +810,8 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Name: game_state::IsSet,
     S::ApplicationType: game_state::IsSet,
+    S::Name: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
 {
     /// Build the final struct
@@ -851,7 +851,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Game<'a> {
@@ -977,7 +977,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A video game."),
@@ -987,9 +987,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("applicationType")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("applicationType")
                             ],
                         ),
                         nullable: None,
@@ -997,7 +997,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "ageRatings",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1013,7 +1013,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "alternativeNames",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1029,7 +1029,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "applicationType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1040,7 +1040,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1059,7 +1059,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1080,7 +1080,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "descriptionFacets",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1100,7 +1100,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("engines"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "engines",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -1122,7 +1124,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "externalIds",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1133,7 +1135,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("genres"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "genres",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1147,7 +1151,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "keywords",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1169,7 +1173,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "languageSupports",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1185,7 +1189,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("media"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "media",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1203,7 +1209,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("modes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "modes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1217,7 +1225,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "multiplayerModes",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1233,7 +1241,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -1248,7 +1258,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("parent"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "parent",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -1265,7 +1277,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "platformFeatures",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1285,7 +1297,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playerPerspectives",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1301,7 +1313,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publishedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1324,7 +1336,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "releases",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1340,7 +1352,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "storyline",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1357,7 +1369,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("summary"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "summary",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -1372,7 +1386,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "systemRequirements",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1392,7 +1406,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("themes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "themes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1406,7 +1422,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "timeToBeat",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1417,7 +1433,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("videos"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "videos",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1431,7 +1449,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "websites",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {

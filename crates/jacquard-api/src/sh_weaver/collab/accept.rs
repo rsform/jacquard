@@ -37,51 +37,51 @@ pub mod accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Resource;
         type CreatedAt;
         type Invite;
-        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Resource = Unset;
         type CreatedAt = Unset;
         type Invite = Unset;
-        type Resource = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Invite = S::Invite;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `invite` field to Set
-    pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInvite<S> {}
-    impl<S: State> State for SetInvite<S> {
-        type CreatedAt = S::CreatedAt;
-        type Invite = Set<members::invite>;
-        type Resource = S::Resource;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
+        type Resource = Set<members::resource>;
         type CreatedAt = S::CreatedAt;
         type Invite = S::Invite;
-        type Resource = Set<members::resource>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Resource = S::Resource;
+        type CreatedAt = Set<members::created_at>;
+        type Invite = S::Invite;
+    }
+    ///State transition - sets the `invite` field to Set
+    pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInvite<S> {}
+    impl<S: State> State for SetInvite<S> {
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+        type Invite = Set<members::invite>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `resource` field
+        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `invite` field
         pub struct invite(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
     }
 }
 
@@ -174,9 +174,9 @@ where
 impl<'a, S> AcceptBuilder<'a, S>
 where
     S: accept_state::State,
+    S::Resource: accept_state::IsSet,
     S::CreatedAt: accept_state::IsSet,
     S::Invite: accept_state::IsSet,
-    S::Resource: accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Accept<'a> {
@@ -191,7 +191,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Accept<'a> {
@@ -293,7 +293,7 @@ fn lexicon_doc_sh_weaver_collab_accept() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -305,9 +305,9 @@ fn lexicon_doc_sh_weaver_collab_accept() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("invite"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("resource"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("invite"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -315,7 +315,7 @@ fn lexicon_doc_sh_weaver_collab_accept() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -334,7 +334,9 @@ fn lexicon_doc_sh_weaver_collab_accept() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("invite"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "invite",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -343,7 +345,7 @@ fn lexicon_doc_sh_weaver_collab_accept() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "resource",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

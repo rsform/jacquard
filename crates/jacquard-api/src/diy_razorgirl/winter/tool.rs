@@ -58,85 +58,85 @@ pub mod tool_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
-        type CreatedAt;
-        type Name;
         type Code;
         type InputSchema;
+        type Name;
+        type CreatedAt;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
-        type CreatedAt = Unset;
-        type Name = Unset;
         type Code = Unset;
         type InputSchema = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Code = S::Code;
-        type InputSchema = S::InputSchema;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Code = S::Code;
-        type InputSchema = S::InputSchema;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Code = S::Code;
-        type InputSchema = S::InputSchema;
+        type Name = Unset;
+        type CreatedAt = Unset;
+        type Description = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Code = Set<members::code>;
         type InputSchema = S::InputSchema;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
     }
     ///State transition - sets the `input_schema` field to Set
     pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInputSchema<S> {}
     impl<S: State> State for SetInputSchema<S> {
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Code = S::Code;
         type InputSchema = Set<members::input_schema>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Code = S::Code;
+        type InputSchema = S::InputSchema;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Code = S::Code;
+        type InputSchema = S::InputSchema;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Code = S::Code;
+        type InputSchema = S::InputSchema;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `code` field
         pub struct code(());
         ///Marker type for the `input_schema` field
         pub struct input_schema(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -404,11 +404,11 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S> ToolBuilder<'a, S>
 where
     S: tool_state::State,
-    S::Description: tool_state::IsSet,
-    S::CreatedAt: tool_state::IsSet,
-    S::Name: tool_state::IsSet,
     S::Code: tool_state::IsSet,
     S::InputSchema: tool_state::IsSet,
+    S::Name: tool_state::IsSet,
+    S::CreatedAt: tool_state::IsSet,
+    S::Description: tool_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tool<'a> {
@@ -432,7 +432,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Tool<'a> {
@@ -582,7 +582,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -590,11 +590,11 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("inputSchema"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("inputSchema"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -602,7 +602,9 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "code",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -621,7 +623,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -640,7 +642,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -657,7 +659,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "inputSchema",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
@@ -665,7 +667,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastUpdated",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -684,7 +686,9 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -699,7 +703,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "requiredCommands",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -721,7 +725,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "requiredSecrets",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -743,7 +747,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "requiredTools",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -769,7 +773,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "requiresNetwork",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -779,7 +783,7 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "requiresWorkspace",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -789,7 +793,9 @@ fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "version",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

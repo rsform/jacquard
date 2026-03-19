@@ -332,7 +332,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> WebEmbed<'a> {
@@ -363,18 +363,20 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("href")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("href")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alignment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -395,7 +397,7 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -416,7 +418,7 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "embedHeight",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -429,7 +431,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("embedUrl"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "embedUrl",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -450,7 +454,7 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "embedWidth",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -463,7 +467,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("href"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "href",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -484,7 +490,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("preview"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "preview",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -492,7 +500,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("siteName"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "siteName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Name of the website"),
@@ -509,7 +519,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Page title"),
@@ -526,7 +538,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "width",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -568,7 +582,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -608,7 +622,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         }
         if let Some(ref value) = self.site_name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -626,7 +640,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         }
         if let Some(ref value) = self.title {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

@@ -52,85 +52,85 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LpVersion;
-        type Location;
+        type LocationType;
         type Srs;
         type CreatedAt;
-        type LocationType;
+        type LpVersion;
+        type Location;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LpVersion = Unset;
-        type Location = Unset;
+        type LocationType = Unset;
         type Srs = Unset;
         type CreatedAt = Unset;
-        type LocationType = Unset;
-    }
-    ///State transition - sets the `lp_version` field to Set
-    pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLpVersion<S> {}
-    impl<S: State> State for SetLpVersion<S> {
-        type LpVersion = Set<members::lp_version>;
-        type Location = S::Location;
-        type Srs = S::Srs;
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type LpVersion = S::LpVersion;
-        type Location = Set<members::location>;
-        type Srs = S::Srs;
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-    }
-    ///State transition - sets the `srs` field to Set
-    pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrs<S> {}
-    impl<S: State> State for SetSrs<S> {
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
-        type Srs = Set<members::srs>;
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
-        type Srs = S::Srs;
-        type CreatedAt = Set<members::created_at>;
-        type LocationType = S::LocationType;
+        type LpVersion = Unset;
+        type Location = Unset;
     }
     ///State transition - sets the `location_type` field to Set
     pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocationType<S> {}
     impl<S: State> State for SetLocationType<S> {
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
+        type LocationType = Set<members::location_type>;
         type Srs = S::Srs;
         type CreatedAt = S::CreatedAt;
-        type LocationType = Set<members::location_type>;
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `srs` field to Set
+    pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrs<S> {}
+    impl<S: State> State for SetSrs<S> {
+        type LocationType = S::LocationType;
+        type Srs = Set<members::srs>;
+        type CreatedAt = S::CreatedAt;
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LocationType = S::LocationType;
+        type Srs = S::Srs;
+        type CreatedAt = Set<members::created_at>;
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `lp_version` field to Set
+    pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLpVersion<S> {}
+    impl<S: State> State for SetLpVersion<S> {
+        type LocationType = S::LocationType;
+        type Srs = S::Srs;
+        type CreatedAt = S::CreatedAt;
+        type LpVersion = Set<members::lp_version>;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type LocationType = S::LocationType;
+        type Srs = S::Srs;
+        type CreatedAt = S::CreatedAt;
+        type LpVersion = S::LpVersion;
+        type Location = Set<members::location>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lp_version` field
-        pub struct lp_version(());
-        ///Marker type for the `location` field
-        pub struct location(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
         ///Marker type for the `srs` field
         pub struct srs(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
+        ///Marker type for the `lp_version` field
+        pub struct lp_version(());
+        ///Marker type for the `location` field
+        pub struct location(());
     }
 }
 
@@ -300,11 +300,11 @@ where
 impl<'a, S> LocationBuilder<'a, S>
 where
     S: location_state::State,
-    S::LpVersion: location_state::IsSet,
-    S::Location: location_state::IsSet,
+    S::LocationType: location_state::IsSet,
     S::Srs: location_state::IsSet,
     S::CreatedAt: location_state::IsSet,
-    S::LocationType: location_state::IsSet,
+    S::LpVersion: location_state::IsSet,
+    S::Location: location_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Location<'a> {
@@ -323,7 +323,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Location<'a> {
@@ -574,7 +574,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -630,7 +630,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
         }
         if let Some(ref value) = self.name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -674,7 +674,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A location reference"),
@@ -684,11 +684,11 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("lpVersion"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("srs"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("locationType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("location"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lpVersion"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("srs"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("locationType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("location"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -696,7 +696,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -719,7 +719,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -740,7 +740,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "location",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -758,7 +758,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "locationType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -779,7 +779,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lpVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -800,7 +800,9 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -819,7 +821,9 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("srs"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "srs",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -845,7 +849,7 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("string"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("string"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -853,14 +857,18 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("string")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("string")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("string"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "string",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -935,7 +943,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationString<'a> {
         {
             let value = &self.string;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

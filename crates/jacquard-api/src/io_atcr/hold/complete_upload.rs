@@ -192,7 +192,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CompleteUpload<'a> {
@@ -347,37 +347,37 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Etag;
         type PartNumber;
+        type Etag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Etag = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `etag` field to Set
-    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEtag<S> {}
-    impl<S: State> State for SetEtag<S> {
-        type Etag = Set<members::etag>;
-        type PartNumber = S::PartNumber;
+        type Etag = Unset;
     }
     ///State transition - sets the `part_number` field to Set
     pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPartNumber<S> {}
     impl<S: State> State for SetPartNumber<S> {
-        type Etag = S::Etag;
         type PartNumber = Set<members::part_number>;
+        type Etag = S::Etag;
+    }
+    ///State transition - sets the `etag` field to Set
+    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEtag<S> {}
+    impl<S: State> State for SetEtag<S> {
+        type PartNumber = S::PartNumber;
+        type Etag = Set<members::etag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `etag` field
-        pub struct etag(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `etag` field
+        pub struct etag(());
     }
 }
 
@@ -450,8 +450,8 @@ where
 impl<'a, S> PartInfoBuilder<'a, S>
 where
     S: part_info_state::State,
-    S::Etag: part_info_state::IsSet,
     S::PartNumber: part_info_state::IsSet,
+    S::Etag: part_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PartInfo<'a> {
@@ -465,7 +465,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> PartInfo<'a> {
@@ -488,7 +488,7 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -502,9 +502,9 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("uploadId"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("digest"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("parts")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("uploadId"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("digest"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("parts")
                                     ],
                                 ),
                                 nullable: None,
@@ -512,7 +512,9 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "digest",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -531,7 +533,9 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("parts"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "parts",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -547,7 +551,7 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "uploadId",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -577,7 +581,7 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("partInfo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("partInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -586,8 +590,8 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("partNumber"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("etag")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("partNumber"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("etag")
                         ],
                     ),
                     nullable: None,
@@ -595,7 +599,9 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("etag"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "etag",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -614,7 +620,7 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "partNumber",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {

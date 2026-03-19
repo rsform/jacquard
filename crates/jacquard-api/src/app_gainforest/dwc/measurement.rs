@@ -73,67 +73,67 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type MeasurementValue;
         type OccurrenceRef;
+        type CreatedAt;
         type MeasurementType;
+        type MeasurementValue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type MeasurementValue = Unset;
         type OccurrenceRef = Unset;
+        type CreatedAt = Unset;
         type MeasurementType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type MeasurementValue = S::MeasurementValue;
-        type OccurrenceRef = S::OccurrenceRef;
-        type MeasurementType = S::MeasurementType;
-    }
-    ///State transition - sets the `measurement_value` field to Set
-    pub struct SetMeasurementValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeasurementValue<S> {}
-    impl<S: State> State for SetMeasurementValue<S> {
-        type CreatedAt = S::CreatedAt;
-        type MeasurementValue = Set<members::measurement_value>;
-        type OccurrenceRef = S::OccurrenceRef;
-        type MeasurementType = S::MeasurementType;
+        type MeasurementValue = Unset;
     }
     ///State transition - sets the `occurrence_ref` field to Set
     pub struct SetOccurrenceRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurrenceRef<S> {}
     impl<S: State> State for SetOccurrenceRef<S> {
-        type CreatedAt = S::CreatedAt;
-        type MeasurementValue = S::MeasurementValue;
         type OccurrenceRef = Set<members::occurrence_ref>;
+        type CreatedAt = S::CreatedAt;
         type MeasurementType = S::MeasurementType;
+        type MeasurementValue = S::MeasurementValue;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type OccurrenceRef = S::OccurrenceRef;
+        type CreatedAt = Set<members::created_at>;
+        type MeasurementType = S::MeasurementType;
+        type MeasurementValue = S::MeasurementValue;
     }
     ///State transition - sets the `measurement_type` field to Set
     pub struct SetMeasurementType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMeasurementType<S> {}
     impl<S: State> State for SetMeasurementType<S> {
-        type CreatedAt = S::CreatedAt;
-        type MeasurementValue = S::MeasurementValue;
         type OccurrenceRef = S::OccurrenceRef;
+        type CreatedAt = S::CreatedAt;
         type MeasurementType = Set<members::measurement_type>;
+        type MeasurementValue = S::MeasurementValue;
+    }
+    ///State transition - sets the `measurement_value` field to Set
+    pub struct SetMeasurementValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeasurementValue<S> {}
+    impl<S: State> State for SetMeasurementValue<S> {
+        type OccurrenceRef = S::OccurrenceRef;
+        type CreatedAt = S::CreatedAt;
+        type MeasurementType = S::MeasurementType;
+        type MeasurementValue = Set<members::measurement_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `measurement_value` field
-        pub struct measurement_value(());
         ///Marker type for the `occurrence_ref` field
         pub struct occurrence_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `measurement_type` field
         pub struct measurement_type(());
+        ///Marker type for the `measurement_value` field
+        pub struct measurement_value(());
     }
 }
 
@@ -419,10 +419,10 @@ where
 impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
-    S::CreatedAt: measurement_state::IsSet,
-    S::MeasurementValue: measurement_state::IsSet,
     S::OccurrenceRef: measurement_state::IsSet,
+    S::CreatedAt: measurement_state::IsSet,
     S::MeasurementType: measurement_state::IsSet,
+    S::MeasurementValue: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
@@ -446,7 +446,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Measurement<'a> {
@@ -544,7 +544,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.measurement_accuracy {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -562,7 +562,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.measurement_determined_by {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -580,7 +580,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.measurement_determined_date {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -598,7 +598,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.measurement_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -616,7 +616,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.measurement_method {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -634,7 +634,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.measurement_remarks {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -653,7 +653,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         {
             let value = &self.measurement_type;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -671,7 +671,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.measurement_unit {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -690,7 +690,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         {
             let value = &self.measurement_value;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -708,7 +708,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.occurrence_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -739,7 +739,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -751,10 +751,10 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("occurrenceRef"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("measurementType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("measurementValue"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("occurrenceRef"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("measurementType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("measurementValue"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -762,7 +762,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -785,7 +785,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementAccuracy",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -806,7 +806,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementDeterminedBy",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -827,7 +827,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementDeterminedDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -848,7 +848,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -869,7 +869,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementMethod",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -890,7 +890,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementRemarks",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -911,7 +911,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -932,7 +932,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementUnit",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -953,7 +953,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurementValue",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -974,7 +974,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurrenceID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -995,7 +995,7 @@ fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurrenceRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

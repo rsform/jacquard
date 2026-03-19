@@ -30,7 +30,7 @@ pub struct Artifact<'a> {
     pub repo: jacquard_common::types::string::AtUri<'a>,
     /// hash of the tag object that this artifact is attached to (only annotated tags are supported)
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub tag: bytes::Bytes,
+    pub tag: jacquard_common::deps::bytes::Bytes,
 }
 
 pub mod artifact_state {
@@ -43,85 +43,85 @@ pub mod artifact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Name;
+        type Artifact;
         type Tag;
         type CreatedAt;
-        type Artifact;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Name = Unset;
+        type Artifact = Unset;
         type Tag = Unset;
         type CreatedAt = Unset;
-        type Artifact = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Name = S::Name;
-        type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
+        type Repo = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
         type Name = Set<members::name>;
+        type Artifact = S::Artifact;
         type Tag = S::Tag;
         type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
         type Repo = S::Repo;
-        type Name = S::Name;
-        type Tag = Set<members::tag>;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
-        type Name = S::Name;
-        type Tag = S::Tag;
-        type CreatedAt = Set<members::created_at>;
-        type Artifact = S::Artifact;
     }
     ///State transition - sets the `artifact` field to Set
     pub struct SetArtifact<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtifact<S> {}
     impl<S: State> State for SetArtifact<S> {
-        type Repo = S::Repo;
         type Name = S::Name;
+        type Artifact = Set<members::artifact>;
         type Tag = S::Tag;
         type CreatedAt = S::CreatedAt;
-        type Artifact = Set<members::artifact>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Name = S::Name;
+        type Artifact = S::Artifact;
+        type Tag = Set<members::tag>;
+        type CreatedAt = S::CreatedAt;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Artifact = S::Artifact;
+        type Tag = S::Tag;
+        type CreatedAt = Set<members::created_at>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Name = S::Name;
+        type Artifact = S::Artifact;
+        type Tag = S::Tag;
+        type CreatedAt = S::CreatedAt;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `artifact` field
+        pub struct artifact(());
         ///Marker type for the `tag` field
         pub struct tag(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `artifact` field
-        pub struct artifact(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -133,7 +133,7 @@ pub struct ArtifactBuilder<'a, S: artifact_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -240,7 +240,7 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<bytes::Bytes>,
+        value: impl Into<jacquard_common::deps::bytes::Bytes>,
     ) -> ArtifactBuilder<'a, artifact_state::SetTag<S>> {
         self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         ArtifactBuilder {
@@ -254,11 +254,11 @@ where
 impl<'a, S> ArtifactBuilder<'a, S>
 where
     S: artifact_state::State,
-    S::Repo: artifact_state::IsSet,
     S::Name: artifact_state::IsSet,
+    S::Artifact: artifact_state::IsSet,
     S::Tag: artifact_state::IsSet,
     S::CreatedAt: artifact_state::IsSet,
-    S::Artifact: artifact_state::IsSet,
+    S::Repo: artifact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Artifact<'a> {
@@ -275,7 +275,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Artifact<'a> {
@@ -379,7 +379,7 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -387,11 +387,11 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("repo"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("tag"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("artifact")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("tag"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("artifact")
                             ],
                         ),
                         nullable: None,
@@ -399,7 +399,7 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "artifact",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -409,7 +409,7 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -432,7 +432,9 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -451,7 +453,9 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "repo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -472,7 +476,9 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tag"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tag",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                     description: None,
                                     max_length: Some(20usize),

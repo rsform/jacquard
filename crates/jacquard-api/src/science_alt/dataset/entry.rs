@@ -41,7 +41,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("datasetSize"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("datasetSize"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -54,7 +54,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("bytes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bytes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -65,7 +67,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("samples"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "samples",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -76,7 +80,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("shards"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "shards",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -91,7 +97,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -103,10 +109,10 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("schemaRef"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("storage"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("schemaRef"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("storage"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -114,7 +120,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contentMetadata",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
@@ -122,7 +128,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -145,7 +151,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -166,7 +172,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("license"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "license",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -185,7 +193,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "metadata",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
@@ -195,7 +203,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "metadataSchemaRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -218,7 +226,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -237,7 +247,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "schemaRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -260,14 +270,18 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "size",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#datasetSize"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("storage"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "storage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -283,7 +297,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -312,7 +328,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("shardChecksum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("shardChecksum"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -321,8 +337,8 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("algorithm"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("algorithm"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("digest")
                         ],
                     ),
                     nullable: None,
@@ -330,7 +346,7 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "algorithm",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -351,7 +367,9 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "digest",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -458,7 +476,7 @@ pub struct Entry<'a> {
     /// Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub metadata: std::option::Option<bytes::Bytes>,
+    pub metadata: std::option::Option<jacquard_common::deps::bytes::Bytes>,
     /// Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -494,65 +512,65 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SchemaRef;
-        type Storage;
         type Name;
+        type Storage;
+        type SchemaRef;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SchemaRef = Unset;
-        type Storage = Unset;
         type Name = Unset;
+        type Storage = Unset;
+        type SchemaRef = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `schema_ref` field to Set
-    pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
-    impl<S: State> State for SetSchemaRef<S> {
-        type SchemaRef = Set<members::schema_ref>;
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Storage = S::Storage;
-        type Name = S::Name;
+        type SchemaRef = S::SchemaRef;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `storage` field to Set
     pub struct SetStorage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStorage<S> {}
     impl<S: State> State for SetStorage<S> {
-        type SchemaRef = S::SchemaRef;
-        type Storage = Set<members::storage>;
         type Name = S::Name;
+        type Storage = Set<members::storage>;
+        type SchemaRef = S::SchemaRef;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type SchemaRef = S::SchemaRef;
+    ///State transition - sets the `schema_ref` field to Set
+    pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
+    impl<S: State> State for SetSchemaRef<S> {
+        type Name = S::Name;
         type Storage = S::Storage;
-        type Name = Set<members::name>;
+        type SchemaRef = Set<members::schema_ref>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SchemaRef = S::SchemaRef;
-        type Storage = S::Storage;
         type Name = S::Name;
+        type Storage = S::Storage;
+        type SchemaRef = S::SchemaRef;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schema_ref` field
-        pub struct schema_ref(());
-        ///Marker type for the `storage` field
-        pub struct storage(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `storage` field
+        pub struct storage(());
+        ///Marker type for the `schema_ref` field
+        pub struct schema_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -566,7 +584,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -682,12 +700,18 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+    pub fn metadata(
+        mut self,
+        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<bytes::Bytes>) -> Self {
+    pub fn maybe_metadata(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -810,9 +834,9 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::SchemaRef: entry_state::IsSet,
-    S::Storage: entry_state::IsSet,
     S::Name: entry_state::IsSet,
+    S::Storage: entry_state::IsSet,
+    S::SchemaRef: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
 {
     /// Build the final struct
@@ -836,7 +860,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Entry<'a> {

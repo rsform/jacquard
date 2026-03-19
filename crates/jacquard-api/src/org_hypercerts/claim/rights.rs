@@ -46,66 +46,66 @@ pub mod rights_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RightsType;
-        type CreatedAt;
         type RightsName;
         type RightsDescription;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RightsType = Unset;
-        type CreatedAt = Unset;
         type RightsName = Unset;
         type RightsDescription = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `rights_type` field to Set
     pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsType<S> {}
     impl<S: State> State for SetRightsType<S> {
         type RightsType = Set<members::rights_type>;
+        type RightsName = S::RightsName;
+        type RightsDescription = S::RightsDescription;
         type CreatedAt = S::CreatedAt;
-        type RightsName = S::RightsName;
-        type RightsDescription = S::RightsDescription;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type RightsType = S::RightsType;
-        type CreatedAt = Set<members::created_at>;
-        type RightsName = S::RightsName;
-        type RightsDescription = S::RightsDescription;
     }
     ///State transition - sets the `rights_name` field to Set
     pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsName<S> {}
     impl<S: State> State for SetRightsName<S> {
         type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
         type RightsName = Set<members::rights_name>;
         type RightsDescription = S::RightsDescription;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rights_description` field to Set
     pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
     impl<S: State> State for SetRightsDescription<S> {
         type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
         type RightsName = S::RightsName;
         type RightsDescription = Set<members::rights_description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type RightsType = S::RightsType;
+        type RightsName = S::RightsName;
+        type RightsDescription = S::RightsDescription;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `rights_name` field
         pub struct rights_name(());
         ///Marker type for the `rights_description` field
         pub struct rights_description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -233,9 +233,9 @@ impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
     S::RightsType: rights_state::IsSet,
-    S::CreatedAt: rights_state::IsSet,
     S::RightsName: rights_state::IsSet,
     S::RightsDescription: rights_state::IsSet,
+    S::CreatedAt: rights_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rights<'a> {
@@ -252,7 +252,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Rights<'a> {
@@ -376,7 +376,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
         {
             let value = &self.rights_description;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -433,7 +433,7 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -445,10 +445,10 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("rightsName"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("rightsType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("rightsDescription"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rightsName"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rightsType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rightsDescription"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -456,7 +456,7 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "attachment",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -473,7 +473,7 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -496,7 +496,7 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "rightsDescription",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -517,7 +517,7 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "rightsName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -538,7 +538,7 @@ fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "rightsType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

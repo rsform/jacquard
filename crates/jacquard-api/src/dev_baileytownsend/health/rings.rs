@@ -43,127 +43,127 @@ pub mod rings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StandHours;
-        type MoveGoal;
-        type StandGoal;
-        type CreatedAt;
         type Move;
-        type ExerciseGoal;
+        type MoveGoal;
         type Exercise;
+        type ExerciseGoal;
+        type StandGoal;
+        type StandHours;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StandHours = Unset;
-        type MoveGoal = Unset;
-        type StandGoal = Unset;
-        type CreatedAt = Unset;
         type Move = Unset;
-        type ExerciseGoal = Unset;
+        type MoveGoal = Unset;
         type Exercise = Unset;
-    }
-    ///State transition - sets the `stand_hours` field to Set
-    pub struct SetStandHours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStandHours<S> {}
-    impl<S: State> State for SetStandHours<S> {
-        type StandHours = Set<members::stand_hours>;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-        type Move = S::Move;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-    }
-    ///State transition - sets the `move_goal` field to Set
-    pub struct SetMoveGoal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMoveGoal<S> {}
-    impl<S: State> State for SetMoveGoal<S> {
-        type StandHours = S::StandHours;
-        type MoveGoal = Set<members::move_goal>;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-        type Move = S::Move;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-    }
-    ///State transition - sets the `stand_goal` field to Set
-    pub struct SetStandGoal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStandGoal<S> {}
-    impl<S: State> State for SetStandGoal<S> {
-        type StandHours = S::StandHours;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = Set<members::stand_goal>;
-        type CreatedAt = S::CreatedAt;
-        type Move = S::Move;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type StandHours = S::StandHours;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = Set<members::created_at>;
-        type Move = S::Move;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
+        type ExerciseGoal = Unset;
+        type StandGoal = Unset;
+        type StandHours = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `move` field to Set
     pub struct SetMove<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMove<S> {}
     impl<S: State> State for SetMove<S> {
-        type StandHours = S::StandHours;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
         type Move = Set<members::r#move>;
-        type ExerciseGoal = S::ExerciseGoal;
-        type Exercise = S::Exercise;
-    }
-    ///State transition - sets the `exercise_goal` field to Set
-    pub struct SetExerciseGoal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExerciseGoal<S> {}
-    impl<S: State> State for SetExerciseGoal<S> {
-        type StandHours = S::StandHours;
         type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
-        type Move = S::Move;
-        type ExerciseGoal = Set<members::exercise_goal>;
         type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `move_goal` field to Set
+    pub struct SetMoveGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoveGoal<S> {}
+    impl<S: State> State for SetMoveGoal<S> {
+        type Move = S::Move;
+        type MoveGoal = Set<members::move_goal>;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `exercise` field to Set
     pub struct SetExercise<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExercise<S> {}
     impl<S: State> State for SetExercise<S> {
-        type StandHours = S::StandHours;
-        type MoveGoal = S::MoveGoal;
-        type StandGoal = S::StandGoal;
-        type CreatedAt = S::CreatedAt;
         type Move = S::Move;
-        type ExerciseGoal = S::ExerciseGoal;
+        type MoveGoal = S::MoveGoal;
         type Exercise = Set<members::exercise>;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `exercise_goal` field to Set
+    pub struct SetExerciseGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExerciseGoal<S> {}
+    impl<S: State> State for SetExerciseGoal<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = Set<members::exercise_goal>;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `stand_goal` field to Set
+    pub struct SetStandGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStandGoal<S> {}
+    impl<S: State> State for SetStandGoal<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandGoal = Set<members::stand_goal>;
+        type StandHours = S::StandHours;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `stand_hours` field to Set
+    pub struct SetStandHours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStandHours<S> {}
+    impl<S: State> State for SetStandHours<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandGoal = S::StandGoal;
+        type StandHours = Set<members::stand_hours>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandGoal = S::StandGoal;
+        type StandHours = S::StandHours;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `stand_hours` field
-        pub struct stand_hours(());
-        ///Marker type for the `move_goal` field
-        pub struct move_goal(());
-        ///Marker type for the `stand_goal` field
-        pub struct stand_goal(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `move` field
         pub struct r#move(());
-        ///Marker type for the `exercise_goal` field
-        pub struct exercise_goal(());
+        ///Marker type for the `move_goal` field
+        pub struct move_goal(());
         ///Marker type for the `exercise` field
         pub struct exercise(());
+        ///Marker type for the `exercise_goal` field
+        pub struct exercise_goal(());
+        ///Marker type for the `stand_goal` field
+        pub struct stand_goal(());
+        ///Marker type for the `stand_hours` field
+        pub struct stand_hours(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -336,13 +336,13 @@ where
 impl<'a, S> RingsBuilder<'a, S>
 where
     S: rings_state::State,
-    S::StandHours: rings_state::IsSet,
-    S::MoveGoal: rings_state::IsSet,
-    S::StandGoal: rings_state::IsSet,
-    S::CreatedAt: rings_state::IsSet,
     S::Move: rings_state::IsSet,
-    S::ExerciseGoal: rings_state::IsSet,
+    S::MoveGoal: rings_state::IsSet,
     S::Exercise: rings_state::IsSet,
+    S::ExerciseGoal: rings_state::IsSet,
+    S::StandGoal: rings_state::IsSet,
+    S::StandHours: rings_state::IsSet,
+    S::CreatedAt: rings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rings<'a> {
@@ -361,7 +361,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Rings<'a> {
@@ -467,7 +467,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -479,13 +479,13 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("move"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("moveGoal"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("exercise"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("exerciseGoal"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("standHours"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("standGoal"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("move"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("moveGoal"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("exercise"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("exerciseGoal"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("standHours"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("standGoal"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -493,7 +493,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -512,7 +512,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "exercise",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -525,7 +525,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "exerciseGoal",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -538,7 +538,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("move"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "move",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -549,7 +551,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "moveGoal",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -562,7 +564,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "standGoal",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -575,7 +577,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "standHours",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {

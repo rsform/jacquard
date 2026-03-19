@@ -35,37 +35,37 @@ pub mod fauna_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GbifTaxonKeys;
         type CreatedAt;
+        type GbifTaxonKeys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GbifTaxonKeys = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
-    impl<S: State> State for SetGbifTaxonKeys<S> {
-        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
-        type CreatedAt = S::CreatedAt;
+        type GbifTaxonKeys = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GbifTaxonKeys = S::GbifTaxonKeys;
         type CreatedAt = Set<members::created_at>;
+        type GbifTaxonKeys = S::GbifTaxonKeys;
+    }
+    ///State transition - sets the `gbif_taxon_keys` field to Set
+    pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
+    impl<S: State> State for SetGbifTaxonKeys<S> {
+        type CreatedAt = S::CreatedAt;
+        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gbif_taxon_keys` field
-        pub struct gbif_taxon_keys(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `gbif_taxon_keys` field
+        pub struct gbif_taxon_keys(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> FaunaBuilder<'a, S>
 where
     S: fauna_state::State,
-    S::GbifTaxonKeys: fauna_state::IsSet,
     S::CreatedAt: fauna_state::IsSet,
+    S::GbifTaxonKeys: fauna_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fauna<'a> {
@@ -153,7 +153,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Fauna<'a> {
@@ -256,7 +256,7 @@ fn lexicon_doc_app_gainforest_organization_observations_fauna() -> ::jacquard_le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -268,8 +268,8 @@ fn lexicon_doc_app_gainforest_organization_observations_fauna() -> ::jacquard_le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("gbifTaxonKeys"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("gbifTaxonKeys"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -277,7 +277,7 @@ fn lexicon_doc_app_gainforest_organization_observations_fauna() -> ::jacquard_le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -300,7 +300,7 @@ fn lexicon_doc_app_gainforest_organization_observations_fauna() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "gbifTaxonKeys",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {

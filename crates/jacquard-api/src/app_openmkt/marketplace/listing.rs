@@ -43,7 +43,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationObj"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("locationObj"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -52,7 +52,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("county"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "county",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -67,7 +69,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("locality"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "locality",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -82,7 +86,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("state"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "state",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -97,7 +103,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "zipPrefix",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -118,7 +124,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -126,11 +132,11 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("price"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("category"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("location"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("price"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("category"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("location"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -138,7 +144,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "category",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -155,7 +161,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "condition",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -172,7 +178,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -191,7 +197,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -208,7 +214,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "externalUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -229,7 +235,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hideFromFriends",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -239,7 +245,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("images"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "images",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -252,7 +260,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "location",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -261,7 +269,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "metadata",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -270,7 +278,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("price"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "price",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -289,7 +299,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -309,7 +321,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("metadataObj"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("metadataObj"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -318,7 +330,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon:
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subcategory",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -414,85 +426,85 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Location;
         type Price;
         type Category;
-        type Location;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Location = Unset;
         type Price = Unset;
         type Category = Unset;
-        type Location = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Price = S::Price;
-        type Category = S::Category;
-        type Location = S::Location;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `price` field to Set
-    pub struct SetPrice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrice<S> {}
-    impl<S: State> State for SetPrice<S> {
-        type CreatedAt = S::CreatedAt;
-        type Price = Set<members::price>;
-        type Category = S::Category;
-        type Location = S::Location;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `category` field to Set
-    pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategory<S> {}
-    impl<S: State> State for SetCategory<S> {
-        type CreatedAt = S::CreatedAt;
-        type Price = S::Price;
-        type Category = Set<members::category>;
-        type Location = S::Location;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
-        type CreatedAt = S::CreatedAt;
+        type Location = Set<members::location>;
         type Price = S::Price;
         type Category = S::Category;
-        type Location = Set<members::location>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `price` field to Set
+    pub struct SetPrice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrice<S> {}
+    impl<S: State> State for SetPrice<S> {
+        type Location = S::Location;
+        type Price = Set<members::price>;
+        type Category = S::Category;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `category` field to Set
+    pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategory<S> {}
+    impl<S: State> State for SetCategory<S> {
+        type Location = S::Location;
+        type Price = S::Price;
+        type Category = Set<members::category>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
+        type Location = S::Location;
         type Price = S::Price;
         type Category = S::Category;
-        type Location = S::Location;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Location = S::Location;
+        type Price = S::Price;
+        type Category = S::Category;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `location` field
+        pub struct location(());
         ///Marker type for the `price` field
         pub struct price(());
         ///Marker type for the `category` field
         pub struct category(());
-        ///Marker type for the `location` field
-        pub struct location(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -757,11 +769,11 @@ where
 impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
-    S::CreatedAt: listing_state::IsSet,
+    S::Location: listing_state::IsSet,
     S::Price: listing_state::IsSet,
     S::Category: listing_state::IsSet,
-    S::Location: listing_state::IsSet,
     S::Title: listing_state::IsSet,
+    S::CreatedAt: listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listing<'a> {
@@ -784,7 +796,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Listing<'a> {

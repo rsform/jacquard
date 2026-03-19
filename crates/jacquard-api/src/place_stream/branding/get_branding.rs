@@ -51,13 +51,13 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("brandingAsset"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("brandingAsset"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
                         ],
                     ),
                     nullable: None,
@@ -65,7 +65,9 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("data"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "data",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -84,7 +86,9 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "height",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -95,7 +99,9 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -114,7 +120,9 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mimeType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -133,7 +141,9 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -152,7 +162,9 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "width",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -167,7 +179,7 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -178,7 +190,7 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                         "broadcaster",
                                     ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {

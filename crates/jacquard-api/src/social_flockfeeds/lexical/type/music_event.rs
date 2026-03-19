@@ -1006,7 +1006,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("embedded"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("embedded"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Event type: Music event."),
@@ -1017,7 +1017,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("about"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "about",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1028,7 +1030,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1040,7 +1044,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "additionalType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1053,7 +1057,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "aggregateRating",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1066,7 +1070,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alternateName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1079,7 +1083,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attendee"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "attendee",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1091,7 +1097,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "attendees",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1105,7 +1111,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("audience"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "audience",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1116,7 +1124,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("composer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "composer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1128,7 +1138,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contributor",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1142,7 +1152,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1156,7 +1166,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("director"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "director",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1167,7 +1179,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disambiguatingDescription",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1180,7 +1192,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("doorTime"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "doorTime",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1191,7 +1205,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("duration"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "duration",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1203,7 +1219,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("endDate"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "endDate",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1214,7 +1232,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "eventAttendanceMode",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1228,7 +1246,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "eventSchedule",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1241,7 +1259,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "eventStatus",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1255,7 +1273,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("funder"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "funder",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1267,7 +1287,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("funding"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "funding",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1278,7 +1300,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identifier",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1292,7 +1314,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "image",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1304,7 +1328,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "inLanguage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1318,7 +1342,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isAccessibleForFree",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1331,7 +1355,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("keywords"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "keywords",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1343,7 +1369,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("location"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "location",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1357,7 +1385,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mainEntityOfPage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1371,7 +1399,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "maximumAttendeeCapacity",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1384,7 +1412,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "maximumPhysicalAttendeeCapacity",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1397,7 +1425,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "maximumVirtualAttendeeCapacity",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1410,7 +1438,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1421,7 +1451,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("offers"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "offers",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1433,7 +1465,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "organizer",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1447,7 +1479,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "performer",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1461,7 +1493,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "performers",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1475,7 +1507,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "potentialAction",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1488,7 +1520,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "previousStartDate",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1501,7 +1533,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "recordedIn",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1514,7 +1546,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "remainingAttendeeCapacity",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1527,7 +1559,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("review"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "review",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1538,7 +1572,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sameAs",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1549,7 +1585,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sponsor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sponsor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1561,7 +1599,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "startDate",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1574,7 +1612,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("subEvent"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "subEvent",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1585,7 +1625,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subEvents",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1598,7 +1638,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subjectOf",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1612,7 +1652,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "superEvent",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1625,7 +1665,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "translator",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1639,7 +1679,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "typicalAgeRange",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1652,7 +1692,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1663,7 +1705,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "workFeatured",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1676,7 +1718,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "workPerformed",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1693,7 +1735,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -1709,7 +1751,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("about"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "about",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -1720,7 +1764,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "actor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -1732,7 +1778,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "additionalType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1745,7 +1791,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "aggregateRating",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1758,7 +1804,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "alternateName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1771,7 +1817,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "attendee",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1785,7 +1831,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "attendees",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1799,7 +1845,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "audience",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1812,7 +1858,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "composer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1826,7 +1872,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contributor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1840,7 +1886,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1854,7 +1900,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "director",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1867,7 +1913,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "disambiguatingDescription",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1880,7 +1926,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "doorTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1893,7 +1939,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "duration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1907,7 +1953,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("endDate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "endDate",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -1918,7 +1966,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "eventAttendanceMode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1932,7 +1980,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "eventSchedule",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1945,7 +1993,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "eventStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1959,7 +2007,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("funder"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "funder",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -1971,7 +2021,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("funding"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "funding",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -1982,7 +2034,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identifier",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1996,7 +2048,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2008,7 +2062,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "inLanguage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2022,7 +2076,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isAccessibleForFree",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2035,7 +2089,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "keywords",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2049,7 +2103,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "location",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2065,7 +2119,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mainEntityOfPage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2079,7 +2133,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "maximumAttendeeCapacity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2092,7 +2146,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "maximumPhysicalAttendeeCapacity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2105,7 +2159,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "maximumVirtualAttendeeCapacity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2118,7 +2172,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2129,7 +2185,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("offers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "offers",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2141,7 +2199,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "organizer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2155,7 +2213,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "performer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2169,7 +2227,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "performers",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2183,7 +2241,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "potentialAction",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2196,7 +2254,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "previousStartDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2209,7 +2267,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "recordedIn",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2222,7 +2280,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "remainingAttendeeCapacity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2235,7 +2293,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("review"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "review",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2246,7 +2306,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sameAs",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2257,7 +2319,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sponsor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sponsor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2269,7 +2333,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2282,7 +2346,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subEvent",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2295,7 +2359,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subEvents",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2308,7 +2372,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subjectOf",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2322,7 +2386,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "superEvent",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2335,7 +2399,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "translator",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2349,7 +2413,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "typicalAgeRange",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2362,7 +2426,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "url",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2373,7 +2439,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "workFeatured",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2386,7 +2452,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> ::jacquard_lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "workPerformed",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3678,7 +3744,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MusicEvent<'a> {

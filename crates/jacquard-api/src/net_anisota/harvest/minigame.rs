@@ -80,85 +80,85 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameContext;
-        type PlayedAt;
-        type FinalScore;
-        type ShapesCollected;
         type RoundDuration;
+        type PlayedAt;
+        type ShapesCollected;
+        type GameContext;
+        type FinalScore;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameContext = Unset;
-        type PlayedAt = Unset;
-        type FinalScore = Unset;
-        type ShapesCollected = Unset;
         type RoundDuration = Unset;
-    }
-    ///State transition - sets the `game_context` field to Set
-    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameContext<S> {}
-    impl<S: State> State for SetGameContext<S> {
-        type GameContext = Set<members::game_context>;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = Set<members::played_at>;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
-    }
-    ///State transition - sets the `final_score` field to Set
-    pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFinalScore<S> {}
-    impl<S: State> State for SetFinalScore<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = Set<members::final_score>;
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
-    }
-    ///State transition - sets the `shapes_collected` field to Set
-    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
-    impl<S: State> State for SetShapesCollected<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = Set<members::shapes_collected>;
-        type RoundDuration = S::RoundDuration;
+        type PlayedAt = Unset;
+        type ShapesCollected = Unset;
+        type GameContext = Unset;
+        type FinalScore = Unset;
     }
     ///State transition - sets the `round_duration` field to Set
     pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
     impl<S: State> State for SetRoundDuration<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
         type RoundDuration = Set<members::round_duration>;
+        type PlayedAt = S::PlayedAt;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = S::GameContext;
+        type FinalScore = S::FinalScore;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = Set<members::played_at>;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = S::GameContext;
+        type FinalScore = S::FinalScore;
+    }
+    ///State transition - sets the `shapes_collected` field to Set
+    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
+    impl<S: State> State for SetShapesCollected<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
+        type ShapesCollected = Set<members::shapes_collected>;
+        type GameContext = S::GameContext;
+        type FinalScore = S::FinalScore;
+    }
+    ///State transition - sets the `game_context` field to Set
+    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGameContext<S> {}
+    impl<S: State> State for SetGameContext<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = Set<members::game_context>;
+        type FinalScore = S::FinalScore;
+    }
+    ///State transition - sets the `final_score` field to Set
+    pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFinalScore<S> {}
+    impl<S: State> State for SetFinalScore<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = S::GameContext;
+        type FinalScore = Set<members::final_score>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_context` field
-        pub struct game_context(());
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
-        ///Marker type for the `final_score` field
-        pub struct final_score(());
-        ///Marker type for the `shapes_collected` field
-        pub struct shapes_collected(());
         ///Marker type for the `round_duration` field
         pub struct round_duration(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
+        ///Marker type for the `shapes_collected` field
+        pub struct shapes_collected(());
+        ///Marker type for the `game_context` field
+        pub struct game_context(());
+        ///Marker type for the `final_score` field
+        pub struct final_score(());
     }
 }
 
@@ -499,11 +499,11 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S> MinigameBuilder<'a, S>
 where
     S: minigame_state::State,
-    S::GameContext: minigame_state::IsSet,
-    S::PlayedAt: minigame_state::IsSet,
-    S::FinalScore: minigame_state::IsSet,
-    S::ShapesCollected: minigame_state::IsSet,
     S::RoundDuration: minigame_state::IsSet,
+    S::PlayedAt: minigame_state::IsSet,
+    S::ShapesCollected: minigame_state::IsSet,
+    S::GameContext: minigame_state::IsSet,
+    S::FinalScore: minigame_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Minigame<'a> {
@@ -532,7 +532,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Minigame<'a> {
@@ -794,7 +794,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -806,11 +806,11 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("playedAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("roundDuration"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("gameContext"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("finalScore"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("shapesCollected")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("playedAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("roundDuration"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("gameContext"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("finalScore"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("shapesCollected")
                             ],
                         ),
                         nullable: None,
@@ -818,7 +818,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "clientVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -839,7 +839,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -862,7 +862,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "earlyHarvests",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -875,7 +875,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "efficiencyBonus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -888,7 +888,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "finalScore",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -901,7 +901,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "gameContext",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -922,7 +922,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lateHarvests",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -935,7 +935,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "peakHarvestRate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -948,7 +948,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "peakRateBonus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -961,7 +961,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "perfectHarvests",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -974,7 +974,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -997,7 +997,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "pointsPerSecond",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1010,7 +1010,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "rarityBreakdown",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1021,7 +1021,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "roundDuration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1034,7 +1034,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "shapesCollected",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1047,7 +1047,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "shapesMissed",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1060,7 +1060,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "totalShapesSpawned",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1078,7 +1078,9 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("rarityBreakdown"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "rarityBreakdown",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1091,7 +1093,9 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("common"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "common",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1102,7 +1106,9 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("rare"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rare",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1113,7 +1119,9 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uncommon"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uncommon",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1124,7 +1132,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "veryCommon",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1137,7 +1145,9 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("veryRare"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "veryRare",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,

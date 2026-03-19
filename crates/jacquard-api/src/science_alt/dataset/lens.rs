@@ -51,7 +51,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("codeReference"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("codeReference"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -60,9 +60,9 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("commit"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("path")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("commit"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("path")
                         ],
                     ),
                     nullable: None,
@@ -70,7 +70,9 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("branch"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "branch",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -89,7 +91,9 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("commit"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "commit",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -108,7 +112,9 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("language"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "language",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -117,7 +123,9 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "path",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -136,7 +144,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "repository",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -161,7 +169,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("lensMetadata"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("lensMetadata"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -178,7 +186,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -190,12 +198,12 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("sourceSchema"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("targetSchema"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("getterCode"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("putterCode"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sourceSchema"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("targetSchema"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("getterCode"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("putterCode"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -203,7 +211,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -226,7 +234,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -247,7 +255,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "getterCode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -258,7 +266,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "language",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -279,7 +287,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "metadata",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -290,7 +298,9 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -309,7 +319,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "putterCode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -320,7 +330,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sourceSchema",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -343,7 +353,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sourceSchemaVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -364,7 +374,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "targetSchema",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -387,7 +397,7 @@ fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "targetSchemaVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -580,105 +590,105 @@ pub mod lens_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type GetterCode;
-        type PutterCode;
-        type CreatedAt;
-        type TargetSchema;
         type SourceSchema;
+        type GetterCode;
+        type Name;
+        type TargetSchema;
+        type CreatedAt;
+        type PutterCode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type GetterCode = Unset;
-        type PutterCode = Unset;
-        type CreatedAt = Unset;
-        type TargetSchema = Unset;
         type SourceSchema = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type GetterCode = S::GetterCode;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-        type TargetSchema = S::TargetSchema;
-        type SourceSchema = S::SourceSchema;
-    }
-    ///State transition - sets the `getter_code` field to Set
-    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
-    impl<S: State> State for SetGetterCode<S> {
-        type Name = S::Name;
-        type GetterCode = Set<members::getter_code>;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-        type TargetSchema = S::TargetSchema;
-        type SourceSchema = S::SourceSchema;
-    }
-    ///State transition - sets the `putter_code` field to Set
-    pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPutterCode<S> {}
-    impl<S: State> State for SetPutterCode<S> {
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type PutterCode = Set<members::putter_code>;
-        type CreatedAt = S::CreatedAt;
-        type TargetSchema = S::TargetSchema;
-        type SourceSchema = S::SourceSchema;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = Set<members::created_at>;
-        type TargetSchema = S::TargetSchema;
-        type SourceSchema = S::SourceSchema;
-    }
-    ///State transition - sets the `target_schema` field to Set
-    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
-    impl<S: State> State for SetTargetSchema<S> {
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-        type TargetSchema = Set<members::target_schema>;
-        type SourceSchema = S::SourceSchema;
+        type GetterCode = Unset;
+        type Name = Unset;
+        type TargetSchema = Unset;
+        type CreatedAt = Unset;
+        type PutterCode = Unset;
     }
     ///State transition - sets the `source_schema` field to Set
     pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
     impl<S: State> State for SetSourceSchema<S> {
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-        type TargetSchema = S::TargetSchema;
         type SourceSchema = Set<members::source_schema>;
+        type GetterCode = S::GetterCode;
+        type Name = S::Name;
+        type TargetSchema = S::TargetSchema;
+        type CreatedAt = S::CreatedAt;
+        type PutterCode = S::PutterCode;
+    }
+    ///State transition - sets the `getter_code` field to Set
+    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
+    impl<S: State> State for SetGetterCode<S> {
+        type SourceSchema = S::SourceSchema;
+        type GetterCode = Set<members::getter_code>;
+        type Name = S::Name;
+        type TargetSchema = S::TargetSchema;
+        type CreatedAt = S::CreatedAt;
+        type PutterCode = S::PutterCode;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type SourceSchema = S::SourceSchema;
+        type GetterCode = S::GetterCode;
+        type Name = Set<members::name>;
+        type TargetSchema = S::TargetSchema;
+        type CreatedAt = S::CreatedAt;
+        type PutterCode = S::PutterCode;
+    }
+    ///State transition - sets the `target_schema` field to Set
+    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
+    impl<S: State> State for SetTargetSchema<S> {
+        type SourceSchema = S::SourceSchema;
+        type GetterCode = S::GetterCode;
+        type Name = S::Name;
+        type TargetSchema = Set<members::target_schema>;
+        type CreatedAt = S::CreatedAt;
+        type PutterCode = S::PutterCode;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SourceSchema = S::SourceSchema;
+        type GetterCode = S::GetterCode;
+        type Name = S::Name;
+        type TargetSchema = S::TargetSchema;
+        type CreatedAt = Set<members::created_at>;
+        type PutterCode = S::PutterCode;
+    }
+    ///State transition - sets the `putter_code` field to Set
+    pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPutterCode<S> {}
+    impl<S: State> State for SetPutterCode<S> {
+        type SourceSchema = S::SourceSchema;
+        type GetterCode = S::GetterCode;
+        type Name = S::Name;
+        type TargetSchema = S::TargetSchema;
+        type CreatedAt = S::CreatedAt;
+        type PutterCode = Set<members::putter_code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `getter_code` field
-        pub struct getter_code(());
-        ///Marker type for the `putter_code` field
-        pub struct putter_code(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `target_schema` field
-        pub struct target_schema(());
         ///Marker type for the `source_schema` field
         pub struct source_schema(());
+        ///Marker type for the `getter_code` field
+        pub struct getter_code(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `target_schema` field
+        pub struct target_schema(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `putter_code` field
+        pub struct putter_code(());
     }
 }
 
@@ -940,12 +950,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
 impl<'a, S> LensBuilder<'a, S>
 where
     S: lens_state::State,
-    S::Name: lens_state::IsSet,
-    S::GetterCode: lens_state::IsSet,
-    S::PutterCode: lens_state::IsSet,
-    S::CreatedAt: lens_state::IsSet,
-    S::TargetSchema: lens_state::IsSet,
     S::SourceSchema: lens_state::IsSet,
+    S::GetterCode: lens_state::IsSet,
+    S::Name: lens_state::IsSet,
+    S::TargetSchema: lens_state::IsSet,
+    S::CreatedAt: lens_state::IsSet,
+    S::PutterCode: lens_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lens<'a> {
@@ -968,7 +978,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Lens<'a> {

@@ -50,50 +50,50 @@ pub mod review_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Transaction;
-        type CreatedAt;
         type Rating;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Transaction = Unset;
-        type CreatedAt = Unset;
         type Rating = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `transaction` field to Set
     pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransaction<S> {}
     impl<S: State> State for SetTransaction<S> {
         type Transaction = Set<members::transaction>;
+        type Rating = S::Rating;
         type CreatedAt = S::CreatedAt;
-        type Rating = S::Rating;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Transaction = S::Transaction;
-        type CreatedAt = Set<members::created_at>;
-        type Rating = S::Rating;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
         type Transaction = S::Transaction;
-        type CreatedAt = S::CreatedAt;
         type Rating = Set<members::rating>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Transaction = S::Transaction;
+        type Rating = S::Rating;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `transaction` field
         pub struct transaction(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `rating` field
         pub struct rating(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -241,8 +241,8 @@ impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
     S::Transaction: review_state::IsSet,
-    S::CreatedAt: review_state::IsSet,
     S::Rating: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -260,7 +260,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Review<'a> {
@@ -502,7 +502,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -514,9 +514,9 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("transaction"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("transaction"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rating"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -524,7 +524,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -547,7 +547,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -568,7 +568,9 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rating",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -579,7 +581,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "reviewerRole",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -600,7 +602,9 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -619,7 +623,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "transaction",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

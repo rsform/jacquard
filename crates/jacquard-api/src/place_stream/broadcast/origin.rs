@@ -50,51 +50,51 @@ pub mod origin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Server;
         type Streamer;
         type UpdatedAt;
+        type Server;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Server = Unset;
         type Streamer = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `server` field to Set
-    pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServer<S> {}
-    impl<S: State> State for SetServer<S> {
-        type Server = Set<members::server>;
-        type Streamer = S::Streamer;
-        type UpdatedAt = S::UpdatedAt;
+        type Server = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type Server = S::Server;
         type Streamer = Set<members::streamer>;
         type UpdatedAt = S::UpdatedAt;
+        type Server = S::Server;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Server = S::Server;
         type Streamer = S::Streamer;
         type UpdatedAt = Set<members::updated_at>;
+        type Server = S::Server;
+    }
+    ///State transition - sets the `server` field to Set
+    pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServer<S> {}
+    impl<S: State> State for SetServer<S> {
+        type Streamer = S::Streamer;
+        type UpdatedAt = S::UpdatedAt;
+        type Server = Set<members::server>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `server` field
-        pub struct server(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `server` field
+        pub struct server(());
     }
 }
 
@@ -247,9 +247,9 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
 impl<'a, S> OriginBuilder<'a, S>
 where
     S: origin_state::State,
-    S::Server: origin_state::IsSet,
     S::Streamer: origin_state::IsSet,
     S::UpdatedAt: origin_state::IsSet,
+    S::Server: origin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Origin<'a> {
@@ -267,7 +267,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Origin<'a> {
@@ -384,7 +384,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -396,9 +396,9 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("streamer"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("server"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("streamer"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("server"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                             ],
                         ),
                         nullable: None,
@@ -406,7 +406,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "broadcaster",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -429,7 +429,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "irohTicket",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -450,7 +450,9 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("server"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "server",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -471,7 +473,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "streamer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -494,7 +496,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -517,7 +519,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "websocketURL",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

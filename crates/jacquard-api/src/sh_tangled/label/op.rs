@@ -37,67 +37,67 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Add;
-        type PerformedAt;
+        type Subject;
         type Delete;
+        type PerformedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Add = Unset;
-        type PerformedAt = Unset;
+        type Subject = Unset;
         type Delete = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Add = S::Add;
-        type PerformedAt = S::PerformedAt;
-        type Delete = S::Delete;
+        type PerformedAt = Unset;
     }
     ///State transition - sets the `add` field to Set
     pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAdd<S> {}
     impl<S: State> State for SetAdd<S> {
-        type Subject = S::Subject;
         type Add = Set<members::add>;
-        type PerformedAt = S::PerformedAt;
-        type Delete = S::Delete;
-    }
-    ///State transition - sets the `performed_at` field to Set
-    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
-    impl<S: State> State for SetPerformedAt<S> {
         type Subject = S::Subject;
-        type Add = S::Add;
-        type PerformedAt = Set<members::performed_at>;
         type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Add = S::Add;
+        type Subject = Set<members::subject>;
+        type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
     }
     ///State transition - sets the `delete` field to Set
     pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDelete<S> {}
     impl<S: State> State for SetDelete<S> {
-        type Subject = S::Subject;
         type Add = S::Add;
-        type PerformedAt = S::PerformedAt;
+        type Subject = S::Subject;
         type Delete = Set<members::delete>;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `performed_at` field to Set
+    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
+    impl<S: State> State for SetPerformedAt<S> {
+        type Add = S::Add;
+        type Subject = S::Subject;
+        type Delete = S::Delete;
+        type PerformedAt = Set<members::performed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `add` field
         pub struct add(());
-        ///Marker type for the `performed_at` field
-        pub struct performed_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `delete` field
         pub struct delete(());
+        ///Marker type for the `performed_at` field
+        pub struct performed_at(());
     }
 }
 
@@ -210,10 +210,10 @@ where
 impl<'a, S> OpBuilder<'a, S>
 where
     S: op_state::State,
-    S::Subject: op_state::IsSet,
     S::Add: op_state::IsSet,
-    S::PerformedAt: op_state::IsSet,
+    S::Subject: op_state::IsSet,
     S::Delete: op_state::IsSet,
+    S::PerformedAt: op_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Op<'a> {
@@ -229,7 +229,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Op<'a> {
@@ -332,7 +332,7 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -340,10 +340,10 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("add"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("delete"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("performedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("add"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("delete"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("performedAt")
                             ],
                         ),
                         nullable: None,
@@ -351,7 +351,9 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("add"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "add",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -363,7 +365,9 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("delete"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "delete",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -375,7 +379,7 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "performedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -394,7 +398,9 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "subject",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -420,13 +426,13 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("operand"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("operand"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
                         ],
                     ),
                     nullable: None,
@@ -434,7 +440,9 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -455,7 +463,9 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -512,37 +522,37 @@ pub mod operand_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Value;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Value = S::Value;
+        type Key = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Key = S::Key;
         type Value = Set<members::value>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Value = S::Value;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -615,8 +625,8 @@ where
 impl<'a, S> OperandBuilder<'a, S>
 where
     S: operand_state::State,
-    S::Key: operand_state::IsSet,
     S::Value: operand_state::IsSet,
+    S::Key: operand_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Operand<'a> {
@@ -630,7 +640,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Operand<'a> {

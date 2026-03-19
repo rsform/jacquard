@@ -114,7 +114,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Schema<'a> {
@@ -214,7 +214,7 @@ fn lexicon_doc_com_atproto_lexicon_schema() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -226,7 +226,7 @@ fn lexicon_doc_com_atproto_lexicon_schema() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("lexicon")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lexicon")
                             ],
                         ),
                         nullable: None,
@@ -234,7 +234,9 @@ fn lexicon_doc_com_atproto_lexicon_schema() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("lexicon"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "lexicon",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

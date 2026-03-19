@@ -30,7 +30,7 @@ pub struct Sequence<'a> {
     pub credits: std::option::Option<Vec<crate::io_sound::credit::Credit<'a>>>,
     /// Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub events: bytes::Bytes,
+    pub events: jacquard_common::deps::bytes::Bytes,
     /// Identifies this sequence for playback by a "sequence" event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub id: std::option::Option<i64>,
@@ -99,7 +99,7 @@ pub struct SequenceBuilder<'a, S: sequence_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<Vec<crate::io_sound::credit::Credit<'a>>>,
-        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -188,7 +188,7 @@ where
     /// Set the `events` field (required)
     pub fn events(
         mut self,
-        value: impl Into<bytes::Bytes>,
+        value: impl Into<jacquard_common::deps::bytes::Bytes>,
     ) -> SequenceBuilder<'a, sequence_state::SetEvents<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SequenceBuilder {
@@ -362,7 +362,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Sequence<'a> {
@@ -494,7 +494,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
         }
         if let Some(ref value) = self.name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -523,7 +523,7 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -535,7 +535,7 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("events")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("events")
                             ],
                         ),
                         nullable: None,
@@ -543,7 +543,7 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "bskyPostRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -554,7 +554,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("credits"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "credits",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -572,7 +574,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("events"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "events",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                     description: None,
                                     max_length: Some(524288usize),
@@ -580,7 +584,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "id",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -591,7 +597,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -610,7 +618,7 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publishedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -633,7 +641,7 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sequences",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -653,7 +661,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -677,7 +687,7 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -700,7 +710,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "url",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -721,7 +733,9 @@ fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "version",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

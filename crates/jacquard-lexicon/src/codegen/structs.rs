@@ -3,7 +3,7 @@ use crate::lexicon::{
     LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString,
 };
 use heck::ToSnakeCase;
-use jacquard_common::smol_str::SmolStr;
+use jacquard_common::deps::smol_str::SmolStr;
 use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::BTreeMap;
@@ -463,10 +463,12 @@ impl<'c> CodeGenerator<'c> {
         let mut from_str_arms = Vec::new();
         let mut as_str_arms = Vec::new();
 
+        let mut known_variant_names = std::collections::HashSet::new();
         for value in known_values {
             // Convert value to valid Rust identifier
             let value_str = value.as_ref();
             let variant_name = value_to_variant_name(value_str);
+            known_variant_names.insert(variant_name.clone());
             let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
 
             variants.push(quote! {
@@ -482,6 +484,14 @@ impl<'c> CodeGenerator<'c> {
             });
         }
 
+        // Choose catch-all name, falling back if "Other" collides with a known value variant.
+        let catchall_name = if known_variant_names.contains("Other") {
+            "UnknownValue"
+        } else {
+            "Other"
+        };
+        let catchall_ident = syn::Ident::new(catchall_name, proc_macro2::Span::call_site());
+
         let doc = self.generate_doc_comment(string.description.as_ref());
 
         // Generate IntoStatic impl
@@ -492,7 +502,7 @@ impl<'c> CodeGenerator<'c> {
                 (variant_name, EnumVariantKind::Unit)
             })
             .chain(std::iter::once((
-                "Other".to_string(),
+                catchall_name.to_string(),
                 EnumVariantKind::Tuple,
             )))
             .collect();
@@ -504,14 +514,14 @@ impl<'c> CodeGenerator<'c> {
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub enum #ident<'a> {
                 #(#variants,)*
-                Other(jacquard_common::CowStr<'a>),
+                #catchall_ident(jacquard_common::CowStr<'a>),
             }
 
             impl<'a> #ident<'a> {
                 pub fn as_str(&self) -> &str {
                     match self {
                         #(#as_str_arms,)*
-                        Self::Other(s) => s.as_ref(),
+                        Self::#catchall_ident(s) => s.as_ref(),
                     }
                 }
             }
@@ -520,7 +530,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: &'a str) -> Self {
                     match s {
                         #(#from_str_arms,)*
-                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
                     }
                 }
             }
@@ -529,7 +539,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: String) -> Self {
                     match s.as_str() {
                         #(#from_str_arms,)*
-                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
                     }
                 }
             }
@@ -539,7 +549,6 @@ impl<'c> CodeGenerator<'c> {
                     self.as_str()
                 }
             }
-
 
             impl<'a> core::fmt::Display for #ident<'a> {
                 fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -587,11 +596,13 @@ impl<'c> CodeGenerator<'c> {
         let mut variants = Vec::new();
         let mut from_str_arms = Vec::new();
         let mut as_str_arms = Vec::new();
+        let mut known_variant_names = std::collections::HashSet::new();
 
         for value in known_values {
             let value_str = value.as_ref();
             // Use known_value_to_variant_name to extract fragment from NSID#fragment
             let variant_name = known_value_to_variant_name(value_str);
+            known_variant_names.insert(variant_name.clone());
             let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
 
             variants.push(quote! {
@@ -607,6 +618,14 @@ impl<'c> CodeGenerator<'c> {
             });
         }
 
+        // Choose catch-all name, falling back if "Other" collides with a known value variant.
+        let catchall_name = if known_variant_names.contains("Other") {
+            "UnknownValue"
+        } else {
+            "Other"
+        };
+        let catchall_ident = syn::Ident::new(catchall_name, proc_macro2::Span::call_site());
+
         let doc = self.generate_doc_comment(string.description.as_ref());
 
         // Generate IntoStatic impl
@@ -617,7 +636,7 @@ impl<'c> CodeGenerator<'c> {
                 (variant_name, EnumVariantKind::Unit)
             })
             .chain(std::iter::once((
-                "Other".to_string(),
+                catchall_name.to_string(),
                 EnumVariantKind::Tuple,
             )))
             .collect();
@@ -629,14 +648,14 @@ impl<'c> CodeGenerator<'c> {
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub enum #ident<'a> {
                 #(#variants,)*
-                Other(jacquard_common::CowStr<'a>),
+                #catchall_ident(jacquard_common::CowStr<'a>),
             }
 
             impl<'a> #ident<'a> {
                 pub fn as_str(&self) -> &str {
                     match self {
                         #(#as_str_arms,)*
-                        Self::Other(s) => s.as_ref(),
+                        Self::#catchall_ident(s) => s.as_ref(),
                     }
                 }
             }
@@ -645,7 +664,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: &'a str) -> Self {
                     match s {
                         #(#from_str_arms,)*
-                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
                     }
                 }
             }
@@ -654,7 +673,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: String) -> Self {
                     match s.as_str() {
                         #(#from_str_arms,)*
-                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
                     }
                 }
             }
@@ -695,7 +714,7 @@ impl<'c> CodeGenerator<'c> {
 
             impl<'a> Default for #ident<'a> {
                 fn default() -> Self {
-                    Self::Other(Default::default())
+                    Self::#catchall_ident(Default::default())
                 }
             }
 

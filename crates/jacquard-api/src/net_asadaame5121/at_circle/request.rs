@@ -47,65 +47,65 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Ring;
         type CreatedAt;
         type SiteTitle;
-        type Ring;
         type SiteUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Ring = Unset;
         type CreatedAt = Unset;
         type SiteTitle = Unset;
-        type Ring = Unset;
         type SiteUrl = Unset;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type Ring = Set<members::ring>;
+        type CreatedAt = S::CreatedAt;
+        type SiteTitle = S::SiteTitle;
+        type SiteUrl = S::SiteUrl;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Ring = S::Ring;
         type CreatedAt = Set<members::created_at>;
         type SiteTitle = S::SiteTitle;
-        type Ring = S::Ring;
         type SiteUrl = S::SiteUrl;
     }
     ///State transition - sets the `site_title` field to Set
     pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiteTitle<S> {}
     impl<S: State> State for SetSiteTitle<S> {
+        type Ring = S::Ring;
         type CreatedAt = S::CreatedAt;
         type SiteTitle = Set<members::site_title>;
-        type Ring = S::Ring;
-        type SiteUrl = S::SiteUrl;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type CreatedAt = S::CreatedAt;
-        type SiteTitle = S::SiteTitle;
-        type Ring = Set<members::ring>;
         type SiteUrl = S::SiteUrl;
     }
     ///State transition - sets the `site_url` field to Set
     pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiteUrl<S> {}
     impl<S: State> State for SetSiteUrl<S> {
+        type Ring = S::Ring;
         type CreatedAt = S::CreatedAt;
         type SiteTitle = S::SiteTitle;
-        type Ring = S::Ring;
         type SiteUrl = Set<members::site_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ring` field
+        pub struct ring(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `site_title` field
         pub struct site_title(());
-        ///Marker type for the `ring` field
-        pub struct ring(());
         ///Marker type for the `site_url` field
         pub struct site_url(());
     }
@@ -257,9 +257,9 @@ where
 impl<'a, S> RequestBuilder<'a, S>
 where
     S: request_state::State,
+    S::Ring: request_state::IsSet,
     S::CreatedAt: request_state::IsSet,
     S::SiteTitle: request_state::IsSet,
-    S::Ring: request_state::IsSet,
     S::SiteUrl: request_state::IsSet,
 {
     /// Build the final struct
@@ -278,7 +278,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Request<'a> {
@@ -382,7 +382,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
         }
         if let Some(ref value) = self.message {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -414,7 +414,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
         {
             let value = &self.site_title;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -445,7 +445,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -457,10 +457,10 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("ring"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("siteUrl"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("siteTitle"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ring"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("siteUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("siteTitle"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -468,7 +468,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -487,7 +487,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "message",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -506,7 +508,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ring"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ring",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -515,7 +519,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rssUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rssUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -536,7 +542,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "siteTitle",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -555,7 +561,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("siteUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "siteUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

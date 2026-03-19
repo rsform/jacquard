@@ -55,50 +55,50 @@ pub mod chapter_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Notebook;
-        type Authors;
         type EntryList;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Notebook = Unset;
-        type Authors = Unset;
         type EntryList = Unset;
+        type Authors = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
         type Notebook = Set<members::notebook>;
+        type EntryList = S::EntryList;
         type Authors = S::Authors;
-        type EntryList = S::EntryList;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Notebook = S::Notebook;
-        type Authors = Set<members::authors>;
-        type EntryList = S::EntryList;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryList<S> {}
     impl<S: State> State for SetEntryList<S> {
         type Notebook = S::Notebook;
-        type Authors = S::Authors;
         type EntryList = Set<members::entry_list>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Notebook = S::Notebook;
+        type EntryList = S::EntryList;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `notebook` field
         pub struct notebook(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
@@ -292,8 +292,8 @@ impl<'a, S> ChapterBuilder<'a, S>
 where
     S: chapter_state::State,
     S::Notebook: chapter_state::IsSet,
-    S::Authors: chapter_state::IsSet,
     S::EntryList: chapter_state::IsSet,
+    S::Authors: chapter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chapter<'a> {
@@ -313,7 +313,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Chapter<'a> {
@@ -420,7 +420,7 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -432,9 +432,9 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("entryList")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("authors"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("entryList")
                             ],
                         ),
                         nullable: None,
@@ -442,7 +442,9 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "authors",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -456,7 +458,7 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contentWarnings",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -467,7 +469,7 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -490,7 +492,7 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "entryList",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -506,7 +508,7 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "notebook",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -517,7 +519,9 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rating",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -526,7 +530,9 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -535,7 +541,9 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

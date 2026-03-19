@@ -133,7 +133,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Intent<'a> {
@@ -156,12 +156,12 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("intent"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("intent"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                         ],
                     ),
                     nullable: None,
@@ -169,7 +169,9 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("allow"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "allow",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -177,7 +179,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "updatedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -202,7 +204,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(::jacquard_common::CowStr::new_static("TODO")),
                     key: Some(::jacquard_common::CowStr::new_static("literal:self")),
@@ -214,7 +216,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "bulkDataset",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -223,7 +225,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "protocolBridging",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -232,7 +234,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publicAccessArchive",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -241,7 +243,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "syntheticContentGeneration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -250,7 +252,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -503,7 +505,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Declaration<'a> {

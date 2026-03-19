@@ -50,50 +50,50 @@ pub mod collection_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Subjects;
-        type Collection;
         type CreatedAt;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Subjects = Unset;
-        type Collection = Unset;
         type CreatedAt = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
         type Subjects = Set<members::subjects>;
+        type CreatedAt = S::CreatedAt;
         type Collection = S::Collection;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Subjects = S::Subjects;
-        type Collection = Set<members::collection>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Subjects = S::Subjects;
-        type Collection = S::Collection;
         type CreatedAt = Set<members::created_at>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Subjects = S::Subjects;
+        type CreatedAt = S::CreatedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `subjects` field
         pub struct subjects(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -247,8 +247,8 @@ impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
     S::Subjects: collection_item_state::IsSet,
-    S::Collection: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
+    S::Collection: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -266,7 +266,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CollectionItem<'a> {
@@ -409,7 +409,7 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -421,9 +421,9 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("subjects"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("collection"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("subjects"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -431,7 +431,7 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "collection",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -454,7 +454,7 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -473,7 +473,9 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "labels",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -487,7 +489,7 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subjects",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -507,7 +509,9 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -525,7 +529,9 @@ fn lexicon_doc_org_okazu_diary_feed_collectionItem() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("via"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "via",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

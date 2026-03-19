@@ -54,37 +54,37 @@ pub mod contributor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContributorRef;
         type CreatedAt;
+        type ContributorRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContributorRef = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `contributor_ref` field to Set
-    pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributorRef<S> {}
-    impl<S: State> State for SetContributorRef<S> {
-        type ContributorRef = Set<members::contributor_ref>;
-        type CreatedAt = S::CreatedAt;
+        type ContributorRef = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ContributorRef = S::ContributorRef;
         type CreatedAt = Set<members::created_at>;
+        type ContributorRef = S::ContributorRef;
+    }
+    ///State transition - sets the `contributor_ref` field to Set
+    pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContributorRef<S> {}
+    impl<S: State> State for SetContributorRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContributorRef = Set<members::contributor_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contributor_ref` field
-        pub struct contributor_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `contributor_ref` field
+        pub struct contributor_ref(());
     }
 }
 
@@ -251,8 +251,8 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S> ContributorBuilder<'a, S>
 where
     S: contributor_state::State,
-    S::ContributorRef: contributor_state::IsSet,
     S::CreatedAt: contributor_state::IsSet,
+    S::ContributorRef: contributor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Contributor<'a> {
@@ -271,7 +271,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Contributor<'a> {
@@ -377,7 +377,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -389,8 +389,8 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("contributorRef"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("contributorRef"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -398,7 +398,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "circularImage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -408,7 +408,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contributorRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -419,7 +419,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -442,7 +442,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hoverIframeUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -465,7 +465,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hoverImageUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -488,7 +488,9 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "url",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -509,7 +511,7 @@ fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "videoUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

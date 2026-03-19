@@ -32,37 +32,37 @@ pub mod data_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Date;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Date = S::Date;
+        type Value = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDate<S> {}
     impl<S: State> State for SetDate<S> {
-        type Value = S::Value;
         type Date = Set<members::date>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Date = S::Date;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -135,8 +135,8 @@ where
 impl<'a, S> DataPointBuilder<'a, S>
 where
     S: data_point_state::State,
-    S::Value: data_point_state::IsSet,
     S::Date: data_point_state::IsSet,
+    S::Value: data_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DataPoint<'a> {
@@ -150,7 +150,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> DataPoint<'a> {
@@ -171,13 +171,13 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dataPoint"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dataPoint"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("date"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("date"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
                         ],
                     ),
                     nullable: None,
@@ -185,7 +185,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("date"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "date",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -202,7 +204,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -217,7 +221,7 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -229,11 +233,11 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("widgetType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("metric"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("period"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("summary"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("widgetType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("metric"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("period"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("summary"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -241,7 +245,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("caption"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "caption",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -256,7 +262,7 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "chartStyle",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -273,7 +279,7 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -292,7 +298,7 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "dataPoints",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -306,7 +312,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -314,7 +322,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("metric"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "metric",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -329,7 +339,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("period"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "period",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -344,7 +356,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("summary"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "summary",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -353,7 +367,7 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "widgetType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -375,7 +389,7 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("trendSummary"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("trendSummary"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -384,7 +398,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("average"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "average",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -395,7 +411,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("best"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "best",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -406,7 +424,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "count",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -417,7 +437,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("total"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "total",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -428,7 +450,9 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("worst"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "worst",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -510,83 +534,83 @@ pub mod trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Summary;
         type Period;
-        type Metric;
+        type Summary;
         type WidgetType;
+        type Metric;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Summary = Unset;
         type Period = Unset;
-        type Metric = Unset;
+        type Summary = Unset;
         type WidgetType = Unset;
+        type Metric = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Summary = Set<members::summary>;
-        type Period = S::Period;
-        type Metric = S::Metric;
-        type WidgetType = S::WidgetType;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPeriod<S> {}
     impl<S: State> State for SetPeriod<S> {
-        type Summary = S::Summary;
         type Period = Set<members::period>;
-        type Metric = S::Metric;
+        type Summary = S::Summary;
         type WidgetType = S::WidgetType;
+        type Metric = S::Metric;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type Summary = S::Summary;
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
         type Period = S::Period;
-        type Metric = Set<members::metric>;
+        type Summary = Set<members::summary>;
         type WidgetType = S::WidgetType;
+        type Metric = S::Metric;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `widget_type` field to Set
     pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidgetType<S> {}
     impl<S: State> State for SetWidgetType<S> {
-        type Summary = S::Summary;
         type Period = S::Period;
-        type Metric = S::Metric;
+        type Summary = S::Summary;
         type WidgetType = Set<members::widget_type>;
+        type Metric = S::Metric;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetric<S> {}
+    impl<S: State> State for SetMetric<S> {
+        type Period = S::Period;
+        type Summary = S::Summary;
+        type WidgetType = S::WidgetType;
+        type Metric = Set<members::metric>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Summary = S::Summary;
         type Period = S::Period;
-        type Metric = S::Metric;
+        type Summary = S::Summary;
         type WidgetType = S::WidgetType;
+        type Metric = S::Metric;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `period` field
         pub struct period(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
         ///Marker type for the `widget_type` field
         pub struct widget_type(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -802,10 +826,10 @@ where
 impl<'a, S> TrendBuilder<'a, S>
 where
     S: trend_state::State,
-    S::Summary: trend_state::IsSet,
     S::Period: trend_state::IsSet,
-    S::Metric: trend_state::IsSet,
+    S::Summary: trend_state::IsSet,
     S::WidgetType: trend_state::IsSet,
+    S::Metric: trend_state::IsSet,
     S::CreatedAt: trend_state::IsSet,
 {
     /// Build the final struct
@@ -827,7 +851,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Trend<'a> {

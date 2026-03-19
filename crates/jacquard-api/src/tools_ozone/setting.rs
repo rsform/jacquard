@@ -55,105 +55,105 @@ pub mod defs_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Scope;
-        type LastUpdatedBy;
         type CreatedBy;
-        type Did;
         type Key;
+        type LastUpdatedBy;
+        type Value;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Scope = Unset;
-        type LastUpdatedBy = Unset;
         type CreatedBy = Unset;
-        type Did = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Scope = S::Scope;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type CreatedBy = S::CreatedBy;
-        type Did = S::Did;
-        type Key = S::Key;
+        type LastUpdatedBy = Unset;
+        type Value = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
-        type Value = S::Value;
         type Scope = Set<members::scope>;
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
         type LastUpdatedBy = S::LastUpdatedBy;
-        type CreatedBy = S::CreatedBy;
-        type Did = S::Did;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
-    impl<S: State> State for SetLastUpdatedBy<S> {
         type Value = S::Value;
-        type Scope = S::Scope;
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type CreatedBy = S::CreatedBy;
         type Did = S::Did;
-        type Key = S::Key;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Value = S::Value;
         type Scope = S::Scope;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type CreatedBy = Set<members::created_by>;
-        type Did = S::Did;
         type Key = S::Key;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Value = S::Value;
-        type Scope = S::Scope;
         type LastUpdatedBy = S::LastUpdatedBy;
-        type CreatedBy = S::CreatedBy;
-        type Did = Set<members::did>;
-        type Key = S::Key;
+        type Value = S::Value;
+        type Did = S::Did;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Value = S::Value;
         type Scope = S::Scope;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type CreatedBy = S::CreatedBy;
-        type Did = S::Did;
         type Key = Set<members::key>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Value = S::Value;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+        type Value = S::Value;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Value = Set<members::value>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Value = S::Value;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `scope` field
         pub struct scope(());
-        ///Marker type for the `last_updated_by` field
-        pub struct last_updated_by(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -397,12 +397,12 @@ where
 impl<'a, S> DefsOptionBuilder<'a, S>
 where
     S: defs_option_state::State,
-    S::Value: defs_option_state::IsSet,
     S::Scope: defs_option_state::IsSet,
-    S::LastUpdatedBy: defs_option_state::IsSet,
     S::CreatedBy: defs_option_state::IsSet,
-    S::Did: defs_option_state::IsSet,
     S::Key: defs_option_state::IsSet,
+    S::LastUpdatedBy: defs_option_state::IsSet,
+    S::Value: defs_option_state::IsSet,
+    S::Did: defs_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DefsOption<'a> {
@@ -424,7 +424,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> DefsOption<'a> {
@@ -643,17 +643,17 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("option"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("option"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("scope"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("lastUpdatedBy")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scope"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdBy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lastUpdatedBy")
                         ],
                     ),
                     nullable: None,
@@ -661,7 +661,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -680,7 +680,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdBy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -699,7 +699,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -716,7 +716,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -733,7 +735,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -750,7 +754,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "lastUpdatedBy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -769,7 +773,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "managerRole",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -786,7 +790,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("scope"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "scope",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -801,7 +807,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "updatedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -820,7 +826,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -861,7 +869,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

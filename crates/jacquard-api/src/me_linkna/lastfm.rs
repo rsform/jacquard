@@ -53,51 +53,51 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ArtistNames;
         type CreatedAt;
         type TrackName;
+        type ArtistNames;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ArtistNames = Unset;
         type CreatedAt = Unset;
         type TrackName = Unset;
-    }
-    ///State transition - sets the `artist_names` field to Set
-    pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtistNames<S> {}
-    impl<S: State> State for SetArtistNames<S> {
-        type ArtistNames = Set<members::artist_names>;
-        type CreatedAt = S::CreatedAt;
-        type TrackName = S::TrackName;
+        type ArtistNames = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ArtistNames = S::ArtistNames;
         type CreatedAt = Set<members::created_at>;
         type TrackName = S::TrackName;
+        type ArtistNames = S::ArtistNames;
     }
     ///State transition - sets the `track_name` field to Set
     pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTrackName<S> {}
     impl<S: State> State for SetTrackName<S> {
-        type ArtistNames = S::ArtistNames;
         type CreatedAt = S::CreatedAt;
         type TrackName = Set<members::track_name>;
+        type ArtistNames = S::ArtistNames;
+    }
+    ///State transition - sets the `artist_names` field to Set
+    pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtistNames<S> {}
+    impl<S: State> State for SetArtistNames<S> {
+        type CreatedAt = S::CreatedAt;
+        type TrackName = S::TrackName;
+        type ArtistNames = Set<members::artist_names>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist_names` field
-        pub struct artist_names(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `track_name` field
         pub struct track_name(());
+        ///Marker type for the `artist_names` field
+        pub struct artist_names(());
     }
 }
 
@@ -270,9 +270,9 @@ where
 impl<'a, S> LastfmBuilder<'a, S>
 where
     S: lastfm_state::State,
-    S::ArtistNames: lastfm_state::IsSet,
     S::CreatedAt: lastfm_state::IsSet,
     S::TrackName: lastfm_state::IsSet,
+    S::ArtistNames: lastfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lastfm<'a> {
@@ -291,7 +291,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Lastfm<'a> {
@@ -395,7 +395,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -407,9 +407,9 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("trackName"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("artistNames"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("trackName"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("artistNames"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -417,7 +417,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "artistNames",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -441,7 +441,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "coverArtUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -462,7 +462,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -485,7 +485,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "originUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -508,7 +508,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playedTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -531,7 +531,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "releaseName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -550,7 +550,7 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "trackName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

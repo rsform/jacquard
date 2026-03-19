@@ -67,83 +67,83 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Images;
-        type Title;
         type Tags;
+        type CreatedAt;
+        type Title;
         type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Images = Unset;
-        type Title = Unset;
         type Tags = Unset;
+        type CreatedAt = Unset;
+        type Title = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
     }
     ///State transition - sets the `images` field to Set
     pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImages<S> {}
     impl<S: State> State for SetImages<S> {
-        type CreatedAt = S::CreatedAt;
         type Images = Set<members::images>;
-        type Title = S::Title;
         type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
         type CreatedAt = S::CreatedAt;
-        type Images = S::Images;
-        type Title = Set<members::title>;
-        type Tags = S::Tags;
+        type Title = S::Title;
         type Visibility = S::Visibility;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
-        type CreatedAt = S::CreatedAt;
         type Images = S::Images;
-        type Title = S::Title;
         type Tags = Set<members::tags>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Images = S::Images;
+        type Tags = S::Tags;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Images = S::Images;
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
         type Visibility = S::Visibility;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type CreatedAt = S::CreatedAt;
         type Images = S::Images;
-        type Title = S::Title;
         type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `images` field
         pub struct images(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
     }
@@ -419,10 +419,10 @@ where
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
-    S::CreatedAt: item_state::IsSet,
     S::Images: item_state::IsSet,
-    S::Title: item_state::IsSet,
     S::Tags: item_state::IsSet,
+    S::CreatedAt: item_state::IsSet,
+    S::Title: item_state::IsSet,
     S::Visibility: item_state::IsSet,
 {
     /// Build the final struct
@@ -447,7 +447,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Item<'a> {
@@ -739,7 +739,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Showcase item record"),
@@ -749,11 +749,11 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("images"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("visibility"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("images"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -761,7 +761,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "category",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -782,7 +782,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -801,7 +801,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -820,7 +820,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "externalLink",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -843,7 +843,9 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("images"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "images",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -861,7 +863,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "metadata",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
@@ -869,7 +871,9 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "notes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -888,7 +892,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "schemaVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -901,7 +905,9 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -925,7 +931,9 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Item title"),
@@ -942,7 +950,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -961,7 +969,7 @@ fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "visibility",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

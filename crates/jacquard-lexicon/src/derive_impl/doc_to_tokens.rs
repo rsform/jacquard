@@ -2,7 +2,7 @@
 
 use crate::lexicon::*;
 use crate::schema::from_ast::{ConstraintCheck, ValidationCheck};
-use jacquard_common::smol_str::SmolStr;
+use jacquard_common::deps::smol_str::SmolStr;
 use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::BTreeMap;
@@ -35,7 +35,7 @@ fn defs_map_to_tokens(
         .map(|(name, def)| {
             let name_str = name.as_str();
             let def_tokens = user_type_to_tokens(def, union_fields);
-            quote! { map.insert(::jacquard_common::smol_str::SmolStr::new_static(#name_str), #def_tokens) }
+            quote! { map.insert(::jacquard_common::deps::smol_str::SmolStr::new_static(#name_str), #def_tokens) }
         })
         .collect();
 
@@ -264,7 +264,7 @@ fn properties_to_tokens(
             let name_str = name.as_str();
             let union_type_path = union_fields.get(name.as_str());
             let prop_tokens = object_property_to_tokens(prop, union_type_path);
-            quote! { map.insert(::jacquard_common::smol_str::SmolStr::new_static(#name_str), #prop_tokens) }
+            quote! { map.insert(::jacquard_common::deps::smol_str::SmolStr::new_static(#name_str), #prop_tokens) }
         })
         .collect();
 
@@ -619,7 +619,7 @@ fn xrpc_parameters_to_tokens(params: &LexXrpcParameters) -> TokenStream {
         .map(|(name, prop)| {
             let name_str = name.as_str();
             let prop_tokens = xrpc_param_property_to_tokens(prop);
-            quote! { map.insert(::jacquard_common::smol_str::SmolStr::new_static(#name_str), #prop_tokens) }
+            quote! { map.insert(::jacquard_common::deps::smol_str::SmolStr::new_static(#name_str), #prop_tokens) }
         })
         .collect();
     let required = option_vec_smol_str_to_tokens(&params.required);
@@ -814,7 +814,7 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::MaxGraphemes { max } => quote! {
                     {
-                        let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                             value.as_ref(),
                             true
                         ).count();
@@ -829,7 +829,7 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::MinGraphemes { min } => quote! {
                     {
-                        let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                             value.as_ref(),
                             true
                         ).count();
@@ -917,7 +917,7 @@ fn option_vec_smol_str_to_tokens(opt: &Option<Vec<SmolStr>>) -> TokenStream {
     match opt {
         Some(v) => {
             let strs: Vec<_> = v.iter().map(|s| s.as_str()).collect();
-            quote! { Some(vec![#(::jacquard_common::smol_str::SmolStr::new_static(#strs)),*]) }
+            quote! { Some(vec![#(::jacquard_common::deps::smol_str::SmolStr::new_static(#strs)),*]) }
         }
         None => quote! { None },
     }

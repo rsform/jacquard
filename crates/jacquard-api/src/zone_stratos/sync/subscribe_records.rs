@@ -43,84 +43,84 @@ pub mod commit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Rev;
+        type Ops;
         type Seq;
         type Time;
-        type Ops;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Rev = Unset;
+        type Ops = Unset;
         type Seq = Unset;
         type Time = Unset;
-        type Ops = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Did = Set<members::did>;
-        type Rev = S::Rev;
+        type Ops = S::Ops;
         type Seq = S::Seq;
         type Time = S::Time;
-        type Ops = S::Ops;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Did = S::Did;
-        type Rev = Set<members::rev>;
-        type Seq = S::Seq;
-        type Time = S::Time;
-        type Ops = S::Ops;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Did = S::Did;
         type Rev = S::Rev;
-        type Seq = Set<members::seq>;
-        type Time = S::Time;
-        type Ops = S::Ops;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Did = S::Did;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
-        type Time = Set<members::time>;
-        type Ops = S::Ops;
     }
     ///State transition - sets the `ops` field to Set
     pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOps<S> {}
     impl<S: State> State for SetOps<S> {
         type Did = S::Did;
-        type Rev = S::Rev;
+        type Ops = Set<members::ops>;
         type Seq = S::Seq;
         type Time = S::Time;
-        type Ops = Set<members::ops>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Did = S::Did;
+        type Ops = S::Ops;
+        type Seq = Set<members::seq>;
+        type Time = S::Time;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Did = S::Did;
+        type Ops = S::Ops;
+        type Seq = S::Seq;
+        type Time = Set<members::time>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Did = S::Did;
+        type Ops = S::Ops;
+        type Seq = S::Seq;
+        type Time = S::Time;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
+        ///Marker type for the `ops` field
+        pub struct ops(());
         ///Marker type for the `seq` field
         pub struct seq(());
         ///Marker type for the `time` field
         pub struct time(());
-        ///Marker type for the `ops` field
-        pub struct ops(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -256,10 +256,10 @@ impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
     S::Did: commit_state::IsSet,
-    S::Rev: commit_state::IsSet,
+    S::Ops: commit_state::IsSet,
     S::Seq: commit_state::IsSet,
     S::Time: commit_state::IsSet,
-    S::Ops: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -276,7 +276,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Commit<'a> {
@@ -302,7 +302,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("commit"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("commit"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -311,11 +311,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("ops")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("time"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ops")
                         ],
                     ),
                     nullable: None,
@@ -323,7 +323,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -344,7 +346,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ops"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "ops",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -360,7 +364,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rev",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("The repo revision."),
@@ -379,7 +385,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "seq",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -390,7 +398,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "time",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -415,7 +425,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("info"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("info"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -423,14 +433,18 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "message",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -449,7 +463,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -472,7 +488,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcSubscription(::jacquard_lexicon::lexicon::LexXrpcSubscription {
                     description: None,
                     parameters: Some(
@@ -480,14 +496,16 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("did")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "cursor",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -498,7 +516,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "did",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -519,7 +539,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("domain"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "domain",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -547,7 +569,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("recordOp"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("recordOp"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -556,8 +578,8 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("path")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("path")
                         ],
                     ),
                     nullable: None,
@@ -565,7 +587,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "action",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -584,13 +608,17 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cid",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "path",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -609,7 +637,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "record",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -963,11 +993,15 @@ impl<'a> SubscribeRecordsMessage<'a> {
         )?;
         match header.t.as_str() {
             "#commit" => {
-                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Commit(Box::new(variant)))
             }
             "#info" => {
-                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Info(Box::new(variant)))
             }
             unknown => {

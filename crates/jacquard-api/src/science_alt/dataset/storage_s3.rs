@@ -203,7 +203,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> StorageS3<'a> {
@@ -228,7 +228,7 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -237,8 +237,8 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("bucket"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("shards")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("bucket"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("shards")
                         ],
                     ),
                     nullable: None,
@@ -246,7 +246,9 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("bucket"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bucket",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("S3 bucket name"),
@@ -263,7 +265,9 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("endpoint"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "endpoint",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -284,7 +288,9 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("region"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "region",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -303,7 +309,9 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("shards"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "shards",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -323,7 +331,7 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("shardEntry"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("shardEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -332,8 +340,8 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("checksum")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum")
                         ],
                     ),
                     nullable: None,
@@ -341,7 +349,9 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("checksum"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "checksum",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -350,7 +360,9 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -475,37 +487,37 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Checksum;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Checksum = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Checksum = S::Checksum;
+        type Key = Unset;
     }
     ///State transition - sets the `checksum` field to Set
     pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChecksum<S> {}
     impl<S: State> State for SetChecksum<S> {
-        type Key = S::Key;
         type Checksum = Set<members::checksum>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Checksum = S::Checksum;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `checksum` field
         pub struct checksum(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -578,8 +590,8 @@ where
 impl<'a, S> ShardEntryBuilder<'a, S>
 where
     S: shard_entry_state::State,
-    S::Key: shard_entry_state::IsSet,
     S::Checksum: shard_entry_state::IsSet,
+    S::Key: shard_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
@@ -593,7 +605,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ShardEntry<'a> {

@@ -170,7 +170,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> BatchEntry<'a> {
@@ -300,13 +300,13 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("batchEntry"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("batchEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("t"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("result")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("t"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("result")
                         ],
                     ),
                     nullable: None,
@@ -314,7 +314,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("q"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("q"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -329,7 +329,9 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("result"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "result",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -347,7 +349,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("t"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("t"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("phenomenonTime"),
@@ -370,7 +372,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -382,10 +384,10 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("datastream"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("windowStart"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("windowEnd"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("observations")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("datastream"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("windowStart"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("windowEnd"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("observations")
                             ],
                         ),
                         nullable: None,
@@ -393,7 +395,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "datastream",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -412,7 +414,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "observations",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -430,7 +432,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "windowEnd",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -449,7 +451,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "windowStart",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -526,65 +528,65 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type WindowEnd;
         type Datastream;
         type WindowStart;
-        type WindowEnd;
         type Observations;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type WindowEnd = Unset;
         type Datastream = Unset;
         type WindowStart = Unset;
-        type WindowEnd = Unset;
         type Observations = Unset;
+    }
+    ///State transition - sets the `window_end` field to Set
+    pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
+    impl<S: State> State for SetWindowEnd<S> {
+        type WindowEnd = Set<members::window_end>;
+        type Datastream = S::Datastream;
+        type WindowStart = S::WindowStart;
+        type Observations = S::Observations;
     }
     ///State transition - sets the `datastream` field to Set
     pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDatastream<S> {}
     impl<S: State> State for SetDatastream<S> {
+        type WindowEnd = S::WindowEnd;
         type Datastream = Set<members::datastream>;
         type WindowStart = S::WindowStart;
-        type WindowEnd = S::WindowEnd;
         type Observations = S::Observations;
     }
     ///State transition - sets the `window_start` field to Set
     pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWindowStart<S> {}
     impl<S: State> State for SetWindowStart<S> {
+        type WindowEnd = S::WindowEnd;
         type Datastream = S::Datastream;
         type WindowStart = Set<members::window_start>;
-        type WindowEnd = S::WindowEnd;
-        type Observations = S::Observations;
-    }
-    ///State transition - sets the `window_end` field to Set
-    pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
-    impl<S: State> State for SetWindowEnd<S> {
-        type Datastream = S::Datastream;
-        type WindowStart = S::WindowStart;
-        type WindowEnd = Set<members::window_end>;
         type Observations = S::Observations;
     }
     ///State transition - sets the `observations` field to Set
     pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservations<S> {}
     impl<S: State> State for SetObservations<S> {
+        type WindowEnd = S::WindowEnd;
         type Datastream = S::Datastream;
         type WindowStart = S::WindowStart;
-        type WindowEnd = S::WindowEnd;
         type Observations = Set<members::observations>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `window_end` field
+        pub struct window_end(());
         ///Marker type for the `datastream` field
         pub struct datastream(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
-        ///Marker type for the `window_end` field
-        pub struct window_end(());
         ///Marker type for the `observations` field
         pub struct observations(());
     }
@@ -701,9 +703,9 @@ where
 impl<'a, S> ObservationBatchBuilder<'a, S>
 where
     S: observation_batch_state::State,
+    S::WindowEnd: observation_batch_state::IsSet,
     S::Datastream: observation_batch_state::IsSet,
     S::WindowStart: observation_batch_state::IsSet,
-    S::WindowEnd: observation_batch_state::IsSet,
     S::Observations: observation_batch_state::IsSet,
 {
     /// Build the final struct
@@ -720,7 +722,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ObservationBatch<'a> {

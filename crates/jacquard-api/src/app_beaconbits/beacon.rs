@@ -99,67 +99,67 @@ pub mod beacon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type VenueName;
         type CreatedAt;
-        type VenueUri;
+        type VenueName;
         type Visibility;
+        type VenueUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type VenueName = Unset;
         type CreatedAt = Unset;
-        type VenueUri = Unset;
+        type VenueName = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueName<S> {}
-    impl<S: State> State for SetVenueName<S> {
-        type VenueName = Set<members::venue_name>;
-        type CreatedAt = S::CreatedAt;
-        type VenueUri = S::VenueUri;
-        type Visibility = S::Visibility;
+        type VenueUri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type VenueName = S::VenueName;
         type CreatedAt = Set<members::created_at>;
-        type VenueUri = S::VenueUri;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `venue_uri` field to Set
-    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
-    impl<S: State> State for SetVenueUri<S> {
         type VenueName = S::VenueName;
-        type CreatedAt = S::CreatedAt;
-        type VenueUri = Set<members::venue_uri>;
         type Visibility = S::Visibility;
+        type VenueUri = S::VenueUri;
+    }
+    ///State transition - sets the `venue_name` field to Set
+    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueName<S> {}
+    impl<S: State> State for SetVenueName<S> {
+        type CreatedAt = S::CreatedAt;
+        type VenueName = Set<members::venue_name>;
+        type Visibility = S::Visibility;
+        type VenueUri = S::VenueUri;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type VenueName = S::VenueName;
         type CreatedAt = S::CreatedAt;
-        type VenueUri = S::VenueUri;
+        type VenueName = S::VenueName;
         type Visibility = Set<members::visibility>;
+        type VenueUri = S::VenueUri;
+    }
+    ///State transition - sets the `venue_uri` field to Set
+    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
+    impl<S: State> State for SetVenueUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type VenueName = S::VenueName;
+        type Visibility = S::Visibility;
+        type VenueUri = Set<members::venue_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `venue_name` field
-        pub struct venue_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
+        ///Marker type for the `venue_name` field
+        pub struct venue_name(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
     }
 }
 
@@ -543,10 +543,10 @@ where
 impl<'a, S> BeaconBuilder<'a, S>
 where
     S: beacon_state::State,
-    S::VenueName: beacon_state::IsSet,
     S::CreatedAt: beacon_state::IsSet,
-    S::VenueUri: beacon_state::IsSet,
+    S::VenueName: beacon_state::IsSet,
     S::Visibility: beacon_state::IsSet,
+    S::VenueUri: beacon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Beacon<'a> {
@@ -575,7 +575,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Beacon<'a> {
@@ -777,7 +777,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.chain_emoji {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -795,7 +795,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         }
         if let Some(ref value) = self.chain_name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -835,7 +835,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         }
         if let Some(ref value) = self.shout {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -853,7 +853,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         }
         if let Some(ref value) = self.venue_address {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -871,7 +871,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         }
         if let Some(ref value) = self.venue_category {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -890,7 +890,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         {
             let value = &self.venue_name;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -909,7 +909,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         {
             let value = &self.venue_uri;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -928,7 +928,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         {
             let value = &self.visibility;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -959,7 +959,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -971,10 +971,10 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("venueUri"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("venueName"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("visibility"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("venueUri"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("venueName"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -982,7 +982,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "addressDetails",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -993,7 +993,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "chainEmoji",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1014,7 +1014,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "chainName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1035,7 +1035,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1058,7 +1058,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "location",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1069,7 +1069,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mentions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1097,7 +1097,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "parentBeacon",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1108,7 +1108,9 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "post",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -1117,7 +1119,9 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rating",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -1128,7 +1132,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "revealAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1151,7 +1155,9 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("shout"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "shout",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1170,7 +1176,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "threadRoot",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1181,7 +1187,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "venueAddress",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1202,7 +1208,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "venueCategory",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1223,7 +1229,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "venueName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1244,7 +1250,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "venueUri",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1265,7 +1271,7 @@ fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "visibility",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

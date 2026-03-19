@@ -44,51 +44,51 @@ pub mod badge_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Recipient;
         type BadgeType;
         type Issuer;
-        type Recipient;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Recipient = Unset;
         type BadgeType = Unset;
         type Issuer = Unset;
-        type Recipient = Unset;
-    }
-    ///State transition - sets the `badge_type` field to Set
-    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
-    impl<S: State> State for SetBadgeType<S> {
-        type BadgeType = Set<members::badge_type>;
-        type Issuer = S::Issuer;
-        type Recipient = S::Recipient;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type BadgeType = S::BadgeType;
-        type Issuer = Set<members::issuer>;
-        type Recipient = S::Recipient;
     }
     ///State transition - sets the `recipient` field to Set
     pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecipient<S> {}
     impl<S: State> State for SetRecipient<S> {
+        type Recipient = Set<members::recipient>;
         type BadgeType = S::BadgeType;
         type Issuer = S::Issuer;
-        type Recipient = Set<members::recipient>;
+    }
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
+    impl<S: State> State for SetBadgeType<S> {
+        type Recipient = S::Recipient;
+        type BadgeType = Set<members::badge_type>;
+        type Issuer = S::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type Recipient = S::Recipient;
+        type BadgeType = S::BadgeType;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `recipient` field
+        pub struct recipient(());
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
-        ///Marker type for the `recipient` field
-        pub struct recipient(());
     }
 }
 
@@ -201,9 +201,9 @@ impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
 impl<'a, S> BadgeViewBuilder<'a, S>
 where
     S: badge_view_state::State,
+    S::Recipient: badge_view_state::IsSet,
     S::BadgeType: badge_view_state::IsSet,
     S::Issuer: badge_view_state::IsSet,
-    S::Recipient: badge_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BadgeView<'a> {
@@ -219,7 +219,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> BadgeView<'a> {
@@ -332,7 +332,7 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("badgeView"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("badgeView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -341,9 +341,9 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("badgeType"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("issuer"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("recipient")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("badgeType"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("issuer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("recipient")
                         ],
                     ),
                     nullable: None,
@@ -351,7 +351,7 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "badgeType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -368,7 +368,9 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("issuer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "issuer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -389,7 +391,7 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "recipient",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -412,7 +414,7 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "signature",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -437,19 +439,19 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("mod"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("mod"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("streamer"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("streamer"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("vip"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("vip"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),

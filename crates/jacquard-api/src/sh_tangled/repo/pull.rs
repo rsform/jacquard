@@ -56,67 +56,67 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PatchBlob;
         type CreatedAt;
-        type Title;
         type Target;
+        type PatchBlob;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PatchBlob = Unset;
         type CreatedAt = Unset;
-        type Title = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `patch_blob` field to Set
-    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
-    impl<S: State> State for SetPatchBlob<S> {
-        type PatchBlob = Set<members::patch_blob>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Target = S::Target;
+        type PatchBlob = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type PatchBlob = S::PatchBlob;
         type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
         type Target = S::Target;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
         type PatchBlob = S::PatchBlob;
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
-        type Target = S::Target;
+        type Title = S::Title;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type PatchBlob = S::PatchBlob;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
         type Target = Set<members::target>;
+        type PatchBlob = S::PatchBlob;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `patch_blob` field to Set
+    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
+    impl<S: State> State for SetPatchBlob<S> {
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+        type PatchBlob = Set<members::patch_blob>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+        type PatchBlob = S::PatchBlob;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `patch_blob` field
-        pub struct patch_blob(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `patch_blob` field
+        pub struct patch_blob(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -333,10 +333,10 @@ where
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
-    S::PatchBlob: pull_state::IsSet,
     S::CreatedAt: pull_state::IsSet,
-    S::Title: pull_state::IsSet,
     S::Target: pull_state::IsSet,
+    S::PatchBlob: pull_state::IsSet,
+    S::Title: pull_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pull<'a> {
@@ -357,7 +357,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Pull<'a> {
@@ -465,7 +465,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -473,10 +473,10 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("target"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("patchBlob"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("target"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("patchBlob"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -484,7 +484,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("body"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "body",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -499,7 +501,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -518,7 +520,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mentions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -542,7 +544,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("patch"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "patch",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -561,7 +565,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "patchBlob",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -571,7 +575,7 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "references",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -595,21 +599,27 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "source",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#source"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("target"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "target",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#target"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -629,13 +639,13 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("source"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("branch"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("sha")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("branch"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sha")
                         ],
                     ),
                     nullable: None,
@@ -643,7 +653,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("branch"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "branch",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -658,7 +670,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "repo",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -675,7 +689,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sha"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sha",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -694,13 +710,13 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("target"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("target"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("branch")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("branch")
                         ],
                     ),
                     nullable: None,
@@ -708,7 +724,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("branch"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "branch",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -723,7 +741,9 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "repo",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -959,7 +979,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Target<'a> {

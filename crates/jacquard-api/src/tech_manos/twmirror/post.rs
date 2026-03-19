@@ -42,67 +42,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BskyPost;
         type TwUserId;
-        type TweetId;
+        type BskyPost;
         type CreatedAt;
+        type TweetId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BskyPost = Unset;
         type TwUserId = Unset;
-        type TweetId = Unset;
+        type BskyPost = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `bsky_post` field to Set
-    pub struct SetBskyPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBskyPost<S> {}
-    impl<S: State> State for SetBskyPost<S> {
-        type BskyPost = Set<members::bsky_post>;
-        type TwUserId = S::TwUserId;
-        type TweetId = S::TweetId;
-        type CreatedAt = S::CreatedAt;
+        type TweetId = Unset;
     }
     ///State transition - sets the `tw_user_id` field to Set
     pub struct SetTwUserId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTwUserId<S> {}
     impl<S: State> State for SetTwUserId<S> {
-        type BskyPost = S::BskyPost;
         type TwUserId = Set<members::tw_user_id>;
-        type TweetId = S::TweetId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tweet_id` field to Set
-    pub struct SetTweetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTweetId<S> {}
-    impl<S: State> State for SetTweetId<S> {
         type BskyPost = S::BskyPost;
-        type TwUserId = S::TwUserId;
-        type TweetId = Set<members::tweet_id>;
         type CreatedAt = S::CreatedAt;
+        type TweetId = S::TweetId;
+    }
+    ///State transition - sets the `bsky_post` field to Set
+    pub struct SetBskyPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBskyPost<S> {}
+    impl<S: State> State for SetBskyPost<S> {
+        type TwUserId = S::TwUserId;
+        type BskyPost = Set<members::bsky_post>;
+        type CreatedAt = S::CreatedAt;
+        type TweetId = S::TweetId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BskyPost = S::BskyPost;
         type TwUserId = S::TwUserId;
-        type TweetId = S::TweetId;
+        type BskyPost = S::BskyPost;
         type CreatedAt = Set<members::created_at>;
+        type TweetId = S::TweetId;
+    }
+    ///State transition - sets the `tweet_id` field to Set
+    pub struct SetTweetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTweetId<S> {}
+    impl<S: State> State for SetTweetId<S> {
+        type TwUserId = S::TwUserId;
+        type BskyPost = S::BskyPost;
+        type CreatedAt = S::CreatedAt;
+        type TweetId = Set<members::tweet_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bsky_post` field
-        pub struct bsky_post(());
         ///Marker type for the `tw_user_id` field
         pub struct tw_user_id(());
-        ///Marker type for the `tweet_id` field
-        pub struct tweet_id(());
+        ///Marker type for the `bsky_post` field
+        pub struct bsky_post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `tweet_id` field
+        pub struct tweet_id(());
     }
 }
 
@@ -215,10 +215,10 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::BskyPost: post_state::IsSet,
     S::TwUserId: post_state::IsSet,
-    S::TweetId: post_state::IsSet,
+    S::BskyPost: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::TweetId: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -234,7 +234,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Post<'a> {
@@ -337,7 +337,7 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("TwitterId"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("TwitterId"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,
@@ -352,7 +352,7 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -364,10 +364,10 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("tweetId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("twUserId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("bskyPost"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("tweetId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("twUserId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bskyPost"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -375,7 +375,7 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "bskyPost",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -386,7 +386,7 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -409,7 +409,7 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "twUserId",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -418,7 +418,9 @@ fn lexicon_doc_tech_manos_twmirror_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tweetId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tweetId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#TwitterId"),

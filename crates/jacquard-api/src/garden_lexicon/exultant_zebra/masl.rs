@@ -141,7 +141,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Masl<'a> {
@@ -164,14 +164,14 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A bundle of resources."),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("resources")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resources")
                         ],
                     ),
                     nullable: None,
@@ -179,7 +179,9 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -198,7 +200,7 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "resources",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -222,7 +224,7 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("resource"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -230,14 +232,16 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("src")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("src")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contentType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -254,7 +258,9 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "path",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -273,7 +279,9 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("src"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "src",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -464,7 +472,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Resource<'a> {

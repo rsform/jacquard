@@ -116,7 +116,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Tabs<'a> {
@@ -208,50 +208,50 @@ pub mod tab_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Key;
-        type Content;
         type Label;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Key = Unset;
-        type Content = Unset;
         type Label = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
         type Key = Set<members::key>;
+        type Label = S::Label;
         type Content = S::Content;
-        type Label = S::Label;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Key = S::Key;
-        type Content = Set<members::content>;
-        type Label = S::Label;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
         type Key = S::Key;
-        type Content = S::Content;
         type Label = Set<members::label>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Key = S::Key;
+        type Label = S::Label;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -345,8 +345,8 @@ impl<'a, S> TabBuilder<'a, S>
 where
     S: tab_state::State,
     S::Key: tab_state::IsSet,
-    S::Content: tab_state::IsSet,
     S::Label: tab_state::IsSet,
+    S::Content: tab_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tab<'a> {
@@ -361,7 +361,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Tab<'a> {
@@ -383,7 +383,7 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -397,7 +397,7 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("items")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
                                     ],
                                 ),
                                 nullable: None,
@@ -405,7 +405,9 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("items"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "items",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static("Tabs to display."),
@@ -428,14 +430,14 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("tab"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("tab"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("label"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("content")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("label"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("content")
                         ],
                     ),
                     nullable: None,
@@ -443,7 +445,9 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "content",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -452,7 +456,9 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -471,7 +477,9 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("label"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "label",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

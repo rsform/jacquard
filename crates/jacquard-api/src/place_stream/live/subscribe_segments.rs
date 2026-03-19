@@ -136,7 +136,9 @@ impl<'a> SubscribeSegmentsMessage<'a> {
         )?;
         match header.t.as_str() {
             "#segment" => {
-                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Segment(Box::new(variant)))
             }
             unknown => {
@@ -172,4 +174,4 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeSegmentsEndpoint {
     type Stream = SubscribeSegmentsStream;
 }
 
-pub type Segment = bytes::Bytes;
+pub type Segment = jacquard_common::deps::bytes::Bytes;

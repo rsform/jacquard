@@ -53,85 +53,85 @@ pub mod captain_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AllowAllCrew;
-        type Owner;
         type Public;
         type EnableBlueskyPosts;
         type DeployedAt;
+        type Owner;
+        type AllowAllCrew;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AllowAllCrew = Unset;
-        type Owner = Unset;
         type Public = Unset;
         type EnableBlueskyPosts = Unset;
         type DeployedAt = Unset;
-    }
-    ///State transition - sets the `allow_all_crew` field to Set
-    pub struct SetAllowAllCrew<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowAllCrew<S> {}
-    impl<S: State> State for SetAllowAllCrew<S> {
-        type AllowAllCrew = Set<members::allow_all_crew>;
-        type Owner = S::Owner;
-        type Public = S::Public;
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
-    }
-    ///State transition - sets the `owner` field to Set
-    pub struct SetOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwner<S> {}
-    impl<S: State> State for SetOwner<S> {
-        type AllowAllCrew = S::AllowAllCrew;
-        type Owner = Set<members::owner>;
-        type Public = S::Public;
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
+        type Owner = Unset;
+        type AllowAllCrew = Unset;
     }
     ///State transition - sets the `public` field to Set
     pub struct SetPublic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublic<S> {}
     impl<S: State> State for SetPublic<S> {
-        type AllowAllCrew = S::AllowAllCrew;
-        type Owner = S::Owner;
         type Public = Set<members::public>;
         type EnableBlueskyPosts = S::EnableBlueskyPosts;
         type DeployedAt = S::DeployedAt;
+        type Owner = S::Owner;
+        type AllowAllCrew = S::AllowAllCrew;
     }
     ///State transition - sets the `enable_bluesky_posts` field to Set
     pub struct SetEnableBlueskyPosts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnableBlueskyPosts<S> {}
     impl<S: State> State for SetEnableBlueskyPosts<S> {
-        type AllowAllCrew = S::AllowAllCrew;
-        type Owner = S::Owner;
         type Public = S::Public;
         type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
         type DeployedAt = S::DeployedAt;
+        type Owner = S::Owner;
+        type AllowAllCrew = S::AllowAllCrew;
     }
     ///State transition - sets the `deployed_at` field to Set
     pub struct SetDeployedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDeployedAt<S> {}
     impl<S: State> State for SetDeployedAt<S> {
-        type AllowAllCrew = S::AllowAllCrew;
-        type Owner = S::Owner;
         type Public = S::Public;
         type EnableBlueskyPosts = S::EnableBlueskyPosts;
         type DeployedAt = Set<members::deployed_at>;
+        type Owner = S::Owner;
+        type AllowAllCrew = S::AllowAllCrew;
+    }
+    ///State transition - sets the `owner` field to Set
+    pub struct SetOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwner<S> {}
+    impl<S: State> State for SetOwner<S> {
+        type Public = S::Public;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type DeployedAt = S::DeployedAt;
+        type Owner = Set<members::owner>;
+        type AllowAllCrew = S::AllowAllCrew;
+    }
+    ///State transition - sets the `allow_all_crew` field to Set
+    pub struct SetAllowAllCrew<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAllowAllCrew<S> {}
+    impl<S: State> State for SetAllowAllCrew<S> {
+        type Public = S::Public;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type DeployedAt = S::DeployedAt;
+        type Owner = S::Owner;
+        type AllowAllCrew = Set<members::allow_all_crew>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `allow_all_crew` field
-        pub struct allow_all_crew(());
-        ///Marker type for the `owner` field
-        pub struct owner(());
         ///Marker type for the `public` field
         pub struct public(());
         ///Marker type for the `enable_bluesky_posts` field
         pub struct enable_bluesky_posts(());
         ///Marker type for the `deployed_at` field
         pub struct deployed_at(());
+        ///Marker type for the `owner` field
+        pub struct owner(());
+        ///Marker type for the `allow_all_crew` field
+        pub struct allow_all_crew(());
     }
 }
 
@@ -321,11 +321,11 @@ impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
 impl<'a, S> CaptainBuilder<'a, S>
 where
     S: captain_state::State,
-    S::AllowAllCrew: captain_state::IsSet,
-    S::Owner: captain_state::IsSet,
     S::Public: captain_state::IsSet,
     S::EnableBlueskyPosts: captain_state::IsSet,
     S::DeployedAt: captain_state::IsSet,
+    S::Owner: captain_state::IsSet,
+    S::AllowAllCrew: captain_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Captain<'a> {
@@ -345,7 +345,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Captain<'a> {
@@ -464,7 +464,7 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -476,11 +476,11 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("owner"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("public"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("allowAllCrew"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("enableBlueskyPosts"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("deployedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("owner"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("public"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("allowAllCrew"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("enableBlueskyPosts"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("deployedAt")
                             ],
                         ),
                         nullable: None,
@@ -488,7 +488,7 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "allowAllCrew",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -498,7 +498,7 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "deployedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -521,7 +521,7 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "enableBlueskyPosts",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -531,7 +531,9 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("owner"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "owner",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -552,7 +554,9 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("public"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "public",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -560,7 +564,9 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("region"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "region",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -579,7 +585,7 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "successor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -602,7 +608,7 @@ fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "supporterBadgeTiers",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {

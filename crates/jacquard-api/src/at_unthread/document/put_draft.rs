@@ -36,66 +36,66 @@ pub mod draft_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Tid;
-        type Content;
         type CreatedAt;
         type UpdatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Tid = Unset;
-        type Content = Unset;
         type CreatedAt = Unset;
         type UpdatedAt = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `tid` field to Set
     pub struct SetTid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTid<S> {}
     impl<S: State> State for SetTid<S> {
         type Tid = Set<members::tid>;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Tid = S::Tid;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Tid = S::Tid;
-        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
         type UpdatedAt = S::UpdatedAt;
+        type Content = S::Content;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type Tid = S::Tid;
-        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Tid = S::Tid;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `tid` field
         pub struct tid(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -209,9 +209,9 @@ impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
     S::Tid: draft_view_state::IsSet,
-    S::Content: draft_view_state::IsSet,
     S::CreatedAt: draft_view_state::IsSet,
     S::UpdatedAt: draft_view_state::IsSet,
+    S::Content: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
@@ -227,7 +227,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> DraftView<'a> {
@@ -252,15 +252,15 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("draftView"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("draftView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("tid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("content"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                         ],
                     ),
                     nullable: None,
@@ -268,7 +268,9 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "content",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -283,7 +285,7 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -302,7 +304,9 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("tid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "tid",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -317,7 +321,7 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "updatedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -340,7 +344,7 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -354,7 +358,7 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("content")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("content")
                                     ],
                                 ),
                                 nullable: None,
@@ -362,7 +366,9 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "content",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -381,7 +387,9 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("tid"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "tid",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(

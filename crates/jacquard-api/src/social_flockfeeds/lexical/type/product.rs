@@ -1242,7 +1242,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("embedded"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("embedded"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1255,7 +1255,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "additionalProperty",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1268,7 +1268,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "additionalType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1281,7 +1281,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "aggregateRating",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1294,7 +1294,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alternateName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1307,7 +1307,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("asin"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "asin",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1318,7 +1320,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("audience"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "audience",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1329,7 +1333,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("award"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "award",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1340,7 +1346,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("awards"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "awards",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1351,7 +1359,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("brand"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "brand",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1363,7 +1373,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("category"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "category",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1377,7 +1389,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("color"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "color",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1388,7 +1402,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "colorSwatch",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1402,7 +1416,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "countryOfAssembly",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1415,7 +1429,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "countryOfLastProcessing",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1428,7 +1442,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "countryOfOrigin",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1441,7 +1455,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("depth"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "depth",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1454,7 +1470,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1468,7 +1484,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disambiguatingDescription",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1481,7 +1497,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("funding"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "funding",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1492,7 +1510,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gtin"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gtin",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1503,7 +1523,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gtin12"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gtin12",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1514,7 +1536,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gtin13"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gtin13",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1525,7 +1549,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gtin14"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gtin14",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1536,7 +1562,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gtin8"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gtin8",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1547,7 +1575,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasAdultConsideration",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1561,7 +1589,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasCertification",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1574,7 +1602,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasEnergyConsumptionDetails",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1587,7 +1615,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasGS1DigitalLink",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1600,7 +1628,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasMeasurement",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1613,7 +1641,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasMerchantReturnPolicy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1626,7 +1654,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasProductReturnPolicy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1639,7 +1667,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "height",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1652,7 +1682,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identifier",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1666,7 +1696,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "image",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1678,7 +1710,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "inProductGroupWithID",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1691,7 +1723,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isAccessoryOrSparePartFor",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1704,7 +1736,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isConsumableFor",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1717,7 +1749,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isFamilyFriendly",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1730,7 +1762,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isRelatedTo",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1744,7 +1776,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isSimilarTo",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1758,7 +1790,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isVariantOf",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1772,7 +1804,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "itemCondition",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1786,7 +1818,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("keywords"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "keywords",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1798,7 +1832,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("logo"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "logo",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1810,7 +1846,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mainEntityOfPage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1824,7 +1860,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "manufacturer",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1837,7 +1873,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("material"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "material",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1849,7 +1887,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mobileUrl",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1862,7 +1900,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("model"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "model",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1874,7 +1914,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mpn"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mpn",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1885,7 +1927,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1896,7 +1940,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "negativeNotes",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1912,7 +1956,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("nsn"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "nsn",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1923,7 +1969,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("offers"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "offers",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1935,7 +1983,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "pattern",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -1947,7 +1997,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "positiveNotes",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1963,7 +2013,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "potentialAction",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1976,7 +2026,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "productID",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1989,7 +2039,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "productionDate",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2002,7 +2052,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "purchaseDate",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2015,7 +2065,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "releaseDate",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2028,7 +2078,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("review"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "review",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2039,7 +2091,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("reviews"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reviews",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2050,7 +2104,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sameAs",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2061,7 +2117,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "size",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2075,7 +2133,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sku"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sku",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2086,7 +2146,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("slogan"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "slogan",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2097,7 +2159,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subjectOf",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2111,7 +2173,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2122,7 +2186,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("weight"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "weight",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2135,7 +2201,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "width",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2152,7 +2220,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -2168,7 +2236,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "additionalProperty",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2181,7 +2249,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "additionalType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2194,7 +2262,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "aggregateRating",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2207,7 +2275,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "alternateName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2220,7 +2288,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("asin"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "asin",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2231,7 +2301,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "audience",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2244,7 +2314,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("award"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "award",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2255,7 +2327,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("awards"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "awards",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2266,7 +2340,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("brand"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "brand",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2278,7 +2354,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "category",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2294,7 +2370,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("color"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "color",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2305,7 +2383,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "colorSwatch",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2319,7 +2397,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "countryOfAssembly",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2332,7 +2410,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "countryOfLastProcessing",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2345,7 +2423,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "countryOfOrigin",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2358,7 +2436,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("depth"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "depth",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2371,7 +2451,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2385,7 +2465,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "disambiguatingDescription",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2398,7 +2478,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("funding"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "funding",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2409,7 +2491,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("gtin"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "gtin",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2420,7 +2504,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("gtin12"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "gtin12",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2431,7 +2517,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("gtin13"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "gtin13",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2442,7 +2530,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("gtin14"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "gtin14",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2453,7 +2543,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("gtin8"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "gtin8",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2464,7 +2556,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasAdultConsideration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2478,7 +2570,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasCertification",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2491,7 +2583,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasEnergyConsumptionDetails",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2504,7 +2596,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasGS1DigitalLink",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2517,7 +2609,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasMeasurement",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2530,7 +2622,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasMerchantReturnPolicy",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2543,7 +2635,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasProductReturnPolicy",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2556,7 +2648,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("height"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "height",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2569,7 +2663,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identifier",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2583,7 +2677,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2595,7 +2691,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "inProductGroupWithID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2608,7 +2704,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isAccessoryOrSparePartFor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2621,7 +2717,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isConsumableFor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2634,7 +2730,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isFamilyFriendly",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2647,7 +2743,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isRelatedTo",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2661,7 +2757,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isSimilarTo",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2675,7 +2771,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isVariantOf",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2689,7 +2785,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "itemCondition",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2703,7 +2799,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "keywords",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2717,7 +2813,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("logo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "logo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2729,7 +2827,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mainEntityOfPage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2743,7 +2841,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "manufacturer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2756,7 +2854,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "material",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2770,7 +2868,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mobileUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2783,7 +2881,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("model"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "model",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2795,7 +2895,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("mpn"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "mpn",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2806,7 +2908,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2817,7 +2921,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "negativeNotes",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2833,7 +2937,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("nsn"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "nsn",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2844,7 +2950,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("offers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "offers",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2856,7 +2964,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "pattern",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2868,7 +2978,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "positiveNotes",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2884,7 +2994,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "potentialAction",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2897,7 +3007,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "productID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2910,7 +3020,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "productionDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2923,7 +3033,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "purchaseDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2936,7 +3046,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "releaseDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2949,7 +3059,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("review"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "review",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2960,7 +3072,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("reviews"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "reviews",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2971,7 +3085,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sameAs",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2982,7 +3098,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "size",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -2996,7 +3114,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sku"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sku",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -3007,7 +3127,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("slogan"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "slogan",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -3018,7 +3140,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subjectOf",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3032,7 +3154,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "url",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -3043,7 +3167,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("weight"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "weight",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -3056,7 +3182,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "width",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4710,7 +4838,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Product<'a> {

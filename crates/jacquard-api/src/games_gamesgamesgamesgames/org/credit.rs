@@ -43,51 +43,51 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Game;
         type Org;
         type Roles;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Game = Unset;
         type Org = Unset;
         type Roles = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Game = Set<members::game>;
-        type Org = S::Org;
-        type Roles = S::Roles;
+        type Game = Unset;
     }
     ///State transition - sets the `org` field to Set
     pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOrg<S> {}
     impl<S: State> State for SetOrg<S> {
-        type Game = S::Game;
         type Org = Set<members::org>;
         type Roles = S::Roles;
+        type Game = S::Game;
     }
     ///State transition - sets the `roles` field to Set
     pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoles<S> {}
     impl<S: State> State for SetRoles<S> {
-        type Game = S::Game;
         type Org = S::Org;
         type Roles = Set<members::roles>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Org = S::Org;
+        type Roles = S::Roles;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `org` field
         pub struct org(());
         ///Marker type for the `roles` field
         pub struct roles(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
@@ -220,9 +220,9 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Game: credit_state::IsSet,
     S::Org: credit_state::IsSet,
     S::Roles: credit_state::IsSet,
+    S::Game: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -239,7 +239,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Credit<'a> {
@@ -357,7 +357,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -369,9 +369,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("org"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("game"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("roles")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("org"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("game"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("roles")
                             ],
                         ),
                         nullable: None,
@@ -379,7 +379,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -398,7 +398,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "displayName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -419,7 +419,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("game"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "game",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -428,7 +430,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("org"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "org",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -437,7 +441,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("roles"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "roles",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {

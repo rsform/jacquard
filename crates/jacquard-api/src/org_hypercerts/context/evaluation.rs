@@ -66,51 +66,51 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Summary;
         type Evaluators;
+        type Summary;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Summary = Unset;
         type Evaluators = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Summary = S::Summary;
-        type Evaluators = S::Evaluators;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type CreatedAt = S::CreatedAt;
-        type Summary = Set<members::summary>;
-        type Evaluators = S::Evaluators;
+        type Summary = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluators` field to Set
     pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluators<S> {}
     impl<S: State> State for SetEvaluators<S> {
-        type CreatedAt = S::CreatedAt;
-        type Summary = S::Summary;
         type Evaluators = Set<members::evaluators>;
+        type Summary = S::Summary;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type Evaluators = S::Evaluators;
+        type Summary = Set<members::summary>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Evaluators = S::Evaluators;
+        type Summary = S::Summary;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `evaluators` field
         pub struct evaluators(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -305,9 +305,9 @@ where
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::CreatedAt: evaluation_state::IsSet,
-    S::Summary: evaluation_state::IsSet,
     S::Evaluators: evaluation_state::IsSet,
+    S::Summary: evaluation_state::IsSet,
+    S::CreatedAt: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
@@ -327,7 +327,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Evaluation<'a> {
@@ -491,7 +491,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
         {
             let value = &self.summary;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -522,7 +522,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -534,9 +534,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("evaluators"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("summary"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("evaluators"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("summary"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -544,7 +544,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "content",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -564,7 +566,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -587,7 +589,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "evaluators",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -607,7 +609,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "location",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -618,7 +620,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurements",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -638,14 +640,18 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("score"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "score",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#score"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "subject",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -654,7 +660,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("summary"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "summary",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -678,7 +686,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("score"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("score"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -687,9 +695,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("min"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("max"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("min"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("max"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
                         ],
                     ),
                     nullable: None,
@@ -697,7 +705,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("max"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "max",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -708,7 +718,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("min"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "min",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -719,7 +731,9 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -769,49 +783,49 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Min;
         type Max;
+        type Min;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Min = Unset;
         type Max = Unset;
+        type Min = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `min` field to Set
-    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMin<S> {}
-    impl<S: State> State for SetMin<S> {
-        type Min = Set<members::min>;
-        type Max = S::Max;
-        type Value = S::Value;
     }
     ///State transition - sets the `max` field to Set
     pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMax<S> {}
     impl<S: State> State for SetMax<S> {
-        type Min = S::Min;
         type Max = Set<members::max>;
+        type Min = S::Min;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `min` field to Set
+    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMin<S> {}
+    impl<S: State> State for SetMin<S> {
+        type Max = S::Max;
+        type Min = Set<members::min>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Min = S::Min;
         type Max = S::Max;
+        type Min = S::Min;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `min` field
-        pub struct min(());
         ///Marker type for the `max` field
         pub struct max(());
+        ///Marker type for the `min` field
+        pub struct min(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -906,8 +920,8 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::Min: score_state::IsSet,
     S::Max: score_state::IsSet,
+    S::Min: score_state::IsSet,
     S::Value: score_state::IsSet,
 {
     /// Build the final struct
@@ -923,7 +937,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Score<'a> {

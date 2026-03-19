@@ -51,66 +51,66 @@ pub mod lexicon_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
+        type Nsid;
         type Slice;
         type Definitions;
-        type Nsid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
+        type Nsid = Unset;
         type Slice = Unset;
         type Definitions = Unset;
-        type Nsid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Nsid = S::Nsid;
         type Slice = S::Slice;
         type Definitions = S::Definitions;
-        type Nsid = S::Nsid;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
-        type CreatedAt = S::CreatedAt;
-        type Slice = Set<members::slice>;
-        type Definitions = S::Definitions;
-        type Nsid = S::Nsid;
-    }
-    ///State transition - sets the `definitions` field to Set
-    pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefinitions<S> {}
-    impl<S: State> State for SetDefinitions<S> {
-        type CreatedAt = S::CreatedAt;
-        type Slice = S::Slice;
-        type Definitions = Set<members::definitions>;
-        type Nsid = S::Nsid;
     }
     ///State transition - sets the `nsid` field to Set
     pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNsid<S> {}
     impl<S: State> State for SetNsid<S> {
         type CreatedAt = S::CreatedAt;
+        type Nsid = Set<members::nsid>;
         type Slice = S::Slice;
         type Definitions = S::Definitions;
-        type Nsid = Set<members::nsid>;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type CreatedAt = S::CreatedAt;
+        type Nsid = S::Nsid;
+        type Slice = Set<members::slice>;
+        type Definitions = S::Definitions;
+    }
+    ///State transition - sets the `definitions` field to Set
+    pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefinitions<S> {}
+    impl<S: State> State for SetDefinitions<S> {
+        type CreatedAt = S::CreatedAt;
+        type Nsid = S::Nsid;
+        type Slice = S::Slice;
+        type Definitions = Set<members::definitions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `nsid` field
+        pub struct nsid(());
         ///Marker type for the `slice` field
         pub struct slice(());
         ///Marker type for the `definitions` field
         pub struct definitions(());
-        ///Marker type for the `nsid` field
-        pub struct nsid(());
     }
 }
 
@@ -278,9 +278,9 @@ impl<'a, S> LexiconBuilder<'a, S>
 where
     S: lexicon_state::State,
     S::CreatedAt: lexicon_state::IsSet,
+    S::Nsid: lexicon_state::IsSet,
     S::Slice: lexicon_state::IsSet,
     S::Definitions: lexicon_state::IsSet,
-    S::Nsid: lexicon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lexicon<'a> {
@@ -299,7 +299,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Lexicon<'a> {
@@ -430,7 +430,7 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -438,10 +438,10 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("nsid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("definitions"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("nsid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("definitions"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("slice")
                             ],
                         ),
                         nullable: None,
@@ -449,7 +449,7 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -472,7 +472,7 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "definitions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -493,7 +493,7 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -514,7 +514,7 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "excludedFromSync",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -524,7 +524,9 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("nsid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "nsid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -543,7 +545,9 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "slice",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -564,7 +568,7 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

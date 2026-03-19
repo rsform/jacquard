@@ -36,65 +36,65 @@ pub mod tangled_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Contents;
         type Filename;
+        type Contents;
+        type CreatedAt;
         type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Contents = Unset;
         type Filename = Unset;
+        type Contents = Unset;
+        type CreatedAt = Unset;
         type Description = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
+    ///State transition - sets the `filename` field to Set
+    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFilename<S> {}
+    impl<S: State> State for SetFilename<S> {
+        type Filename = Set<members::filename>;
         type Contents = S::Contents;
-        type Filename = S::Filename;
+        type CreatedAt = S::CreatedAt;
         type Description = S::Description;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContents<S> {}
     impl<S: State> State for SetContents<S> {
-        type CreatedAt = S::CreatedAt;
-        type Contents = Set<members::contents>;
         type Filename = S::Filename;
+        type Contents = Set<members::contents>;
+        type CreatedAt = S::CreatedAt;
         type Description = S::Description;
     }
-    ///State transition - sets the `filename` field to Set
-    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFilename<S> {}
-    impl<S: State> State for SetFilename<S> {
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Filename = S::Filename;
         type Contents = S::Contents;
-        type Filename = Set<members::filename>;
+        type CreatedAt = Set<members::created_at>;
         type Description = S::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type Contents = S::Contents;
         type Filename = S::Filename;
+        type Contents = S::Contents;
+        type CreatedAt = S::CreatedAt;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `contents` field
-        pub struct contents(());
         ///Marker type for the `filename` field
         pub struct filename(());
+        ///Marker type for the `contents` field
+        pub struct contents(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
     }
@@ -209,9 +209,9 @@ where
 impl<'a, S> TangledStringBuilder<'a, S>
 where
     S: tangled_string_state::State,
-    S::CreatedAt: tangled_string_state::IsSet,
-    S::Contents: tangled_string_state::IsSet,
     S::Filename: tangled_string_state::IsSet,
+    S::Contents: tangled_string_state::IsSet,
+    S::CreatedAt: tangled_string_state::IsSet,
     S::Description: tangled_string_state::IsSet,
 {
     /// Build the final struct
@@ -228,7 +228,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TangledString<'a> {
@@ -319,7 +319,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
         {
             let value = &self.contents;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -338,7 +338,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
         {
             let value = &self.description;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -357,7 +357,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
         {
             let value = &self.filename;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -376,7 +376,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
         {
             let value = &self.filename;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -405,7 +405,7 @@ fn lexicon_doc_sh_tangled_string() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -413,10 +413,10 @@ fn lexicon_doc_sh_tangled_string() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("filename"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("contents")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("filename"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("contents")
                             ],
                         ),
                         nullable: None,
@@ -424,7 +424,7 @@ fn lexicon_doc_sh_tangled_string() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contents",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -441,7 +441,7 @@ fn lexicon_doc_sh_tangled_string() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -460,7 +460,7 @@ fn lexicon_doc_sh_tangled_string() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -477,7 +477,7 @@ fn lexicon_doc_sh_tangled_string() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "filename",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

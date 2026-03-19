@@ -48,57 +48,85 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalScore;
         type AverageScore;
-        type TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight;
-        type HighestScore;
         type GamesPlayed;
+        type HighestScore;
+        type TotalScore;
+        type TimesTwentyFortyEightBeenFound;
+        type CreatedAt;
+        type LeastMovesToFindTwentyFortyEight;
         type SyncStatus;
         type HighestNumberBlock;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalScore = Unset;
         type AverageScore = Unset;
-        type TimesTwentyFortyEightBeenFound = Unset;
-        type LeastMovesToFindTwentyFortyEight = Unset;
-        type HighestScore = Unset;
         type GamesPlayed = Unset;
+        type HighestScore = Unset;
+        type TotalScore = Unset;
+        type TimesTwentyFortyEightBeenFound = Unset;
+        type CreatedAt = Unset;
+        type LeastMovesToFindTwentyFortyEight = Unset;
         type SyncStatus = Unset;
         type HighestNumberBlock = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `total_score` field to Set
-    pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalScore<S> {}
-    impl<S: State> State for SetTotalScore<S> {
-        type TotalScore = Set<members::total_score>;
-        type AverageScore = S::AverageScore;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
-        type GamesPlayed = S::GamesPlayed;
-        type SyncStatus = S::SyncStatus;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `average_score` field to Set
     pub struct SetAverageScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAverageScore<S> {}
     impl<S: State> State for SetAverageScore<S> {
-        type TotalScore = S::TotalScore;
         type AverageScore = Set<members::average_score>;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
         type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = S::CreatedAt;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
         type SyncStatus = S::SyncStatus;
         type HighestNumberBlock = S::HighestNumberBlock;
+    }
+    ///State transition - sets the `games_played` field to Set
+    pub struct SetGamesPlayed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGamesPlayed<S> {}
+    impl<S: State> State for SetGamesPlayed<S> {
+        type AverageScore = S::AverageScore;
+        type GamesPlayed = Set<members::games_played>;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
         type CreatedAt = S::CreatedAt;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type SyncStatus = S::SyncStatus;
+        type HighestNumberBlock = S::HighestNumberBlock;
+    }
+    ///State transition - sets the `highest_score` field to Set
+    pub struct SetHighestScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHighestScore<S> {}
+    impl<S: State> State for SetHighestScore<S> {
+        type AverageScore = S::AverageScore;
+        type GamesPlayed = S::GamesPlayed;
+        type HighestScore = Set<members::highest_score>;
+        type TotalScore = S::TotalScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = S::CreatedAt;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type SyncStatus = S::SyncStatus;
+        type HighestNumberBlock = S::HighestNumberBlock;
+    }
+    ///State transition - sets the `total_score` field to Set
+    pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalScore<S> {}
+    impl<S: State> State for SetTotalScore<S> {
+        type AverageScore = S::AverageScore;
+        type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = Set<members::total_score>;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = S::CreatedAt;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type SyncStatus = S::SyncStatus;
+        type HighestNumberBlock = S::HighestNumberBlock;
     }
     ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
     pub struct SetTimesTwentyFortyEightBeenFound<S: State = Empty>(
@@ -106,17 +134,31 @@ pub mod stats_state {
     );
     impl<S: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<S> {}
     impl<S: State> State for SetTimesTwentyFortyEightBeenFound<S> {
-        type TotalScore = S::TotalScore;
         type AverageScore = S::AverageScore;
+        type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
         type TimesTwentyFortyEightBeenFound = Set<
             members::times_twenty_forty_eight_been_found,
         >;
+        type CreatedAt = S::CreatedAt;
         type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
-        type GamesPlayed = S::GamesPlayed;
         type SyncStatus = S::SyncStatus;
         type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AverageScore = S::AverageScore;
+        type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = Set<members::created_at>;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type SyncStatus = S::SyncStatus;
+        type HighestNumberBlock = S::HighestNumberBlock;
     }
     ///State transition - sets the `least_moves_to_find_twenty_forty_eight` field to Set
     pub struct SetLeastMovesToFindTwentyFortyEight<S: State = Empty>(
@@ -124,109 +166,67 @@ pub mod stats_state {
     );
     impl<S: State> sealed::Sealed for SetLeastMovesToFindTwentyFortyEight<S> {}
     impl<S: State> State for SetLeastMovesToFindTwentyFortyEight<S> {
-        type TotalScore = S::TotalScore;
         type AverageScore = S::AverageScore;
+        type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
         type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = S::CreatedAt;
         type LeastMovesToFindTwentyFortyEight = Set<
             members::least_moves_to_find_twenty_forty_eight,
         >;
-        type HighestScore = S::HighestScore;
-        type GamesPlayed = S::GamesPlayed;
         type SyncStatus = S::SyncStatus;
         type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `highest_score` field to Set
-    pub struct SetHighestScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHighestScore<S> {}
-    impl<S: State> State for SetHighestScore<S> {
-        type TotalScore = S::TotalScore;
-        type AverageScore = S::AverageScore;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = Set<members::highest_score>;
-        type GamesPlayed = S::GamesPlayed;
-        type SyncStatus = S::SyncStatus;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `games_played` field to Set
-    pub struct SetGamesPlayed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGamesPlayed<S> {}
-    impl<S: State> State for SetGamesPlayed<S> {
-        type TotalScore = S::TotalScore;
-        type AverageScore = S::AverageScore;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
-        type GamesPlayed = Set<members::games_played>;
-        type SyncStatus = S::SyncStatus;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `sync_status` field to Set
     pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
     impl<S: State> State for SetSyncStatus<S> {
-        type TotalScore = S::TotalScore;
         type AverageScore = S::AverageScore;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
         type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = S::CreatedAt;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
         type SyncStatus = Set<members::sync_status>;
         type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `highest_number_block` field to Set
     pub struct SetHighestNumberBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHighestNumberBlock<S> {}
     impl<S: State> State for SetHighestNumberBlock<S> {
-        type TotalScore = S::TotalScore;
         type AverageScore = S::AverageScore;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
         type GamesPlayed = S::GamesPlayed;
+        type HighestScore = S::HighestScore;
+        type TotalScore = S::TotalScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type CreatedAt = S::CreatedAt;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
         type SyncStatus = S::SyncStatus;
         type HighestNumberBlock = Set<members::highest_number_block>;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TotalScore = S::TotalScore;
-        type AverageScore = S::AverageScore;
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type HighestScore = S::HighestScore;
-        type GamesPlayed = S::GamesPlayed;
-        type SyncStatus = S::SyncStatus;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_score` field
-        pub struct total_score(());
         ///Marker type for the `average_score` field
         pub struct average_score(());
-        ///Marker type for the `times_twenty_forty_eight_been_found` field
-        pub struct times_twenty_forty_eight_been_found(());
-        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
-        pub struct least_moves_to_find_twenty_forty_eight(());
-        ///Marker type for the `highest_score` field
-        pub struct highest_score(());
         ///Marker type for the `games_played` field
         pub struct games_played(());
+        ///Marker type for the `highest_score` field
+        pub struct highest_score(());
+        ///Marker type for the `total_score` field
+        pub struct total_score(());
+        ///Marker type for the `times_twenty_forty_eight_been_found` field
+        pub struct times_twenty_forty_eight_been_found(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
+        pub struct least_moves_to_find_twenty_forty_eight(());
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
         ///Marker type for the `highest_number_block` field
         pub struct highest_number_block(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -449,15 +449,15 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
-    S::TotalScore: stats_state::IsSet,
     S::AverageScore: stats_state::IsSet,
-    S::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
-    S::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
-    S::HighestScore: stats_state::IsSet,
     S::GamesPlayed: stats_state::IsSet,
+    S::HighestScore: stats_state::IsSet,
+    S::TotalScore: stats_state::IsSet,
+    S::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
+    S::CreatedAt: stats_state::IsSet,
+    S::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
     S::SyncStatus: stats_state::IsSet,
     S::HighestNumberBlock: stats_state::IsSet,
-    S::CreatedAt: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
@@ -481,7 +481,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Stats<'a> {
@@ -592,7 +592,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -604,15 +604,15 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("highestScore"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("gamesPlayed"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("totalScore"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("highestNumberBlock"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("timesTwentyFortyEightBeenFound"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("leastMovesToFindTwentyFortyEight"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("averageScore"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("highestScore"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("gamesPlayed"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalScore"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("highestNumberBlock"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("timesTwentyFortyEightBeenFound"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("leastMovesToFindTwentyFortyEight"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("averageScore"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("syncStatus"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -620,7 +620,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "averageScore",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -633,7 +633,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -652,7 +652,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "gamesPlayed",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -665,7 +665,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "highestNumberBlock",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -678,7 +678,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "highestScore",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -691,7 +691,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "leastMovesToFindTwentyFortyEight",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -704,7 +704,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "syncStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -715,7 +715,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "timesTwentyFortyEightBeenFound",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -728,7 +728,7 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "totalScore",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {

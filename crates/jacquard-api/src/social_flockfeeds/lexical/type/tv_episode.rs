@@ -2490,7 +2490,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("embedded"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("embedded"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2503,7 +2503,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("about"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "about",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2514,7 +2516,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("abstract"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "abstract",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2525,7 +2529,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessMode",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2538,7 +2542,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessModeSufficient",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2551,7 +2555,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessibilityAPI",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2564,7 +2568,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessibilityControl",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2577,7 +2581,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessibilityFeature",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2590,7 +2594,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessibilityHazard",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2603,7 +2607,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessibilitySummary",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2616,7 +2620,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accountablePerson",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2629,7 +2633,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "acquireLicensePage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2643,7 +2647,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2655,7 +2661,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("actors"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actors",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2666,7 +2674,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "additionalType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2679,7 +2687,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "aggregateRating",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2692,7 +2700,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alternateName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2705,7 +2713,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alternativeHeadline",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2718,7 +2726,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "archivedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2732,7 +2740,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("assesses"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "assesses",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2744,7 +2754,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "associatedMedia",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2757,7 +2767,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("audience"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "audience",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2768,7 +2780,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("audio"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "audio",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2781,7 +2795,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "author",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2793,7 +2809,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("award"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "award",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2804,7 +2822,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("awards"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "awards",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2815,7 +2835,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "character",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2828,7 +2848,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("citation"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "citation",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2840,7 +2862,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "comment",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -2851,7 +2875,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "commentCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2864,7 +2888,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "conditionsOfAccess",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2877,7 +2901,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contentLocation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2890,7 +2914,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contentRating",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2904,7 +2928,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contentReferenceTime",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2917,7 +2941,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contributor",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2931,7 +2955,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "copyrightHolder",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2945,7 +2969,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "copyrightNotice",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2958,7 +2982,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "copyrightYear",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2971,7 +2995,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "correction",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2985,7 +3009,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "countryOfOrigin",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -2998,7 +3022,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "creativeWorkStatus",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3012,7 +3036,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "creator",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3024,7 +3050,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "creditText",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3037,7 +3063,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "dateCreated",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3050,7 +3076,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "dateModified",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3063,7 +3089,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "datePublished",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3076,7 +3102,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3090,7 +3116,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "digitalSourceType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3104,7 +3130,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("director"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "director",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3115,7 +3143,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "directors",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3128,7 +3156,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disambiguatingDescription",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3141,7 +3169,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "discussionUrl",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3154,7 +3182,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("duration"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "duration",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3166,7 +3196,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("editEIDR"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "editEIDR",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3177,7 +3209,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("editor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "editor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3188,7 +3222,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "educationalAlignment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3201,7 +3235,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "educationalLevel",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3215,7 +3249,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "educationalUse",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3229,7 +3263,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("encoding"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "encoding",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3240,7 +3276,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "encodingFormat",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3253,7 +3289,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "encodings",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3266,7 +3302,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "episodeNumber",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3279,7 +3315,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "exampleOfWork",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3292,7 +3328,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("expires"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "expires",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3303,7 +3341,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "fileFormat",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3316,7 +3354,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("funder"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "funder",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3328,7 +3368,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("funding"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "funding",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3339,7 +3381,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("genre"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "genre",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3350,7 +3394,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("hasPart"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "hasPart",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3361,7 +3407,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("headline"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "headline",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3372,7 +3420,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identifier",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3386,7 +3434,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "image",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3398,7 +3448,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "inLanguage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3412,7 +3462,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "interactionStatistic",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3425,7 +3475,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "interactivityType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3438,7 +3488,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "interpretedAsClaim",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3451,7 +3501,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isAccessibleForFree",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3464,7 +3514,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isBasedOn",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3479,7 +3529,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isBasedOnUrl",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3494,7 +3544,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isFamilyFriendly",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3507,7 +3557,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("isPartOf"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "isPartOf",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3519,7 +3571,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("keywords"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "keywords",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3531,7 +3585,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "learningResourceType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3545,7 +3599,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("license"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "license",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3557,7 +3613,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "locationCreated",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3570,7 +3626,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mainEntity",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3583,7 +3639,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mainEntityOfPage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3597,7 +3653,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "maintainer",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3611,7 +3667,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("material"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "material",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3623,7 +3681,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "materialExtent",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3637,7 +3695,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mentions"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mentions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3648,7 +3708,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("musicBy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "musicBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3660,7 +3722,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3671,7 +3735,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("offers"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "offers",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3683,7 +3749,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "partOfSeason",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3696,7 +3762,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "partOfSeries",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3709,7 +3775,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "partOfTVSeries",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3722,7 +3788,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "pattern",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3734,7 +3802,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("position"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "position",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3745,7 +3815,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "potentialAction",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3758,7 +3828,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("producer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "producer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3770,7 +3842,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "productionCompany",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3783,7 +3855,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("provider"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "provider",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3795,7 +3869,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publication",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3808,7 +3882,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publisher",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3822,7 +3896,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publisherImprint",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3835,7 +3909,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publishingPrinciples",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3849,7 +3923,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "recordedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3862,7 +3936,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "releasedEvent",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3875,7 +3949,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("review"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "review",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3886,7 +3962,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("reviews"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reviews",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3897,7 +3975,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sameAs",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3908,7 +3988,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "schemaVersion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3921,7 +4001,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sdDatePublished",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3934,7 +4014,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sdLicense",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3948,7 +4028,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sdPublisher",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3962,7 +4042,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "size",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -3976,7 +4058,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sourceOrganization",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -3989,7 +4071,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("spatial"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "spatial",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4000,7 +4084,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "spatialCoverage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4013,7 +4097,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sponsor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sponsor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4025,7 +4111,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subjectOf",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4039,7 +4125,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subtitleLanguage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4053,7 +4139,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("teaches"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "teaches",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4065,7 +4153,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("temporal"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "temporal",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4076,7 +4166,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "temporalCoverage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4089,7 +4179,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "text",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4100,7 +4192,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "thumbnail",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4113,7 +4205,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "thumbnailUrl",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4126,7 +4218,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "timeRequired",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4139,7 +4231,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "titleEIDR",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4152,7 +4244,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("trailer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "trailer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4163,7 +4257,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "translationOfWork",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4176,7 +4270,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "translator",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4190,7 +4284,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "typicalAgeRange",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4203,7 +4297,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4214,7 +4310,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "usageInfo",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4228,7 +4324,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "version",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4239,7 +4337,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("video"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "video",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -4251,7 +4351,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "wordCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4264,7 +4364,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "workExample",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4277,7 +4377,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "workTranslation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4294,7 +4394,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -4310,7 +4410,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("about"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "about",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4321,7 +4423,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "abstract",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4334,7 +4436,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessMode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4347,7 +4449,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessModeSufficient",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4360,7 +4462,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessibilityAPI",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4373,7 +4475,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessibilityControl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4386,7 +4488,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessibilityFeature",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4399,7 +4501,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessibilityHazard",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4412,7 +4514,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accessibilitySummary",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4425,7 +4527,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "accountablePerson",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4438,7 +4540,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "acquireLicensePage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4452,7 +4554,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "actor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4464,7 +4568,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("actors"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "actors",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4475,7 +4581,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "additionalType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4488,7 +4594,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "aggregateRating",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4501,7 +4607,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "alternateName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4514,7 +4620,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "alternativeHeadline",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4527,7 +4633,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "archivedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4541,7 +4647,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "assesses",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4555,7 +4661,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "associatedMedia",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4568,7 +4674,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "audience",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4581,7 +4687,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("audio"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "audio",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4594,7 +4702,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "author",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4606,7 +4716,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("award"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "award",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4617,7 +4729,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("awards"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "awards",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4628,7 +4742,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "character",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4641,7 +4755,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "citation",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4655,7 +4769,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "comment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4666,7 +4782,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "commentCount",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4679,7 +4795,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "conditionsOfAccess",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4692,7 +4808,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contentLocation",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4705,7 +4821,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contentRating",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4719,7 +4835,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contentReferenceTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4732,7 +4848,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contributor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4746,7 +4862,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "copyrightHolder",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4760,7 +4876,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "copyrightNotice",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4773,7 +4889,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "copyrightYear",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4786,7 +4902,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "correction",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4800,7 +4916,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "countryOfOrigin",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4813,7 +4929,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "creativeWorkStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4827,7 +4943,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("creator"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "creator",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -4839,7 +4957,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "creditText",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4852,7 +4970,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "dateCreated",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4865,7 +4983,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "dateModified",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4878,7 +4996,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "datePublished",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4891,7 +5009,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4905,7 +5023,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "digitalSourceType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4919,7 +5037,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "director",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4932,7 +5050,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "directors",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4945,7 +5063,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "disambiguatingDescription",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4958,7 +5076,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "discussionUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4971,7 +5089,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "duration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4985,7 +5103,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "editEIDR",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -4998,7 +5116,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("editor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "editor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5009,7 +5129,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "educationalAlignment",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5022,7 +5142,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "educationalLevel",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5036,7 +5156,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "educationalUse",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5050,7 +5170,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "encoding",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5063,7 +5183,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "encodingFormat",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5076,7 +5196,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "encodings",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5089,7 +5209,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "episodeNumber",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5102,7 +5222,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "exampleOfWork",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5115,7 +5235,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("expires"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "expires",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5126,7 +5248,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "fileFormat",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5139,7 +5261,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("funder"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "funder",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5151,7 +5275,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("funding"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "funding",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5162,7 +5288,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("genre"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "genre",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5173,7 +5301,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("hasPart"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "hasPart",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5184,7 +5314,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "headline",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5197,7 +5327,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identifier",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5211,7 +5341,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5223,7 +5355,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "inLanguage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5237,7 +5369,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "interactionStatistic",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5250,7 +5382,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "interactivityType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5263,7 +5395,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "interpretedAsClaim",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5276,7 +5408,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isAccessibleForFree",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5289,7 +5421,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isBasedOn",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5304,7 +5436,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isBasedOnUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5319,7 +5451,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isFamilyFriendly",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5332,7 +5464,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "isPartOf",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5346,7 +5478,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "keywords",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5360,7 +5492,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "learningResourceType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5374,7 +5506,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("license"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "license",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5386,7 +5520,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "locationCreated",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5399,7 +5533,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mainEntity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5412,7 +5546,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mainEntityOfPage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5426,7 +5560,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "maintainer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5440,7 +5574,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "material",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5454,7 +5588,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "materialExtent",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5468,7 +5602,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mentions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5481,7 +5615,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("musicBy"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "musicBy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5493,7 +5629,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5504,7 +5642,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("offers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "offers",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5516,7 +5656,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "partOfSeason",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5529,7 +5669,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "partOfSeries",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5542,7 +5682,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "partOfTVSeries",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5555,7 +5695,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "pattern",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5567,7 +5709,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "position",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5580,7 +5722,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "potentialAction",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5593,7 +5735,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "producer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5607,7 +5749,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "productionCompany",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5620,7 +5762,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "provider",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5634,7 +5776,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publication",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5647,7 +5789,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publisher",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5661,7 +5803,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publisherImprint",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5674,7 +5816,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publishingPrinciples",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5688,7 +5830,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "recordedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5701,7 +5843,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "releasedEvent",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5714,7 +5856,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("review"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "review",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5725,7 +5869,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("reviews"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "reviews",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5736,7 +5882,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sameAs",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5747,7 +5895,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "schemaVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5760,7 +5908,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sdDatePublished",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5773,7 +5921,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sdLicense",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5787,7 +5935,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sdPublisher",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5801,7 +5949,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "size",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5815,7 +5965,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sourceOrganization",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5828,7 +5978,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("spatial"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "spatial",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5839,7 +5991,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "spatialCoverage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5852,7 +6004,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sponsor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sponsor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5864,7 +6018,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subjectOf",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5878,7 +6032,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subtitleLanguage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5892,7 +6046,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("teaches"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "teaches",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5904,7 +6060,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "temporal",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5917,7 +6073,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "temporalCoverage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5930,7 +6086,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "text",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -5941,7 +6099,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "thumbnail",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5954,7 +6112,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "thumbnailUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5967,7 +6125,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "timeRequired",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5980,7 +6138,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "titleEIDR",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -5993,7 +6151,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("trailer"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "trailer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -6004,7 +6164,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "translationOfWork",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -6017,7 +6177,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "translator",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -6031,7 +6191,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "typicalAgeRange",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -6044,7 +6204,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "url",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -6055,7 +6217,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "usageInfo",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -6069,7 +6231,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "version",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -6080,7 +6244,9 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("video"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "video",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -6092,7 +6258,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "wordCount",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -6105,7 +6271,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "workExample",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -6118,7 +6284,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "workTranslation",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -9389,7 +9555,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TvEpisode<'a> {

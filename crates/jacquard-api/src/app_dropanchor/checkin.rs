@@ -55,7 +55,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("address"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("address"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -63,14 +63,18 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("country")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("country")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("country"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "country",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -89,7 +93,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("locality"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "locality",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -108,7 +114,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -127,7 +135,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "postalCode",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -146,7 +154,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("region"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "region",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -165,7 +175,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("street"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "street",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("The street address"),
@@ -186,7 +198,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("checkinImage"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("checkinImage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -195,8 +207,8 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("thumb"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("fullsize")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("thumb"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("fullsize")
                         ],
                     ),
                     nullable: None,
@@ -204,7 +216,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "alt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -223,7 +237,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("fullsize"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "fullsize",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -231,7 +247,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("thumb"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "thumb",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -243,7 +261,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("fsqPlace"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("fsqPlace"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -252,7 +270,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("fsqPlaceId")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("fsqPlaceId")
                         ],
                     ),
                     nullable: None,
@@ -260,7 +278,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "fsqPlaceId",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -281,7 +299,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "latitude",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -300,7 +320,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "longitude",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -321,7 +341,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -344,7 +366,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("geo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("geo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -353,8 +375,8 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("longitude")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("latitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("longitude")
                         ],
                     ),
                     nullable: None,
@@ -362,7 +384,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("altitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "altitude",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Altitude in meters"),
@@ -379,7 +403,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "latitude",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -398,7 +424,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "longitude",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -419,7 +445,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -442,7 +470,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -454,10 +482,10 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("address"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("geo")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("address"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("geo")
                             ],
                         ),
                         nullable: None,
@@ -465,14 +493,16 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("address"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "address",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#address"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "category",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -493,7 +523,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "categoryGroup",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -514,7 +544,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "categoryIcon",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -535,7 +565,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -558,21 +588,27 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("fsq"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "fsq",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#fsqPlace"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("geo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "geo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#geo"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -581,7 +617,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "text",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -880,7 +918,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CheckinImage<'a> {
@@ -1172,67 +1210,67 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Address;
-        type Geo;
         type Text;
         type CreatedAt;
+        type Geo;
+        type Address;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Address = Unset;
-        type Geo = Unset;
         type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type Address = Set<members::address>;
-        type Geo = S::Geo;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `geo` field to Set
-    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGeo<S> {}
-    impl<S: State> State for SetGeo<S> {
-        type Address = S::Address;
-        type Geo = Set<members::geo>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
+        type Geo = Unset;
+        type Address = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Address = S::Address;
-        type Geo = S::Geo;
         type Text = Set<members::text>;
         type CreatedAt = S::CreatedAt;
+        type Geo = S::Geo;
+        type Address = S::Address;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Address = S::Address;
-        type Geo = S::Geo;
         type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Geo = S::Geo;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `geo` field to Set
+    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGeo<S> {}
+    impl<S: State> State for SetGeo<S> {
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Geo = Set<members::geo>;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Geo = S::Geo;
+        type Address = Set<members::address>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `address` field
-        pub struct address(());
-        ///Marker type for the `geo` field
-        pub struct geo(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `geo` field
+        pub struct geo(());
+        ///Marker type for the `address` field
+        pub struct address(());
     }
 }
 
@@ -1452,10 +1490,10 @@ where
 impl<'a, S> CheckinBuilder<'a, S>
 where
     S: checkin_state::State,
-    S::Address: checkin_state::IsSet,
-    S::Geo: checkin_state::IsSet,
     S::Text: checkin_state::IsSet,
     S::CreatedAt: checkin_state::IsSet,
+    S::Geo: checkin_state::IsSet,
+    S::Address: checkin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Checkin<'a> {
@@ -1476,7 +1514,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Checkin<'a> {

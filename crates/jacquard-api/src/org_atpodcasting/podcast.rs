@@ -63,151 +63,151 @@ pub mod podcast_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Artwork;
         type FeedUrl;
+        type Language;
+        type Description;
+        type Guid;
+        type Categories;
         type CreatedAt;
         type Title;
-        type Description;
-        type Language;
-        type Categories;
-        type Artwork;
-        type Guid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Artwork = Unset;
         type FeedUrl = Unset;
+        type Language = Unset;
+        type Description = Unset;
+        type Guid = Unset;
+        type Categories = Unset;
         type CreatedAt = Unset;
         type Title = Unset;
-        type Description = Unset;
-        type Language = Unset;
-        type Categories = Unset;
-        type Artwork = Unset;
-        type Guid = Unset;
-    }
-    ///State transition - sets the `feed_url` field to Set
-    pub struct SetFeedUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeedUrl<S> {}
-    impl<S: State> State for SetFeedUrl<S> {
-        type FeedUrl = Set<members::feed_url>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Description = S::Description;
-        type Language = S::Language;
-        type Categories = S::Categories;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type FeedUrl = S::FeedUrl;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Description = S::Description;
-        type Language = S::Language;
-        type Categories = S::Categories;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type FeedUrl = S::FeedUrl;
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
-        type Description = S::Description;
-        type Language = S::Language;
-        type Categories = S::Categories;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type FeedUrl = S::FeedUrl;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Description = Set<members::description>;
-        type Language = S::Language;
-        type Categories = S::Categories;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type FeedUrl = S::FeedUrl;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Description = S::Description;
-        type Language = Set<members::language>;
-        type Categories = S::Categories;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-    }
-    ///State transition - sets the `categories` field to Set
-    pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategories<S> {}
-    impl<S: State> State for SetCategories<S> {
-        type FeedUrl = S::FeedUrl;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Description = S::Description;
-        type Language = S::Language;
-        type Categories = Set<members::categories>;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
     }
     ///State transition - sets the `artwork` field to Set
     pub struct SetArtwork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtwork<S> {}
     impl<S: State> State for SetArtwork<S> {
+        type Artwork = Set<members::artwork>;
         type FeedUrl = S::FeedUrl;
+        type Language = S::Language;
+        type Description = S::Description;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
         type Title = S::Title;
-        type Description = S::Description;
+    }
+    ///State transition - sets the `feed_url` field to Set
+    pub struct SetFeedUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeedUrl<S> {}
+    impl<S: State> State for SetFeedUrl<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = Set<members::feed_url>;
         type Language = S::Language;
-        type Categories = S::Categories;
-        type Artwork = Set<members::artwork>;
+        type Description = S::Description;
         type Guid = S::Guid;
+        type Categories = S::Categories;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLanguage<S> {}
+    impl<S: State> State for SetLanguage<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = S::FeedUrl;
+        type Language = Set<members::language>;
+        type Description = S::Description;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = S::FeedUrl;
+        type Language = S::Language;
+        type Description = Set<members::description>;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `guid` field to Set
     pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGuid<S> {}
     impl<S: State> State for SetGuid<S> {
+        type Artwork = S::Artwork;
         type FeedUrl = S::FeedUrl;
+        type Language = S::Language;
+        type Description = S::Description;
+        type Guid = Set<members::guid>;
+        type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
         type Title = S::Title;
-        type Description = S::Description;
-        type Language = S::Language;
-        type Categories = S::Categories;
+    }
+    ///State transition - sets the `categories` field to Set
+    pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategories<S> {}
+    impl<S: State> State for SetCategories<S> {
         type Artwork = S::Artwork;
-        type Guid = Set<members::guid>;
+        type FeedUrl = S::FeedUrl;
+        type Language = S::Language;
+        type Description = S::Description;
+        type Guid = S::Guid;
+        type Categories = Set<members::categories>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = S::FeedUrl;
+        type Language = S::Language;
+        type Description = S::Description;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = S::FeedUrl;
+        type Language = S::Language;
+        type Description = S::Description;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `artwork` field
+        pub struct artwork(());
         ///Marker type for the `feed_url` field
         pub struct feed_url(());
+        ///Marker type for the `language` field
+        pub struct language(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `guid` field
+        pub struct guid(());
+        ///Marker type for the `categories` field
+        pub struct categories(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `language` field
-        pub struct language(());
-        ///Marker type for the `categories` field
-        pub struct categories(());
-        ///Marker type for the `artwork` field
-        pub struct artwork(());
-        ///Marker type for the `guid` field
-        pub struct guid(());
     }
 }
 
@@ -466,14 +466,14 @@ where
 impl<'a, S> PodcastBuilder<'a, S>
 where
     S: podcast_state::State,
+    S::Artwork: podcast_state::IsSet,
     S::FeedUrl: podcast_state::IsSet,
+    S::Language: podcast_state::IsSet,
+    S::Description: podcast_state::IsSet,
+    S::Guid: podcast_state::IsSet,
+    S::Categories: podcast_state::IsSet,
     S::CreatedAt: podcast_state::IsSet,
     S::Title: podcast_state::IsSet,
-    S::Description: podcast_state::IsSet,
-    S::Language: podcast_state::IsSet,
-    S::Categories: podcast_state::IsSet,
-    S::Artwork: podcast_state::IsSet,
-    S::Guid: podcast_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podcast<'a> {
@@ -496,7 +496,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Podcast<'a> {
@@ -658,7 +658,7 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -670,14 +670,14 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("artwork"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("language"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("feedUrl"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("categories"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("guid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("artwork"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("language"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("feedUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("categories"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("guid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -685,7 +685,9 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("artwork"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "artwork",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -693,7 +695,7 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "categories",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -714,7 +716,7 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -737,7 +739,7 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -758,7 +760,7 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "explicit",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -768,7 +770,9 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("feedUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "feedUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -789,7 +793,9 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("guid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "guid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -808,7 +814,7 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "language",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -831,7 +837,9 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("link"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "link",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -852,7 +860,9 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("movedTo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "movedTo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -873,7 +883,9 @@ fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

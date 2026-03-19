@@ -39,12 +39,12 @@ fn lexicon_doc_fyi_questionable_richtext_code() -> ::jacquard_lexicon::lexicon::
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("plaintext")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("plaintext")
                         ],
                     ),
                     nullable: None,
@@ -52,7 +52,9 @@ fn lexicon_doc_fyi_questionable_richtext_code() -> ::jacquard_lexicon::lexicon::
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("language"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "language",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -67,7 +69,7 @@ fn lexicon_doc_fyi_questionable_richtext_code() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "plaintext",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -84,7 +86,7 @@ fn lexicon_doc_fyi_questionable_richtext_code() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "syntaxHighlightingTheme",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -148,7 +150,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
         }
         if let Some(ref value) = self.language {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -190,7 +192,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
         }
         if let Some(ref value) = self.syntax_highlighting_theme {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

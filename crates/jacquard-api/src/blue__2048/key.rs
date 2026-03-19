@@ -155,7 +155,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Key<'a> {
@@ -176,7 +176,7 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -185,8 +185,8 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -194,7 +194,7 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -213,7 +213,9 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -236,7 +238,7 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("signatureRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("signatureRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -245,9 +247,9 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("atURI"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("signature"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("atURI"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -255,7 +257,9 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("atURI"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "atURI",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -274,7 +278,7 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -293,7 +297,7 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "signature",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -371,49 +375,49 @@ pub mod signature_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AtUri;
         type Signature;
+        type AtUri;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AtUri = Unset;
         type Signature = Unset;
+        type AtUri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `at_uri` field to Set
-    pub struct SetAtUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAtUri<S> {}
-    impl<S: State> State for SetAtUri<S> {
-        type AtUri = Set<members::at_uri>;
-        type Signature = S::Signature;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
-        type AtUri = S::AtUri;
         type Signature = Set<members::signature>;
+        type AtUri = S::AtUri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `at_uri` field to Set
+    pub struct SetAtUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAtUri<S> {}
+    impl<S: State> State for SetAtUri<S> {
+        type Signature = S::Signature;
+        type AtUri = Set<members::at_uri>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AtUri = S::AtUri;
         type Signature = S::Signature;
+        type AtUri = S::AtUri;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `at_uri` field
-        pub struct at_uri(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `at_uri` field
+        pub struct at_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -508,8 +512,8 @@ where
 impl<'a, S> SignatureRefBuilder<'a, S>
 where
     S: signature_ref_state::State,
-    S::AtUri: signature_ref_state::IsSet,
     S::Signature: signature_ref_state::IsSet,
+    S::AtUri: signature_ref_state::IsSet,
     S::CreatedAt: signature_ref_state::IsSet,
 {
     /// Build the final struct
@@ -525,7 +529,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SignatureRef<'a> {

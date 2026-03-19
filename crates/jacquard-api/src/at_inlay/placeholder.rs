@@ -33,37 +33,37 @@ pub mod placeholder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fallback;
         type Children;
+        type Fallback;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fallback = Unset;
         type Children = Unset;
-    }
-    ///State transition - sets the `fallback` field to Set
-    pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFallback<S> {}
-    impl<S: State> State for SetFallback<S> {
-        type Fallback = Set<members::fallback>;
-        type Children = S::Children;
+        type Fallback = Unset;
     }
     ///State transition - sets the `children` field to Set
     pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChildren<S> {}
     impl<S: State> State for SetChildren<S> {
-        type Fallback = S::Fallback;
         type Children = Set<members::children>;
+        type Fallback = S::Fallback;
+    }
+    ///State transition - sets the `fallback` field to Set
+    pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFallback<S> {}
+    impl<S: State> State for SetFallback<S> {
+        type Children = S::Children;
+        type Fallback = Set<members::fallback>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fallback` field
-        pub struct fallback(());
         ///Marker type for the `children` field
         pub struct children(());
+        ///Marker type for the `fallback` field
+        pub struct fallback(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> PlaceholderBuilder<'a, S>
 where
     S: placeholder_state::State,
-    S::Fallback: placeholder_state::IsSet,
     S::Children: placeholder_state::IsSet,
+    S::Fallback: placeholder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Placeholder<'a> {
@@ -151,7 +151,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Placeholder<'a> {

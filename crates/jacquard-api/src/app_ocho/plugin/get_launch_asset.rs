@@ -159,7 +159,7 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLaunchAssetOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 /// Response type for
@@ -182,7 +182,7 @@ impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(GetLaunchAssetOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }

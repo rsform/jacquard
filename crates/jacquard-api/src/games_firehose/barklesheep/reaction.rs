@@ -35,49 +35,49 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Emoji;
         type GameId;
+        type Emoji;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Emoji = Unset;
         type GameId = Unset;
+        type Emoji = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `emoji` field to Set
-    pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmoji<S> {}
-    impl<S: State> State for SetEmoji<S> {
-        type Emoji = Set<members::emoji>;
-        type GameId = S::GameId;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `game_id` field to Set
     pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameId<S> {}
     impl<S: State> State for SetGameId<S> {
-        type Emoji = S::Emoji;
         type GameId = Set<members::game_id>;
+        type Emoji = S::Emoji;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `emoji` field to Set
+    pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmoji<S> {}
+    impl<S: State> State for SetEmoji<S> {
+        type GameId = S::GameId;
+        type Emoji = Set<members::emoji>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Emoji = S::Emoji;
         type GameId = S::GameId;
+        type Emoji = S::Emoji;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `emoji` field
-        pub struct emoji(());
         ///Marker type for the `game_id` field
         pub struct game_id(());
+        ///Marker type for the `emoji` field
+        pub struct emoji(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -172,8 +172,8 @@ where
 impl<'a, S> ReactionBuilder<'a, S>
 where
     S: reaction_state::State,
-    S::Emoji: reaction_state::IsSet,
     S::GameId: reaction_state::IsSet,
+    S::Emoji: reaction_state::IsSet,
     S::CreatedAt: reaction_state::IsSet,
 {
     /// Build the final struct
@@ -189,7 +189,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Reaction<'a> {
@@ -304,7 +304,7 @@ fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -316,9 +316,9 @@ fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("gameId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("emoji"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("gameId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("emoji"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -326,7 +326,7 @@ fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -345,7 +345,9 @@ fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("emoji"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "emoji",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -360,7 +362,9 @@ fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("gameId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "gameId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

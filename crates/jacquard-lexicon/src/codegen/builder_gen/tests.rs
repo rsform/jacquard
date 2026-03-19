@@ -10,7 +10,7 @@ use crate::lexicon::{
     LexInteger, LexObject, LexObjectProperty, LexString, LexXrpcParameters,
     LexXrpcParametersProperty,
 };
-use jacquard_common::smol_str::SmolStr;
+use jacquard_common::deps::smol_str::SmolStr;
 use std::collections::BTreeMap;
 
 #[test]

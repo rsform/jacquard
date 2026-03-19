@@ -215,7 +215,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Button<'a> {
@@ -318,7 +318,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
         }
         if let Some(ref value) = self.alt {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -348,7 +348,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
         }
         if let Some(ref value) = self.href {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -378,7 +378,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
         }
         if let Some(ref value) = self.title {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -407,7 +407,7 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -419,8 +419,8 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("blob"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("postedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("blob"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("postedAt")
                             ],
                         ),
                         nullable: None,
@@ -428,7 +428,9 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("alt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "alt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -447,7 +449,9 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("blob"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "blob",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -455,7 +459,9 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("href"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "href",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -474,7 +480,7 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "postedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -497,7 +503,9 @@ fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

@@ -48,7 +48,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("abilities"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("abilities"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -61,7 +61,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cha"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cha",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -72,7 +74,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("con"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "con",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -83,7 +87,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("dex"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "dex",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -94,7 +100,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("int"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "int",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -105,7 +113,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("str"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "str",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -116,7 +126,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("wis"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "wis",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -131,20 +143,24 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("attack"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("attack"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("An attack action"),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("bonus"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bonus",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -163,7 +179,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("damage"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "damage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -182,7 +200,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "damageBonus",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -195,7 +213,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "damageType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -214,7 +232,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Attack name"),
@@ -235,7 +255,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("coinage"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("coinage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(::jacquard_common::CowStr::new_static("Currency")),
                     required: None,
@@ -244,7 +264,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -255,7 +275,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ep"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ep"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -266,7 +286,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("gp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -277,7 +297,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("pp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("pp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -288,7 +308,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -303,7 +323,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("combat"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("combat"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -316,7 +336,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ac"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ac"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -327,7 +347,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("hitDice"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "hitDice",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -346,7 +368,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hitDiceUsed",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -359,7 +381,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "initiative",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -372,7 +394,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("speed"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "speed",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -387,7 +411,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("conditions"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("conditions"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -400,7 +424,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "deathSaves",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -409,7 +433,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "exhaustion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -422,7 +446,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "inspiration",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -436,15 +460,15 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("customStat"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("customStat"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A custom stat"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
                         ],
                     ),
                     nullable: None,
@@ -452,7 +476,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("category"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "category",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Category (optional)"),
@@ -469,7 +495,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("max"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "max",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -480,7 +508,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("min"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "min",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -491,7 +521,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Stat name"),
@@ -508,7 +540,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -523,7 +557,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("customStats"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("customStats"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -536,7 +570,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("stats"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "stats",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Custom stat entries"),
@@ -550,7 +586,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "systemName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -569,7 +605,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "systemVersion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -592,7 +628,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccAbilities"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccAbilities"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -605,7 +641,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("agi"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "agi",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -616,7 +654,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("agiBase"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "agiBase",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -627,7 +667,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("int"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "int",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -638,7 +680,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("luk"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "luk",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -649,7 +693,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("per"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "per",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -660,7 +706,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sta"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sta",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -671,7 +719,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("staBase"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "staBase",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -682,7 +732,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("str"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "str",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -693,7 +745,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("strBase"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "strBase",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -708,7 +762,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccAttack"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccAttack"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -716,14 +770,16 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "attackMod",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -744,7 +800,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("damage"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "damage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -763,7 +821,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "damageBonus",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -784,7 +842,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Weapon name"),
@@ -801,7 +861,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -820,7 +882,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("range"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "range",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -839,7 +903,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -862,7 +928,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccCleric"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCleric"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -875,7 +941,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("deity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "deity",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -894,7 +962,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disapprovalRange",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -907,7 +975,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disapprovalTable",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -928,7 +996,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "holySymbol",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -949,7 +1017,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "knownSpells",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -967,7 +1035,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "layOnHandsDie",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -988,7 +1056,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "maxSpellLevel",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1001,7 +1069,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "spellCheckMod",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1014,7 +1082,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "turnUnholyDie",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1035,7 +1103,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("unholy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "unholy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -1047,15 +1117,15 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccClericSpell"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccClericSpell"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A cleric spell"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("level")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level")
                         ],
                     ),
                     nullable: None,
@@ -1063,7 +1133,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1074,7 +1146,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Spell name"),
@@ -1091,7 +1165,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1110,7 +1186,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sinful"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "sinful",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -1122,7 +1200,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccCoinage"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCoinage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1135,7 +1213,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1146,7 +1224,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("gp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1157,7 +1235,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("sp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1172,7 +1250,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccCombat"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCombat"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Combat statistics"),
@@ -1183,7 +1261,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ac"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ac"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1194,7 +1272,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "actionDie",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1215,7 +1293,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "attackMod",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1228,7 +1306,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("critDie"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "critDie",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1247,7 +1327,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "critTable",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1268,7 +1348,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "fumbleDie",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1289,7 +1369,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "initiative",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1302,7 +1382,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("speed"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "speed",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1317,7 +1399,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccCorruption"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCorruption"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1330,7 +1412,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("effect"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "effect",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1349,7 +1433,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "permanent",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -1359,7 +1443,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "source",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1378,7 +1464,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1401,7 +1489,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccEquipment"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccEquipment"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Equipment and inventory"),
@@ -1412,7 +1500,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("armor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "armor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1431,7 +1521,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "armorCheckPenalty",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1444,7 +1534,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gear"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gear",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Other equipment"),
@@ -1461,7 +1553,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("shield"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "shield",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Shield (if any)"),
@@ -1478,7 +1572,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "tradeGoods",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1499,7 +1593,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("treasure"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "treasure",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1518,7 +1614,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("weapons"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "weapons",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Weapons carried"),
@@ -1539,7 +1637,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccHalfling"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccHalfling"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Halfling class features"),
@@ -1550,7 +1648,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "goodLuckCharm",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -1560,7 +1658,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "infravision",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1573,7 +1671,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "luckSpentOnAllies",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1586,7 +1684,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "luckyWeapon",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1607,7 +1705,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sneakAndHide",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1620,7 +1718,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "twoWeaponFighting",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -1634,7 +1732,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccHp"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccHp"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1647,7 +1745,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("current"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "current",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1658,7 +1758,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("max"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "max",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1673,7 +1775,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccIdentity"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccIdentity"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1686,7 +1788,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alignment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1707,7 +1809,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("class"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "class",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1726,7 +1830,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1737,7 +1843,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "occupation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1758,7 +1864,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1777,7 +1885,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("xp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("xp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1792,7 +1900,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccLuck"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccLuck"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1805,7 +1913,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "birthAugur",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1826,7 +1934,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "birthAugurEffect",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1847,7 +1955,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "luckyWeapon",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1868,7 +1976,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "startingLuck",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1885,7 +1993,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccSaves"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccSaves"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1898,7 +2006,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("fort"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "fort",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1909,7 +2019,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "ref",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1920,7 +2032,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("will"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "will",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1935,7 +2049,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccSpellburn"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccSpellburn"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1948,7 +2062,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "agiBurned",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1961,7 +2075,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "recoveryRate",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1974,7 +2088,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "staBurned",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1987,7 +2101,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "strBurned",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2004,7 +2118,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccStats"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccStats"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2017,7 +2131,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "abilities",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -2028,7 +2142,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "abilitiesNotes",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2049,7 +2163,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attacks"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "attacks",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Weapon attacks"),
@@ -2063,28 +2179,34 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cleric"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cleric",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccCleric"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("coinage"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "coinage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccCoinage"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("combat"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "combat",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccCombat"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "equipment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -2095,28 +2217,32 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("halfling"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "halfling",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccHalfling"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("hp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccHp"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("identity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "identity",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccIdentity"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "languages",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2135,14 +2261,18 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("luck"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "luck",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccLuck"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -2161,28 +2291,36 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("saves"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "saves",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccSaves"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("thief"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "thief",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccThief"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("warrior"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "warrior",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccWarrior"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("wizard"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "wizard",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#dccWizard"),
@@ -2193,7 +2331,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccThief"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccThief"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2206,7 +2344,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alignment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2227,7 +2365,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("backstab"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "backstab",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -2238,7 +2378,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "luckyWeapon",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2259,7 +2399,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("skills"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "skills",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -2272,7 +2414,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccThiefSkills"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccThiefSkills"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2285,7 +2427,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("backstab"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "backstab",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -2296,7 +2440,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "castSpellFromScroll",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2309,7 +2453,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "climbSheerSurfaces",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2322,7 +2466,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disableTrap",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2335,7 +2479,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "disguiseSelf",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2348,7 +2492,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("findTrap"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "findTrap",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -2359,7 +2505,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "forgeDocument",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2372,7 +2518,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "handlePoison",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2385,7 +2531,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hideInShadows",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2398,7 +2544,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("pickLock"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "pickLock",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -2409,7 +2557,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "pickPocket",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2422,7 +2570,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "readLanguages",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2435,7 +2583,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sneakSilently",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2452,7 +2600,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccWarrior"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccWarrior"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2465,7 +2613,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("deedDie"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "deedDie",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -2484,7 +2634,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "infravision",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2497,7 +2647,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "luckyWeapon",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2518,7 +2668,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mightyDeeds",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -2544,7 +2694,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "shieldBash",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -2554,7 +2704,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "smellGold",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -2564,7 +2714,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "undergroundSkills",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2581,7 +2731,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccWizard"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccWizard"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2594,7 +2744,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "corruption",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -2614,7 +2764,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "corruptionText",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2635,7 +2785,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "knownSpells",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -2655,7 +2805,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "maxSpellLevel",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2668,7 +2818,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("patron"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "patron",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -2687,7 +2839,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "patronBond",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2708,7 +2860,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "spellCheckMod",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2721,7 +2873,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "spellburn",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -2736,7 +2888,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dccWizardSpell"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccWizardSpell"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2745,8 +2897,8 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("level")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level")
                         ],
                     ),
                     nullable: None,
@@ -2754,7 +2906,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -2765,7 +2919,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("lost"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "lost",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -2773,7 +2929,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mercurialMagic",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2794,7 +2950,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mercurialRoll",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2807,7 +2963,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Spell name"),
@@ -2824,7 +2982,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -2847,7 +3007,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("deathSaves"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("deathSaves"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2860,7 +3020,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("failures"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "failures",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -2871,7 +3033,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "successes",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -2888,7 +3050,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dndStats"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("dndStats"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -2901,7 +3063,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "abilities",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -2910,7 +3072,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attacks"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "attacks",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Attack actions"),
@@ -2924,21 +3088,25 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("coinage"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "coinage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#coinage"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("combat"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "combat",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#combat"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "conditions",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -2947,7 +3115,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "equipment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -2956,7 +3124,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("features"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "features",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -2975,21 +3145,23 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("hp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#hp"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("identity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "identity",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#identity"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "languages",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3008,14 +3180,16 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("passives"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "passives",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#passives"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "personality",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -3024,7 +3198,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "proficiencies",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3045,21 +3219,25 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("saves"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "saves",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#saves"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("skills"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "skills",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#skills"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "spellcasting",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -3074,7 +3252,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("equipment"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("equipment"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Gear and inventory"),
@@ -3085,7 +3263,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("armor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "armor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Armor"),
@@ -3102,7 +3282,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("gear"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gear",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Other equipment"),
@@ -3119,7 +3301,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("treasure"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "treasure",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -3138,7 +3322,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("weapons"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "weapons",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Weapons"),
@@ -3159,7 +3345,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("hp"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Hit point tracking"),
@@ -3170,7 +3356,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("current"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "current",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3181,7 +3369,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("max"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "max",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3192,7 +3382,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("temp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "temp",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3207,7 +3399,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("identity"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("identity"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3220,7 +3412,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "alignment",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3241,7 +3433,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "background",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3262,7 +3454,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("class"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "class",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -3281,7 +3475,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3292,7 +3488,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "proficiency",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -3305,7 +3501,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("race"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "race",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -3324,7 +3522,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("xp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("xp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3339,7 +3537,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3351,7 +3549,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -3359,7 +3557,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3382,28 +3580,36 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("custom"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "custom",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#customStats"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("dcc"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "dcc",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#dccStats"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("dnd"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "dnd",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#dndStats"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("reverie"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "reverie",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -3412,14 +3618,16 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rmmz"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rmmz",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#rmmzStats"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3447,7 +3655,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("passives"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("passives"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3460,7 +3668,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("insight"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "insight",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3471,7 +3681,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "investigation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -3484,7 +3694,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "perception",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -3501,7 +3711,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("personality"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("personality"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3514,7 +3724,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "backstory",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3533,7 +3743,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("bonds"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bonds",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Bonds"),
@@ -3550,7 +3762,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("flaws"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "flaws",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Flaws"),
@@ -3567,7 +3781,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ideals"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "ideals",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Ideals"),
@@ -3584,7 +3800,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("traits"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "traits",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Personality traits"),
@@ -3605,7 +3823,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("reverieStats"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("reverieStats"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3618,7 +3836,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "authority",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -3631,7 +3849,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("entropy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "entropy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3642,7 +3862,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("liberty"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "liberty",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3653,7 +3875,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("oblivion"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "oblivion",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3664,7 +3888,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("octant"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "octant",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -3683,7 +3909,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "receptive",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -3696,7 +3922,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("skeptic"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "skeptic",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3711,7 +3939,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("rmmzStats"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("rmmzStats"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3724,7 +3952,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("agi"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "agi",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3735,7 +3965,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("atk"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "atk",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3746,7 +3978,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("class"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "class",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Class"),
@@ -3763,7 +3997,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3774,7 +4010,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("def"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "def",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3785,7 +4023,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("eva"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "eva",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3796,7 +4036,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("hit"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "hit",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3807,7 +4049,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("hp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3818,7 +4060,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3829,7 +4073,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("luk"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "luk",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3840,7 +4086,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mat"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mat",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3851,7 +4099,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("maxHp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "maxHp",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3862,7 +4112,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("maxMp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "maxMp",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3873,7 +4125,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("maxTp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "maxTp",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3884,7 +4138,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mdf"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mdf",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3895,7 +4151,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3906,7 +4162,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("tp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3917,7 +4173,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("xp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("xp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3932,7 +4188,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("saves"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("saves"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3945,7 +4201,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cha"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cha",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3956,7 +4214,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("con"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "con",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3967,7 +4227,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("dex"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "dex",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3978,7 +4240,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("int"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "int",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -3989,7 +4253,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("str"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "str",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4000,7 +4266,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("wis"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "wis",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4015,7 +4283,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("skills"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("skills"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -4028,7 +4296,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "acrobatics",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4041,7 +4309,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "animalHandling",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4054,7 +4322,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("arcana"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "arcana",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4065,7 +4335,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "athletics",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4078,7 +4348,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "deception",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4091,7 +4361,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("history"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "history",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4102,7 +4374,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("insight"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "insight",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4113,7 +4387,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "intimidation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4126,7 +4400,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "investigation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4139,7 +4413,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("medicine"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "medicine",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4150,7 +4426,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("nature"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "nature",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4161,7 +4439,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "perception",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4174,7 +4452,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "performance",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4187,7 +4465,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "persuasion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4200,7 +4478,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("religion"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "religion",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4211,7 +4491,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "sleightOfHand",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4224,7 +4504,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("stealth"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "stealth",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4235,7 +4517,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("survival"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "survival",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4250,7 +4534,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("spellList"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("spellList"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -4263,7 +4547,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cantrips"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cantrips",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Cantrips (at-will)"),
@@ -4285,7 +4571,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l1"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l1"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("1st-level spells"),
@@ -4307,7 +4593,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l2"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l2"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("2nd-level spells"),
@@ -4329,7 +4615,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l3"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l3"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("3rd-level spells"),
@@ -4351,7 +4637,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l4"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l4"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("4th-level spells"),
@@ -4373,7 +4659,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l5"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l5"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("5th-level spells"),
@@ -4395,7 +4681,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l6"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l6"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("6th-level spells"),
@@ -4417,7 +4703,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l7"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l7"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("7th-level spells"),
@@ -4439,7 +4725,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l8"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l8"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("8th-level spells"),
@@ -4461,7 +4747,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("l9"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l9"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("9th-level spells"),
@@ -4487,7 +4773,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("spellcasting"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("spellcasting"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Spellcasting details"),
@@ -4498,7 +4784,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ability"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "ability",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -4517,7 +4805,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attack"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "attack",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4528,7 +4818,7 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("dc"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("dc"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4539,7 +4829,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("slots"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "slots",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -4555,7 +4847,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("spells"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "spells",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#spellList"),
@@ -4566,15 +4860,15 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("spellslot"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("spellslot"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Spell slot entry"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("total")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("total")
                         ],
                     ),
                     nullable: None,
@@ -4582,7 +4876,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4593,7 +4889,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("total"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "total",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -4604,7 +4902,9 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("used"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "used",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -5340,7 +5640,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CustomStat<'a> {
@@ -6093,37 +6393,37 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Level = S::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Name = S::Name;
         type Level = Set<members::level>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Level = S::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -6227,8 +6527,8 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
 impl<'a, S> DccClericSpellBuilder<'a, S>
 where
     S: dcc_cleric_spell_state::State,
-    S::Name: dcc_cleric_spell_state::IsSet,
     S::Level: dcc_cleric_spell_state::IsSet,
+    S::Name: dcc_cleric_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccClericSpell<'a> {
@@ -6244,7 +6544,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> DccClericSpell<'a> {
@@ -7887,37 +8187,37 @@ pub mod dcc_wizard_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Level = S::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Name = S::Name;
         type Level = Set<members::level>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Level = S::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -8055,8 +8355,8 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 impl<'a, S> DccWizardSpellBuilder<'a, S>
 where
     S: dcc_wizard_spell_state::State,
-    S::Name: dcc_wizard_spell_state::IsSet,
     S::Level: dcc_wizard_spell_state::IsSet,
+    S::Name: dcc_wizard_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccWizardSpell<'a> {
@@ -8074,7 +8374,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> DccWizardSpell<'a> {
@@ -8989,7 +9289,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Stats<'a> {
@@ -10462,7 +10762,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Spellslot<'a> {

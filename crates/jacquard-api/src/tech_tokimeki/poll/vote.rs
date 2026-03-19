@@ -36,51 +36,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Poll;
-        type OptionIndex;
         type CreatedAt;
+        type OptionIndex;
+        type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Poll = Unset;
-        type OptionIndex = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type Poll = Set<members::poll>;
-        type OptionIndex = S::OptionIndex;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `option_index` field to Set
-    pub struct SetOptionIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOptionIndex<S> {}
-    impl<S: State> State for SetOptionIndex<S> {
-        type Poll = S::Poll;
-        type OptionIndex = Set<members::option_index>;
-        type CreatedAt = S::CreatedAt;
+        type OptionIndex = Unset;
+        type Poll = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Poll = S::Poll;
-        type OptionIndex = S::OptionIndex;
         type CreatedAt = Set<members::created_at>;
+        type OptionIndex = S::OptionIndex;
+        type Poll = S::Poll;
+    }
+    ///State transition - sets the `option_index` field to Set
+    pub struct SetOptionIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOptionIndex<S> {}
+    impl<S: State> State for SetOptionIndex<S> {
+        type CreatedAt = S::CreatedAt;
+        type OptionIndex = Set<members::option_index>;
+        type Poll = S::Poll;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type CreatedAt = S::CreatedAt;
+        type OptionIndex = S::OptionIndex;
+        type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `poll` field
-        pub struct poll(());
-        ///Marker type for the `option_index` field
-        pub struct option_index(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `option_index` field
+        pub struct option_index(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
     }
 }
 
@@ -173,9 +173,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Poll: vote_state::IsSet,
-    S::OptionIndex: vote_state::IsSet,
     S::CreatedAt: vote_state::IsSet,
+    S::OptionIndex: vote_state::IsSet,
+    S::Poll: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Vote<'a> {
@@ -316,7 +316,7 @@ fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A vote on a poll"),
@@ -326,9 +326,9 @@ fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("poll"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("optionIndex"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("poll"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("optionIndex"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -336,7 +336,7 @@ fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -355,7 +355,7 @@ fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "optionIndex",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -368,7 +368,9 @@ fn lexicon_doc_tech_tokimeki_poll_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("poll"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "poll",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

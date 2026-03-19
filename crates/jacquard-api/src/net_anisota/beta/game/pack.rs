@@ -51,8 +51,8 @@ pub mod pack_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type TotalOpens;
-        type LastOpenTime;
         type CreatedAt;
+        type LastOpenTime;
         type Streak;
     }
     /// Empty state - all required fields are unset
@@ -60,8 +60,8 @@ pub mod pack_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type TotalOpens = Unset;
-        type LastOpenTime = Unset;
         type CreatedAt = Unset;
+        type LastOpenTime = Unset;
         type Streak = Unset;
     }
     ///State transition - sets the `total_opens` field to Set
@@ -69,17 +69,8 @@ pub mod pack_state {
     impl<S: State> sealed::Sealed for SetTotalOpens<S> {}
     impl<S: State> State for SetTotalOpens<S> {
         type TotalOpens = Set<members::total_opens>;
+        type CreatedAt = S::CreatedAt;
         type LastOpenTime = S::LastOpenTime;
-        type CreatedAt = S::CreatedAt;
-        type Streak = S::Streak;
-    }
-    ///State transition - sets the `last_open_time` field to Set
-    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
-    impl<S: State> State for SetLastOpenTime<S> {
-        type TotalOpens = S::TotalOpens;
-        type LastOpenTime = Set<members::last_open_time>;
-        type CreatedAt = S::CreatedAt;
         type Streak = S::Streak;
     }
     ///State transition - sets the `created_at` field to Set
@@ -87,8 +78,17 @@ pub mod pack_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type TotalOpens = S::TotalOpens;
-        type LastOpenTime = S::LastOpenTime;
         type CreatedAt = Set<members::created_at>;
+        type LastOpenTime = S::LastOpenTime;
+        type Streak = S::Streak;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
+    impl<S: State> State for SetLastOpenTime<S> {
+        type TotalOpens = S::TotalOpens;
+        type CreatedAt = S::CreatedAt;
+        type LastOpenTime = Set<members::last_open_time>;
         type Streak = S::Streak;
     }
     ///State transition - sets the `streak` field to Set
@@ -96,8 +96,8 @@ pub mod pack_state {
     impl<S: State> sealed::Sealed for SetStreak<S> {}
     impl<S: State> State for SetStreak<S> {
         type TotalOpens = S::TotalOpens;
-        type LastOpenTime = S::LastOpenTime;
         type CreatedAt = S::CreatedAt;
+        type LastOpenTime = S::LastOpenTime;
         type Streak = Set<members::streak>;
     }
     /// Marker types for field names
@@ -105,10 +105,10 @@ pub mod pack_state {
     pub mod members {
         ///Marker type for the `total_opens` field
         pub struct total_opens(());
-        ///Marker type for the `last_open_time` field
-        pub struct last_open_time(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `last_open_time` field
+        pub struct last_open_time(());
         ///Marker type for the `streak` field
         pub struct streak(());
     }
@@ -282,8 +282,8 @@ impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
     S::TotalOpens: pack_state::IsSet,
-    S::LastOpenTime: pack_state::IsSet,
     S::CreatedAt: pack_state::IsSet,
+    S::LastOpenTime: pack_state::IsSet,
     S::Streak: pack_state::IsSet,
 {
     /// Build the final struct
@@ -303,7 +303,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Pack<'a> {
@@ -456,7 +456,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -468,10 +468,10 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("lastOpenTime"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("totalOpens"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("streak"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lastOpenTime"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalOpens"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("streak"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -479,7 +479,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -502,7 +502,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastModified",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -525,7 +525,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastOpenTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -548,7 +548,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "longestStreak",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -561,7 +561,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "packHistory",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -581,7 +581,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("streak"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "streak",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -592,7 +594,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "totalOpens",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -610,7 +612,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("packHistoryEntry"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "packHistoryEntry",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -623,7 +627,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "itemsReceived",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -643,7 +647,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("openTime"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "openTime",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -664,7 +670,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "streakCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -681,7 +687,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("receivedItem"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("receivedItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -694,7 +700,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("itemId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "itemId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -713,7 +721,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("quantity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "quantity",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -724,7 +734,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("rarity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rarity",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Rarity of the item"),

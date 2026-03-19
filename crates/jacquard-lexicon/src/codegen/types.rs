@@ -31,7 +31,7 @@ impl<'c> CodeGenerator<'c> {
                     Ok(self.string_to_rust_type(s))
                 }
             }
-            LexObjectProperty::Bytes(_) => Ok(quote! { bytes::Bytes }),
+            LexObjectProperty::Bytes(_) => Ok(quote! { jacquard_common::deps::bytes::Bytes }),
             LexObjectProperty::CidLink(_) => {
                 Ok(quote! { jacquard_common::types::cid::CidLink<'a> })
             }
@@ -141,7 +141,7 @@ impl<'c> CodeGenerator<'c> {
             LexArrayItem::Boolean(_) => Ok(quote! { bool }),
             LexArrayItem::Integer(_) => Ok(quote! { i64 }),
             LexArrayItem::String(s) => Ok(self.string_to_rust_type(s)),
-            LexArrayItem::Bytes(_) => Ok(quote! { bytes::Bytes }),
+            LexArrayItem::Bytes(_) => Ok(quote! { jacquard_common::deps::bytes::Bytes }),
             LexArrayItem::CidLink(_) => Ok(quote! { jacquard_common::types::cid::CidLink<'a> }),
             LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::BlobRef<'a> }),
             LexArrayItem::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),

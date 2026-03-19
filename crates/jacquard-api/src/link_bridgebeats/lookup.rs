@@ -35,37 +35,37 @@ pub mod lookup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Results;
         type LookedUpAt;
+        type Results;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Results = Unset;
         type LookedUpAt = Unset;
-    }
-    ///State transition - sets the `results` field to Set
-    pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResults<S> {}
-    impl<S: State> State for SetResults<S> {
-        type Results = Set<members::results>;
-        type LookedUpAt = S::LookedUpAt;
+        type Results = Unset;
     }
     ///State transition - sets the `looked_up_at` field to Set
     pub struct SetLookedUpAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLookedUpAt<S> {}
     impl<S: State> State for SetLookedUpAt<S> {
-        type Results = S::Results;
         type LookedUpAt = Set<members::looked_up_at>;
+        type Results = S::Results;
+    }
+    ///State transition - sets the `results` field to Set
+    pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResults<S> {}
+    impl<S: State> State for SetResults<S> {
+        type LookedUpAt = S::LookedUpAt;
+        type Results = Set<members::results>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `results` field
-        pub struct results(());
         ///Marker type for the `looked_up_at` field
         pub struct looked_up_at(());
+        ///Marker type for the `results` field
+        pub struct results(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> LookupBuilder<'a, S>
 where
     S: lookup_state::State,
-    S::Results: lookup_state::IsSet,
     S::LookedUpAt: lookup_state::IsSet,
+    S::Results: lookup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lookup<'a> {
@@ -153,7 +153,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Lookup<'a> {
@@ -280,7 +280,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -292,8 +292,8 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("results"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("lookedUpAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("results"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lookedUpAt")
                             ],
                         ),
                         nullable: None,
@@ -301,7 +301,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lookedUpAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -324,7 +324,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("results"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "results",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -347,7 +349,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("providerResult"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("providerResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -356,11 +358,11 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("provider"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("artist"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("marketRegion")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("provider"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("marketRegion")
                         ],
                     ),
                     nullable: None,
@@ -368,7 +370,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("artUrl"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "artUrl",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -389,7 +393,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("artist"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "artist",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -408,7 +414,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "externalId",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -429,7 +435,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("isAlbum"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "isAlbum",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -437,7 +445,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "marketRegion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -458,7 +466,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("provider"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "provider",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -477,7 +487,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -496,7 +508,9 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -576,83 +590,83 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MarketRegion;
-        type Title;
+        type Url;
         type Artist;
+        type Title;
         type Provider;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MarketRegion = Unset;
-        type Title = Unset;
+        type Url = Unset;
         type Artist = Unset;
+        type Title = Unset;
         type Provider = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Provider = S::Provider;
     }
     ///State transition - sets the `market_region` field to Set
     pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
     impl<S: State> State for SetMarketRegion<S> {
-        type Url = S::Url;
         type MarketRegion = Set<members::market_region>;
-        type Title = S::Title;
+        type Url = S::Url;
         type Artist = S::Artist;
+        type Title = S::Title;
         type Provider = S::Provider;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
         type MarketRegion = S::MarketRegion;
-        type Title = Set<members::title>;
+        type Url = Set<members::url>;
         type Artist = S::Artist;
+        type Title = S::Title;
         type Provider = S::Provider;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type Url = S::Url;
         type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
+        type Url = S::Url;
         type Artist = Set<members::artist>;
+        type Title = S::Title;
+        type Provider = S::Provider;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type MarketRegion = S::MarketRegion;
+        type Url = S::Url;
+        type Artist = S::Artist;
+        type Title = Set<members::title>;
         type Provider = S::Provider;
     }
     ///State transition - sets the `provider` field to Set
     pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProvider<S> {}
     impl<S: State> State for SetProvider<S> {
-        type Url = S::Url;
         type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
+        type Url = S::Url;
         type Artist = S::Artist;
+        type Title = S::Title;
         type Provider = Set<members::provider>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `market_region` field
         pub struct market_region(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `artist` field
         pub struct artist(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `provider` field
         pub struct provider(());
     }
@@ -841,10 +855,10 @@ where
 impl<'a, S> ProviderResultBuilder<'a, S>
 where
     S: provider_result_state::State,
-    S::Url: provider_result_state::IsSet,
     S::MarketRegion: provider_result_state::IsSet,
-    S::Title: provider_result_state::IsSet,
+    S::Url: provider_result_state::IsSet,
     S::Artist: provider_result_state::IsSet,
+    S::Title: provider_result_state::IsSet,
     S::Provider: provider_result_state::IsSet,
 {
     /// Build the final struct
@@ -865,7 +879,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ProviderResult<'a> {

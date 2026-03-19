@@ -16,7 +16,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlob {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[jacquard_derive::lexicon]
@@ -62,7 +62,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
     {
         Ok(
             Box::new(Self {
-                body: bytes::Bytes::copy_from_slice(body),
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
             }),
         )
     }

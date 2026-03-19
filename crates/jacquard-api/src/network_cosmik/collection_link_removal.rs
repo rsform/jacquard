@@ -38,51 +38,51 @@ pub mod collection_link_removal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
-        type RemovedAt;
         type RemovedLink;
+        type RemovedAt;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
-        type RemovedAt = Unset;
         type RemovedLink = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type RemovedAt = S::RemovedAt;
-        type RemovedLink = S::RemovedLink;
-    }
-    ///State transition - sets the `removed_at` field to Set
-    pub struct SetRemovedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRemovedAt<S> {}
-    impl<S: State> State for SetRemovedAt<S> {
-        type Collection = S::Collection;
-        type RemovedAt = Set<members::removed_at>;
-        type RemovedLink = S::RemovedLink;
+        type RemovedAt = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `removed_link` field to Set
     pub struct SetRemovedLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRemovedLink<S> {}
     impl<S: State> State for SetRemovedLink<S> {
-        type Collection = S::Collection;
-        type RemovedAt = S::RemovedAt;
         type RemovedLink = Set<members::removed_link>;
+        type RemovedAt = S::RemovedAt;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `removed_at` field to Set
+    pub struct SetRemovedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRemovedAt<S> {}
+    impl<S: State> State for SetRemovedAt<S> {
+        type RemovedLink = S::RemovedLink;
+        type RemovedAt = Set<members::removed_at>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type RemovedLink = S::RemovedLink;
+        type RemovedAt = S::RemovedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `removed_at` field
-        pub struct removed_at(());
         ///Marker type for the `removed_link` field
         pub struct removed_link(());
+        ///Marker type for the `removed_at` field
+        pub struct removed_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -187,9 +187,9 @@ where
 impl<'a, S> CollectionLinkRemovalBuilder<'a, S>
 where
     S: collection_link_removal_state::State,
-    S::Collection: collection_link_removal_state::IsSet,
-    S::RemovedAt: collection_link_removal_state::IsSet,
     S::RemovedLink: collection_link_removal_state::IsSet,
+    S::RemovedAt: collection_link_removal_state::IsSet,
+    S::Collection: collection_link_removal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLinkRemoval<'a> {
@@ -204,7 +204,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CollectionLinkRemoval<'a> {
@@ -308,7 +308,7 @@ fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -320,9 +320,9 @@ fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("collection"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("removedLink"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("removedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("removedLink"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("removedAt")
                             ],
                         ),
                         nullable: None,
@@ -330,7 +330,7 @@ fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "collection",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -341,7 +341,7 @@ fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "removedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -364,7 +364,7 @@ fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "removedLink",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

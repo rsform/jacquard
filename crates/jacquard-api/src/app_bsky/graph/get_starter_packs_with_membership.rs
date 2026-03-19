@@ -368,7 +368,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> StarterPackWithMembership<'a> {
@@ -393,7 +393,7 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -401,14 +401,16 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("actor")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("actor")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "actor",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -429,7 +431,9 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "cursor",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -444,7 +448,9 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "limit",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -463,7 +469,7 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "starterPackWithMembership",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -474,7 +480,7 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("starterPack")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("starterPack")
                         ],
                     ),
                     nullable: None,
@@ -482,7 +488,9 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("listItem"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "listItem",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -491,7 +499,7 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "starterPack",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

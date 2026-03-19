@@ -19,14 +19,14 @@ pub(crate) enum BuilderSchema<'a> {
 
 impl<'a> BuilderSchema<'a> {
     /// Get the required fields list
-    pub fn required(&self) -> Option<&[jacquard_common::smol_str::SmolStr]> {
+    pub fn required(&self) -> Option<&[jacquard_common::deps::smol_str::SmolStr]> {
         match self {
             BuilderSchema::Object(obj) => obj.required.as_deref(),
             BuilderSchema::Parameters(params) => params.required.as_deref(),
         }
     }
 
-    pub fn nullable(&self) -> Option<&[jacquard_common::smol_str::SmolStr]> {
+    pub fn nullable(&self) -> Option<&[jacquard_common::deps::smol_str::SmolStr]> {
         match self {
             BuilderSchema::Object(obj) => obj.nullable.as_deref(),
             BuilderSchema::Parameters(_) => None,
@@ -34,7 +34,7 @@ impl<'a> BuilderSchema<'a> {
     }
 
     /// Get the property names (field names)
-    pub fn property_names(&self) -> Vec<&jacquard_common::smol_str::SmolStr> {
+    pub fn property_names(&self) -> Vec<&jacquard_common::deps::smol_str::SmolStr> {
         match self {
             BuilderSchema::Object(obj) => obj.properties.keys().collect(),
             BuilderSchema::Parameters(params) => params.properties.keys().collect(),

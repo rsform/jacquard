@@ -1,7 +1,7 @@
 use crate::error::{CodegenError, Result};
 use crate::lexicon::{LexUserType, LexiconDoc};
 use crate::ref_utils::RefPath;
-use jacquard_common::{into_static::IntoStatic, smol_str::SmolStr};
+use jacquard_common::{into_static::IntoStatic, deps::smol_str::SmolStr};
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;

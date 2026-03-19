@@ -29,7 +29,9 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationElsewhere"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "locationElsewhere",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -42,7 +44,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationHome"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("locationHome"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -55,7 +57,9 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationMathTextbook"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "locationMathTextbook",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -68,7 +72,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationOnSkin"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("locationOnSkin"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -81,7 +85,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationSchool"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("locationSchool"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -94,7 +98,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -106,7 +110,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("time")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("time")
                             ],
                         ),
                         nullable: None,
@@ -114,7 +118,9 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("time"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "time",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -131,7 +137,9 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tool"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tool",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -145,7 +153,9 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("where"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "where",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -164,7 +174,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("toolFinger"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("toolFinger"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -177,7 +187,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("toolMarker"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("toolMarker"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -190,7 +200,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("toolOther"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("toolOther"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -203,7 +213,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("toolPen"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("toolPen"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -216,7 +226,7 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("toolPencil"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("toolPencil"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -516,7 +526,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Deltarune<'a> {

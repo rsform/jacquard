@@ -116,7 +116,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Preference<'a> {
@@ -216,7 +216,7 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -228,7 +228,7 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("myPage")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("myPage")
                             ],
                         ),
                         nullable: None,
@@ -236,7 +236,9 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("myPage"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "myPage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
@@ -251,12 +253,12 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("myPage"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("myPage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("isUseMyPage")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isUseMyPage")
                         ],
                     ),
                     nullable: None,
@@ -264,7 +266,7 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -285,7 +287,7 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isUseMyPage",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -438,7 +440,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MyPage<'a> {
@@ -477,7 +479,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MyPage<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

@@ -51,51 +51,51 @@ pub mod fact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Args;
         type Predicate;
+        type Args;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Args = Unset;
         type Predicate = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Args = S::Args;
-        type Predicate = S::Predicate;
-    }
-    ///State transition - sets the `args` field to Set
-    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArgs<S> {}
-    impl<S: State> State for SetArgs<S> {
-        type CreatedAt = S::CreatedAt;
-        type Args = Set<members::args>;
-        type Predicate = S::Predicate;
+        type Args = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `predicate` field to Set
     pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPredicate<S> {}
     impl<S: State> State for SetPredicate<S> {
-        type CreatedAt = S::CreatedAt;
-        type Args = S::Args;
         type Predicate = Set<members::predicate>;
+        type Args = S::Args;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `args` field to Set
+    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArgs<S> {}
+    impl<S: State> State for SetArgs<S> {
+        type Predicate = S::Predicate;
+        type Args = Set<members::args>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Predicate = S::Predicate;
+        type Args = S::Args;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `args` field
-        pub struct args(());
         ///Marker type for the `predicate` field
         pub struct predicate(());
+        ///Marker type for the `args` field
+        pub struct args(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -285,9 +285,9 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
-    S::CreatedAt: fact_state::IsSet,
-    S::Args: fact_state::IsSet,
     S::Predicate: fact_state::IsSet,
+    S::Args: fact_state::IsSet,
+    S::CreatedAt: fact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fact<'a> {
@@ -307,7 +307,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Fact<'a> {
@@ -452,7 +452,7 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -460,9 +460,9 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("predicate"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("args"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("predicate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("args"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -470,7 +470,9 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("args"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "args",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -490,7 +492,7 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "confidence",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -511,7 +513,7 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -530,7 +532,7 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "expiresAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -549,7 +551,7 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "predicate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -566,7 +568,9 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "source",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -585,7 +589,7 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "supersedes",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -606,7 +610,9 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {

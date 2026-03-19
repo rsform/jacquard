@@ -256,7 +256,7 @@ impl<'c> CodeGenerator<'c> {
                             syn::Ident::new(&variant.variant_name, proc_macro2::Span::call_site());
                         quote! {
                             #ref_str_literal => {
-                                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
                                 Ok(Self::#variant_ident(Box::new(variant)))
                             }
                         }
@@ -490,7 +490,7 @@ impl<'c> CodeGenerator<'c> {
         } else {
             // Binary body: just a bytes field
             quote! {
-                pub body: bytes::Bytes,
+                pub body: jacquard_common::deps::bytes::Bytes,
             }
         };
 
@@ -571,7 +571,7 @@ impl<'c> CodeGenerator<'c> {
             self.generate_body_fields(nsid, &struct_name, schema, false)?
         } else {
             quote! {
-                pub body: bytes::Bytes,
+                pub body: jacquard_common::deps::bytes::Bytes,
             }
         };
 
@@ -982,7 +982,7 @@ impl<'c> CodeGenerator<'c> {
                     Self::Output<'de>: serde::Deserialize<'de>,
                 {
                     Ok(#output_ident {
-                        body: bytes::Bytes::copy_from_slice(body),
+                        body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
                     })
                 }
             }
@@ -1035,7 +1035,7 @@ impl<'c> CodeGenerator<'c> {
                     Self: serde::Deserialize<'de>,
                 {
                     Ok(Box::new(Self {
-                        body: bytes::Bytes::copy_from_slice(body),
+                        body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
                     }))
                 }
             }

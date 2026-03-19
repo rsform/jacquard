@@ -158,7 +158,7 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocksOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[jacquard_derive::open_union]
@@ -251,7 +251,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBlocksResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(GetBlocksOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }

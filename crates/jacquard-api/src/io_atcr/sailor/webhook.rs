@@ -43,67 +43,67 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Triggers;
-        type PrivateCid;
         type HoldDid;
         type CreatedAt;
+        type PrivateCid;
+        type Triggers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Triggers = Unset;
-        type PrivateCid = Unset;
         type HoldDid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `triggers` field to Set
-    pub struct SetTriggers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggers<S> {}
-    impl<S: State> State for SetTriggers<S> {
-        type Triggers = Set<members::triggers>;
-        type PrivateCid = S::PrivateCid;
-        type HoldDid = S::HoldDid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `private_cid` field to Set
-    pub struct SetPrivateCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrivateCid<S> {}
-    impl<S: State> State for SetPrivateCid<S> {
-        type Triggers = S::Triggers;
-        type PrivateCid = Set<members::private_cid>;
-        type HoldDid = S::HoldDid;
-        type CreatedAt = S::CreatedAt;
+        type PrivateCid = Unset;
+        type Triggers = Unset;
     }
     ///State transition - sets the `hold_did` field to Set
     pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHoldDid<S> {}
     impl<S: State> State for SetHoldDid<S> {
-        type Triggers = S::Triggers;
-        type PrivateCid = S::PrivateCid;
         type HoldDid = Set<members::hold_did>;
         type CreatedAt = S::CreatedAt;
+        type PrivateCid = S::PrivateCid;
+        type Triggers = S::Triggers;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Triggers = S::Triggers;
-        type PrivateCid = S::PrivateCid;
         type HoldDid = S::HoldDid;
         type CreatedAt = Set<members::created_at>;
+        type PrivateCid = S::PrivateCid;
+        type Triggers = S::Triggers;
+    }
+    ///State transition - sets the `private_cid` field to Set
+    pub struct SetPrivateCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrivateCid<S> {}
+    impl<S: State> State for SetPrivateCid<S> {
+        type HoldDid = S::HoldDid;
+        type CreatedAt = S::CreatedAt;
+        type PrivateCid = Set<members::private_cid>;
+        type Triggers = S::Triggers;
+    }
+    ///State transition - sets the `triggers` field to Set
+    pub struct SetTriggers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggers<S> {}
+    impl<S: State> State for SetTriggers<S> {
+        type HoldDid = S::HoldDid;
+        type CreatedAt = S::CreatedAt;
+        type PrivateCid = S::PrivateCid;
+        type Triggers = Set<members::triggers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `triggers` field
-        pub struct triggers(());
-        ///Marker type for the `private_cid` field
-        pub struct private_cid(());
         ///Marker type for the `hold_did` field
         pub struct hold_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `private_cid` field
+        pub struct private_cid(());
+        ///Marker type for the `triggers` field
+        pub struct triggers(());
     }
 }
 
@@ -236,10 +236,10 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
-    S::Triggers: webhook_state::IsSet,
-    S::PrivateCid: webhook_state::IsSet,
     S::HoldDid: webhook_state::IsSet,
     S::CreatedAt: webhook_state::IsSet,
+    S::PrivateCid: webhook_state::IsSet,
+    S::Triggers: webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Webhook<'a> {
@@ -256,7 +256,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Webhook<'a> {
@@ -385,7 +385,7 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -397,10 +397,10 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("holdDid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("triggers"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("privateCid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("holdDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("triggers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("privateCid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -408,7 +408,7 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -431,7 +431,9 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("holdDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "holdDid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -452,7 +454,7 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "privateCid",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -473,7 +475,7 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "triggers",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -486,7 +488,7 @@ fn lexicon_doc_io_atcr_sailor_webhook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

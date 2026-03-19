@@ -36,51 +36,51 @@ pub mod selected_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuestionRef;
         type AnswerRef;
         type CreatedAt;
+        type QuestionRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuestionRef = Unset;
         type AnswerRef = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `question_ref` field to Set
-    pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
-    impl<S: State> State for SetQuestionRef<S> {
-        type QuestionRef = Set<members::question_ref>;
-        type AnswerRef = S::AnswerRef;
-        type CreatedAt = S::CreatedAt;
+        type QuestionRef = Unset;
     }
     ///State transition - sets the `answer_ref` field to Set
     pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
     impl<S: State> State for SetAnswerRef<S> {
-        type QuestionRef = S::QuestionRef;
         type AnswerRef = Set<members::answer_ref>;
         type CreatedAt = S::CreatedAt;
+        type QuestionRef = S::QuestionRef;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type QuestionRef = S::QuestionRef;
         type AnswerRef = S::AnswerRef;
         type CreatedAt = Set<members::created_at>;
+        type QuestionRef = S::QuestionRef;
+    }
+    ///State transition - sets the `question_ref` field to Set
+    pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
+    impl<S: State> State for SetQuestionRef<S> {
+        type AnswerRef = S::AnswerRef;
+        type CreatedAt = S::CreatedAt;
+        type QuestionRef = Set<members::question_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `question_ref` field
-        pub struct question_ref(());
         ///Marker type for the `answer_ref` field
         pub struct answer_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `question_ref` field
+        pub struct question_ref(());
     }
 }
 
@@ -173,9 +173,9 @@ where
 impl<'a, S> SelectedAnswerBuilder<'a, S>
 where
     S: selected_answer_state::State,
-    S::QuestionRef: selected_answer_state::IsSet,
     S::AnswerRef: selected_answer_state::IsSet,
     S::CreatedAt: selected_answer_state::IsSet,
+    S::QuestionRef: selected_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SelectedAnswer<'a> {
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SelectedAnswer<'a> {
@@ -292,7 +292,7 @@ fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon:
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -304,9 +304,9 @@ fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon:
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("questionRef"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("answerRef"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("questionRef"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("answerRef"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -314,7 +314,7 @@ fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "answerRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -325,7 +325,7 @@ fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -348,7 +348,7 @@ fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "questionRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

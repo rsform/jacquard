@@ -36,37 +36,37 @@ pub mod failed_scheduling_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Error;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Error = S::Error;
+        type Subject = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetError<S> {}
     impl<S: State> State for SetError<S> {
-        type Subject = S::Subject;
         type Error = Set<members::error>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Error = S::Error;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -159,8 +159,8 @@ where
 impl<'a, S> FailedSchedulingBuilder<'a, S>
 where
     S: failed_scheduling_state::State,
-    S::Subject: failed_scheduling_state::IsSet,
     S::Error: failed_scheduling_state::IsSet,
+    S::Subject: failed_scheduling_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FailedScheduling<'a> {
@@ -175,7 +175,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> FailedScheduling<'a> {
@@ -201,13 +201,15 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("failedScheduling"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "failedScheduling",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("error")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("error")
                         ],
                     ),
                     nullable: None,
@@ -215,7 +217,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "error",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -230,7 +234,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "errorCode",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -247,7 +251,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "subject",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -268,7 +274,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -282,10 +288,10 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("action"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("subjects"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("scheduling")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("subjects"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("createdBy"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduling")
                                     ],
                                 ),
                                 nullable: None,
@@ -293,7 +299,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("action"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "action",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                             description: None,
                                             refs: vec![
@@ -303,7 +311,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "createdBy",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -322,7 +330,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("modTool"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "modTool",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
                                             r#ref: ::jacquard_common::CowStr::new_static(
@@ -331,7 +341,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "scheduling",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -342,7 +352,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "subjects",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -379,15 +389,15 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "scheduledActionResults",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("succeeded"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("failed")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("succeeded"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("failed")
                         ],
                     ),
                     nullable: None,
@@ -395,7 +405,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("failed"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "failed",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -409,7 +421,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "succeeded",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -437,7 +449,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("schedulingConfig"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "schedulingConfig",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -450,7 +464,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "executeAfter",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -473,7 +487,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "executeAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -496,7 +510,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "executeUntil",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -523,7 +537,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("takedown"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("takedown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -536,7 +550,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "acknowledgeAccountSubjects",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -546,7 +560,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "comment",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -561,7 +577,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "durationInHours",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -574,7 +590,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "emailContent",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -595,7 +611,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "emailSubject",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -616,7 +632,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("policies"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "policies",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -640,7 +658,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "severityLevel",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -661,7 +679,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "strikeCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -674,7 +692,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "strikeExpiresAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -761,65 +779,65 @@ pub mod schedule_action_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scheduling;
-        type Subjects;
         type Action;
+        type Subjects;
+        type Scheduling;
         type CreatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scheduling = Unset;
-        type Subjects = Unset;
         type Action = Unset;
+        type Subjects = Unset;
+        type Scheduling = Unset;
         type CreatedBy = Unset;
     }
-    ///State transition - sets the `scheduling` field to Set
-    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduling<S> {}
-    impl<S: State> State for SetScheduling<S> {
-        type Scheduling = Set<members::scheduling>;
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Action = Set<members::action>;
         type Subjects = S::Subjects;
-        type Action = S::Action;
+        type Scheduling = S::Scheduling;
         type CreatedBy = S::CreatedBy;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
-        type Scheduling = S::Scheduling;
-        type Subjects = Set<members::subjects>;
         type Action = S::Action;
+        type Subjects = Set<members::subjects>;
+        type Scheduling = S::Scheduling;
         type CreatedBy = S::CreatedBy;
     }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Scheduling = S::Scheduling;
+    ///State transition - sets the `scheduling` field to Set
+    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduling<S> {}
+    impl<S: State> State for SetScheduling<S> {
+        type Action = S::Action;
         type Subjects = S::Subjects;
-        type Action = Set<members::action>;
+        type Scheduling = Set<members::scheduling>;
         type CreatedBy = S::CreatedBy;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Scheduling = S::Scheduling;
-        type Subjects = S::Subjects;
         type Action = S::Action;
+        type Subjects = S::Subjects;
+        type Scheduling = S::Scheduling;
         type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scheduling` field
-        pub struct scheduling(());
-        ///Marker type for the `subjects` field
-        pub struct subjects(());
         ///Marker type for the `action` field
         pub struct action(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
+        ///Marker type for the `scheduling` field
+        pub struct scheduling(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
     }
@@ -960,9 +978,9 @@ where
 impl<'a, S> ScheduleActionBuilder<'a, S>
 where
     S: schedule_action_state::State,
-    S::Scheduling: schedule_action_state::IsSet,
-    S::Subjects: schedule_action_state::IsSet,
     S::Action: schedule_action_state::IsSet,
+    S::Subjects: schedule_action_state::IsSet,
+    S::Scheduling: schedule_action_state::IsSet,
     S::CreatedBy: schedule_action_state::IsSet,
 {
     /// Build the final struct
@@ -980,7 +998,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ScheduleAction<'a> {
@@ -1072,37 +1090,37 @@ pub mod scheduled_action_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Succeeded;
         type Failed;
+        type Succeeded;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Succeeded = Unset;
         type Failed = Unset;
-    }
-    ///State transition - sets the `succeeded` field to Set
-    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
-    impl<S: State> State for SetSucceeded<S> {
-        type Succeeded = Set<members::succeeded>;
-        type Failed = S::Failed;
+        type Succeeded = Unset;
     }
     ///State transition - sets the `failed` field to Set
     pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFailed<S> {}
     impl<S: State> State for SetFailed<S> {
-        type Succeeded = S::Succeeded;
         type Failed = Set<members::failed>;
+        type Succeeded = S::Succeeded;
+    }
+    ///State transition - sets the `succeeded` field to Set
+    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
+    impl<S: State> State for SetSucceeded<S> {
+        type Failed = S::Failed;
+        type Succeeded = Set<members::succeeded>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `succeeded` field
-        pub struct succeeded(());
         ///Marker type for the `failed` field
         pub struct failed(());
+        ///Marker type for the `succeeded` field
+        pub struct succeeded(());
     }
 }
 
@@ -1188,8 +1206,8 @@ where
 impl<'a, S> ScheduledActionResultsBuilder<'a, S>
 where
     S: scheduled_action_results_state::State,
-    S::Succeeded: scheduled_action_results_state::IsSet,
     S::Failed: scheduled_action_results_state::IsSet,
+    S::Succeeded: scheduled_action_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledActionResults<'a> {
@@ -1203,7 +1221,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ScheduledActionResults<'a> {

@@ -47,85 +47,85 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Librarians;
-        type Title;
-        type Books;
         type Duedate;
+        type Title;
         type CreatedAt;
+        type Books;
+        type Librarians;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Librarians = Unset;
-        type Title = Unset;
-        type Books = Unset;
         type Duedate = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `librarians` field to Set
-    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
-    impl<S: State> State for SetLibrarians<S> {
-        type Librarians = Set<members::librarians>;
-        type Title = S::Title;
-        type Books = S::Books;
-        type Duedate = S::Duedate;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Librarians = S::Librarians;
-        type Title = Set<members::title>;
-        type Books = S::Books;
-        type Duedate = S::Duedate;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Librarians = S::Librarians;
-        type Title = S::Title;
-        type Books = Set<members::books>;
-        type Duedate = S::Duedate;
-        type CreatedAt = S::CreatedAt;
+        type Books = Unset;
+        type Librarians = Unset;
     }
     ///State transition - sets the `duedate` field to Set
     pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuedate<S> {}
     impl<S: State> State for SetDuedate<S> {
-        type Librarians = S::Librarians;
-        type Title = S::Title;
-        type Books = S::Books;
         type Duedate = Set<members::duedate>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
+        type Books = S::Books;
+        type Librarians = S::Librarians;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Duedate = S::Duedate;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Books = S::Books;
+        type Librarians = S::Librarians;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Librarians = S::Librarians;
-        type Title = S::Title;
-        type Books = S::Books;
         type Duedate = S::Duedate;
+        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Books = S::Books;
+        type Librarians = S::Librarians;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type Duedate = S::Duedate;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Books = Set<members::books>;
+        type Librarians = S::Librarians;
+    }
+    ///State transition - sets the `librarians` field to Set
+    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
+    impl<S: State> State for SetLibrarians<S> {
+        type Duedate = S::Duedate;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Books = S::Books;
+        type Librarians = Set<members::librarians>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `books` field
-        pub struct books(());
         ///Marker type for the `duedate` field
         pub struct duedate(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `books` field
+        pub struct books(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
     }
 }
 
@@ -278,11 +278,11 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Librarians: list_state::IsSet,
-    S::Title: list_state::IsSet,
-    S::Books: list_state::IsSet,
     S::Duedate: list_state::IsSet,
+    S::Title: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
+    S::Books: list_state::IsSet,
+    S::Librarians: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -300,7 +300,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> List<'a> {
@@ -404,7 +404,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -436,7 +436,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
         {
             let value = &self.title;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -465,7 +465,7 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -477,11 +477,11 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("librarians"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("books"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("duedate"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("librarians"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("books"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("duedate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -489,7 +489,9 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("books"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "books",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -507,7 +509,7 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -530,7 +532,7 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -551,7 +553,9 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("duedate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "duedate",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -572,7 +576,7 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "librarians",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -600,7 +604,9 @@ fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

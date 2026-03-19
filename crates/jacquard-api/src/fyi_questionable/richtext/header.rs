@@ -178,7 +178,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Header<'a> {
@@ -202,13 +202,13 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("plaintext"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("level")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("plaintext"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level")
                         ],
                     ),
                     nullable: None,
@@ -216,7 +216,9 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "facets",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -230,7 +232,9 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "level",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -241,7 +245,7 @@ fn lexicon_doc_fyi_questionable_richtext_header() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "plaintext",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -319,7 +323,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
         {
             let value = &self.plaintext;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

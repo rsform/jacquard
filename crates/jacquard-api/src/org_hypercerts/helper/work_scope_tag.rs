@@ -314,7 +314,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> WorkScopeTag<'a> {
@@ -451,7 +451,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -520,7 +520,7 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -532,9 +532,9 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("key"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("label")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("label")
                             ],
                         ),
                         nullable: None,
@@ -542,7 +542,9 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("aliases"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "aliases",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -566,7 +568,7 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -589,7 +591,7 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -610,7 +612,7 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "externalReference",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -627,7 +629,9 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "key",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -646,7 +650,9 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("kind"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "kind",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -665,7 +671,9 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("label"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "label",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -684,7 +692,9 @@ fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("parent"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "parent",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

@@ -43,37 +43,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Game;
         type Credits;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Game = Unset;
         type Credits = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Game = Set<members::game>;
-        type Credits = S::Credits;
+        type Game = Unset;
     }
     ///State transition - sets the `credits` field to Set
     pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCredits<S> {}
     impl<S: State> State for SetCredits<S> {
-        type Game = S::Game;
         type Credits = Set<members::credits>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Credits = S::Credits;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `credits` field
         pub struct credits(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
@@ -186,8 +186,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Game: credit_state::IsSet,
     S::Credits: credit_state::IsSet,
+    S::Game: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -203,7 +203,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Credit<'a> {
@@ -320,7 +320,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -332,8 +332,8 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("game"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("credits")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("game"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("credits")
                             ],
                         ),
                         nullable: None,
@@ -341,7 +341,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "actor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -350,7 +352,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("credits"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "credits",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -368,7 +372,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "displayName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -389,7 +393,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("game"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "game",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

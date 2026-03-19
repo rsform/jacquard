@@ -20,14 +20,14 @@
 pub struct Declaration<'a> {
     /// Array of opaque values to allow for key rolling
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub continuity_proofs: std::option::Option<Vec<bytes::Bytes>>,
+    pub continuity_proofs: std::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
     /// Opaque value, an ed25519 public key prefixed with a byte enum
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub current_key: bytes::Bytes,
+    pub current_key: jacquard_common::deps::bytes::Bytes,
     /// Opaque value, contains MLS KeyPackage(s), and other signature data, and is signed by the currentKey
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub key_package: std::option::Option<bytes::Bytes>,
+    pub key_package: std::option::Option<jacquard_common::deps::bytes::Bytes>,
     /// Controls who can message this account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -87,9 +87,9 @@ pub mod declaration_state {
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<bytes::Bytes>>,
-        ::core::option::Option<bytes::Bytes>,
-        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<crate::com_germnetwork::declaration::MessageMe<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -118,13 +118,16 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `continuityProofs` field (optional)
     pub fn continuity_proofs(
         mut self,
-        value: impl Into<Option<Vec<bytes::Bytes>>>,
+        value: impl Into<Option<Vec<jacquard_common::deps::bytes::Bytes>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `continuityProofs` field to an Option value (optional)
-    pub fn maybe_continuity_proofs(mut self, value: Option<Vec<bytes::Bytes>>) -> Self {
+    pub fn maybe_continuity_proofs(
+        mut self,
+        value: Option<Vec<jacquard_common::deps::bytes::Bytes>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -138,7 +141,7 @@ where
     /// Set the `currentKey` field (required)
     pub fn current_key(
         mut self,
-        value: impl Into<bytes::Bytes>,
+        value: impl Into<jacquard_common::deps::bytes::Bytes>,
     ) -> DeclarationBuilder<'a, declaration_state::SetCurrentKey<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         DeclarationBuilder {
@@ -151,12 +154,18 @@ where
 
 impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `keyPackage` field (optional)
-    pub fn key_package(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+    pub fn key_package(
+        mut self,
+        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `keyPackage` field to an Option value (optional)
-    pub fn maybe_key_package(mut self, value: Option<bytes::Bytes>) -> Self {
+    pub fn maybe_key_package(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -221,7 +230,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Declaration<'a> {
@@ -363,7 +372,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -375,8 +384,8 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("currentKey")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("currentKey")
                             ],
                         ),
                         nullable: None,
@@ -384,7 +393,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "continuityProofs",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -403,7 +412,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "currentKey",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
@@ -413,7 +422,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "keyPackage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
@@ -423,7 +432,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "messageMe",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -432,7 +441,9 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "version",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -456,13 +467,13 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("messageMe"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("messageMe"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("showButtonTo"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("messageMeUrl")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("showButtonTo"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("messageMeUrl")
                         ],
                     ),
                     nullable: None,
@@ -470,7 +481,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "messageMeUrl",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -493,7 +504,7 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "showButtonTo",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -552,37 +563,37 @@ pub mod message_me_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessageMeUrl;
         type ShowButtonTo;
+        type MessageMeUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessageMeUrl = Unset;
         type ShowButtonTo = Unset;
-    }
-    ///State transition - sets the `message_me_url` field to Set
-    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
-    impl<S: State> State for SetMessageMeUrl<S> {
-        type MessageMeUrl = Set<members::message_me_url>;
-        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Unset;
     }
     ///State transition - sets the `show_button_to` field to Set
     pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
     impl<S: State> State for SetShowButtonTo<S> {
-        type MessageMeUrl = S::MessageMeUrl;
         type ShowButtonTo = Set<members::show_button_to>;
+        type MessageMeUrl = S::MessageMeUrl;
+    }
+    ///State transition - sets the `message_me_url` field to Set
+    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
+    impl<S: State> State for SetMessageMeUrl<S> {
+        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Set<members::message_me_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message_me_url` field
-        pub struct message_me_url(());
         ///Marker type for the `show_button_to` field
         pub struct show_button_to(());
+        ///Marker type for the `message_me_url` field
+        pub struct message_me_url(());
     }
 }
 
@@ -655,8 +666,8 @@ where
 impl<'a, S> MessageMeBuilder<'a, S>
 where
     S: message_me_state::State,
-    S::MessageMeUrl: message_me_state::IsSet,
     S::ShowButtonTo: message_me_state::IsSet,
+    S::MessageMeUrl: message_me_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageMe<'a> {
@@ -670,7 +681,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MessageMe<'a> {

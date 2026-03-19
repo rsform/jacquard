@@ -16,7 +16,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sign {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[derive(
@@ -30,7 +30,7 @@ pub struct Sign {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SignOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 /// Response type for
@@ -53,7 +53,7 @@ impl jacquard_common::xrpc::XrpcResp for SignResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(SignOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }
@@ -75,7 +75,7 @@ impl jacquard_common::xrpc::XrpcRequest for Sign {
     {
         Ok(
             Box::new(Self {
-                body: bytes::Bytes::copy_from_slice(body),
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
             }),
         )
     }

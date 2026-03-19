@@ -8,7 +8,7 @@ use crate::ref_utils::RefPath;
 use crate::schema::SchemaRegistry;
 use cid::Cid as IpldCid;
 use dashmap::DashMap;
-use jacquard_common::{smol_str, types::value::Data};
+use jacquard_common::{deps::smol_str, types::value::Data};
 use sha2::{Digest, Sha256};
 use smol_str::SmolStr;
 use std::{

@@ -61,8 +61,8 @@ pub mod multi_observation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sensor;
         type Entries;
+        type Sensor;
         type PhenomenonTime;
         type Thing;
     }
@@ -70,26 +70,26 @@ pub mod multi_observation_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sensor = Unset;
         type Entries = Unset;
+        type Sensor = Unset;
         type PhenomenonTime = Unset;
         type Thing = Unset;
-    }
-    ///State transition - sets the `sensor` field to Set
-    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSensor<S> {}
-    impl<S: State> State for SetSensor<S> {
-        type Sensor = Set<members::sensor>;
-        type Entries = S::Entries;
-        type PhenomenonTime = S::PhenomenonTime;
-        type Thing = S::Thing;
     }
     ///State transition - sets the `entries` field to Set
     pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntries<S> {}
     impl<S: State> State for SetEntries<S> {
-        type Sensor = S::Sensor;
         type Entries = Set<members::entries>;
+        type Sensor = S::Sensor;
+        type PhenomenonTime = S::PhenomenonTime;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `sensor` field to Set
+    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSensor<S> {}
+    impl<S: State> State for SetSensor<S> {
+        type Entries = S::Entries;
+        type Sensor = Set<members::sensor>;
         type PhenomenonTime = S::PhenomenonTime;
         type Thing = S::Thing;
     }
@@ -97,8 +97,8 @@ pub mod multi_observation_state {
     pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
     impl<S: State> State for SetPhenomenonTime<S> {
-        type Sensor = S::Sensor;
         type Entries = S::Entries;
+        type Sensor = S::Sensor;
         type PhenomenonTime = Set<members::phenomenon_time>;
         type Thing = S::Thing;
     }
@@ -106,18 +106,18 @@ pub mod multi_observation_state {
     pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThing<S> {}
     impl<S: State> State for SetThing<S> {
-        type Sensor = S::Sensor;
         type Entries = S::Entries;
+        type Sensor = S::Sensor;
         type PhenomenonTime = S::PhenomenonTime;
         type Thing = Set<members::thing>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sensor` field
-        pub struct sensor(());
         ///Marker type for the `entries` field
         pub struct entries(());
+        ///Marker type for the `sensor` field
+        pub struct sensor(());
         ///Marker type for the `phenomenon_time` field
         pub struct phenomenon_time(());
         ///Marker type for the `thing` field
@@ -318,8 +318,8 @@ where
 impl<'a, S> MultiObservationBuilder<'a, S>
 where
     S: multi_observation_state::State,
-    S::Sensor: multi_observation_state::IsSet,
     S::Entries: multi_observation_state::IsSet,
+    S::Sensor: multi_observation_state::IsSet,
     S::PhenomenonTime: multi_observation_state::IsSet,
     S::Thing: multi_observation_state::IsSet,
 {
@@ -341,7 +341,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MultiObservation<'a> {
@@ -585,7 +585,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -597,10 +597,10 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("thing"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("sensor"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("phenomenonTime"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("entries")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("thing"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sensor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("phenomenonTime"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("entries")
                             ],
                         ),
                         nullable: None,
@@ -608,7 +608,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "derivedFrom",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -636,7 +636,9 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("entries"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "entries",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -654,7 +656,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "phenomenonTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -677,7 +679,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "phenomenonTimeEnd",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -700,7 +702,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "resultQuality",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -721,7 +723,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "resultTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -744,7 +746,9 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sensor"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sensor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -765,7 +769,9 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("thing"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "thing",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -791,7 +797,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "multiObservationEntry",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -802,9 +808,9 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("observedProperty"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("unitOfMeasurement"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("result")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("observedProperty"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("unitOfMeasurement"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("result")
                         ],
                     ),
                     nullable: None,
@@ -812,7 +818,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "observedProperty",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -835,7 +841,9 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("result"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "result",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -849,7 +857,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "resultQuality",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -870,7 +878,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "resultScaleFactor",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -883,7 +891,7 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "unitOfMeasurement",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -941,51 +949,51 @@ pub mod multi_observation_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ObservedProperty;
-        type Result;
         type UnitOfMeasurement;
+        type Result;
+        type ObservedProperty;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ObservedProperty = Unset;
-        type Result = Unset;
         type UnitOfMeasurement = Unset;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type ObservedProperty = Set<members::observed_property>;
-        type Result = S::Result;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-    }
-    ///State transition - sets the `result` field to Set
-    pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResult<S> {}
-    impl<S: State> State for SetResult<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type Result = Set<members::result>;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Result = Unset;
+        type ObservedProperty = Unset;
     }
     ///State transition - sets the `unit_of_measurement` field to Set
     pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
     impl<S: State> State for SetUnitOfMeasurement<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type Result = S::Result;
         type UnitOfMeasurement = Set<members::unit_of_measurement>;
+        type Result = S::Result;
+        type ObservedProperty = S::ObservedProperty;
+    }
+    ///State transition - sets the `result` field to Set
+    pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResult<S> {}
+    impl<S: State> State for SetResult<S> {
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Result = Set<members::result>;
+        type ObservedProperty = S::ObservedProperty;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
+    impl<S: State> State for SetObservedProperty<S> {
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Result = S::Result;
+        type ObservedProperty = Set<members::observed_property>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `observed_property` field
-        pub struct observed_property(());
-        ///Marker type for the `result` field
-        pub struct result(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
+        ///Marker type for the `result` field
+        pub struct result(());
+        ///Marker type for the `observed_property` field
+        pub struct observed_property(());
     }
 }
 
@@ -1123,9 +1131,9 @@ where
 impl<'a, S> MultiObservationEntryBuilder<'a, S>
 where
     S: multi_observation_entry_state::State,
-    S::ObservedProperty: multi_observation_entry_state::IsSet,
-    S::Result: multi_observation_entry_state::IsSet,
     S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
+    S::Result: multi_observation_entry_state::IsSet,
+    S::ObservedProperty: multi_observation_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservationEntry<'a> {
@@ -1142,7 +1150,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MultiObservationEntry<'a> {

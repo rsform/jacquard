@@ -207,7 +207,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Broadcast<'a> {
@@ -233,7 +233,7 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("bearer"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("bearer"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -252,7 +252,7 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("broadcast"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("broadcast"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -260,14 +260,18 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("bearer")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("bearer")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("bearer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bearer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -276,7 +280,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cost"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cost",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -287,7 +293,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("from"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "from",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -308,7 +316,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("offset"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "offset",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -319,7 +329,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("until"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "until",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -344,13 +356,13 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("credit"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("credit"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("entity"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("role")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("entity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("role")
                         ],
                     ),
                     nullable: None,
@@ -358,7 +370,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("entity"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "entity",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -367,7 +381,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("role"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "role",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -390,13 +406,13 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("entity"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("entity"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("name")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
                         ],
                     ),
                     nullable: None,
@@ -404,7 +420,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -419,7 +437,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -438,7 +458,7 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("genre"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("genre"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -457,13 +477,13 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("geocoordinates"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("geocoordinates"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("longitude")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("latitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("longitude")
                         ],
                     ),
                     nullable: None,
@@ -471,7 +491,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "latitude",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -486,7 +508,7 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "longitude",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -507,7 +529,7 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("membership"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("membership"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -515,14 +537,18 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("group")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("group")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("group"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "group",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -539,7 +565,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "index",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -554,7 +582,7 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("recording"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("recording"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -562,14 +590,18 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("bearer")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("bearer")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("bearer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bearer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -578,7 +610,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cost"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cost",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -589,7 +623,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("from"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "from",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -610,7 +646,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("until"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "until",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -635,13 +673,13 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("track"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("track"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("artists")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("artists")
                         ],
                     ),
                     nullable: None,
@@ -649,7 +687,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("album"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "album",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -664,7 +704,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("artists"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "artists",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -688,7 +730,9 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -757,37 +801,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entity;
         type Role;
+        type Entity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entity = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `entity` field to Set
-    pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntity<S> {}
-    impl<S: State> State for SetEntity<S> {
-        type Entity = Set<members::entity>;
-        type Role = S::Role;
+        type Entity = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Entity = S::Entity;
         type Role = Set<members::role>;
+        type Entity = S::Entity;
+    }
+    ///State transition - sets the `entity` field to Set
+    pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntity<S> {}
+    impl<S: State> State for SetEntity<S> {
+        type Role = S::Role;
+        type Entity = Set<members::entity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entity` field
-        pub struct entity(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `entity` field
+        pub struct entity(());
     }
 }
 
@@ -860,8 +904,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Entity: credit_state::IsSet,
     S::Role: credit_state::IsSet,
+    S::Entity: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -875,7 +919,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Credit<'a> {
@@ -1046,7 +1090,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
         {
             let value = &self.name;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1271,7 +1315,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Membership<'a> {
@@ -1477,7 +1521,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Recording<'a> {
@@ -1676,7 +1720,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Track<'a> {

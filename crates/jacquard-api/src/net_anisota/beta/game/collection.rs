@@ -93,8 +93,8 @@ pub mod collection_state {
     pub trait State: sealed::Sealed {
         type CreatedAt;
         type SpecimenId;
-        type Quantity;
         type AcquiredAt;
+        type Quantity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -102,8 +102,8 @@ pub mod collection_state {
     impl State for Empty {
         type CreatedAt = Unset;
         type SpecimenId = Unset;
-        type Quantity = Unset;
         type AcquiredAt = Unset;
+        type Quantity = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -111,8 +111,8 @@ pub mod collection_state {
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
         type SpecimenId = S::SpecimenId;
-        type Quantity = S::Quantity;
         type AcquiredAt = S::AcquiredAt;
+        type Quantity = S::Quantity;
     }
     ///State transition - sets the `specimen_id` field to Set
     pub struct SetSpecimenId<S: State = Empty>(PhantomData<fn() -> S>);
@@ -120,17 +120,8 @@ pub mod collection_state {
     impl<S: State> State for SetSpecimenId<S> {
         type CreatedAt = S::CreatedAt;
         type SpecimenId = Set<members::specimen_id>;
+        type AcquiredAt = S::AcquiredAt;
         type Quantity = S::Quantity;
-        type AcquiredAt = S::AcquiredAt;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuantity<S> {}
-    impl<S: State> State for SetQuantity<S> {
-        type CreatedAt = S::CreatedAt;
-        type SpecimenId = S::SpecimenId;
-        type Quantity = Set<members::quantity>;
-        type AcquiredAt = S::AcquiredAt;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -138,8 +129,17 @@ pub mod collection_state {
     impl<S: State> State for SetAcquiredAt<S> {
         type CreatedAt = S::CreatedAt;
         type SpecimenId = S::SpecimenId;
-        type Quantity = S::Quantity;
         type AcquiredAt = Set<members::acquired_at>;
+        type Quantity = S::Quantity;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type CreatedAt = S::CreatedAt;
+        type SpecimenId = S::SpecimenId;
+        type AcquiredAt = S::AcquiredAt;
+        type Quantity = Set<members::quantity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -148,10 +148,10 @@ pub mod collection_state {
         pub struct created_at(());
         ///Marker type for the `specimen_id` field
         pub struct specimen_id(());
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
     }
 }
 
@@ -534,8 +534,8 @@ where
     S: collection_state::State,
     S::CreatedAt: collection_state::IsSet,
     S::SpecimenId: collection_state::IsSet,
-    S::Quantity: collection_state::IsSet,
     S::AcquiredAt: collection_state::IsSet,
+    S::Quantity: collection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {
@@ -564,7 +564,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Collection<'a> {
@@ -765,7 +765,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -777,10 +777,10 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("specimenId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("quantity"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("acquiredAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("specimenId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quantity"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("acquiredAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -788,7 +788,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "acquiredAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -811,7 +811,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "commonName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -832,7 +832,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -855,7 +855,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("family"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "family",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Taxonomic family"),
@@ -872,7 +874,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("genus"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "genus",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Taxonomic genus"),
@@ -889,7 +893,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastModified",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -912,7 +916,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastSeen",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -935,7 +939,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "logRecordUri",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -956,7 +960,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "quantity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -969,7 +973,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rarity"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rarity",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -988,7 +994,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "scientificName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1009,7 +1015,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "source",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1028,7 +1036,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sourceDetails",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1039,7 +1047,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("species"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "species",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Taxonomic species"),
@@ -1056,7 +1066,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "specimenData",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1067,7 +1077,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "specimenId",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1088,7 +1098,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "status",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1112,7 +1124,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("sourceDetails"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("sourceDetails"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1125,7 +1137,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attempts"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "attempts",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1136,7 +1150,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "catchProbability",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1157,7 +1171,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "gameCardUri",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1178,7 +1192,9 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("location"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "location",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1201,7 +1217,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("specimenData"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("specimenData"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1214,7 +1230,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "authorship",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1235,7 +1251,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "description",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

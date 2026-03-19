@@ -40,51 +40,51 @@ pub mod group_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type Group;
         type AddedAt;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type Group = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type Group = S::Group;
-        type AddedAt = S::AddedAt;
+        type Image = Unset;
     }
     ///State transition - sets the `group` field to Set
     pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGroup<S> {}
     impl<S: State> State for SetGroup<S> {
-        type Image = S::Image;
         type Group = Set<members::group>;
         type AddedAt = S::AddedAt;
+        type Image = S::Image;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Image = S::Image;
         type Group = S::Group;
         type AddedAt = Set<members::added_at>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Group = S::Group;
+        type AddedAt = S::AddedAt;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `group` field
         pub struct group(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -194,9 +194,9 @@ impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
 impl<'a, S> GroupItemBuilder<'a, S>
 where
     S: group_item_state::State,
-    S::Image: group_item_state::IsSet,
     S::Group: group_item_state::IsSet,
     S::AddedAt: group_item_state::IsSet,
+    S::Image: group_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GroupItem<'a> {
@@ -212,7 +212,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> GroupItem<'a> {
@@ -315,7 +315,7 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -327,9 +327,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("group"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("addedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("group"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("addedAt")
                             ],
                         ),
                         nullable: None,
@@ -337,7 +337,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "addedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -354,7 +356,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("group"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "group",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -375,7 +379,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -396,7 +402,9 @@ fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("note"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "note",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

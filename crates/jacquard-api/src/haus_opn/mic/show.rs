@@ -48,66 +48,66 @@ pub mod show_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Artist;
-        type Title;
         type CreatedAt;
         type Schedule;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Artist = Unset;
-        type Title = Unset;
         type CreatedAt = Unset;
         type Schedule = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
         type Artist = Set<members::artist>;
+        type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Schedule = S::Schedule;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Schedule = S::Schedule;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Artist = S::Artist;
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
         type Schedule = S::Schedule;
+        type Title = S::Title;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
         type Artist = S::Artist;
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Schedule = Set<members::schedule>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `artist` field
         pub struct artist(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -261,9 +261,9 @@ impl<'a, S> ShowBuilder<'a, S>
 where
     S: show_state::State,
     S::Artist: show_state::IsSet,
-    S::Title: show_state::IsSet,
     S::CreatedAt: show_state::IsSet,
     S::Schedule: show_state::IsSet,
+    S::Title: show_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Show<'a> {
@@ -281,7 +281,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Show<'a> {
@@ -512,7 +512,7 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -524,10 +524,10 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("artist"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("schedule"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("schedule"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -535,7 +535,9 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("artist"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "artist",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -556,7 +558,7 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "coverArt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -566,7 +568,7 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -585,7 +587,7 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -602,7 +604,7 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "schedule",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -619,7 +621,9 @@ fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

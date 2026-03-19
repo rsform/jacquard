@@ -72,105 +72,105 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
-        type SignedPayload;
-        type Model;
-        type Image;
         type ObtainedAt;
+        type Signature;
         type OriginalOwner;
+        type Model;
+        type SignedPayload;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
-        type SignedPayload = Unset;
-        type Model = Unset;
-        type Image = Unset;
         type ObtainedAt = Unset;
+        type Signature = Unset;
         type OriginalOwner = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Signature = Set<members::signature>;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = S::Image;
-        type ObtainedAt = S::ObtainedAt;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `signed_payload` field to Set
-    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
-    impl<S: State> State for SetSignedPayload<S> {
-        type Signature = S::Signature;
-        type SignedPayload = Set<members::signed_payload>;
-        type Model = S::Model;
-        type Image = S::Image;
-        type ObtainedAt = S::ObtainedAt;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = Set<members::model>;
-        type Image = S::Image;
-        type ObtainedAt = S::ObtainedAt;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = Set<members::image>;
-        type ObtainedAt = S::ObtainedAt;
-        type OriginalOwner = S::OriginalOwner;
+        type Model = Unset;
+        type SignedPayload = Unset;
+        type Image = Unset;
     }
     ///State transition - sets the `obtained_at` field to Set
     pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
     impl<S: State> State for SetObtainedAt<S> {
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = S::Image;
         type ObtainedAt = Set<members::obtained_at>;
+        type Signature = S::Signature;
         type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type SignedPayload = S::SignedPayload;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = Set<members::signature>;
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type SignedPayload = S::SignedPayload;
+        type Image = S::Image;
     }
     ///State transition - sets the `original_owner` field to Set
     pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
     impl<S: State> State for SetOriginalOwner<S> {
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = S::Image;
         type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
         type OriginalOwner = Set<members::original_owner>;
+        type Model = S::Model;
+        type SignedPayload = S::SignedPayload;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type OriginalOwner = S::OriginalOwner;
+        type Model = Set<members::model>;
+        type SignedPayload = S::SignedPayload;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `signed_payload` field to Set
+    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
+    impl<S: State> State for SetSignedPayload<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type SignedPayload = Set<members::signed_payload>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type SignedPayload = S::SignedPayload;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `signed_payload` field
-        pub struct signed_payload(());
-        ///Marker type for the `model` field
-        pub struct model(());
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
         ///Marker type for the `original_owner` field
         pub struct original_owner(());
+        ///Marker type for the `model` field
+        pub struct model(());
+        ///Marker type for the `signed_payload` field
+        pub struct signed_payload(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -459,12 +459,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::Signature: sticker_state::IsSet,
-    S::SignedPayload: sticker_state::IsSet,
-    S::Model: sticker_state::IsSet,
-    S::Image: sticker_state::IsSet,
     S::ObtainedAt: sticker_state::IsSet,
+    S::Signature: sticker_state::IsSet,
     S::OriginalOwner: sticker_state::IsSet,
+    S::Model: sticker_state::IsSet,
+    S::SignedPayload: sticker_state::IsSet,
+    S::Image: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {
@@ -489,7 +489,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Sticker<'a> {
@@ -820,7 +820,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         }
         if let Some(ref value) = self.message {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -863,7 +863,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         }
         if let Some(ref value) = self.name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -944,7 +944,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Definition of a sticker"),
@@ -954,12 +954,12 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("originalOwner"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("model"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("obtainedAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("signature"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("signedPayload")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("originalOwner"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("model"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("obtainedAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signedPayload")
                             ],
                         ),
                         nullable: None,
@@ -967,13 +967,15 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "image",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                     description: None,
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "imageType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -994,7 +996,9 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "message",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -1009,7 +1013,9 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("model"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "model",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1028,7 +1034,9 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -1043,7 +1051,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "obtainedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1066,7 +1074,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "obtainedFrom",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1089,7 +1097,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "originalOwner",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1112,7 +1120,9 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("shape"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "shape",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1131,7 +1141,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "signature",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1152,7 +1162,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "signedPayload",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1173,7 +1183,7 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subjectDid",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1196,7 +1206,9 @@ fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {

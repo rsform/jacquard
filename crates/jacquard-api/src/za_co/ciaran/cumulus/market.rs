@@ -36,8 +36,8 @@ pub mod market_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Question;
-        type CreatedAt;
         type Liquidity;
+        type CreatedAt;
         type ClosesAt;
     }
     /// Empty state - all required fields are unset
@@ -45,8 +45,8 @@ pub mod market_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Question = Unset;
-        type CreatedAt = Unset;
         type Liquidity = Unset;
+        type CreatedAt = Unset;
         type ClosesAt = Unset;
     }
     ///State transition - sets the `question` field to Set
@@ -54,17 +54,8 @@ pub mod market_state {
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
         type Question = Set<members::question>;
+        type Liquidity = S::Liquidity;
         type CreatedAt = S::CreatedAt;
-        type Liquidity = S::Liquidity;
-        type ClosesAt = S::ClosesAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
-        type CreatedAt = Set<members::created_at>;
-        type Liquidity = S::Liquidity;
         type ClosesAt = S::ClosesAt;
     }
     ///State transition - sets the `liquidity` field to Set
@@ -72,8 +63,17 @@ pub mod market_state {
     impl<S: State> sealed::Sealed for SetLiquidity<S> {}
     impl<S: State> State for SetLiquidity<S> {
         type Question = S::Question;
-        type CreatedAt = S::CreatedAt;
         type Liquidity = Set<members::liquidity>;
+        type CreatedAt = S::CreatedAt;
+        type ClosesAt = S::ClosesAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Question = S::Question;
+        type Liquidity = S::Liquidity;
+        type CreatedAt = Set<members::created_at>;
         type ClosesAt = S::ClosesAt;
     }
     ///State transition - sets the `closes_at` field to Set
@@ -81,8 +81,8 @@ pub mod market_state {
     impl<S: State> sealed::Sealed for SetClosesAt<S> {}
     impl<S: State> State for SetClosesAt<S> {
         type Question = S::Question;
-        type CreatedAt = S::CreatedAt;
         type Liquidity = S::Liquidity;
+        type CreatedAt = S::CreatedAt;
         type ClosesAt = Set<members::closes_at>;
     }
     /// Marker types for field names
@@ -90,10 +90,10 @@ pub mod market_state {
     pub mod members {
         ///Marker type for the `question` field
         pub struct question(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `liquidity` field
         pub struct liquidity(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `closes_at` field
         pub struct closes_at(());
     }
@@ -209,8 +209,8 @@ impl<'a, S> MarketBuilder<'a, S>
 where
     S: market_state::State,
     S::Question: market_state::IsSet,
-    S::CreatedAt: market_state::IsSet,
     S::Liquidity: market_state::IsSet,
+    S::CreatedAt: market_state::IsSet,
     S::ClosesAt: market_state::IsSet,
 {
     /// Build the final struct
@@ -227,7 +227,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Market<'a> {
@@ -343,7 +343,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -355,10 +355,10 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::Lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("question"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("liquidity"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("closesAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("question"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("liquidity"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("closesAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -366,7 +366,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "closesAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -385,7 +385,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -404,7 +404,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "liquidity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -417,7 +417,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_market() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "question",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

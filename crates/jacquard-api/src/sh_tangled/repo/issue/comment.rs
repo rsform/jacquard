@@ -43,51 +43,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Issue;
         type Body;
         type CreatedAt;
-        type Issue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Issue = Unset;
         type Body = Unset;
         type CreatedAt = Unset;
-        type Issue = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Body = Set<members::body>;
-        type CreatedAt = S::CreatedAt;
-        type Issue = S::Issue;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Body = S::Body;
-        type CreatedAt = Set<members::created_at>;
-        type Issue = S::Issue;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssue<S> {}
     impl<S: State> State for SetIssue<S> {
+        type Issue = Set<members::issue>;
         type Body = S::Body;
         type CreatedAt = S::CreatedAt;
-        type Issue = Set<members::issue>;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Issue = S::Issue;
+        type Body = Set<members::body>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Issue = S::Issue;
+        type Body = S::Body;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `issue` field
+        pub struct issue(());
         ///Marker type for the `body` field
         pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `issue` field
-        pub struct issue(());
     }
 }
 
@@ -240,9 +240,9 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
+    S::Issue: comment_state::IsSet,
     S::Body: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
-    S::Issue: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -260,7 +260,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Comment<'a> {
@@ -365,7 +365,7 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -373,9 +373,9 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("issue"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("body"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("issue"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("body"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -383,7 +383,9 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("body"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "body",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -398,7 +400,7 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -417,7 +419,9 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("issue"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "issue",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -434,7 +438,7 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mentions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -458,7 +462,7 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "references",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -482,7 +486,9 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("replyTo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "replyTo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

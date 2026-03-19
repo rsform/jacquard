@@ -47,7 +47,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("eip712Message"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("eip712Message"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -56,11 +56,11 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("evmAddress"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("chainId"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("timestamp"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("nonce")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("evmAddress"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("chainId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("nonce")
                         ],
                     ),
                     nullable: None,
@@ -68,7 +68,9 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("chainId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "chainId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -87,7 +89,9 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -106,7 +110,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "evmAddress",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -127,7 +131,9 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("nonce"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "nonce",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -146,7 +152,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "timestamp",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -171,7 +177,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -183,12 +189,12 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("address"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("chainId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("signature"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("message"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("signatureType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("address"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("chainId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("message"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signatureType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -196,7 +202,9 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("address"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "address",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -215,7 +223,9 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("chainId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "chainId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -226,7 +236,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -249,7 +259,9 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "message",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -258,7 +270,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "signature",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -279,7 +291,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "signatureType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -445,105 +457,105 @@ pub mod attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
-        type Message;
         type SignatureType;
-        type ChainId;
-        type Address;
+        type Message;
         type CreatedAt;
+        type Address;
+        type Signature;
+        type ChainId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
-        type Message = Unset;
         type SignatureType = Unset;
-        type ChainId = Unset;
-        type Address = Unset;
+        type Message = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Signature = Set<members::signature>;
-        type Message = S::Message;
-        type SignatureType = S::SignatureType;
-        type ChainId = S::ChainId;
-        type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Signature = S::Signature;
-        type Message = Set<members::message>;
-        type SignatureType = S::SignatureType;
-        type ChainId = S::ChainId;
-        type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
+        type Address = Unset;
+        type Signature = Unset;
+        type ChainId = Unset;
     }
     ///State transition - sets the `signature_type` field to Set
     pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignatureType<S> {}
     impl<S: State> State for SetSignatureType<S> {
-        type Signature = S::Signature;
-        type Message = S::Message;
         type SignatureType = Set<members::signature_type>;
-        type ChainId = S::ChainId;
-        type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `chain_id` field to Set
-    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChainId<S> {}
-    impl<S: State> State for SetChainId<S> {
-        type Signature = S::Signature;
         type Message = S::Message;
-        type SignatureType = S::SignatureType;
-        type ChainId = Set<members::chain_id>;
+        type CreatedAt = S::CreatedAt;
         type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
         type Signature = S::Signature;
-        type Message = S::Message;
-        type SignatureType = S::SignatureType;
         type ChainId = S::ChainId;
-        type Address = Set<members::address>;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type SignatureType = S::SignatureType;
+        type Message = Set<members::message>;
         type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+        type Signature = S::Signature;
+        type ChainId = S::ChainId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Signature = S::Signature;
-        type Message = S::Message;
         type SignatureType = S::SignatureType;
-        type ChainId = S::ChainId;
-        type Address = S::Address;
+        type Message = S::Message;
         type CreatedAt = Set<members::created_at>;
+        type Address = S::Address;
+        type Signature = S::Signature;
+        type ChainId = S::ChainId;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type SignatureType = S::SignatureType;
+        type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Address = Set<members::address>;
+        type Signature = S::Signature;
+        type ChainId = S::ChainId;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type SignatureType = S::SignatureType;
+        type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+        type Signature = Set<members::signature>;
+        type ChainId = S::ChainId;
+    }
+    ///State transition - sets the `chain_id` field to Set
+    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChainId<S> {}
+    impl<S: State> State for SetChainId<S> {
+        type SignatureType = S::SignatureType;
+        type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+        type Signature = S::Signature;
+        type ChainId = Set<members::chain_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `signature_type` field
         pub struct signature_type(());
-        ///Marker type for the `chain_id` field
-        pub struct chain_id(());
-        ///Marker type for the `address` field
-        pub struct address(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `chain_id` field
+        pub struct chain_id(());
     }
 }
 
@@ -698,12 +710,12 @@ where
 impl<'a, S> AttestationBuilder<'a, S>
 where
     S: attestation_state::State,
-    S::Signature: attestation_state::IsSet,
-    S::Message: attestation_state::IsSet,
     S::SignatureType: attestation_state::IsSet,
-    S::ChainId: attestation_state::IsSet,
-    S::Address: attestation_state::IsSet,
+    S::Message: attestation_state::IsSet,
     S::CreatedAt: attestation_state::IsSet,
+    S::Address: attestation_state::IsSet,
+    S::Signature: attestation_state::IsSet,
+    S::ChainId: attestation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Attestation<'a> {
@@ -721,7 +733,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Attestation<'a> {

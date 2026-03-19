@@ -199,37 +199,37 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Slug;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Slug = S::Slug;
+        type Ref = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Ref = S::Ref;
         type Slug = Set<members::slug>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Slug = S::Slug;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -302,8 +302,8 @@ where
 impl<'a, S> SlugResultBuilder<'a, S>
 where
     S: slug_result_state::State,
-    S::Ref: slug_result_state::IsSet,
     S::Slug: slug_result_state::IsSet,
+    S::Ref: slug_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SlugResult<'a> {
@@ -317,7 +317,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SlugResult<'a> {
@@ -342,7 +342,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -350,14 +350,16 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("slug")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("slug")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "limit",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -368,7 +370,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("slug"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "slug",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -395,13 +399,13 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("slugResult"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("slugResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("slug"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("ref")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("slug"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ref")
                         ],
                     ),
                     nullable: None,
@@ -409,7 +413,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "ref",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -426,7 +432,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("slug"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "slug",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,

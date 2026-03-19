@@ -212,12 +212,8 @@ pub type Lazy<T> = std::sync::LazyLock<T>;
 #[cfg(not(feature = "std"))]
 pub use spin::Lazy;
 
-pub use bytes;
-pub use chrono;
 pub use cowstr::CowStr;
 pub use into_static::IntoStatic;
-pub use smol_str;
-pub use url;
 
 /// A copy-on-write immutable string type that uses [`smol_str::SmolStr`] for
 /// the "owned" variant.
@@ -226,6 +222,8 @@ pub mod cowstr;
 #[macro_use]
 /// Trait for taking ownership of most borrowed types in jacquard.
 pub mod into_static;
+/// Re-exports of external crate dependencies for consistent access across jacquard.
+pub mod deps;
 pub mod error;
 pub mod http_client;
 pub mod macros;
@@ -288,4 +286,27 @@ where
 {
     let value = T::deserialize(deserializer)?;
     Ok(value.into_static())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::deps::smol_str::SmolStr;
+    use crate::deps::bytes;
+    use crate::deps::chrono;
+
+    #[test]
+    fn deps_smol_str() {
+        let s = SmolStr::new_static("test");
+        assert_eq!(s, "test");
+    }
+
+    #[test]
+    fn deps_bytes() {
+        let _x = bytes::Bytes::from_static(b"hello");
+    }
+
+    #[test]
+    fn deps_chrono() {
+        let _now = chrono::Utc::now();
+    }
 }

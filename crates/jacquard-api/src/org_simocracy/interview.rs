@@ -41,8 +41,8 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type YesNoAnswers;
         type OpenAnswers;
+        type YesNoAnswers;
         type Sim;
         type CreatedAt;
     }
@@ -50,26 +50,26 @@ pub mod interview_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type YesNoAnswers = Unset;
         type OpenAnswers = Unset;
+        type YesNoAnswers = Unset;
         type Sim = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `yes_no_answers` field to Set
-    pub struct SetYesNoAnswers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYesNoAnswers<S> {}
-    impl<S: State> State for SetYesNoAnswers<S> {
-        type YesNoAnswers = Set<members::yes_no_answers>;
-        type OpenAnswers = S::OpenAnswers;
-        type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `open_answers` field to Set
     pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOpenAnswers<S> {}
     impl<S: State> State for SetOpenAnswers<S> {
-        type YesNoAnswers = S::YesNoAnswers;
         type OpenAnswers = Set<members::open_answers>;
+        type YesNoAnswers = S::YesNoAnswers;
+        type Sim = S::Sim;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `yes_no_answers` field to Set
+    pub struct SetYesNoAnswers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetYesNoAnswers<S> {}
+    impl<S: State> State for SetYesNoAnswers<S> {
+        type OpenAnswers = S::OpenAnswers;
+        type YesNoAnswers = Set<members::yes_no_answers>;
         type Sim = S::Sim;
         type CreatedAt = S::CreatedAt;
     }
@@ -77,8 +77,8 @@ pub mod interview_state {
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
-        type YesNoAnswers = S::YesNoAnswers;
         type OpenAnswers = S::OpenAnswers;
+        type YesNoAnswers = S::YesNoAnswers;
         type Sim = Set<members::sim>;
         type CreatedAt = S::CreatedAt;
     }
@@ -86,18 +86,18 @@ pub mod interview_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type YesNoAnswers = S::YesNoAnswers;
         type OpenAnswers = S::OpenAnswers;
+        type YesNoAnswers = S::YesNoAnswers;
         type Sim = S::Sim;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `yes_no_answers` field
-        pub struct yes_no_answers(());
         ///Marker type for the `open_answers` field
         pub struct open_answers(());
+        ///Marker type for the `yes_no_answers` field
+        pub struct yes_no_answers(());
         ///Marker type for the `sim` field
         pub struct sim(());
         ///Marker type for the `created_at` field
@@ -214,8 +214,8 @@ where
 impl<'a, S> InterviewBuilder<'a, S>
 where
     S: interview_state::State,
-    S::YesNoAnswers: interview_state::IsSet,
     S::OpenAnswers: interview_state::IsSet,
+    S::YesNoAnswers: interview_state::IsSet,
     S::Sim: interview_state::IsSet,
     S::CreatedAt: interview_state::IsSet,
 {
@@ -233,7 +233,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Interview<'a> {
@@ -336,7 +336,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -348,10 +348,10 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("sim"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("openAnswers"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("yesNoAnswers"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sim"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("openAnswers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("yesNoAnswers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -359,7 +359,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -382,7 +382,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "openAnswers",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -400,7 +400,9 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sim"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sim",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -409,7 +411,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "yesNoAnswers",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -434,7 +436,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("openAnswer"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("openAnswer"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -443,8 +445,8 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("question"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("answer")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("question"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer")
                         ],
                     ),
                     nullable: None,
@@ -452,7 +454,9 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("answer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "answer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -471,7 +475,9 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("question"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "question",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -494,7 +500,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("valueResponse"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("valueResponse"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -503,8 +509,8 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("statement"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("answer")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("statement"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer")
                         ],
                     ),
                     nullable: None,
@@ -512,7 +518,9 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("answer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "answer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -520,7 +528,7 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "statement",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -600,7 +608,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
         {
             let value = &self.answer;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -781,7 +789,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ValueResponse<'a> {

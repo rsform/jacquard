@@ -152,7 +152,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Vote<'a> {
@@ -253,7 +253,7 @@ fn lexicon_doc_pub_leaflet_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -265,8 +265,8 @@ fn lexicon_doc_pub_leaflet_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDo
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("poll"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("option")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("poll"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("option")
                             ],
                         ),
                         nullable: None,
@@ -274,7 +274,9 @@ fn lexicon_doc_pub_leaflet_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDo
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("option"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "option",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -294,7 +296,9 @@ fn lexicon_doc_pub_leaflet_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("poll"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "poll",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

@@ -30,7 +30,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("bold"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("bold"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -47,7 +47,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("byteSlice"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("byteSlice"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -56,8 +56,8 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("byteStart"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("byteEnd")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("byteStart"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("byteEnd")
                         ],
                     ),
                     nullable: None,
@@ -65,7 +65,9 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("byteEnd"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "byteEnd",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -76,7 +78,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "byteStart",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -93,7 +95,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("code"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -110,7 +112,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("codeBlock"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("codeBlock"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -123,7 +125,9 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "lang",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -146,7 +150,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("italic"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("italic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -163,20 +167,24 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("link"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("link"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Facet feature for a URL."),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -197,7 +205,7 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -206,8 +214,8 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("features")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("features")
                         ],
                     ),
                     nullable: None,
@@ -215,7 +223,9 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("features"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "features",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -234,7 +244,9 @@ fn lexicon_doc_network_slices_tools_richtext_facet() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "index",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#byteSlice"),
@@ -408,7 +420,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ByteSlice<'a> {
@@ -671,7 +683,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Link<'a> {
@@ -848,7 +860,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Facet<'a> {

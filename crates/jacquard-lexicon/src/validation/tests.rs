@@ -4,7 +4,7 @@ use super::*;
 use crate::{lexicon::*, schema::LexiconSchema};
 use jacquard_common::{
     CowStr,
-    smol_str::ToSmolStr,
+    deps::smol_str::ToSmolStr,
     types::{string::AtprotoStr, value::Data},
 };
 use std::collections::BTreeMap;

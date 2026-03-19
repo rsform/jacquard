@@ -57,49 +57,49 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Code;
+        type Slug;
         type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Code = Unset;
+        type Slug = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Code = S::Code;
-        type When = S::When;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Slug = S::Slug;
         type Code = Set<members::code>;
+        type Slug = S::Slug;
+        type When = S::When;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Code = S::Code;
+        type Slug = Set<members::slug>;
         type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Slug = S::Slug;
         type Code = S::Code;
+        type Slug = S::Slug;
         type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `when` field
         pub struct when(());
     }
@@ -285,8 +285,8 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::Slug: tape_state::IsSet,
     S::Code: tape_state::IsSet,
+    S::Slug: tape_state::IsSet,
     S::When: tape_state::IsSet,
 {
     /// Build the final struct
@@ -307,7 +307,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Tape<'a> {
@@ -414,7 +414,7 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -422,9 +422,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("slug"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("when")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("slug"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("when")
                             ],
                         ),
                         nullable: None,
@@ -432,7 +432,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("acUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "acUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -451,7 +453,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "code",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -470,7 +474,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ref",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -489,7 +495,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("slug"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "slug",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -508,7 +516,7 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "thumbnail",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -518,7 +526,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("video"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "video",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -526,7 +536,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "when",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -547,7 +559,9 @@ fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("zipUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "zipUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

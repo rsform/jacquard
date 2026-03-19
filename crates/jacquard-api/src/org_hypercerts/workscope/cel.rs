@@ -41,67 +41,67 @@ pub mod cel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UsedTags;
+        type Expression;
         type CreatedAt;
         type Version;
-        type Expression;
+        type UsedTags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UsedTags = Unset;
+        type Expression = Unset;
         type CreatedAt = Unset;
         type Version = Unset;
-        type Expression = Unset;
-    }
-    ///State transition - sets the `used_tags` field to Set
-    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
-    impl<S: State> State for SetUsedTags<S> {
-        type UsedTags = Set<members::used_tags>;
-        type CreatedAt = S::CreatedAt;
-        type Version = S::Version;
-        type Expression = S::Expression;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UsedTags = S::UsedTags;
-        type CreatedAt = Set<members::created_at>;
-        type Version = S::Version;
-        type Expression = S::Expression;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type UsedTags = S::UsedTags;
-        type CreatedAt = S::CreatedAt;
-        type Version = Set<members::version>;
-        type Expression = S::Expression;
+        type UsedTags = Unset;
     }
     ///State transition - sets the `expression` field to Set
     pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpression<S> {}
     impl<S: State> State for SetExpression<S> {
-        type UsedTags = S::UsedTags;
+        type Expression = Set<members::expression>;
         type CreatedAt = S::CreatedAt;
         type Version = S::Version;
-        type Expression = Set<members::expression>;
+        type UsedTags = S::UsedTags;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Expression = S::Expression;
+        type CreatedAt = Set<members::created_at>;
+        type Version = S::Version;
+        type UsedTags = S::UsedTags;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Expression = S::Expression;
+        type CreatedAt = S::CreatedAt;
+        type Version = Set<members::version>;
+        type UsedTags = S::UsedTags;
+    }
+    ///State transition - sets the `used_tags` field to Set
+    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
+    impl<S: State> State for SetUsedTags<S> {
+        type Expression = S::Expression;
+        type CreatedAt = S::CreatedAt;
+        type Version = S::Version;
+        type UsedTags = Set<members::used_tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `used_tags` field
-        pub struct used_tags(());
+        ///Marker type for the `expression` field
+        pub struct expression(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `version` field
         pub struct version(());
-        ///Marker type for the `expression` field
-        pub struct expression(());
+        ///Marker type for the `used_tags` field
+        pub struct used_tags(());
     }
 }
 
@@ -214,10 +214,10 @@ where
 impl<'a, S> CelBuilder<'a, S>
 where
     S: cel_state::State,
-    S::UsedTags: cel_state::IsSet,
+    S::Expression: cel_state::IsSet,
     S::CreatedAt: cel_state::IsSet,
     S::Version: cel_state::IsSet,
-    S::Expression: cel_state::IsSet,
+    S::UsedTags: cel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cel<'a> {
@@ -233,7 +233,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Cel<'a> {
@@ -342,7 +342,7 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -351,10 +351,10 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("expression"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("usedTags"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("version"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("expression"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("usedTags"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("version"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -362,7 +362,7 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -385,7 +385,7 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "expression",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -406,7 +406,9 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("usedTags"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "usedTags",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -424,7 +426,9 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "version",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -480,7 +484,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
         {
             let value = &self.expression;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

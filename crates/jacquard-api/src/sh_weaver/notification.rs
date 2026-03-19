@@ -52,95 +52,93 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsRead;
         type Uri;
         type Cid;
         type IndexedAt;
         type Author;
         type Reason;
+        type IsRead;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsRead = Unset;
         type Uri = Unset;
         type Cid = Unset;
         type IndexedAt = Unset;
         type Author = Unset;
         type Reason = Unset;
-    }
-    ///State transition - sets the `is_read` field to Set
-    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsRead<S> {}
-    impl<S: State> State for SetIsRead<S> {
-        type IsRead = Set<members::is_read>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Reason = S::Reason;
+        type IsRead = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IsRead = S::IsRead;
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
         type Author = S::Author;
         type Reason = S::Reason;
+        type IsRead = S::IsRead;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type IsRead = S::IsRead;
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
         type IndexedAt = S::IndexedAt;
         type Author = S::Author;
         type Reason = S::Reason;
+        type IsRead = S::IsRead;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type IsRead = S::IsRead;
         type Uri = S::Uri;
         type Cid = S::Cid;
         type IndexedAt = Set<members::indexed_at>;
         type Author = S::Author;
         type Reason = S::Reason;
+        type IsRead = S::IsRead;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type IsRead = S::IsRead;
         type Uri = S::Uri;
         type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
         type Author = Set<members::author>;
         type Reason = S::Reason;
+        type IsRead = S::IsRead;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type IsRead = S::IsRead;
         type Uri = S::Uri;
         type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
         type Author = S::Author;
         type Reason = Set<members::reason>;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `is_read` field to Set
+    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsRead<S> {}
+    impl<S: State> State for SetIsRead<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type IsRead = Set<members::is_read>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_read` field
-        pub struct is_read(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
@@ -151,6 +149,8 @@ pub mod notification_state {
         pub struct author(());
         ///Marker type for the `reason` field
         pub struct reason(());
+        ///Marker type for the `is_read` field
+        pub struct is_read(());
     }
 }
 
@@ -343,12 +343,12 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
-    S::IsRead: notification_state::IsSet,
     S::Uri: notification_state::IsSet,
     S::Cid: notification_state::IsSet,
     S::IndexedAt: notification_state::IsSet,
     S::Author: notification_state::IsSet,
     S::Reason: notification_state::IsSet,
+    S::IsRead: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
@@ -368,7 +368,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Notification<'a> {
@@ -397,7 +397,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("notification"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("notification"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -406,12 +406,12 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("isRead"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isRead"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -419,7 +419,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "author",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -428,7 +430,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cid",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -445,7 +449,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "indexedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -464,7 +468,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("isRead"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "isRead",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -472,7 +478,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reason",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -481,7 +489,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "reasonSubject",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -504,13 +512,17 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "record",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -531,7 +543,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("notificationGroup"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "notificationGroup",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -540,11 +554,11 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("actors"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("mostRecentAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("count"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("actors"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mostRecentAt")
                         ],
                     ),
                     nullable: None,
@@ -552,7 +566,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("actors"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actors",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -570,7 +586,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "count",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -581,7 +599,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("isRead"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "isRead",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -589,7 +609,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mostRecentAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -608,7 +628,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reason",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -617,7 +639,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "subject",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -632,7 +656,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("notificationReason"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "notificationReason",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -651,7 +677,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "subscriptionUpdateView",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -662,9 +688,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("newEntries"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("newEntries"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                         ],
                     ),
                     nullable: None,
@@ -672,7 +698,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "newEntries",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -692,7 +718,9 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notebook",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -701,7 +729,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "updatedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -720,7 +748,7 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "updatedEntries",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -801,85 +829,85 @@ pub mod notification_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reason;
-        type Actors;
-        type Subject;
-        type Count;
         type MostRecentAt;
+        type Subject;
+        type Reason;
+        type Count;
+        type Actors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reason = Unset;
-        type Actors = Unset;
-        type Subject = Unset;
-        type Count = Unset;
         type MostRecentAt = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type Actors = S::Actors;
-        type Subject = S::Subject;
-        type Count = S::Count;
-        type MostRecentAt = S::MostRecentAt;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActors<S> {}
-    impl<S: State> State for SetActors<S> {
-        type Reason = S::Reason;
-        type Actors = Set<members::actors>;
-        type Subject = S::Subject;
-        type Count = S::Count;
-        type MostRecentAt = S::MostRecentAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Reason = S::Reason;
-        type Actors = S::Actors;
-        type Subject = Set<members::subject>;
-        type Count = S::Count;
-        type MostRecentAt = S::MostRecentAt;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Reason = S::Reason;
-        type Actors = S::Actors;
-        type Subject = S::Subject;
-        type Count = Set<members::count>;
-        type MostRecentAt = S::MostRecentAt;
+        type Subject = Unset;
+        type Reason = Unset;
+        type Count = Unset;
+        type Actors = Unset;
     }
     ///State transition - sets the `most_recent_at` field to Set
     pub struct SetMostRecentAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMostRecentAt<S> {}
     impl<S: State> State for SetMostRecentAt<S> {
-        type Reason = S::Reason;
-        type Actors = S::Actors;
-        type Subject = S::Subject;
-        type Count = S::Count;
         type MostRecentAt = Set<members::most_recent_at>;
+        type Subject = S::Subject;
+        type Reason = S::Reason;
+        type Count = S::Count;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type MostRecentAt = S::MostRecentAt;
+        type Subject = Set<members::subject>;
+        type Reason = S::Reason;
+        type Count = S::Count;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type MostRecentAt = S::MostRecentAt;
+        type Subject = S::Subject;
+        type Reason = Set<members::reason>;
+        type Count = S::Count;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type MostRecentAt = S::MostRecentAt;
+        type Subject = S::Subject;
+        type Reason = S::Reason;
+        type Count = Set<members::count>;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type MostRecentAt = S::MostRecentAt;
+        type Subject = S::Subject;
+        type Reason = S::Reason;
+        type Count = S::Count;
+        type Actors = Set<members::actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason` field
-        pub struct reason(());
-        ///Marker type for the `actors` field
-        pub struct actors(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `most_recent_at` field
         pub struct most_recent_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
+        ///Marker type for the `count` field
+        pub struct count(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
     }
 }
 
@@ -1026,11 +1054,11 @@ where
 impl<'a, S> NotificationGroupBuilder<'a, S>
 where
     S: notification_group_state::State,
-    S::Reason: notification_group_state::IsSet,
-    S::Actors: notification_group_state::IsSet,
-    S::Subject: notification_group_state::IsSet,
-    S::Count: notification_group_state::IsSet,
     S::MostRecentAt: notification_group_state::IsSet,
+    S::Subject: notification_group_state::IsSet,
+    S::Reason: notification_group_state::IsSet,
+    S::Count: notification_group_state::IsSet,
+    S::Actors: notification_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotificationGroup<'a> {
@@ -1048,7 +1076,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> NotificationGroup<'a> {
@@ -1479,7 +1507,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SubscriptionUpdateView<'a> {

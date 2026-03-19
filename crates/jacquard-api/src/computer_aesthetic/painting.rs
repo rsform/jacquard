@@ -52,85 +52,85 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
-        type When;
-        type Ref;
-        type ImageUrl;
         type Slug;
+        type Code;
+        type ImageUrl;
+        type Ref;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
-        type When = Unset;
-        type Ref = Unset;
-        type ImageUrl = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type When = S::When;
-        type Ref = S::Ref;
-        type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Code = S::Code;
-        type When = Set<members::when>;
-        type Ref = S::Ref;
-        type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Code = S::Code;
-        type When = S::When;
-        type Ref = Set<members::r#ref>;
-        type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `image_url` field to Set
-    pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImageUrl<S> {}
-    impl<S: State> State for SetImageUrl<S> {
-        type Code = S::Code;
-        type When = S::When;
-        type Ref = S::Ref;
-        type ImageUrl = Set<members::image_url>;
-        type Slug = S::Slug;
+        type Code = Unset;
+        type ImageUrl = Unset;
+        type Ref = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Code = S::Code;
-        type When = S::When;
-        type Ref = S::Ref;
-        type ImageUrl = S::ImageUrl;
         type Slug = Set<members::slug>;
+        type Code = S::Code;
+        type ImageUrl = S::ImageUrl;
+        type Ref = S::Ref;
+        type When = S::When;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Slug = S::Slug;
+        type Code = Set<members::code>;
+        type ImageUrl = S::ImageUrl;
+        type Ref = S::Ref;
+        type When = S::When;
+    }
+    ///State transition - sets the `image_url` field to Set
+    pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImageUrl<S> {}
+    impl<S: State> State for SetImageUrl<S> {
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type ImageUrl = Set<members::image_url>;
+        type Ref = S::Ref;
+        type When = S::When;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type ImageUrl = S::ImageUrl;
+        type Ref = Set<members::r#ref>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type ImageUrl = S::ImageUrl;
+        type Ref = S::Ref;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
-        ///Marker type for the `when` field
-        pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
-        ///Marker type for the `image_url` field
-        pub struct image_url(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `image_url` field
+        pub struct image_url(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -303,11 +303,11 @@ where
 impl<'a, S> PaintingBuilder<'a, S>
 where
     S: painting_state::State,
-    S::Code: painting_state::IsSet,
-    S::When: painting_state::IsSet,
-    S::Ref: painting_state::IsSet,
-    S::ImageUrl: painting_state::IsSet,
     S::Slug: painting_state::IsSet,
+    S::Code: painting_state::IsSet,
+    S::ImageUrl: painting_state::IsSet,
+    S::Ref: painting_state::IsSet,
+    S::When: painting_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Painting<'a> {
@@ -326,7 +326,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Painting<'a> {
@@ -496,7 +496,7 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -508,11 +508,11 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("slug"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("imageUrl"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("slug"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("imageUrl"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ref")
                             ],
                         ),
                         nullable: None,
@@ -520,7 +520,9 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "code",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -539,7 +541,7 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "imageUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -562,7 +564,7 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "recordingUrl",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -585,7 +587,9 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ref",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -604,7 +608,9 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("slug"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "slug",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -623,7 +629,7 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "thumbnail",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -633,7 +639,9 @@ fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "when",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

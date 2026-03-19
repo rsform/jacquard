@@ -55,67 +55,67 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type JobId;
         type CreatedAt;
+        type JobId;
         type RetryCount;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type JobId = Unset;
         type CreatedAt = Unset;
+        type JobId = Unset;
         type RetryCount = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type JobId = S::JobId;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-    }
-    ///State transition - sets the `job_id` field to Set
-    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJobId<S> {}
-    impl<S: State> State for SetJobId<S> {
-        type Status = S::Status;
-        type JobId = Set<members::job_id>;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
-        type JobId = S::JobId;
         type CreatedAt = Set<members::created_at>;
+        type JobId = S::JobId;
         type RetryCount = S::RetryCount;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type CreatedAt = S::CreatedAt;
+        type JobId = Set<members::job_id>;
+        type RetryCount = S::RetryCount;
+        type Status = S::Status;
     }
     ///State transition - sets the `retry_count` field to Set
     pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRetryCount<S> {}
     impl<S: State> State for SetRetryCount<S> {
-        type Status = S::Status;
-        type JobId = S::JobId;
         type CreatedAt = S::CreatedAt;
+        type JobId = S::JobId;
         type RetryCount = Set<members::retry_count>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type JobId = S::JobId;
+        type RetryCount = S::RetryCount;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `job_id` field
-        pub struct job_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
         ///Marker type for the `retry_count` field
         pub struct retry_count(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -309,10 +309,10 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
-    S::Status: job_status_state::IsSet,
-    S::JobId: job_status_state::IsSet,
     S::CreatedAt: job_status_state::IsSet,
+    S::JobId: job_status_state::IsSet,
     S::RetryCount: job_status_state::IsSet,
+    S::Status: job_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> JobStatus<'a> {
@@ -332,7 +332,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> JobStatus<'a> {
@@ -361,15 +361,15 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("jobStatus"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("jobStatus"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("retryCount")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("jobId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("retryCount")
                         ],
                     ),
                     nullable: None,
@@ -377,7 +377,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "completedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -400,7 +400,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -423,7 +423,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "error",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -442,7 +444,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "jobId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("UUID of the job"),
@@ -459,7 +463,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("result"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "result",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -468,7 +474,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "retryCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -481,7 +487,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "startedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -504,7 +510,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "status",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -527,7 +535,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -535,14 +543,16 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("jobId")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("jobId")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "jobId",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -569,16 +579,16 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("syncJobResult"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("syncJobResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("success"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("totalRecords"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("collectionsSynced"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("reposProcessed"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("message")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("success"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("totalRecords"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("collectionsSynced"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reposProcessed"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("message")
                         ],
                     ),
                     nullable: None,
@@ -586,7 +596,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "collectionsSynced",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -614,7 +624,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "message",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -633,7 +645,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "reposProcessed",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -646,7 +658,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("success"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "success",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -654,7 +668,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "totalRecords",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -875,9 +889,9 @@ pub mod sync_job_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type TotalRecords;
         type Success;
         type CollectionsSynced;
-        type TotalRecords;
         type ReposProcessed;
         type Message;
     }
@@ -885,19 +899,29 @@ pub mod sync_job_result_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type TotalRecords = Unset;
         type Success = Unset;
         type CollectionsSynced = Unset;
-        type TotalRecords = Unset;
         type ReposProcessed = Unset;
         type Message = Unset;
+    }
+    ///State transition - sets the `total_records` field to Set
+    pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
+    impl<S: State> State for SetTotalRecords<S> {
+        type TotalRecords = Set<members::total_records>;
+        type Success = S::Success;
+        type CollectionsSynced = S::CollectionsSynced;
+        type ReposProcessed = S::ReposProcessed;
+        type Message = S::Message;
     }
     ///State transition - sets the `success` field to Set
     pub struct SetSuccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSuccess<S> {}
     impl<S: State> State for SetSuccess<S> {
+        type TotalRecords = S::TotalRecords;
         type Success = Set<members::success>;
         type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
         type ReposProcessed = S::ReposProcessed;
         type Message = S::Message;
     }
@@ -905,19 +929,9 @@ pub mod sync_job_result_state {
     pub struct SetCollectionsSynced<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollectionsSynced<S> {}
     impl<S: State> State for SetCollectionsSynced<S> {
+        type TotalRecords = S::TotalRecords;
         type Success = S::Success;
         type CollectionsSynced = Set<members::collections_synced>;
-        type TotalRecords = S::TotalRecords;
-        type ReposProcessed = S::ReposProcessed;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `total_records` field to Set
-    pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
-    impl<S: State> State for SetTotalRecords<S> {
-        type Success = S::Success;
-        type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = Set<members::total_records>;
         type ReposProcessed = S::ReposProcessed;
         type Message = S::Message;
     }
@@ -925,9 +939,9 @@ pub mod sync_job_result_state {
     pub struct SetReposProcessed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReposProcessed<S> {}
     impl<S: State> State for SetReposProcessed<S> {
+        type TotalRecords = S::TotalRecords;
         type Success = S::Success;
         type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
         type ReposProcessed = Set<members::repos_processed>;
         type Message = S::Message;
     }
@@ -935,21 +949,21 @@ pub mod sync_job_result_state {
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
+        type TotalRecords = S::TotalRecords;
         type Success = S::Success;
         type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
         type ReposProcessed = S::ReposProcessed;
         type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `total_records` field
+        pub struct total_records(());
         ///Marker type for the `success` field
         pub struct success(());
         ///Marker type for the `collections_synced` field
         pub struct collections_synced(());
-        ///Marker type for the `total_records` field
-        pub struct total_records(());
         ///Marker type for the `repos_processed` field
         pub struct repos_processed(());
         ///Marker type for the `message` field
@@ -1086,9 +1100,9 @@ where
 impl<'a, S> SyncJobResultBuilder<'a, S>
 where
     S: sync_job_result_state::State,
+    S::TotalRecords: sync_job_result_state::IsSet,
     S::Success: sync_job_result_state::IsSet,
     S::CollectionsSynced: sync_job_result_state::IsSet,
-    S::TotalRecords: sync_job_result_state::IsSet,
     S::ReposProcessed: sync_job_result_state::IsSet,
     S::Message: sync_job_result_state::IsSet,
 {
@@ -1107,7 +1121,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SyncJobResult<'a> {

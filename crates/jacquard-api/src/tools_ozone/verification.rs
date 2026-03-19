@@ -75,104 +75,104 @@ pub mod verification_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Subject;
+        type Issuer;
         type Handle;
         type DisplayName;
         type CreatedAt;
-        type Issuer;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Subject = Unset;
+        type Issuer = Unset;
         type Handle = Unset;
         type DisplayName = Unset;
         type CreatedAt = Unset;
-        type Issuer = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
-        type Subject = S::Subject;
+        type Issuer = S::Issuer;
         type Handle = S::Handle;
         type DisplayName = S::DisplayName;
         type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Uri = S::Uri;
-        type Subject = Set<members::subject>;
-        type Handle = S::Handle;
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Uri = S::Uri;
         type Subject = S::Subject;
-        type Handle = Set<members::handle>;
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Uri = S::Uri;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
-        type DisplayName = Set<members::display_name>;
-        type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
-        type DisplayName = S::DisplayName;
-        type CreatedAt = Set<members::created_at>;
-        type Issuer = S::Issuer;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssuer<S> {}
     impl<S: State> State for SetIssuer<S> {
         type Uri = S::Uri;
-        type Subject = S::Subject;
+        type Issuer = Set<members::issuer>;
         type Handle = S::Handle;
         type DisplayName = S::DisplayName;
         type CreatedAt = S::CreatedAt;
-        type Issuer = Set<members::issuer>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Uri = S::Uri;
+        type Issuer = S::Issuer;
+        type Handle = Set<members::handle>;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Uri = S::Uri;
+        type Issuer = S::Issuer;
+        type Handle = S::Handle;
+        type DisplayName = Set<members::display_name>;
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type Issuer = S::Issuer;
+        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Uri = S::Uri;
+        type Issuer = S::Issuer;
+        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
         ///Marker type for the `handle` field
         pub struct handle(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -480,11 +480,11 @@ impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
     S::Uri: verification_view_state::IsSet,
-    S::Subject: verification_view_state::IsSet,
+    S::Issuer: verification_view_state::IsSet,
     S::Handle: verification_view_state::IsSet,
     S::DisplayName: verification_view_state::IsSet,
     S::CreatedAt: verification_view_state::IsSet,
-    S::Issuer: verification_view_state::IsSet,
+    S::Subject: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {
@@ -509,7 +509,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> VerificationView<'a> {
@@ -581,7 +581,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("verificationView"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "verificationView",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -590,12 +592,12 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("issuer"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("displayName"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("issuer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("displayName"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -603,7 +605,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -626,7 +628,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "displayName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -647,7 +649,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "handle",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -668,7 +672,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("issuer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "issuer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -689,7 +695,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "issuerProfile",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -699,7 +705,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "issuerRepo",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -712,7 +718,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "revokeReason",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -733,7 +739,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "revokedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -756,7 +762,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "revokedBy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -779,7 +785,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "subject",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -800,7 +808,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subjectProfile",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -810,7 +818,7 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "subjectRepo",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -823,7 +831,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

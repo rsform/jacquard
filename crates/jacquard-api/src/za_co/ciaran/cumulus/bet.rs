@@ -36,49 +36,49 @@ pub mod bet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Market;
         type CreatedAt;
+        type Market;
         type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Market = Unset;
         type CreatedAt = Unset;
+        type Market = Unset;
         type Position = Unset;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarket<S> {}
-    impl<S: State> State for SetMarket<S> {
-        type Market = Set<members::market>;
-        type CreatedAt = S::CreatedAt;
-        type Position = S::Position;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Market = S::Market;
         type CreatedAt = Set<members::created_at>;
+        type Market = S::Market;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMarket<S> {}
+    impl<S: State> State for SetMarket<S> {
+        type CreatedAt = S::CreatedAt;
+        type Market = Set<members::market>;
         type Position = S::Position;
     }
     ///State transition - sets the `position` field to Set
     pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPosition<S> {}
     impl<S: State> State for SetPosition<S> {
-        type Market = S::Market;
         type CreatedAt = S::CreatedAt;
+        type Market = S::Market;
         type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `market` field
-        pub struct market(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `market` field
+        pub struct market(());
         ///Marker type for the `position` field
         pub struct position(());
     }
@@ -173,8 +173,8 @@ where
 impl<'a, S> BetBuilder<'a, S>
 where
     S: bet_state::State,
-    S::Market: bet_state::IsSet,
     S::CreatedAt: bet_state::IsSet,
+    S::Market: bet_state::IsSet,
     S::Position: bet_state::IsSet,
 {
     /// Build the final struct
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Bet<'a> {
@@ -318,7 +318,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -330,9 +330,9 @@ fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("market"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("position"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("market"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("position"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -340,7 +340,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -359,7 +359,9 @@ fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("market"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "market",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -368,7 +370,7 @@ fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "position",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

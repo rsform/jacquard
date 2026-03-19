@@ -8,7 +8,7 @@ use super::properties::build_object_properties;
 use super::types::*;
 use crate::lexicon::*;
 use heck::ToLowerCamelCase;
-use jacquard_common::smol_str::SmolStr;
+use jacquard_common::deps::smol_str::SmolStr;
 use std::collections::BTreeMap;
 use syn::DeriveInput;
 

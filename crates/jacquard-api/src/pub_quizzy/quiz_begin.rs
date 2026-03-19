@@ -40,67 +40,67 @@ pub mod quiz_begin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type League;
-        type EndsAt;
         type Quiz;
+        type League;
         type StartedAt;
+        type EndsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type League = Unset;
-        type EndsAt = Unset;
         type Quiz = Unset;
+        type League = Unset;
         type StartedAt = Unset;
-    }
-    ///State transition - sets the `league` field to Set
-    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLeague<S> {}
-    impl<S: State> State for SetLeague<S> {
-        type League = Set<members::league>;
-        type EndsAt = S::EndsAt;
-        type Quiz = S::Quiz;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `ends_at` field to Set
-    pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndsAt<S> {}
-    impl<S: State> State for SetEndsAt<S> {
-        type League = S::League;
-        type EndsAt = Set<members::ends_at>;
-        type Quiz = S::Quiz;
-        type StartedAt = S::StartedAt;
+        type EndsAt = Unset;
     }
     ///State transition - sets the `quiz` field to Set
     pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuiz<S> {}
     impl<S: State> State for SetQuiz<S> {
-        type League = S::League;
-        type EndsAt = S::EndsAt;
         type Quiz = Set<members::quiz>;
+        type League = S::League;
         type StartedAt = S::StartedAt;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `league` field to Set
+    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLeague<S> {}
+    impl<S: State> State for SetLeague<S> {
+        type Quiz = S::Quiz;
+        type League = Set<members::league>;
+        type StartedAt = S::StartedAt;
+        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type League = S::League;
-        type EndsAt = S::EndsAt;
         type Quiz = S::Quiz;
+        type League = S::League;
         type StartedAt = Set<members::started_at>;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `ends_at` field to Set
+    pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndsAt<S> {}
+    impl<S: State> State for SetEndsAt<S> {
+        type Quiz = S::Quiz;
+        type League = S::League;
+        type StartedAt = S::StartedAt;
+        type EndsAt = Set<members::ends_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `league` field
-        pub struct league(());
-        ///Marker type for the `ends_at` field
-        pub struct ends_at(());
         ///Marker type for the `quiz` field
         pub struct quiz(());
+        ///Marker type for the `league` field
+        pub struct league(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `ends_at` field
+        pub struct ends_at(());
     }
 }
 
@@ -213,10 +213,10 @@ where
 impl<'a, S> QuizBeginBuilder<'a, S>
 where
     S: quiz_begin_state::State,
-    S::League: quiz_begin_state::IsSet,
-    S::EndsAt: quiz_begin_state::IsSet,
     S::Quiz: quiz_begin_state::IsSet,
+    S::League: quiz_begin_state::IsSet,
     S::StartedAt: quiz_begin_state::IsSet,
+    S::EndsAt: quiz_begin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizBegin<'a> {
@@ -232,7 +232,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> QuizBegin<'a> {
@@ -335,7 +335,7 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -347,10 +347,10 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("league"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("quiz"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("startedAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("endsAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("league"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quiz"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startedAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("endsAt")
                             ],
                         ),
                         nullable: None,
@@ -358,7 +358,9 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("endsAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "endsAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("When the quiz ends"),
@@ -377,7 +379,9 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("league"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "league",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -386,7 +390,9 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("quiz"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "quiz",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -395,7 +401,7 @@ fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

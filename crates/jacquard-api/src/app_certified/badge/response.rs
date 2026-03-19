@@ -42,51 +42,51 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Response;
         type BadgeAward;
         type CreatedAt;
-        type Response;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Response = Unset;
         type BadgeAward = Unset;
         type CreatedAt = Unset;
-        type Response = Unset;
-    }
-    ///State transition - sets the `badge_award` field to Set
-    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
-    impl<S: State> State for SetBadgeAward<S> {
-        type BadgeAward = Set<members::badge_award>;
-        type CreatedAt = S::CreatedAt;
-        type Response = S::Response;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type BadgeAward = S::BadgeAward;
-        type CreatedAt = Set<members::created_at>;
-        type Response = S::Response;
     }
     ///State transition - sets the `response` field to Set
     pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResponse<S> {}
     impl<S: State> State for SetResponse<S> {
+        type Response = Set<members::response>;
         type BadgeAward = S::BadgeAward;
         type CreatedAt = S::CreatedAt;
-        type Response = Set<members::response>;
+    }
+    ///State transition - sets the `badge_award` field to Set
+    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
+    impl<S: State> State for SetBadgeAward<S> {
+        type Response = S::Response;
+        type BadgeAward = Set<members::badge_award>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Response = S::Response;
+        type BadgeAward = S::BadgeAward;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `response` field
+        pub struct response(());
         ///Marker type for the `badge_award` field
         pub struct badge_award(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `response` field
-        pub struct response(());
     }
 }
 
@@ -196,9 +196,9 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
+    S::Response: response_state::IsSet,
     S::BadgeAward: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
-    S::Response: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -214,7 +214,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Response<'a> {
@@ -418,7 +418,7 @@ fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -430,9 +430,9 @@ fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::Le
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("badgeAward"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("response"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("badgeAward"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("response"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -440,7 +440,7 @@ fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::Le
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "badgeAward",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -451,7 +451,7 @@ fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -474,7 +474,7 @@ fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "response",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -495,7 +495,9 @@ fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("weight"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "weight",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

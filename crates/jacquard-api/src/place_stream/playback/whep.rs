@@ -158,7 +158,7 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Whep {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[derive(
@@ -172,7 +172,7 @@ pub struct Whep {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WhepOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[jacquard_derive::open_union]
@@ -230,7 +230,7 @@ impl jacquard_common::xrpc::XrpcResp for WhepResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(WhepOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }
@@ -252,7 +252,7 @@ impl jacquard_common::xrpc::XrpcRequest for Whep {
     {
         Ok(
             Box::new(Self {
-                body: bytes::Bytes::copy_from_slice(body),
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
             }),
         )
     }

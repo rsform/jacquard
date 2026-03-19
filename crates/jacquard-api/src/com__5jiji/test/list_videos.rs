@@ -28,7 +28,7 @@ pub struct ListVideos;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListVideosOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 /// Response type for

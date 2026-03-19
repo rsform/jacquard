@@ -117,7 +117,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> BodyExternal<'a> {
@@ -137,7 +137,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("bodyExternal"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("bodyExternal"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -145,14 +145,18 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -177,7 +181,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("bodyTemplate"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("bodyTemplate"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -185,14 +189,18 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("node")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("node")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("node"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "node",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -202,7 +210,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -214,7 +222,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("type")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type")
                             ],
                         ),
                         nullable: None,
@@ -222,7 +230,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("body"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "body",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -237,7 +247,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -256,7 +266,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -273,7 +283,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("imports"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "imports",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -299,7 +311,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "type",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -320,7 +334,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -343,7 +357,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("via"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "via",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -357,7 +373,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("view"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "view",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#view"),
@@ -369,7 +387,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("view"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("view"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -378,8 +396,8 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("prop"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("accepts")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("prop"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("accepts")
                         ],
                     ),
                     nullable: None,
@@ -387,7 +405,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("accepts"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "accepts",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -407,7 +427,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("prop"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "prop",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -430,7 +452,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("viewPrimitive"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("viewPrimitive"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -438,14 +460,18 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("type")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("format"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "format",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -464,7 +490,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -487,7 +515,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("viewRecord"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("viewRecord"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -500,7 +528,7 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "collection",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -523,7 +551,9 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("rkey"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rkey",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -679,7 +709,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> BodyTemplate<'a> {
@@ -981,7 +1011,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Component<'a> {
@@ -1106,7 +1136,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Component<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1157,37 +1187,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Prop;
         type Accepts;
+        type Prop;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Prop = Unset;
         type Accepts = Unset;
-    }
-    ///State transition - sets the `prop` field to Set
-    pub struct SetProp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProp<S> {}
-    impl<S: State> State for SetProp<S> {
-        type Prop = Set<members::prop>;
-        type Accepts = S::Accepts;
+        type Prop = Unset;
     }
     ///State transition - sets the `accepts` field to Set
     pub struct SetAccepts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccepts<S> {}
     impl<S: State> State for SetAccepts<S> {
-        type Prop = S::Prop;
         type Accepts = Set<members::accepts>;
+        type Prop = S::Prop;
+    }
+    ///State transition - sets the `prop` field to Set
+    pub struct SetProp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProp<S> {}
+    impl<S: State> State for SetProp<S> {
+        type Accepts = S::Accepts;
+        type Prop = Set<members::prop>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `prop` field
-        pub struct prop(());
         ///Marker type for the `accepts` field
         pub struct accepts(());
+        ///Marker type for the `prop` field
+        pub struct prop(());
     }
 }
 
@@ -1260,8 +1290,8 @@ where
 impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
-    S::Prop: view_state::IsSet,
     S::Accepts: view_state::IsSet,
+    S::Prop: view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> View<'a> {
@@ -1275,7 +1305,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> View<'a> {

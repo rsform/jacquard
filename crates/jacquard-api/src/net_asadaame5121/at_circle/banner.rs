@@ -35,51 +35,51 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Banner;
         type Ring;
+        type Banner;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Banner = Unset;
         type Ring = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Banner = S::Banner;
-        type Ring = S::Ring;
-    }
-    ///State transition - sets the `banner` field to Set
-    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBanner<S> {}
-    impl<S: State> State for SetBanner<S> {
-        type CreatedAt = S::CreatedAt;
-        type Banner = Set<members::banner>;
-        type Ring = S::Ring;
+        type Banner = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
-        type CreatedAt = S::CreatedAt;
-        type Banner = S::Banner;
         type Ring = Set<members::ring>;
+        type Banner = S::Banner;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `banner` field to Set
+    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBanner<S> {}
+    impl<S: State> State for SetBanner<S> {
+        type Ring = S::Ring;
+        type Banner = Set<members::banner>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ring = S::Ring;
+        type Banner = S::Banner;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `banner` field
-        pub struct banner(());
         ///Marker type for the `ring` field
         pub struct ring(());
+        ///Marker type for the `banner` field
+        pub struct banner(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -172,9 +172,9 @@ where
 impl<'a, S> BannerBuilder<'a, S>
 where
     S: banner_state::State,
-    S::CreatedAt: banner_state::IsSet,
-    S::Banner: banner_state::IsSet,
     S::Ring: banner_state::IsSet,
+    S::Banner: banner_state::IsSet,
+    S::CreatedAt: banner_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Banner<'a> {
@@ -189,7 +189,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Banner<'a> {
@@ -291,7 +291,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -303,9 +303,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("ring"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("banner"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ring"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("banner"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -313,7 +313,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("banner"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "banner",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -321,7 +323,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -340,7 +342,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ring"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ring",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

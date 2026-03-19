@@ -150,7 +150,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Astral<'a> {
@@ -251,7 +251,7 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("literal:self")),
@@ -259,8 +259,8 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDo
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("points"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("powers")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("points"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("powers")
                             ],
                         ),
                         nullable: None,
@@ -268,7 +268,9 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDo
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("points"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "points",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -279,7 +281,9 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("powers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "powers",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -296,7 +300,7 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("power"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("power"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,

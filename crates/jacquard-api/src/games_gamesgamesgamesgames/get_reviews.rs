@@ -240,8 +240,8 @@ pub mod popfeed_review_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rating;
-        type Uri;
         type CreatedAt;
+        type Uri;
         type Did;
     }
     /// Empty state - all required fields are unset
@@ -249,8 +249,8 @@ pub mod popfeed_review_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rating = Unset;
-        type Uri = Unset;
         type CreatedAt = Unset;
+        type Uri = Unset;
         type Did = Unset;
     }
     ///State transition - sets the `rating` field to Set
@@ -258,17 +258,8 @@ pub mod popfeed_review_state {
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
         type Rating = Set<members::rating>;
+        type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Rating = S::Rating;
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
         type Did = S::Did;
     }
     ///State transition - sets the `created_at` field to Set
@@ -276,8 +267,17 @@ pub mod popfeed_review_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Rating = S::Rating;
-        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
         type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
@@ -285,8 +285,8 @@ pub mod popfeed_review_state {
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Rating = S::Rating;
-        type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -294,10 +294,10 @@ pub mod popfeed_review_state {
     pub mod members {
         ///Marker type for the `rating` field
         pub struct rating(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
     }
@@ -511,8 +511,8 @@ impl<'a, S> PopfeedReviewBuilder<'a, S>
 where
     S: popfeed_review_state::State,
     S::Rating: popfeed_review_state::IsSet,
-    S::Uri: popfeed_review_state::IsSet,
     S::CreatedAt: popfeed_review_state::IsSet,
+    S::Uri: popfeed_review_state::IsSet,
     S::Did: popfeed_review_state::IsSet,
 {
     /// Build the final struct
@@ -534,7 +534,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> PopfeedReview<'a> {
@@ -566,7 +566,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -574,14 +574,16 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("uri")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "cursor",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -600,7 +602,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "limit",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -611,7 +615,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "uri",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -640,15 +646,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("popfeedReview"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("popfeedReview"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("rating"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("rating"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -656,7 +662,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "containsSpoilers",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -666,7 +672,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -685,7 +691,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -702,7 +710,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "facets",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -716,7 +726,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("rating"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rating",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -727,7 +739,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "tags",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -747,7 +761,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "text",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -762,7 +778,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -777,7 +795,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(

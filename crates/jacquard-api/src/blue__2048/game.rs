@@ -43,105 +43,105 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type SeededRecording;
         type Won;
+        type SyncStatus;
         type CreatedAt;
         type Completed;
         type CurrentScore;
-        type SeededRecording;
-        type SyncStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type SeededRecording = Unset;
         type Won = Unset;
+        type SyncStatus = Unset;
         type CreatedAt = Unset;
         type Completed = Unset;
         type CurrentScore = Unset;
-        type SeededRecording = Unset;
-        type SyncStatus = Unset;
-    }
-    ///State transition - sets the `won` field to Set
-    pub struct SetWon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWon<S> {}
-    impl<S: State> State for SetWon<S> {
-        type Won = Set<members::won>;
-        type CreatedAt = S::CreatedAt;
-        type Completed = S::Completed;
-        type CurrentScore = S::CurrentScore;
-        type SeededRecording = S::SeededRecording;
-        type SyncStatus = S::SyncStatus;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Won = S::Won;
-        type CreatedAt = Set<members::created_at>;
-        type Completed = S::Completed;
-        type CurrentScore = S::CurrentScore;
-        type SeededRecording = S::SeededRecording;
-        type SyncStatus = S::SyncStatus;
-    }
-    ///State transition - sets the `completed` field to Set
-    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCompleted<S> {}
-    impl<S: State> State for SetCompleted<S> {
-        type Won = S::Won;
-        type CreatedAt = S::CreatedAt;
-        type Completed = Set<members::completed>;
-        type CurrentScore = S::CurrentScore;
-        type SeededRecording = S::SeededRecording;
-        type SyncStatus = S::SyncStatus;
-    }
-    ///State transition - sets the `current_score` field to Set
-    pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
-    impl<S: State> State for SetCurrentScore<S> {
-        type Won = S::Won;
-        type CreatedAt = S::CreatedAt;
-        type Completed = S::Completed;
-        type CurrentScore = Set<members::current_score>;
-        type SeededRecording = S::SeededRecording;
-        type SyncStatus = S::SyncStatus;
     }
     ///State transition - sets the `seeded_recording` field to Set
     pub struct SetSeededRecording<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeededRecording<S> {}
     impl<S: State> State for SetSeededRecording<S> {
+        type SeededRecording = Set<members::seeded_recording>;
         type Won = S::Won;
+        type SyncStatus = S::SyncStatus;
         type CreatedAt = S::CreatedAt;
         type Completed = S::Completed;
         type CurrentScore = S::CurrentScore;
-        type SeededRecording = Set<members::seeded_recording>;
+    }
+    ///State transition - sets the `won` field to Set
+    pub struct SetWon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWon<S> {}
+    impl<S: State> State for SetWon<S> {
+        type SeededRecording = S::SeededRecording;
+        type Won = Set<members::won>;
         type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
     }
     ///State transition - sets the `sync_status` field to Set
     pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
     impl<S: State> State for SetSyncStatus<S> {
+        type SeededRecording = S::SeededRecording;
         type Won = S::Won;
+        type SyncStatus = Set<members::sync_status>;
         type CreatedAt = S::CreatedAt;
         type Completed = S::Completed;
         type CurrentScore = S::CurrentScore;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
         type SeededRecording = S::SeededRecording;
-        type SyncStatus = Set<members::sync_status>;
+        type Won = S::Won;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = Set<members::created_at>;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+    }
+    ///State transition - sets the `completed` field to Set
+    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCompleted<S> {}
+    impl<S: State> State for SetCompleted<S> {
+        type SeededRecording = S::SeededRecording;
+        type Won = S::Won;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+        type Completed = Set<members::completed>;
+        type CurrentScore = S::CurrentScore;
+    }
+    ///State transition - sets the `current_score` field to Set
+    pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
+    impl<S: State> State for SetCurrentScore<S> {
+        type SeededRecording = S::SeededRecording;
+        type Won = S::Won;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+        type CurrentScore = Set<members::current_score>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `seeded_recording` field
+        pub struct seeded_recording(());
         ///Marker type for the `won` field
         pub struct won(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `completed` field
         pub struct completed(());
         ///Marker type for the `current_score` field
         pub struct current_score(());
-        ///Marker type for the `seeded_recording` field
-        pub struct seeded_recording(());
-        ///Marker type for the `sync_status` field
-        pub struct sync_status(());
     }
 }
 
@@ -294,12 +294,12 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
+    S::SeededRecording: game_state::IsSet,
     S::Won: game_state::IsSet,
+    S::SyncStatus: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
     S::Completed: game_state::IsSet,
     S::CurrentScore: game_state::IsSet,
-    S::SeededRecording: game_state::IsSet,
-    S::SyncStatus: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -317,7 +317,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Game<'a> {
@@ -420,7 +420,7 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -432,12 +432,12 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("currentScore"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("won"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("completed"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("seededRecording"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("currentScore"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("won"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("completed"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("seededRecording"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("syncStatus"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -445,7 +445,7 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "completed",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -455,7 +455,7 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -474,7 +474,7 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "currentScore",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -487,7 +487,7 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "seededRecording",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -508,7 +508,7 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "syncStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -519,7 +519,9 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("won"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "won",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,

@@ -7,7 +7,7 @@
 use crate::resolver::{IdentityError, IdentityResolver};
 
 use jacquard_common::{
-    IntoStatic, from_json_value, smol_str,
+    IntoStatic, from_json_value, deps::smol_str,
     types::{aturi::AtUri, cid::Cid, did::Did, string::Nsid},
 };
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -408,7 +408,7 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
         // Try cache first
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
-            let authority = jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
+            let authority = jacquard_common::deps::smol_str::SmolStr::from(nsid.domain_authority());
             if let Some(did) = crate::cache_impl::get(&caches.authority_to_did, &authority) {
                 return Ok(did);
             }
@@ -423,7 +423,7 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
             Ok(did) => {
                 if let Some(caches) = &self.caches {
                     let authority =
-                        jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
+                        jacquard_common::deps::smol_str::SmolStr::from(nsid.domain_authority());
                     crate::cache_impl::insert(&caches.authority_to_did, authority, did.clone());
                 }
             }
@@ -458,7 +458,7 @@ impl crate::JacquardResolver {
         // Try cache first
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
-            let authority = jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
+            let authority = jacquard_common::deps::smol_str::SmolStr::from(nsid.domain_authority());
             if let Some(did) = crate::cache_impl::get(&caches.authority_to_did, &authority) {
                 return Ok(did);
             }
@@ -499,7 +499,7 @@ impl crate::JacquardResolver {
                     #[cfg(feature = "cache")]
                     if let Ok(ref did) = result {
                         if let Some(caches) = &self.caches {
-                            let authority_key = jacquard_common::smol_str::SmolStr::from(authority);
+                            let authority_key = jacquard_common::deps::smol_str::SmolStr::from(authority);
                             crate::cache_impl::insert(
                                 &caches.authority_to_did,
                                 authority_key,

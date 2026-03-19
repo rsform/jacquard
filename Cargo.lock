@@ -2391,18 +2391,12 @@ dependencies = [
 name = "jacquard-api"
 version = "0.9.5"
 dependencies = [
- "bon",
- "bytes",
  "jacquard-common",
  "jacquard-derive",
  "jacquard-lexicon",
  "miette",
- "rustversion",
  "serde",
- "serde_bytes",
- "serde_ipld_dagcbor",
  "thiserror 2.0.17",
- "unicode-segmentation",
 ]
 
 [[package]]
@@ -2469,6 +2463,7 @@ dependencies = [
  "regex-automata",
  "regex-lite",
  "reqwest",
+ "rustversion",
  "serde",
  "serde_bytes",
  "serde_html_form",
@@ -2483,6 +2478,7 @@ dependencies = [
  "tokio-util",
  "tracing 0.1.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "trait-variant",
+ "unicode-segmentation",
  "url",
  "zstd",
 ]

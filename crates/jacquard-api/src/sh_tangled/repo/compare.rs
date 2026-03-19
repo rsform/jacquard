@@ -35,50 +35,50 @@ pub mod compare_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Rev1;
         type Rev2;
+        type Rev1;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Rev1 = Unset;
         type Rev2 = Unset;
+        type Rev1 = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Rev2 = S::Rev2;
         type Rev1 = S::Rev1;
-        type Rev2 = S::Rev2;
-    }
-    ///State transition - sets the `rev1` field to Set
-    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev1<S> {}
-    impl<S: State> State for SetRev1<S> {
-        type Repo = S::Repo;
-        type Rev1 = Set<members::rev1>;
-        type Rev2 = S::Rev2;
     }
     ///State transition - sets the `rev2` field to Set
     pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev2<S> {}
     impl<S: State> State for SetRev2<S> {
         type Repo = S::Repo;
-        type Rev1 = S::Rev1;
         type Rev2 = Set<members::rev2>;
+        type Rev1 = S::Rev1;
+    }
+    ///State transition - sets the `rev1` field to Set
+    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev1<S> {}
+    impl<S: State> State for SetRev1<S> {
+        type Repo = S::Repo;
+        type Rev2 = S::Rev2;
+        type Rev1 = Set<members::rev1>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `rev1` field
-        pub struct rev1(());
         ///Marker type for the `rev2` field
         pub struct rev2(());
+        ///Marker type for the `rev1` field
+        pub struct rev1(());
     }
 }
 
@@ -172,8 +172,8 @@ impl<'a, S> CompareBuilder<'a, S>
 where
     S: compare_state::State,
     S::Repo: compare_state::IsSet,
-    S::Rev1: compare_state::IsSet,
     S::Rev2: compare_state::IsSet,
+    S::Rev1: compare_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Compare<'a> {
@@ -197,7 +197,7 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CompareOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[jacquard_derive::open_union]
@@ -285,7 +285,7 @@ impl jacquard_common::xrpc::XrpcResp for CompareResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(CompareOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }

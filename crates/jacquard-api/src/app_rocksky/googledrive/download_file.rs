@@ -120,7 +120,7 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadFileOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 /// Response type for
@@ -143,7 +143,7 @@ impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(DownloadFileOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }

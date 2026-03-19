@@ -79,7 +79,7 @@ pub(super) fn sanitize_name_cow(s: &str) -> CowStr<'_> {
     }
 
     if s.is_empty() {
-        return CowStr::Owned(jacquard_common::smol_str::SmolStr::new_static("unknown"));
+        return CowStr::Owned(jacquard_common::deps::smol_str::SmolStr::new_static("unknown"));
     }
 
     // Replace invalid characters with underscores

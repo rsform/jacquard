@@ -44,6 +44,8 @@ thiserror = { version = "2.0", default-features = false }
 
 # trait stuff
 trait-variant = "0.1.2"
+rustversion = "1.0"
+unicode-segmentation = "1.12"
 
 
 bon = "3.8.0"

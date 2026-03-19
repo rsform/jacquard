@@ -39,49 +39,49 @@ pub mod store_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Text;
+        type Uri;
         type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Text = Unset;
+        type Uri = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Text = S::Text;
-        type Visibility = S::Visibility;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Uri = S::Uri;
         type Text = Set<members::text>;
+        type Uri = S::Uri;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Text = S::Text;
+        type Uri = Set<members::uri>;
         type Visibility = S::Visibility;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Uri = S::Uri;
         type Text = S::Text;
+        type Uri = S::Uri;
         type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
     }
@@ -196,8 +196,8 @@ where
 impl<'a, S> StoreBuilder<'a, S>
 where
     S: store_state::State,
-    S::Uri: store_state::IsSet,
     S::Text: store_state::IsSet,
+    S::Uri: store_state::IsSet,
     S::Visibility: store_state::IsSet,
 {
     /// Build the final struct
@@ -214,7 +214,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Store<'a> {

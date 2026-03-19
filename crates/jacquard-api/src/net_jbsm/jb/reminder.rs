@@ -47,67 +47,67 @@ pub mod reminder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TriggerAt;
         type Subject;
-        type Requester;
         type CreatedAt;
+        type TriggerAt;
+        type Requester;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TriggerAt = Unset;
         type Subject = Unset;
-        type Requester = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `trigger_at` field to Set
-    pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
-    impl<S: State> State for SetTriggerAt<S> {
-        type TriggerAt = Set<members::trigger_at>;
-        type Subject = S::Subject;
-        type Requester = S::Requester;
-        type CreatedAt = S::CreatedAt;
+        type TriggerAt = Unset;
+        type Requester = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type TriggerAt = S::TriggerAt;
         type Subject = Set<members::subject>;
-        type Requester = S::Requester;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `requester` field to Set
-    pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRequester<S> {}
-    impl<S: State> State for SetRequester<S> {
         type TriggerAt = S::TriggerAt;
-        type Subject = S::Subject;
-        type Requester = Set<members::requester>;
-        type CreatedAt = S::CreatedAt;
+        type Requester = S::Requester;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type TriggerAt = S::TriggerAt;
         type Subject = S::Subject;
-        type Requester = S::Requester;
         type CreatedAt = Set<members::created_at>;
+        type TriggerAt = S::TriggerAt;
+        type Requester = S::Requester;
+    }
+    ///State transition - sets the `trigger_at` field to Set
+    pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
+    impl<S: State> State for SetTriggerAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type TriggerAt = Set<members::trigger_at>;
+        type Requester = S::Requester;
+    }
+    ///State transition - sets the `requester` field to Set
+    pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRequester<S> {}
+    impl<S: State> State for SetRequester<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type TriggerAt = S::TriggerAt;
+        type Requester = Set<members::requester>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trigger_at` field
-        pub struct trigger_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `requester` field
-        pub struct requester(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `trigger_at` field
+        pub struct trigger_at(());
+        ///Marker type for the `requester` field
+        pub struct requester(());
     }
 }
 
@@ -254,10 +254,10 @@ where
 impl<'a, S> ReminderBuilder<'a, S>
 where
     S: reminder_state::State,
-    S::TriggerAt: reminder_state::IsSet,
     S::Subject: reminder_state::IsSet,
-    S::Requester: reminder_state::IsSet,
     S::CreatedAt: reminder_state::IsSet,
+    S::TriggerAt: reminder_state::IsSet,
+    S::Requester: reminder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reminder<'a> {
@@ -275,7 +275,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Reminder<'a> {
@@ -393,7 +393,7 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -405,10 +405,10 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("triggerAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("requester")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("triggerAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("requester")
                             ],
                         ),
                         nullable: None,
@@ -416,7 +416,7 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -439,7 +439,7 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurred",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -449,7 +449,7 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "originUri",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -472,7 +472,7 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "requester",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -495,7 +495,9 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "subject",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -514,7 +516,7 @@ fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "triggerAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

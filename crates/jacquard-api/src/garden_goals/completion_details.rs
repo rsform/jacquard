@@ -57,85 +57,85 @@ pub mod completion_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Year;
         type Month;
+        type UpdatedAt;
         type GoalId;
         type Day;
-        type UpdatedAt;
-        type Year;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Year = Unset;
         type Month = Unset;
+        type UpdatedAt = Unset;
         type GoalId = Unset;
         type Day = Unset;
-        type UpdatedAt = Unset;
-        type Year = Unset;
-    }
-    ///State transition - sets the `month` field to Set
-    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonth<S> {}
-    impl<S: State> State for SetMonth<S> {
-        type Month = Set<members::month>;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type UpdatedAt = S::UpdatedAt;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type Month = S::Month;
-        type GoalId = Set<members::goal_id>;
-        type Day = S::Day;
-        type UpdatedAt = S::UpdatedAt;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `day` field to Set
-    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDay<S> {}
-    impl<S: State> State for SetDay<S> {
-        type Month = S::Month;
-        type GoalId = S::GoalId;
-        type Day = Set<members::day>;
-        type UpdatedAt = S::UpdatedAt;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Month = S::Month;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type UpdatedAt = Set<members::updated_at>;
-        type Year = S::Year;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
+        type Year = Set<members::year>;
         type Month = S::Month;
+        type UpdatedAt = S::UpdatedAt;
         type GoalId = S::GoalId;
         type Day = S::Day;
+    }
+    ///State transition - sets the `month` field to Set
+    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMonth<S> {}
+    impl<S: State> State for SetMonth<S> {
+        type Year = S::Year;
+        type Month = Set<members::month>;
         type UpdatedAt = S::UpdatedAt;
-        type Year = Set<members::year>;
+        type GoalId = S::GoalId;
+        type Day = S::Day;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Year = S::Year;
+        type Month = S::Month;
+        type UpdatedAt = Set<members::updated_at>;
+        type GoalId = S::GoalId;
+        type Day = S::Day;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoalId<S> {}
+    impl<S: State> State for SetGoalId<S> {
+        type Year = S::Year;
+        type Month = S::Month;
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = Set<members::goal_id>;
+        type Day = S::Day;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDay<S> {}
+    impl<S: State> State for SetDay<S> {
+        type Year = S::Year;
+        type Month = S::Month;
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = S::GoalId;
+        type Day = Set<members::day>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `year` field
+        pub struct year(());
         ///Marker type for the `month` field
         pub struct month(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
         ///Marker type for the `day` field
         pub struct day(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `year` field
-        pub struct year(());
     }
 }
 
@@ -355,11 +355,11 @@ where
 impl<'a, S> CompletionDetailsBuilder<'a, S>
 where
     S: completion_details_state::State,
+    S::Year: completion_details_state::IsSet,
     S::Month: completion_details_state::IsSet,
+    S::UpdatedAt: completion_details_state::IsSet,
     S::GoalId: completion_details_state::IsSet,
     S::Day: completion_details_state::IsSet,
-    S::UpdatedAt: completion_details_state::IsSet,
-    S::Year: completion_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompletionDetails<'a> {
@@ -380,7 +380,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CompletionDetails<'a> {
@@ -585,7 +585,7 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -597,11 +597,11 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("goalId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("year"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("month"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("day"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("goalId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("year"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("month"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("day"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                             ],
                         ),
                         nullable: None,
@@ -609,7 +609,9 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("day"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "day",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -620,7 +622,9 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("goalId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "goalId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -639,7 +643,9 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("goalUri"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "goalUri",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -660,7 +666,9 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("month"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "month",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -671,7 +679,9 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "notes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -690,7 +700,7 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "photoAlt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -711,7 +721,7 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "photoBlob",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -721,7 +731,7 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -744,7 +754,9 @@ fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("year"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "year",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

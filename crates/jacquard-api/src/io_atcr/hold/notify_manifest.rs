@@ -36,7 +36,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("blobInfo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("blobInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -45,7 +45,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "digest",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -60,7 +62,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "size",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -75,7 +79,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("childManifestInfo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "childManifestInfo",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -84,7 +90,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "digest",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -99,7 +107,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mediaType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -116,7 +124,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("platform"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "platform",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -125,7 +135,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "size",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -140,7 +152,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("layerInfo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("layerInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -149,7 +161,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "digest",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -164,7 +178,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mediaType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -181,7 +195,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "size",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -196,7 +212,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -210,10 +226,10 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("manifestDigest"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("manifest")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("userDid"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("manifestDigest"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("manifest")
                                     ],
                                 ),
                                 nullable: None,
@@ -221,7 +237,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "manifest",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -232,7 +248,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "manifestDigest",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -253,7 +269,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "operation",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -274,7 +290,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "repository",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -295,7 +311,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("tag"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "tag",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -314,7 +332,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "userDid",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -344,7 +364,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("manifestInfo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("manifestInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("OCI manifest information"),
@@ -355,14 +375,18 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("config"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "config",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#blobInfo"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("layers"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "layers",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -374,7 +398,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "manifests",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -394,7 +418,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "mediaType",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -417,7 +441,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("platformInfo"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("platformInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -426,7 +450,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "architecture",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -443,7 +467,7 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("os"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("os"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -671,67 +695,67 @@ pub mod notify_manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type UserDid;
         type ManifestDigest;
         type Manifest;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type UserDid = Unset;
         type ManifestDigest = Unset;
         type Manifest = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type UserDid = S::UserDid;
-        type ManifestDigest = S::ManifestDigest;
-        type Manifest = S::Manifest;
+        type Repository = Unset;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
-        type Repository = S::Repository;
         type UserDid = Set<members::user_did>;
         type ManifestDigest = S::ManifestDigest;
         type Manifest = S::Manifest;
+        type Repository = S::Repository;
     }
     ///State transition - sets the `manifest_digest` field to Set
     pub struct SetManifestDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifestDigest<S> {}
     impl<S: State> State for SetManifestDigest<S> {
-        type Repository = S::Repository;
         type UserDid = S::UserDid;
         type ManifestDigest = Set<members::manifest_digest>;
         type Manifest = S::Manifest;
+        type Repository = S::Repository;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifest<S> {}
     impl<S: State> State for SetManifest<S> {
-        type Repository = S::Repository;
         type UserDid = S::UserDid;
         type ManifestDigest = S::ManifestDigest;
         type Manifest = Set<members::manifest>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type UserDid = S::UserDid;
+        type ManifestDigest = S::ManifestDigest;
+        type Manifest = S::Manifest;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
         ///Marker type for the `manifest_digest` field
         pub struct manifest_digest(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -878,10 +902,10 @@ where
 impl<'a, S> NotifyManifestBuilder<'a, S>
 where
     S: notify_manifest_state::State,
-    S::Repository: notify_manifest_state::IsSet,
     S::UserDid: notify_manifest_state::IsSet,
     S::ManifestDigest: notify_manifest_state::IsSet,
     S::Manifest: notify_manifest_state::IsSet,
+    S::Repository: notify_manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotifyManifest<'a> {
@@ -899,7 +923,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> NotifyManifest<'a> {

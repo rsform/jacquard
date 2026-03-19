@@ -799,7 +799,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("appleCategory"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("appleCategory"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -807,14 +807,18 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("value")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -837,7 +841,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("episodeRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("episodeRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -846,8 +850,8 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("podcastGuid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("feedItemGuid")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("podcastGuid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("feedItemGuid")
                         ],
                     ),
                     nullable: None,
@@ -855,7 +859,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "feedItemGuid",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -876,7 +880,9 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("feedUrl"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "feedUrl",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -897,7 +903,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "podcastGuid",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -922,7 +928,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("podcastRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("podcastRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -931,7 +937,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("podcastGuid")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("podcastGuid")
                         ],
                     ),
                     nullable: None,
@@ -939,7 +945,9 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("feedUrl"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "feedUrl",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -960,7 +968,7 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "podcastGuid",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

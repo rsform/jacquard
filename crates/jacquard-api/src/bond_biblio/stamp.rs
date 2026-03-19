@@ -39,50 +39,50 @@ pub mod stamp_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type List;
-        type Book;
         type CreatedAt;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type List = Unset;
-        type Book = Unset;
         type CreatedAt = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
         type List = Set<members::list>;
+        type CreatedAt = S::CreatedAt;
         type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type List = S::List;
-        type Book = Set<members::book>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type List = S::List;
-        type Book = S::Book;
         type CreatedAt = Set<members::created_at>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type List = S::List;
+        type CreatedAt = S::CreatedAt;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `list` field
         pub struct list(());
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
@@ -176,8 +176,8 @@ impl<'a, S> StampBuilder<'a, S>
 where
     S: stamp_state::State,
     S::List: stamp_state::IsSet,
-    S::Book: stamp_state::IsSet,
     S::CreatedAt: stamp_state::IsSet,
+    S::Book: stamp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stamp<'a> {
@@ -192,7 +192,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Stamp<'a> {
@@ -292,7 +292,7 @@ fn lexicon_doc_bond_biblio_stamp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -304,9 +304,9 @@ fn lexicon_doc_bond_biblio_stamp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("list"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("book"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("list"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("book"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -314,7 +314,9 @@ fn lexicon_doc_bond_biblio_stamp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("book"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "book",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -335,7 +337,7 @@ fn lexicon_doc_bond_biblio_stamp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -358,7 +360,9 @@ fn lexicon_doc_bond_biblio_stamp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("list"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "list",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

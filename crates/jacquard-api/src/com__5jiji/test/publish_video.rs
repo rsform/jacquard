@@ -16,7 +16,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishVideo {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[derive(
@@ -30,7 +30,7 @@ pub struct PublishVideo {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishVideoOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 #[jacquard_derive::open_union]
@@ -95,7 +95,7 @@ impl jacquard_common::xrpc::XrpcRequest for PublishVideo {
     {
         Ok(
             Box::new(Self {
-                body: bytes::Bytes::copy_from_slice(body),
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
             }),
         )
     }

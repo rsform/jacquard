@@ -38,7 +38,7 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("multiRefSys"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("multiRefSys"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -47,7 +47,9 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("refSys"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "refSys",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -65,18 +67,22 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("refSysByRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("refSysByRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("href")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("href")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("epoch"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "epoch",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -87,7 +93,9 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("href"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "href",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -108,18 +116,22 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("refSysCustom"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("refSysCustom"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("type")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -142,18 +154,24 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("refSysSimpleRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "refSysSimpleRef",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -176,18 +194,22 @@ fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("singleRefSys"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("singleRefSys"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("refSys")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("refSys")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("refSys"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "refSys",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
@@ -363,7 +385,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> RefSysByRef<'a> {
@@ -570,7 +592,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SingleRefSys<'a> {

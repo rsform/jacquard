@@ -30,10 +30,10 @@ pub struct Registration<'a> {
     pub book_id: jacquard_common::CowStr<'a>,
     /// The MultiFormat public key of the book.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub book_pub: bytes::Bytes,
+    pub book_pub: jacquard_common::deps::bytes::Bytes,
     /// The MultiFormat signature of this record, without this attribute, as created by the private key associated with the book.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub book_sig: bytes::Bytes,
+    pub book_sig: jacquard_common::deps::bytes::Bytes,
     /// Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -60,151 +60,151 @@ pub mod registration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type PublicationId;
-        type BookPub;
-        type BookSig;
+        type Did;
         type Authors;
+        type BookSig;
+        type PublicationId;
+        type Title;
         type OccurredAt;
         type BookId;
-        type Did;
+        type BookPub;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type PublicationId = Unset;
-        type BookPub = Unset;
-        type BookSig = Unset;
+        type Did = Unset;
         type Authors = Unset;
+        type BookSig = Unset;
+        type PublicationId = Unset;
+        type Title = Unset;
         type OccurredAt = Unset;
         type BookId = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type PublicationId = S::PublicationId;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-        type BookId = S::BookId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `publication_id` field to Set
-    pub struct SetPublicationId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublicationId<S> {}
-    impl<S: State> State for SetPublicationId<S> {
-        type Title = S::Title;
-        type PublicationId = Set<members::publication_id>;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-        type BookId = S::BookId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `book_pub` field to Set
-    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookPub<S> {}
-    impl<S: State> State for SetBookPub<S> {
-        type Title = S::Title;
-        type PublicationId = S::PublicationId;
-        type BookPub = Set<members::book_pub>;
-        type BookSig = S::BookSig;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-        type BookId = S::BookId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `book_sig` field to Set
-    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookSig<S> {}
-    impl<S: State> State for SetBookSig<S> {
-        type Title = S::Title;
-        type PublicationId = S::PublicationId;
-        type BookPub = S::BookPub;
-        type BookSig = Set<members::book_sig>;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-        type BookId = S::BookId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
-        type PublicationId = S::PublicationId;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
-        type Authors = Set<members::authors>;
-        type OccurredAt = S::OccurredAt;
-        type BookId = S::BookId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `occurred_at` field to Set
-    pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
-    impl<S: State> State for SetOccurredAt<S> {
-        type Title = S::Title;
-        type PublicationId = S::PublicationId;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
-        type Authors = S::Authors;
-        type OccurredAt = Set<members::occurred_at>;
-        type BookId = S::BookId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `book_id` field to Set
-    pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookId<S> {}
-    impl<S: State> State for SetBookId<S> {
-        type Title = S::Title;
-        type PublicationId = S::PublicationId;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-        type BookId = Set<members::book_id>;
-        type Did = S::Did;
+        type BookPub = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Title = S::Title;
-        type PublicationId = S::PublicationId;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
+        type Did = Set<members::did>;
         type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type PublicationId = S::PublicationId;
+        type Title = S::Title;
         type OccurredAt = S::OccurredAt;
         type BookId = S::BookId;
-        type Did = Set<members::did>;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Did = S::Did;
+        type Authors = Set<members::authors>;
+        type BookSig = S::BookSig;
+        type PublicationId = S::PublicationId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `book_sig` field to Set
+    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookSig<S> {}
+    impl<S: State> State for SetBookSig<S> {
+        type Did = S::Did;
+        type Authors = S::Authors;
+        type BookSig = Set<members::book_sig>;
+        type PublicationId = S::PublicationId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `publication_id` field to Set
+    pub struct SetPublicationId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublicationId<S> {}
+    impl<S: State> State for SetPublicationId<S> {
+        type Did = S::Did;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type PublicationId = Set<members::publication_id>;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Did = S::Did;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type PublicationId = S::PublicationId;
+        type Title = Set<members::title>;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `occurred_at` field to Set
+    pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
+    impl<S: State> State for SetOccurredAt<S> {
+        type Did = S::Did;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type PublicationId = S::PublicationId;
+        type Title = S::Title;
+        type OccurredAt = Set<members::occurred_at>;
+        type BookId = S::BookId;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `book_id` field to Set
+    pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookId<S> {}
+    impl<S: State> State for SetBookId<S> {
+        type Did = S::Did;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type PublicationId = S::PublicationId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookId = Set<members::book_id>;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `book_pub` field to Set
+    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookPub<S> {}
+    impl<S: State> State for SetBookPub<S> {
+        type Did = S::Did;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type PublicationId = S::PublicationId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type BookPub = Set<members::book_pub>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `publication_id` field
-        pub struct publication_id(());
-        ///Marker type for the `book_pub` field
-        pub struct book_pub(());
-        ///Marker type for the `book_sig` field
-        pub struct book_sig(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `book_sig` field
+        pub struct book_sig(());
+        ///Marker type for the `publication_id` field
+        pub struct publication_id(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
         ///Marker type for the `book_id` field
         pub struct book_id(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `book_pub` field
+        pub struct book_pub(());
     }
 }
 
@@ -215,8 +215,8 @@ pub struct RegistrationBuilder<'a, S: registration_state::State> {
         ::core::option::Option<crate::org_passingreads::AspectRatio<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bytes::Bytes>,
-        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -320,7 +320,7 @@ where
     /// Set the `bookPub` field (required)
     pub fn book_pub(
         mut self,
-        value: impl Into<bytes::Bytes>,
+        value: impl Into<jacquard_common::deps::bytes::Bytes>,
     ) -> RegistrationBuilder<'a, registration_state::SetBookPub<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         RegistrationBuilder {
@@ -339,7 +339,7 @@ where
     /// Set the `bookSig` field (required)
     pub fn book_sig(
         mut self,
-        value: impl Into<bytes::Bytes>,
+        value: impl Into<jacquard_common::deps::bytes::Bytes>,
     ) -> RegistrationBuilder<'a, registration_state::SetBookSig<S>> {
         self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         RegistrationBuilder {
@@ -448,14 +448,14 @@ where
 impl<'a, S> RegistrationBuilder<'a, S>
 where
     S: registration_state::State,
-    S::Title: registration_state::IsSet,
-    S::PublicationId: registration_state::IsSet,
-    S::BookPub: registration_state::IsSet,
-    S::BookSig: registration_state::IsSet,
+    S::Did: registration_state::IsSet,
     S::Authors: registration_state::IsSet,
+    S::BookSig: registration_state::IsSet,
+    S::PublicationId: registration_state::IsSet,
+    S::Title: registration_state::IsSet,
     S::OccurredAt: registration_state::IsSet,
     S::BookId: registration_state::IsSet,
-    S::Did: registration_state::IsSet,
+    S::BookPub: registration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Registration<'a> {
@@ -477,7 +477,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Registration<'a> {
@@ -612,7 +612,7 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -624,14 +624,14 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("bookId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("publicationId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("occurredAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("bookPub"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("bookSig")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bookId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("authors"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("publicationId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("occurredAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bookPub"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bookSig")
                             ],
                         ),
                         nullable: None,
@@ -639,7 +639,7 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "aspectRatio",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -650,7 +650,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "authors",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -674,7 +676,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("bookId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "bookId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -693,7 +697,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("bookPub"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "bookPub",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                     description: None,
                                     max_length: None,
@@ -701,7 +707,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("bookSig"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "bookSig",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                     description: None,
                                     max_length: None,
@@ -709,7 +717,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("cover"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "cover",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -717,7 +727,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "did",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -738,7 +750,7 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurredAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -757,7 +769,7 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publicationId",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -778,7 +790,9 @@ fn lexicon_doc_org_passingreads_book_registration() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

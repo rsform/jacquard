@@ -46,67 +46,67 @@ pub mod auth_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
-        type AccessJwt;
         type RefreshJwt;
+        type Did;
+        type AccessJwt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-        type AccessJwt = Unset;
         type RefreshJwt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
-        type AccessJwt = S::AccessJwt;
-        type RefreshJwt = S::RefreshJwt;
+        type Did = Unset;
+        type AccessJwt = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
-        type AccessJwt = S::AccessJwt;
         type RefreshJwt = S::RefreshJwt;
-    }
-    ///State transition - sets the `access_jwt` field to Set
-    pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
-    impl<S: State> State for SetAccessJwt<S> {
         type Did = S::Did;
-        type Handle = S::Handle;
-        type AccessJwt = Set<members::access_jwt>;
-        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = S::AccessJwt;
     }
     ///State transition - sets the `refresh_jwt` field to Set
     pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
     impl<S: State> State for SetRefreshJwt<S> {
-        type Did = S::Did;
         type Handle = S::Handle;
-        type AccessJwt = S::AccessJwt;
         type RefreshJwt = Set<members::refresh_jwt>;
+        type Did = S::Did;
+        type AccessJwt = S::AccessJwt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type RefreshJwt = S::RefreshJwt;
+        type Did = Set<members::did>;
+        type AccessJwt = S::AccessJwt;
+    }
+    ///State transition - sets the `access_jwt` field to Set
+    pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
+    impl<S: State> State for SetAccessJwt<S> {
+        type Handle = S::Handle;
+        type RefreshJwt = S::RefreshJwt;
+        type Did = S::Did;
+        type AccessJwt = Set<members::access_jwt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `access_jwt` field
-        pub struct access_jwt(());
         ///Marker type for the `refresh_jwt` field
         pub struct refresh_jwt(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `access_jwt` field
+        pub struct access_jwt(());
     }
 }
 
@@ -219,10 +219,10 @@ where
 impl<'a, S> AuthCallbackBuilder<'a, S>
 where
     S: auth_callback_state::State,
-    S::Did: auth_callback_state::IsSet,
     S::Handle: auth_callback_state::IsSet,
-    S::AccessJwt: auth_callback_state::IsSet,
     S::RefreshJwt: auth_callback_state::IsSet,
+    S::Did: auth_callback_state::IsSet,
+    S::AccessJwt: auth_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthCallback<'a> {
@@ -238,7 +238,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> AuthCallback<'a> {
@@ -261,15 +261,15 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("authCallback"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("authCallback"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("refreshJwt"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("accessJwt"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("did")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("refreshJwt"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("accessJwt"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
                         ],
                     ),
                     nullable: None,
@@ -277,7 +277,7 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessJwt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -294,7 +294,9 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -311,7 +313,9 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "handle",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -326,7 +330,7 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "refreshJwt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

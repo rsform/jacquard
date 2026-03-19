@@ -98,7 +98,7 @@ impl_into_static_passthru!(
     isize,
     f32,
     f64,
-    crate::smol_str::SmolStr
+    crate::deps::smol_str::SmolStr
 );
 
 impl<T: IntoStatic> IntoStatic for Box<T> {

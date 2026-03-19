@@ -337,67 +337,67 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScientificName;
         type BasisOfRecord;
-        type EventDate;
         type CreatedAt;
+        type ScientificName;
+        type EventDate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScientificName = Unset;
         type BasisOfRecord = Unset;
-        type EventDate = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type ScientificName = Set<members::scientific_name>;
-        type BasisOfRecord = S::BasisOfRecord;
-        type EventDate = S::EventDate;
-        type CreatedAt = S::CreatedAt;
+        type ScientificName = Unset;
+        type EventDate = Unset;
     }
     ///State transition - sets the `basis_of_record` field to Set
     pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
     impl<S: State> State for SetBasisOfRecord<S> {
-        type ScientificName = S::ScientificName;
         type BasisOfRecord = Set<members::basis_of_record>;
-        type EventDate = S::EventDate;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
         type ScientificName = S::ScientificName;
-        type BasisOfRecord = S::BasisOfRecord;
-        type EventDate = Set<members::event_date>;
-        type CreatedAt = S::CreatedAt;
+        type EventDate = S::EventDate;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ScientificName = S::ScientificName;
         type BasisOfRecord = S::BasisOfRecord;
-        type EventDate = S::EventDate;
         type CreatedAt = Set<members::created_at>;
+        type ScientificName = S::ScientificName;
+        type EventDate = S::EventDate;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScientificName<S> {}
+    impl<S: State> State for SetScientificName<S> {
+        type BasisOfRecord = S::BasisOfRecord;
+        type CreatedAt = S::CreatedAt;
+        type ScientificName = Set<members::scientific_name>;
+        type EventDate = S::EventDate;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventDate<S> {}
+    impl<S: State> State for SetEventDate<S> {
+        type BasisOfRecord = S::BasisOfRecord;
+        type CreatedAt = S::CreatedAt;
+        type ScientificName = S::ScientificName;
+        type EventDate = Set<members::event_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scientific_name` field
-        pub struct scientific_name(());
         ///Marker type for the `basis_of_record` field
         pub struct basis_of_record(());
-        ///Marker type for the `event_date` field
-        pub struct event_date(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `scientific_name` field
+        pub struct scientific_name(());
+        ///Marker type for the `event_date` field
+        pub struct event_date(());
     }
 }
 
@@ -2009,10 +2009,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S> OccurrenceBuilder<'a, S>
 where
     S: occurrence_state::State,
-    S::ScientificName: occurrence_state::IsSet,
     S::BasisOfRecord: occurrence_state::IsSet,
-    S::EventDate: occurrence_state::IsSet,
     S::CreatedAt: occurrence_state::IsSet,
+    S::ScientificName: occurrence_state::IsSet,
+    S::EventDate: occurrence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Occurrence<'a> {
@@ -2103,7 +2103,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Occurrence<'a> {
@@ -2268,7 +2268,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.associated_media {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2286,7 +2286,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.associated_occurrences {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2304,7 +2304,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.associated_references {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2322,7 +2322,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.associated_sequences {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2341,7 +2341,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         {
             let value = &self.basis_of_record;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2359,7 +2359,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.behavior {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2377,7 +2377,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.class {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2395,7 +2395,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.collection_code {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2424,7 +2424,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.country {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2466,7 +2466,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.county {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2484,7 +2484,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.data_generalizations {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2502,7 +2502,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.dataset_name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2520,7 +2520,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.date_identified {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2538,7 +2538,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.dc_type {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2556,7 +2556,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.decimal_latitude {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2574,7 +2574,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.decimal_longitude {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2592,7 +2592,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.dynamic_properties {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2611,7 +2611,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         {
             let value = &self.event_date;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2629,7 +2629,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.event_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2647,7 +2647,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.event_time {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2665,7 +2665,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.family {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2683,7 +2683,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.field_notes {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2701,7 +2701,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.gbif_taxon_key {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2719,7 +2719,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.genus {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2737,7 +2737,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.geodetic_datum {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2755,7 +2755,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.habitat {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2773,7 +2773,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.higher_classification {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2791,7 +2791,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identification_qualifier {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2809,7 +2809,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identification_remarks {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2827,7 +2827,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identified_by {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2845,7 +2845,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identified_by_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2874,7 +2874,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.information_withheld {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2892,7 +2892,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.infraspecific_epithet {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2910,7 +2910,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.institution_code {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2928,7 +2928,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.kingdom {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2946,7 +2946,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.license {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2964,7 +2964,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.life_stage {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -2982,7 +2982,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.locality {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3000,7 +3000,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.location_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3018,7 +3018,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.location_remarks {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3058,7 +3058,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.municipality {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3076,7 +3076,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.nomenclatural_code {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3094,7 +3094,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.occurrence_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3112,7 +3112,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.occurrence_remarks {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3130,7 +3130,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.occurrence_status {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3148,7 +3148,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.order {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3166,7 +3166,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.organism_quantity {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3184,7 +3184,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.organism_quantity_type {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3202,7 +3202,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.phylum {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3220,7 +3220,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.previous_identifications {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3238,7 +3238,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.recorded_by {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3256,7 +3256,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.recorded_by_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3274,7 +3274,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.reproductive_condition {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3292,7 +3292,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.rights_holder {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3310,7 +3310,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.sampling_effort {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3328,7 +3328,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.sampling_protocol {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3347,7 +3347,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         {
             let value = &self.scientific_name;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3365,7 +3365,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.scientific_name_authorship {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3383,7 +3383,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.sex {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3401,7 +3401,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.specific_epithet {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3419,7 +3419,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.state_province {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3437,7 +3437,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.taxon_rank {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3455,7 +3455,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.taxonomic_status {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3473,7 +3473,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.verbatim_locality {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3491,7 +3491,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.vernacular_name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -3522,7 +3522,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -3534,10 +3534,10 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("basisOfRecord"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("scientificName"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("eventDate"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("basisOfRecord"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scientificName"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("eventDate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -3545,7 +3545,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "associatedMedia",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3566,7 +3566,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "associatedOccurrences",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3587,7 +3587,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "associatedReferences",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3608,7 +3608,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "associatedSequences",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3629,7 +3629,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "audioEvidence",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -3640,7 +3640,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "basisOfRecord",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3661,7 +3661,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "behavior",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3682,7 +3682,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("class"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "class",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -3701,7 +3703,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "collectionCode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3722,7 +3724,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "coordinateUncertaintyInMeters",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -3735,7 +3737,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("country"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "country",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -3754,7 +3758,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "countryCode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3775,7 +3779,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("county"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "county",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -3794,7 +3800,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3817,7 +3823,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "dataGeneralizations",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3838,7 +3844,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "datasetName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3859,7 +3865,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "dateIdentified",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3880,7 +3886,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("dcType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "dcType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -3899,7 +3907,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "decimalLatitude",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3920,7 +3928,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "decimalLongitude",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3941,7 +3949,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "dynamicProperties",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3962,7 +3970,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "eventDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -3983,7 +3991,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("eventID"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "eventID",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4002,7 +4012,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "eventRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4025,7 +4035,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "eventTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4046,7 +4056,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("family"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "family",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4065,7 +4077,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "fieldNotes",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4086,7 +4098,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "gbifTaxonKey",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4107,7 +4119,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("genus"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "genus",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4126,7 +4140,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "geodeticDatum",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4147,7 +4161,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("habitat"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "habitat",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4166,7 +4182,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "higherClassification",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4187,7 +4203,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identificationQualifier",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4208,7 +4224,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identificationRemarks",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4229,7 +4245,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identifiedBy",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4250,7 +4266,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "identifiedByID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4271,7 +4287,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "imageEvidence",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -4282,7 +4298,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "individualCount",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4295,7 +4311,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "informationWithheld",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4316,7 +4332,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "infraspecificEpithet",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4337,7 +4353,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "institutionCode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4358,7 +4374,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("kingdom"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "kingdom",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4377,7 +4395,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("license"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "license",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4396,7 +4416,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lifeStage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4417,7 +4437,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "locality",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4438,7 +4458,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "locationID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4459,7 +4479,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "locationRemarks",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4480,7 +4500,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "maximumDepthInMeters",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4493,7 +4513,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "maximumElevationInMeters",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4506,7 +4526,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "minimumDepthInMeters",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4519,7 +4539,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "minimumElevationInMeters",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -4532,7 +4552,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "municipality",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4553,7 +4573,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "nomenclaturalCode",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4574,7 +4594,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurrenceID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4595,7 +4615,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurrenceRemarks",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4616,7 +4636,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurrenceStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4637,7 +4657,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("order"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "order",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4656,7 +4678,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "organismQuantity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4677,7 +4699,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "organismQuantityType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4698,7 +4720,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("phylum"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "phylum",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4717,7 +4741,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "previousIdentifications",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4738,7 +4762,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "recordedBy",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4759,7 +4783,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "recordedByID",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4780,7 +4804,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "references",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4803,7 +4827,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "reproductiveCondition",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4824,7 +4848,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "rightsHolder",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4845,7 +4869,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "samplingEffort",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4866,7 +4890,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "samplingProtocol",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4887,7 +4911,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "scientificName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4908,7 +4932,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "scientificNameAuthorship",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4929,7 +4953,9 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sex"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sex",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -4948,7 +4974,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "specificEpithet",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4969,7 +4995,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "spectrogramEvidence",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -4980,7 +5006,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "stateProvince",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -5001,7 +5027,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "taxonRank",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -5022,7 +5048,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "taxonomicStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -5043,7 +5069,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "verbatimLocality",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -5064,7 +5090,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "vernacularName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -5085,7 +5111,7 @@ fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "videoEvidence",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

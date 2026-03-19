@@ -37,50 +37,50 @@ pub mod issue_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Bug;
         type Issue;
+        type Bug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Bug = Unset;
         type Issue = Unset;
+        type Bug = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Issue = S::Issue;
         type Bug = S::Bug;
-        type Issue = S::Issue;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type CreatedAt = S::CreatedAt;
-        type Bug = Set<members::bug>;
-        type Issue = S::Issue;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssue<S> {}
     impl<S: State> State for SetIssue<S> {
         type CreatedAt = S::CreatedAt;
-        type Bug = S::Bug;
         type Issue = Set<members::issue>;
+        type Bug = S::Bug;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBug<S> {}
+    impl<S: State> State for SetBug<S> {
+        type CreatedAt = S::CreatedAt;
+        type Issue = S::Issue;
+        type Bug = Set<members::bug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `bug` field
-        pub struct bug(());
         ///Marker type for the `issue` field
         pub struct issue(());
+        ///Marker type for the `bug` field
+        pub struct bug(());
     }
 }
 
@@ -174,8 +174,8 @@ impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
     S::CreatedAt: issue_state::IsSet,
-    S::Bug: issue_state::IsSet,
     S::Issue: issue_state::IsSet,
+    S::Bug: issue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Issue<'a> {
@@ -292,7 +292,7 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> ::jacquard_lexicon::lexicon::
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -300,9 +300,9 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> ::jacquard_lexicon::lexicon::
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("bug"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("issue"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bug"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("issue"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -310,7 +310,9 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> ::jacquard_lexicon::lexicon::
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("bug"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "bug",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -331,7 +333,7 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -350,7 +352,9 @@ fn lexicon_doc_network_slices_tools_bug_issue() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("issue"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "issue",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

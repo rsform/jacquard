@@ -38,49 +38,49 @@ pub mod mood_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mood;
         type When;
+        type Mood;
         type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mood = Unset;
         type When = Unset;
+        type Mood = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `mood` field to Set
-    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMood<S> {}
-    impl<S: State> State for SetMood<S> {
-        type Mood = Set<members::mood>;
-        type When = S::When;
-        type Ref = S::Ref;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Mood = S::Mood;
         type When = Set<members::when>;
+        type Mood = S::Mood;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `mood` field to Set
+    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMood<S> {}
+    impl<S: State> State for SetMood<S> {
+        type When = S::When;
+        type Mood = Set<members::mood>;
         type Ref = S::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Mood = S::Mood;
         type When = S::When;
+        type Mood = S::Mood;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mood` field
-        pub struct mood(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `mood` field
+        pub struct mood(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
     }
@@ -175,8 +175,8 @@ where
 impl<'a, S> MoodBuilder<'a, S>
 where
     S: mood_state::State,
-    S::Mood: mood_state::IsSet,
     S::When: mood_state::IsSet,
+    S::Mood: mood_state::IsSet,
     S::Ref: mood_state::IsSet,
 {
     /// Build the final struct
@@ -192,7 +192,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Mood<'a> {
@@ -307,7 +307,7 @@ fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -319,9 +319,9 @@ fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("mood"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("mood"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ref")
                             ],
                         ),
                         nullable: None,
@@ -329,7 +329,9 @@ fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("mood"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "mood",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -348,7 +350,9 @@ fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ref",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -367,7 +371,9 @@ fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "when",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

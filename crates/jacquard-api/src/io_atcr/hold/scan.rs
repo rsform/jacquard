@@ -62,203 +62,203 @@ pub mod scan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserDid;
-        type High;
+        type Low;
         type Medium;
+        type Manifest;
+        type ScannerVersion;
+        type High;
         type ScannedAt;
         type Critical;
-        type Low;
-        type Manifest;
         type Repository;
-        type ScannerVersion;
+        type UserDid;
         type Total;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserDid = Unset;
-        type High = Unset;
+        type Low = Unset;
         type Medium = Unset;
+        type Manifest = Unset;
+        type ScannerVersion = Unset;
+        type High = Unset;
         type ScannedAt = Unset;
         type Critical = Unset;
-        type Low = Unset;
-        type Manifest = Unset;
         type Repository = Unset;
-        type ScannerVersion = Unset;
+        type UserDid = Unset;
         type Total = Unset;
     }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type UserDid = Set<members::user_did>;
+    ///State transition - sets the `low` field to Set
+    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLow<S> {}
+    impl<S: State> State for SetLow<S> {
+        type Low = Set<members::low>;
+        type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
         type High = S::High;
-        type Medium = S::Medium;
         type ScannedAt = S::ScannedAt;
         type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
         type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `high` field to Set
-    pub struct SetHigh<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHigh<S> {}
-    impl<S: State> State for SetHigh<S> {
         type UserDid = S::UserDid;
-        type High = Set<members::high>;
-        type Medium = S::Medium;
-        type ScannedAt = S::ScannedAt;
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
         type Total = S::Total;
     }
     ///State transition - sets the `medium` field to Set
     pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedium<S> {}
     impl<S: State> State for SetMedium<S> {
-        type UserDid = S::UserDid;
-        type High = S::High;
+        type Low = S::Low;
         type Medium = Set<members::medium>;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = S::High;
         type ScannedAt = S::ScannedAt;
         type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
         type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `scanned_at` field to Set
-    pub struct SetScannedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScannedAt<S> {}
-    impl<S: State> State for SetScannedAt<S> {
         type UserDid = S::UserDid;
-        type High = S::High;
-        type Medium = S::Medium;
-        type ScannedAt = Set<members::scanned_at>;
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `critical` field to Set
-    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCritical<S> {}
-    impl<S: State> State for SetCritical<S> {
-        type UserDid = S::UserDid;
-        type High = S::High;
-        type Medium = S::Medium;
-        type ScannedAt = S::ScannedAt;
-        type Critical = Set<members::critical>;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `low` field to Set
-    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLow<S> {}
-    impl<S: State> State for SetLow<S> {
-        type UserDid = S::UserDid;
-        type High = S::High;
-        type Medium = S::Medium;
-        type ScannedAt = S::ScannedAt;
-        type Critical = S::Critical;
-        type Low = Set<members::low>;
-        type Manifest = S::Manifest;
-        type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
         type Total = S::Total;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifest<S> {}
     impl<S: State> State for SetManifest<S> {
-        type UserDid = S::UserDid;
-        type High = S::High;
-        type Medium = S::Medium;
-        type ScannedAt = S::ScannedAt;
-        type Critical = S::Critical;
         type Low = S::Low;
+        type Medium = S::Medium;
         type Manifest = Set<members::manifest>;
-        type Repository = S::Repository;
         type ScannerVersion = S::ScannerVersion;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type UserDid = S::UserDid;
         type High = S::High;
-        type Medium = S::Medium;
         type ScannedAt = S::ScannedAt;
         type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Repository = Set<members::repository>;
-        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+        type UserDid = S::UserDid;
         type Total = S::Total;
     }
     ///State transition - sets the `scanner_version` field to Set
     pub struct SetScannerVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScannerVersion<S> {}
     impl<S: State> State for SetScannerVersion<S> {
-        type UserDid = S::UserDid;
-        type High = S::High;
+        type Low = S::Low;
         type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = Set<members::scanner_version>;
+        type High = S::High;
         type ScannedAt = S::ScannedAt;
         type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
         type Repository = S::Repository;
-        type ScannerVersion = Set<members::scanner_version>;
+        type UserDid = S::UserDid;
+        type Total = S::Total;
+    }
+    ///State transition - sets the `high` field to Set
+    pub struct SetHigh<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHigh<S> {}
+    impl<S: State> State for SetHigh<S> {
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = Set<members::high>;
+        type ScannedAt = S::ScannedAt;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type UserDid = S::UserDid;
+        type Total = S::Total;
+    }
+    ///State transition - sets the `scanned_at` field to Set
+    pub struct SetScannedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScannedAt<S> {}
+    impl<S: State> State for SetScannedAt<S> {
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = S::High;
+        type ScannedAt = Set<members::scanned_at>;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type UserDid = S::UserDid;
+        type Total = S::Total;
+    }
+    ///State transition - sets the `critical` field to Set
+    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCritical<S> {}
+    impl<S: State> State for SetCritical<S> {
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = S::High;
+        type ScannedAt = S::ScannedAt;
+        type Critical = Set<members::critical>;
+        type Repository = S::Repository;
+        type UserDid = S::UserDid;
+        type Total = S::Total;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = S::High;
+        type ScannedAt = S::ScannedAt;
+        type Critical = S::Critical;
+        type Repository = Set<members::repository>;
+        type UserDid = S::UserDid;
+        type Total = S::Total;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = S::High;
+        type ScannedAt = S::ScannedAt;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type UserDid = Set<members::user_did>;
         type Total = S::Total;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotal<S> {}
     impl<S: State> State for SetTotal<S> {
-        type UserDid = S::UserDid;
-        type High = S::High;
+        type Low = S::Low;
         type Medium = S::Medium;
+        type Manifest = S::Manifest;
+        type ScannerVersion = S::ScannerVersion;
+        type High = S::High;
         type ScannedAt = S::ScannedAt;
         type Critical = S::Critical;
-        type Low = S::Low;
-        type Manifest = S::Manifest;
         type Repository = S::Repository;
-        type ScannerVersion = S::ScannerVersion;
+        type UserDid = S::UserDid;
         type Total = Set<members::total>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `high` field
-        pub struct high(());
+        ///Marker type for the `low` field
+        pub struct low(());
         ///Marker type for the `medium` field
         pub struct medium(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
+        ///Marker type for the `scanner_version` field
+        pub struct scanner_version(());
+        ///Marker type for the `high` field
+        pub struct high(());
         ///Marker type for the `scanned_at` field
         pub struct scanned_at(());
         ///Marker type for the `critical` field
         pub struct critical(());
-        ///Marker type for the `low` field
-        pub struct low(());
-        ///Marker type for the `manifest` field
-        pub struct manifest(());
         ///Marker type for the `repository` field
         pub struct repository(());
-        ///Marker type for the `scanner_version` field
-        pub struct scanner_version(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
         ///Marker type for the `total` field
         pub struct total(());
     }
@@ -546,15 +546,15 @@ impl<'a, S: scan_state::State> ScanBuilder<'a, S> {
 impl<'a, S> ScanBuilder<'a, S>
 where
     S: scan_state::State,
-    S::UserDid: scan_state::IsSet,
-    S::High: scan_state::IsSet,
+    S::Low: scan_state::IsSet,
     S::Medium: scan_state::IsSet,
+    S::Manifest: scan_state::IsSet,
+    S::ScannerVersion: scan_state::IsSet,
+    S::High: scan_state::IsSet,
     S::ScannedAt: scan_state::IsSet,
     S::Critical: scan_state::IsSet,
-    S::Low: scan_state::IsSet,
-    S::Manifest: scan_state::IsSet,
     S::Repository: scan_state::IsSet,
-    S::ScannerVersion: scan_state::IsSet,
+    S::UserDid: scan_state::IsSet,
     S::Total: scan_state::IsSet,
 {
     /// Build the final struct
@@ -579,7 +579,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Scan<'a> {
@@ -774,7 +774,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -786,16 +786,16 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("manifest"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("critical"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("high"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("medium"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("low"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("total"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("scannerVersion"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("scannedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("manifest"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("userDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("critical"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("high"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("medium"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("low"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scannerVersion"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scannedAt")
                             ],
                         ),
                         nullable: None,
@@ -803,7 +803,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "critical",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -816,7 +816,9 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("high"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "high",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -827,7 +829,9 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("low"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "low",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -838,7 +842,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "manifest",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -861,7 +865,9 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("medium"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "medium",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -872,7 +878,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "repository",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -893,7 +899,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sbomBlob",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -903,7 +909,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "scannedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -926,7 +932,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "scannerVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -947,7 +953,9 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("total"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "total",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -958,7 +966,9 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "userDid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -979,7 +989,7 @@ fn lexicon_doc_io_atcr_hold_scan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "vulnReportBlob",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {

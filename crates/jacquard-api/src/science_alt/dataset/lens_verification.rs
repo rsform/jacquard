@@ -40,7 +40,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("codeHash"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("codeHash"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -49,8 +49,8 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("algorithm"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("algorithm"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("digest")
                         ],
                     ),
                     nullable: None,
@@ -58,7 +58,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "algorithm",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -79,7 +79,9 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "digest",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -102,7 +104,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -114,10 +116,10 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("lens"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("lensCommit"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("verificationMethod"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lens"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lensCommit"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("verificationMethod"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -125,7 +127,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "codeHash",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -134,7 +136,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -157,7 +159,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -178,7 +180,9 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("lens"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "lens",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -199,7 +203,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lensCommit",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -220,7 +224,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "proofRef",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -231,7 +235,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "verificationMethod",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -348,67 +352,67 @@ pub mod lens_verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Lens;
+        type CreatedAt;
         type VerificationMethod;
         type LensCommit;
-        type CreatedAt;
-        type Lens;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Lens = Unset;
+        type CreatedAt = Unset;
         type VerificationMethod = Unset;
         type LensCommit = Unset;
-        type CreatedAt = Unset;
-        type Lens = Unset;
-    }
-    ///State transition - sets the `verification_method` field to Set
-    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
-    impl<S: State> State for SetVerificationMethod<S> {
-        type VerificationMethod = Set<members::verification_method>;
-        type LensCommit = S::LensCommit;
-        type CreatedAt = S::CreatedAt;
-        type Lens = S::Lens;
-    }
-    ///State transition - sets the `lens_commit` field to Set
-    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
-    impl<S: State> State for SetLensCommit<S> {
-        type VerificationMethod = S::VerificationMethod;
-        type LensCommit = Set<members::lens_commit>;
-        type CreatedAt = S::CreatedAt;
-        type Lens = S::Lens;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type VerificationMethod = S::VerificationMethod;
-        type LensCommit = S::LensCommit;
-        type CreatedAt = Set<members::created_at>;
-        type Lens = S::Lens;
     }
     ///State transition - sets the `lens` field to Set
     pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLens<S> {}
     impl<S: State> State for SetLens<S> {
+        type Lens = Set<members::lens>;
+        type CreatedAt = S::CreatedAt;
         type VerificationMethod = S::VerificationMethod;
         type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Lens = S::Lens;
+        type CreatedAt = Set<members::created_at>;
+        type VerificationMethod = S::VerificationMethod;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `verification_method` field to Set
+    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
+    impl<S: State> State for SetVerificationMethod<S> {
+        type Lens = S::Lens;
         type CreatedAt = S::CreatedAt;
-        type Lens = Set<members::lens>;
+        type VerificationMethod = Set<members::verification_method>;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `lens_commit` field to Set
+    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
+    impl<S: State> State for SetLensCommit<S> {
+        type Lens = S::Lens;
+        type CreatedAt = S::CreatedAt;
+        type VerificationMethod = S::VerificationMethod;
+        type LensCommit = Set<members::lens_commit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `lens` field
+        pub struct lens(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `verification_method` field
         pub struct verification_method(());
         ///Marker type for the `lens_commit` field
         pub struct lens_commit(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `lens` field
-        pub struct lens(());
     }
 }
 
@@ -589,10 +593,10 @@ where
 impl<'a, S> LensVerificationBuilder<'a, S>
 where
     S: lens_verification_state::State,
+    S::Lens: lens_verification_state::IsSet,
+    S::CreatedAt: lens_verification_state::IsSet,
     S::VerificationMethod: lens_verification_state::IsSet,
     S::LensCommit: lens_verification_state::IsSet,
-    S::CreatedAt: lens_verification_state::IsSet,
-    S::Lens: lens_verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LensVerification<'a> {
@@ -611,7 +615,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> LensVerification<'a> {

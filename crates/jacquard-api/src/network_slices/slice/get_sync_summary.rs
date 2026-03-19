@@ -34,50 +34,50 @@ pub mod collection_summary_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type IsExternal;
-        type EstimatedRepos;
         type Collection;
+        type EstimatedRepos;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type IsExternal = Unset;
-        type EstimatedRepos = Unset;
         type Collection = Unset;
+        type EstimatedRepos = Unset;
     }
     ///State transition - sets the `is_external` field to Set
     pub struct SetIsExternal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsExternal<S> {}
     impl<S: State> State for SetIsExternal<S> {
         type IsExternal = Set<members::is_external>;
+        type Collection = S::Collection;
         type EstimatedRepos = S::EstimatedRepos;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `estimated_repos` field to Set
-    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
-    impl<S: State> State for SetEstimatedRepos<S> {
-        type IsExternal = S::IsExternal;
-        type EstimatedRepos = Set<members::estimated_repos>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type IsExternal = S::IsExternal;
-        type EstimatedRepos = S::EstimatedRepos;
         type Collection = Set<members::collection>;
+        type EstimatedRepos = S::EstimatedRepos;
+    }
+    ///State transition - sets the `estimated_repos` field to Set
+    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
+    impl<S: State> State for SetEstimatedRepos<S> {
+        type IsExternal = S::IsExternal;
+        type Collection = S::Collection;
+        type EstimatedRepos = Set<members::estimated_repos>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `is_external` field
         pub struct is_external(());
-        ///Marker type for the `estimated_repos` field
-        pub struct estimated_repos(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `estimated_repos` field
+        pub struct estimated_repos(());
     }
 }
 
@@ -171,8 +171,8 @@ impl<'a, S> CollectionSummaryBuilder<'a, S>
 where
     S: collection_summary_state::State,
     S::IsExternal: collection_summary_state::IsSet,
-    S::EstimatedRepos: collection_summary_state::IsSet,
     S::Collection: collection_summary_state::IsSet,
+    S::EstimatedRepos: collection_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionSummary<'a> {
@@ -187,7 +187,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CollectionSummary<'a> {
@@ -211,14 +211,16 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("collectionSummary"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "collectionSummary",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("estimatedRepos"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("isExternal")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("estimatedRepos"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isExternal")
                         ],
                     ),
                     nullable: None,
@@ -226,7 +228,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "collection",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -243,7 +245,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "estimatedRepos",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -256,7 +258,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "isExternal",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -270,7 +272,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -278,14 +280,14 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("slice")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                         "collections",
                                     ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
@@ -307,7 +309,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                         "externalCollections",
                                     ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
@@ -329,7 +331,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("repos"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "repos",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -349,7 +353,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "slice",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(

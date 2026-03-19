@@ -152,7 +152,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TestRecord<'a> {
@@ -281,7 +281,7 @@ fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> ::jacquard_lexicon::lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -293,8 +293,8 @@ fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> ::jacquard_lexicon::lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("geometry"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("text")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("geometry"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("text")
                             ],
                         ),
                         nullable: None,
@@ -302,7 +302,7 @@ fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> ::jacquard_lexicon::lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "geometry",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -319,7 +319,9 @@ fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "text",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

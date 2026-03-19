@@ -185,67 +185,67 @@ pub mod metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessagesSent;
-        type Convos;
-        type ConvosStarted;
         type MessagesReceived;
+        type Convos;
+        type MessagesSent;
+        type ConvosStarted;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessagesSent = Unset;
-        type Convos = Unset;
-        type ConvosStarted = Unset;
         type MessagesReceived = Unset;
-    }
-    ///State transition - sets the `messages_sent` field to Set
-    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
-    impl<S: State> State for SetMessagesSent<S> {
-        type MessagesSent = Set<members::messages_sent>;
-        type Convos = S::Convos;
-        type ConvosStarted = S::ConvosStarted;
-        type MessagesReceived = S::MessagesReceived;
-    }
-    ///State transition - sets the `convos` field to Set
-    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvos<S> {}
-    impl<S: State> State for SetConvos<S> {
-        type MessagesSent = S::MessagesSent;
-        type Convos = Set<members::convos>;
-        type ConvosStarted = S::ConvosStarted;
-        type MessagesReceived = S::MessagesReceived;
-    }
-    ///State transition - sets the `convos_started` field to Set
-    pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
-    impl<S: State> State for SetConvosStarted<S> {
-        type MessagesSent = S::MessagesSent;
-        type Convos = S::Convos;
-        type ConvosStarted = Set<members::convos_started>;
-        type MessagesReceived = S::MessagesReceived;
+        type Convos = Unset;
+        type MessagesSent = Unset;
+        type ConvosStarted = Unset;
     }
     ///State transition - sets the `messages_received` field to Set
     pub struct SetMessagesReceived<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessagesReceived<S> {}
     impl<S: State> State for SetMessagesReceived<S> {
-        type MessagesSent = S::MessagesSent;
-        type Convos = S::Convos;
-        type ConvosStarted = S::ConvosStarted;
         type MessagesReceived = Set<members::messages_received>;
+        type Convos = S::Convos;
+        type MessagesSent = S::MessagesSent;
+        type ConvosStarted = S::ConvosStarted;
+    }
+    ///State transition - sets the `convos` field to Set
+    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvos<S> {}
+    impl<S: State> State for SetConvos<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type Convos = Set<members::convos>;
+        type MessagesSent = S::MessagesSent;
+        type ConvosStarted = S::ConvosStarted;
+    }
+    ///State transition - sets the `messages_sent` field to Set
+    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
+    impl<S: State> State for SetMessagesSent<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type Convos = S::Convos;
+        type MessagesSent = Set<members::messages_sent>;
+        type ConvosStarted = S::ConvosStarted;
+    }
+    ///State transition - sets the `convos_started` field to Set
+    pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
+    impl<S: State> State for SetConvosStarted<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type Convos = S::Convos;
+        type MessagesSent = S::MessagesSent;
+        type ConvosStarted = Set<members::convos_started>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `messages_sent` field
-        pub struct messages_sent(());
-        ///Marker type for the `convos` field
-        pub struct convos(());
-        ///Marker type for the `convos_started` field
-        pub struct convos_started(());
         ///Marker type for the `messages_received` field
         pub struct messages_received(());
+        ///Marker type for the `convos` field
+        pub struct convos(());
+        ///Marker type for the `messages_sent` field
+        pub struct messages_sent(());
+        ///Marker type for the `convos_started` field
+        pub struct convos_started(());
     }
 }
 
@@ -358,10 +358,10 @@ where
 impl<'a, S> MetadataBuilder<'a, S>
 where
     S: metadata_state::State,
-    S::MessagesSent: metadata_state::IsSet,
-    S::Convos: metadata_state::IsSet,
-    S::ConvosStarted: metadata_state::IsSet,
     S::MessagesReceived: metadata_state::IsSet,
+    S::Convos: metadata_state::IsSet,
+    S::MessagesSent: metadata_state::IsSet,
+    S::ConvosStarted: metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Metadata<'a> {
@@ -377,7 +377,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Metadata<'a> {
@@ -404,7 +404,7 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -412,14 +412,16 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("actor")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("actor")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "actor",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -444,15 +446,15 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("metadata"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("metadata"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("messagesSent"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("messagesReceived"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("convos"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("convosStarted")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("messagesSent"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("messagesReceived"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("convos"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("convosStarted")
                         ],
                     ),
                     nullable: None,
@@ -460,7 +462,9 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("convos"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "convos",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -471,7 +475,7 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "convosStarted",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -484,7 +488,7 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "messagesReceived",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -497,7 +501,7 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "messagesSent",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {

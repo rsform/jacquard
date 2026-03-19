@@ -43,37 +43,37 @@ pub mod create_report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type ReasonType;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type ReasonType = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type ReasonType = S::ReasonType;
+        type Subject = Unset;
     }
     ///State transition - sets the `reason_type` field to Set
     pub struct SetReasonType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReasonType<S> {}
     impl<S: State> State for SetReasonType<S> {
-        type Subject = S::Subject;
         type ReasonType = Set<members::reason_type>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type ReasonType = S::ReasonType;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `reason_type` field
         pub struct reason_type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -187,8 +187,8 @@ where
 impl<'a, S> CreateReportBuilder<'a, S>
 where
     S: create_report_state::State,
-    S::Subject: create_report_state::IsSet,
     S::ReasonType: create_report_state::IsSet,
+    S::Subject: create_report_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateReport<'a> {
@@ -204,7 +204,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CreateReport<'a> {
@@ -345,7 +345,7 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -359,8 +359,8 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("reasonType"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("subject")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("reasonType"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("subject")
                                     ],
                                 ),
                                 nullable: None,
@@ -368,14 +368,18 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("modTool"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "modTool",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
                                             r#ref: ::jacquard_common::CowStr::new_static("#modTool"),
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "reason",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -394,7 +398,7 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "reasonType",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -405,7 +409,9 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "subject",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                             description: None,
                                             refs: vec![
@@ -425,7 +431,7 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("modTool"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("modTool"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -433,20 +439,26 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("meta"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "meta",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

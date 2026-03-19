@@ -146,7 +146,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> AspectRatio<'a> {
@@ -167,13 +167,13 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("aspectRatio"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("aspectRatio"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height")
                         ],
                     ),
                     nullable: None,
@@ -181,7 +181,9 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "height",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -192,7 +194,9 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "width",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -207,7 +211,7 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -221,7 +225,7 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("children")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("children")
                                     ],
                                 ),
                                 nullable: None,
@@ -229,7 +233,7 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "children",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
@@ -237,14 +241,18 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("max"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "max",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
                                             r#ref: ::jacquard_common::CowStr::new_static("#aspectRatio"),
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("min"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "min",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
                                             r#ref: ::jacquard_common::CowStr::new_static("#aspectRatio"),
@@ -465,7 +473,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Clip<'a> {

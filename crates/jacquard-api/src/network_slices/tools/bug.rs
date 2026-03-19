@@ -63,105 +63,105 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
-        type Namespace;
         type StepsToReproduce;
         type Severity;
         type CreatedAt;
+        type Namespace;
         type Title;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
-        type Namespace = Unset;
         type StepsToReproduce = Unset;
         type Severity = Unset;
         type CreatedAt = Unset;
+        type Namespace = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Namespace = S::Namespace;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Severity = S::Severity;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNamespace<S> {}
-    impl<S: State> State for SetNamespace<S> {
-        type Description = S::Description;
-        type Namespace = Set<members::namespace>;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Severity = S::Severity;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type Description = Unset;
     }
     ///State transition - sets the `steps_to_reproduce` field to Set
     pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
     impl<S: State> State for SetStepsToReproduce<S> {
-        type Description = S::Description;
-        type Namespace = S::Namespace;
         type StepsToReproduce = Set<members::steps_to_reproduce>;
         type Severity = S::Severity;
         type CreatedAt = S::CreatedAt;
+        type Namespace = S::Namespace;
         type Title = S::Title;
+        type Description = S::Description;
     }
     ///State transition - sets the `severity` field to Set
     pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeverity<S> {}
     impl<S: State> State for SetSeverity<S> {
-        type Description = S::Description;
-        type Namespace = S::Namespace;
         type StepsToReproduce = S::StepsToReproduce;
         type Severity = Set<members::severity>;
         type CreatedAt = S::CreatedAt;
+        type Namespace = S::Namespace;
         type Title = S::Title;
+        type Description = S::Description;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Description = S::Description;
-        type Namespace = S::Namespace;
         type StepsToReproduce = S::StepsToReproduce;
         type Severity = S::Severity;
         type CreatedAt = Set<members::created_at>;
+        type Namespace = S::Namespace;
         type Title = S::Title;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNamespace<S> {}
+    impl<S: State> State for SetNamespace<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Namespace = Set<members::namespace>;
+        type Title = S::Title;
+        type Description = S::Description;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Description = S::Description;
-        type Namespace = S::Namespace;
         type StepsToReproduce = S::StepsToReproduce;
         type Severity = S::Severity;
         type CreatedAt = S::CreatedAt;
+        type Namespace = S::Namespace;
         type Title = Set<members::title>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Namespace = S::Namespace;
+        type Title = S::Title;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `namespace` field
-        pub struct namespace(());
         ///Marker type for the `steps_to_reproduce` field
         pub struct steps_to_reproduce(());
         ///Marker type for the `severity` field
         pub struct severity(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `namespace` field
+        pub struct namespace(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -410,12 +410,12 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::Description: bug_state::IsSet,
-    S::Namespace: bug_state::IsSet,
     S::StepsToReproduce: bug_state::IsSet,
     S::Severity: bug_state::IsSet,
     S::CreatedAt: bug_state::IsSet,
+    S::Namespace: bug_state::IsSet,
     S::Title: bug_state::IsSet,
+    S::Description: bug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bug<'a> {
@@ -437,7 +437,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Bug<'a> {
@@ -657,7 +657,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
         {
             let value = &self.description;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -689,7 +689,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
         {
             let value = &self.steps_to_reproduce;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -721,7 +721,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
         {
             let value = &self.title;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -752,7 +752,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -760,12 +760,12 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("namespace"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("stepsToReproduce"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("severity"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("namespace"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("stepsToReproduce"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("severity"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -773,7 +773,9 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("appUsed"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "appUsed",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -788,7 +790,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "attachments",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -800,7 +802,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -819,7 +821,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -836,7 +838,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "descriptionFacets",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -856,7 +858,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "namespace",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -877,7 +879,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "severity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -894,7 +896,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "stepsToReproduce",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -911,7 +913,7 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "stepsToReproduceFacets",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -931,7 +933,9 @@ fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

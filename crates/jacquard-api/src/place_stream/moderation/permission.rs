@@ -41,51 +41,51 @@ pub mod permission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Permissions;
         type Moderator;
+        type Permissions;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Permissions = Unset;
         type Moderator = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Permissions = S::Permissions;
-        type Moderator = S::Moderator;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type CreatedAt = S::CreatedAt;
-        type Permissions = Set<members::permissions>;
-        type Moderator = S::Moderator;
+        type Permissions = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `moderator` field to Set
     pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModerator<S> {}
     impl<S: State> State for SetModerator<S> {
-        type CreatedAt = S::CreatedAt;
-        type Permissions = S::Permissions;
         type Moderator = Set<members::moderator>;
+        type Permissions = S::Permissions;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Moderator = S::Moderator;
+        type Permissions = Set<members::permissions>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Moderator = S::Moderator;
+        type Permissions = S::Permissions;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
         ///Marker type for the `moderator` field
         pub struct moderator(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -198,9 +198,9 @@ where
 impl<'a, S> PermissionBuilder<'a, S>
 where
     S: permission_state::State,
-    S::CreatedAt: permission_state::IsSet,
-    S::Permissions: permission_state::IsSet,
     S::Moderator: permission_state::IsSet,
+    S::Permissions: permission_state::IsSet,
+    S::CreatedAt: permission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Permission<'a> {
@@ -216,7 +216,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Permission<'a> {
@@ -319,7 +319,7 @@ fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -331,9 +331,9 @@ fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("moderator"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("permissions"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("moderator"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("permissions"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -341,7 +341,7 @@ fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -364,7 +364,7 @@ fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "expirationTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -387,7 +387,7 @@ fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "moderator",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -410,7 +410,7 @@ fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "permissions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {

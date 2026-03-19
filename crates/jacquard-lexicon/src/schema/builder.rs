@@ -10,7 +10,7 @@ use crate::lexicon::{
     LexXrpcQueryParameter, Lexicon, LexiconDoc,
 };
 use jacquard_common::CowStr;
-use jacquard_common::smol_str::SmolStr;
+use jacquard_common::deps::smol_str::SmolStr;
 use std::collections::BTreeMap;
 
 /// Builder for lexicon documents

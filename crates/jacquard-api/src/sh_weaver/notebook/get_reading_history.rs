@@ -214,37 +214,37 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Progress;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Progress = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type Progress = S::Progress;
+        type Notebook = Unset;
     }
     ///State transition - sets the `progress` field to Set
     pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProgress<S> {}
     impl<S: State> State for SetProgress<S> {
-        type Notebook = S::Notebook;
         type Progress = Set<members::progress>;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Progress = S::Progress;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `progress` field
         pub struct progress(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
@@ -337,8 +337,8 @@ where
 impl<'a, S> ReadingHistoryItemBuilder<'a, S>
 where
     S: reading_history_item_state::State,
-    S::Notebook: reading_history_item_state::IsSet,
     S::Progress: reading_history_item_state::IsSet,
+    S::Notebook: reading_history_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReadingHistoryItem<'a> {
@@ -353,7 +353,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ReadingHistoryItem<'a> {
@@ -379,7 +379,7 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -390,7 +390,9 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "cursor",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -405,7 +407,9 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "limit",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -416,7 +420,9 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "status",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(
@@ -443,13 +449,15 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("readingHistoryItem"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "readingHistoryItem",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("progress")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("progress")
                         ],
                     ),
                     nullable: None,
@@ -457,7 +465,7 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "currentEntry",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -468,7 +476,9 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notebook",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -477,7 +487,9 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("progress"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "progress",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(

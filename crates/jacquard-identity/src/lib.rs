@@ -81,7 +81,7 @@ use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
 use jacquard_common::http_client::HttpClient;
-use jacquard_common::smol_str::{SmolStr, ToSmolStr};
+use jacquard_common::deps::smol_str::{SmolStr, ToSmolStr};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
@@ -581,13 +581,13 @@ impl JacquardResolver {
             .map_err(|e| IdentityError::from(e).with_context(format!("resolving handle {}", handle)))?;
         // Note: XrpcError<E> has GAT lifetimes that prevent boxing; use debug format
         let out = resp.parse().map_err(|e| {
-            IdentityError::xrpc(jacquard_common::smol_str::format_smolstr!("{:?}", e))
+            IdentityError::xrpc(jacquard_common::deps::smol_str::format_smolstr!("{:?}", e))
                 .with_context(format!("parsing response for handle {}", handle))
         })?;
         Did::new_owned(out.did.as_str())
             .map(|d| d.into_static())
             .map_err(|e| {
-                IdentityError::invalid_doc(jacquard_common::smol_str::format_smolstr!(
+                IdentityError::invalid_doc(jacquard_common::deps::smol_str::format_smolstr!(
                     "PDS returned invalid DID '{}': {}",
                     out.did,
                     e
@@ -613,7 +613,7 @@ impl JacquardResolver {
             .map_err(|e| IdentityError::from(e).with_context(format!("fetching DID doc for {}", did)))?;
         // Note: XrpcError<E> has GAT lifetimes that prevent boxing; use debug format
         let out = resp.parse().map_err(|e| {
-            IdentityError::xrpc(jacquard_common::smol_str::format_smolstr!("{:?}", e))
+            IdentityError::xrpc(jacquard_common::deps::smol_str::format_smolstr!("{:?}", e))
                 .with_context(format!("parsing DID doc response for {}", did))
         })?;
         let doc_json = serde_json::to_value(&out.did_doc)?;

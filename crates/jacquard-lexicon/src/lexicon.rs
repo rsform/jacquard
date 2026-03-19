@@ -2,7 +2,7 @@
 // https://github.com/atrium-rs/atrium/blob/main/lexicon/atrium-lex/src/lexicon.rs
 // https://github.com/atrium-rs/atrium/blob/main/lexicon/atrium-lex/src/lib.rs
 
-use jacquard_common::{CowStr, into_static::IntoStatic, smol_str::SmolStr, types::blob::MimeType};
+use jacquard_common::{CowStr, into_static::IntoStatic, deps::smol_str::SmolStr, types::blob::MimeType};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use serde_with::skip_serializing_none;

@@ -67,85 +67,85 @@ pub mod receipt_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type To;
         type Amount;
-        type CreatedAt;
-        type Currency;
+        type To;
         type From;
+        type Currency;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type To = Unset;
         type Amount = Unset;
-        type CreatedAt = Unset;
-        type Currency = Unset;
+        type To = Unset;
         type From = Unset;
-    }
-    ///State transition - sets the `to` field to Set
-    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTo<S> {}
-    impl<S: State> State for SetTo<S> {
-        type To = Set<members::to>;
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type Currency = S::Currency;
-        type From = S::From;
+        type Currency = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `amount` field to Set
     pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAmount<S> {}
     impl<S: State> State for SetAmount<S> {
-        type To = S::To;
         type Amount = Set<members::amount>;
-        type CreatedAt = S::CreatedAt;
-        type Currency = S::Currency;
-        type From = S::From;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type To = S::To;
-        type Amount = S::Amount;
-        type CreatedAt = Set<members::created_at>;
+        type From = S::From;
         type Currency = S::Currency;
-        type From = S::From;
-    }
-    ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrency<S> {}
-    impl<S: State> State for SetCurrency<S> {
-        type To = S::To;
-        type Amount = S::Amount;
         type CreatedAt = S::CreatedAt;
-        type Currency = Set<members::currency>;
+    }
+    ///State transition - sets the `to` field to Set
+    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTo<S> {}
+    impl<S: State> State for SetTo<S> {
+        type Amount = S::Amount;
+        type To = Set<members::to>;
         type From = S::From;
+        type Currency = S::Currency;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `from` field to Set
     pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFrom<S> {}
     impl<S: State> State for SetFrom<S> {
-        type To = S::To;
         type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type Currency = S::Currency;
+        type To = S::To;
         type From = Set<members::from>;
+        type Currency = S::Currency;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `currency` field to Set
+    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrency<S> {}
+    impl<S: State> State for SetCurrency<S> {
+        type Amount = S::Amount;
+        type To = S::To;
+        type From = S::From;
+        type Currency = Set<members::currency>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Amount = S::Amount;
+        type To = S::To;
+        type From = S::From;
+        type Currency = S::Currency;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `to` field
-        pub struct to(());
         ///Marker type for the `amount` field
         pub struct amount(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `currency` field
-        pub struct currency(());
+        ///Marker type for the `to` field
+        pub struct to(());
         ///Marker type for the `from` field
         pub struct from(());
+        ///Marker type for the `currency` field
+        pub struct currency(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -407,11 +407,11 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S> ReceiptBuilder<'a, S>
 where
     S: receipt_state::State,
-    S::To: receipt_state::IsSet,
     S::Amount: receipt_state::IsSet,
-    S::CreatedAt: receipt_state::IsSet,
-    S::Currency: receipt_state::IsSet,
+    S::To: receipt_state::IsSet,
     S::From: receipt_state::IsSet,
+    S::Currency: receipt_state::IsSet,
+    S::CreatedAt: receipt_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Receipt<'a> {
@@ -434,7 +434,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Receipt<'a> {
@@ -631,7 +631,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -643,11 +643,11 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("from"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("to"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("amount"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("currency"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("from"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("to"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("amount"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("currency"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -655,7 +655,9 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("amount"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "amount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -674,7 +676,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -697,7 +699,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "currency",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -718,7 +720,9 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("for"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "for",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -739,7 +743,9 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("from"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "from",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -748,7 +754,9 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "notes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -767,7 +775,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "occurredAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -790,7 +798,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "paymentNetwork",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -811,7 +819,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "paymentRail",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -832,7 +840,9 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("to"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "to",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -851,7 +861,7 @@ fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "transactionId",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

@@ -154,7 +154,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ChaptersRef<'a> {
@@ -177,7 +177,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("chaptersRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("chaptersRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -186,8 +186,8 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
                         ],
                     ),
                     nullable: None,
@@ -195,7 +195,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mimeType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -214,7 +216,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -239,7 +243,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -251,13 +255,13 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("podcast"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("media"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("publishedAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("duration"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("feedItemGuid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("podcast"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("media"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("publishedAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("duration"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("feedItemGuid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -265,7 +269,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "alternateMedia",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -283,7 +287,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("artwork"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "artwork",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -291,7 +297,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "chapters",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -300,7 +306,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -323,7 +329,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -344,7 +350,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "duration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -357,7 +363,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "episodeNumber",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -370,7 +376,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "episodeType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -391,7 +397,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "explicit",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -401,7 +407,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "feedItemGuid",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -422,7 +428,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("link"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "link",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -443,14 +451,18 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("media"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "media",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#mediaRef"),
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("podcast"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "podcast",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -459,7 +471,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "publishedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -482,7 +494,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "seasonNumber",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -495,7 +507,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -514,7 +528,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "transcript",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -539,7 +553,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("mediaRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("mediaRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -548,8 +562,8 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
                         ],
                     ),
                     nullable: None,
@@ -557,7 +571,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mimeType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -576,7 +592,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -601,7 +619,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("transcriptRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("transcriptRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -610,8 +628,8 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
                         ],
                     ),
                     nullable: None,
@@ -619,7 +637,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("language"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "language",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -640,7 +660,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mimeType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -659,7 +681,9 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -789,127 +813,127 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type FeedItemGuid;
         type Podcast;
-        type CreatedAt;
+        type Duration;
+        type Media;
+        type FeedItemGuid;
         type PublishedAt;
         type Title;
-        type Media;
-        type Duration;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type FeedItemGuid = Unset;
         type Podcast = Unset;
-        type CreatedAt = Unset;
+        type Duration = Unset;
+        type Media = Unset;
+        type FeedItemGuid = Unset;
         type PublishedAt = Unset;
         type Title = Unset;
-        type Media = Unset;
-        type Duration = Unset;
-    }
-    ///State transition - sets the `feed_item_guid` field to Set
-    pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
-    impl<S: State> State for SetFeedItemGuid<S> {
-        type FeedItemGuid = Set<members::feed_item_guid>;
-        type Podcast = S::Podcast;
-        type CreatedAt = S::CreatedAt;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Media = S::Media;
-        type Duration = S::Duration;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `podcast` field to Set
     pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPodcast<S> {}
     impl<S: State> State for SetPodcast<S> {
-        type FeedItemGuid = S::FeedItemGuid;
         type Podcast = Set<members::podcast>;
-        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
         type PublishedAt = S::PublishedAt;
         type Title = S::Title;
-        type Media = S::Media;
-        type Duration = S::Duration;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type CreatedAt = Set<members::created_at>;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Media = S::Media;
-        type Duration = S::Duration;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
         type CreatedAt = S::CreatedAt;
-        type PublishedAt = Set<members::published_at>;
-        type Title = S::Title;
-        type Media = S::Media;
-        type Duration = S::Duration;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type CreatedAt = S::CreatedAt;
-        type PublishedAt = S::PublishedAt;
-        type Title = Set<members::title>;
-        type Media = S::Media;
-        type Duration = S::Duration;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type CreatedAt = S::CreatedAt;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Media = Set<members::media>;
-        type Duration = S::Duration;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
-        type FeedItemGuid = S::FeedItemGuid;
         type Podcast = S::Podcast;
-        type CreatedAt = S::CreatedAt;
+        type Duration = Set<members::duration>;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
         type PublishedAt = S::PublishedAt;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type Media = Set<members::media>;
+        type FeedItemGuid = S::FeedItemGuid;
+        type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `feed_item_guid` field to Set
+    pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
+    impl<S: State> State for SetFeedItemGuid<S> {
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
         type Media = S::Media;
-        type Duration = Set<members::duration>;
+        type FeedItemGuid = Set<members::feed_item_guid>;
+        type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
+        type PublishedAt = Set<members::published_at>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
+        type PublishedAt = S::PublishedAt;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
+        type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `feed_item_guid` field
-        pub struct feed_item_guid(());
         ///Marker type for the `podcast` field
         pub struct podcast(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `media` field
+        pub struct media(());
+        ///Marker type for the `feed_item_guid` field
+        pub struct feed_item_guid(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `media` field
-        pub struct media(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1281,13 +1305,13 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::FeedItemGuid: episode_state::IsSet,
     S::Podcast: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
+    S::Duration: episode_state::IsSet,
+    S::Media: episode_state::IsSet,
+    S::FeedItemGuid: episode_state::IsSet,
     S::PublishedAt: episode_state::IsSet,
     S::Title: episode_state::IsSet,
-    S::Media: episode_state::IsSet,
-    S::Duration: episode_state::IsSet,
+    S::CreatedAt: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
@@ -1316,7 +1340,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Episode<'a> {
@@ -1760,7 +1784,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MediaRef<'a> {
@@ -1962,7 +1986,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TranscriptRef<'a> {

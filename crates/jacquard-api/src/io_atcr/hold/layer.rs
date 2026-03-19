@@ -47,10 +47,10 @@ pub mod layer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Manifest;
-        type CreatedAt;
-        type Size;
         type MediaType;
         type UserDid;
+        type Size;
+        type CreatedAt;
         type Digest;
     }
     /// Empty state - all required fields are unset
@@ -58,10 +58,10 @@ pub mod layer_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Manifest = Unset;
-        type CreatedAt = Unset;
-        type Size = Unset;
         type MediaType = Unset;
         type UserDid = Unset;
+        type Size = Unset;
+        type CreatedAt = Unset;
         type Digest = Unset;
     }
     ///State transition - sets the `manifest` field to Set
@@ -69,32 +69,10 @@ pub mod layer_state {
     impl<S: State> sealed::Sealed for SetManifest<S> {}
     impl<S: State> State for SetManifest<S> {
         type Manifest = Set<members::manifest>;
-        type CreatedAt = S::CreatedAt;
+        type MediaType = S::MediaType;
+        type UserDid = S::UserDid;
         type Size = S::Size;
-        type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
-        type Digest = S::Digest;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Manifest = S::Manifest;
-        type CreatedAt = Set<members::created_at>;
-        type Size = S::Size;
-        type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
-        type Digest = S::Digest;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Manifest = S::Manifest;
         type CreatedAt = S::CreatedAt;
-        type Size = Set<members::size>;
-        type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
         type Digest = S::Digest;
     }
     ///State transition - sets the `media_type` field to Set
@@ -102,10 +80,10 @@ pub mod layer_state {
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
         type MediaType = Set<members::media_type>;
         type UserDid = S::UserDid;
+        type Size = S::Size;
+        type CreatedAt = S::CreatedAt;
         type Digest = S::Digest;
     }
     ///State transition - sets the `user_did` field to Set
@@ -113,10 +91,32 @@ pub mod layer_state {
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
         type MediaType = S::MediaType;
         type UserDid = Set<members::user_did>;
+        type Size = S::Size;
+        type CreatedAt = S::CreatedAt;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Manifest = S::Manifest;
+        type MediaType = S::MediaType;
+        type UserDid = S::UserDid;
+        type Size = Set<members::size>;
+        type CreatedAt = S::CreatedAt;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Manifest = S::Manifest;
+        type MediaType = S::MediaType;
+        type UserDid = S::UserDid;
+        type Size = S::Size;
+        type CreatedAt = Set<members::created_at>;
         type Digest = S::Digest;
     }
     ///State transition - sets the `digest` field to Set
@@ -124,10 +124,10 @@ pub mod layer_state {
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
         type MediaType = S::MediaType;
         type UserDid = S::UserDid;
+        type Size = S::Size;
+        type CreatedAt = S::CreatedAt;
         type Digest = Set<members::digest>;
     }
     /// Marker types for field names
@@ -135,14 +135,14 @@ pub mod layer_state {
     pub mod members {
         ///Marker type for the `manifest` field
         pub struct manifest(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `digest` field
         pub struct digest(());
     }
@@ -298,10 +298,10 @@ impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
     S::Manifest: layer_state::IsSet,
-    S::CreatedAt: layer_state::IsSet,
-    S::Size: layer_state::IsSet,
     S::MediaType: layer_state::IsSet,
     S::UserDid: layer_state::IsSet,
+    S::Size: layer_state::IsSet,
+    S::CreatedAt: layer_state::IsSet,
     S::Digest: layer_state::IsSet,
 {
     /// Build the final struct
@@ -320,7 +320,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Layer<'a> {
@@ -449,7 +449,7 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -461,12 +461,12 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("digest"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("mediaType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("manifest"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("digest"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("size"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("mediaType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("manifest"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("userDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -474,7 +474,7 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -497,7 +497,9 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("digest"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "digest",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -516,7 +518,7 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "manifest",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -539,7 +541,7 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "mediaType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -560,7 +562,9 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "size",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -571,7 +575,9 @@ fn lexicon_doc_io_atcr_hold_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("userDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "userDid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

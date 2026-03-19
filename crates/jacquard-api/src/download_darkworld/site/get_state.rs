@@ -97,105 +97,105 @@ pub mod output_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TitleColors;
-        type UseSusieProphecy;
         type FavoriteArtists;
-        type FavoriteDeltaruneCharacters;
-        type FavoriteAlbums;
         type FavoriteGames;
+        type FavoriteAlbums;
+        type UseSusieProphecy;
+        type FavoriteDeltaruneCharacters;
+        type TitleColors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TitleColors = Unset;
-        type UseSusieProphecy = Unset;
         type FavoriteArtists = Unset;
-        type FavoriteDeltaruneCharacters = Unset;
-        type FavoriteAlbums = Unset;
         type FavoriteGames = Unset;
-    }
-    ///State transition - sets the `title_colors` field to Set
-    pub struct SetTitleColors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitleColors<S> {}
-    impl<S: State> State for SetTitleColors<S> {
-        type TitleColors = Set<members::title_colors>;
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteGames = S::FavoriteGames;
-    }
-    ///State transition - sets the `use_susie_prophecy` field to Set
-    pub struct SetUseSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
-    impl<S: State> State for SetUseSusieProphecy<S> {
-        type TitleColors = S::TitleColors;
-        type UseSusieProphecy = Set<members::use_susie_prophecy>;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteGames = S::FavoriteGames;
+        type FavoriteAlbums = Unset;
+        type UseSusieProphecy = Unset;
+        type FavoriteDeltaruneCharacters = Unset;
+        type TitleColors = Unset;
     }
     ///State transition - sets the `favorite_artists` field to Set
     pub struct SetFavoriteArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavoriteArtists<S> {}
     impl<S: State> State for SetFavoriteArtists<S> {
-        type TitleColors = S::TitleColors;
-        type UseSusieProphecy = S::UseSusieProphecy;
         type FavoriteArtists = Set<members::favorite_artists>;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type FavoriteGames = S::FavoriteGames;
         type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteGames = S::FavoriteGames;
-    }
-    ///State transition - sets the `favorite_deltarune_characters` field to Set
-    pub struct SetFavoriteDeltaruneCharacters<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<S> {}
-    impl<S: State> State for SetFavoriteDeltaruneCharacters<S> {
-        type TitleColors = S::TitleColors;
         type UseSusieProphecy = S::UseSusieProphecy;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteGames = S::FavoriteGames;
-    }
-    ///State transition - sets the `favorite_albums` field to Set
-    pub struct SetFavoriteAlbums<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteAlbums<S> {}
-    impl<S: State> State for SetFavoriteAlbums<S> {
-        type TitleColors = S::TitleColors;
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type FavoriteArtists = S::FavoriteArtists;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = Set<members::favorite_albums>;
-        type FavoriteGames = S::FavoriteGames;
+        type TitleColors = S::TitleColors;
     }
     ///State transition - sets the `favorite_games` field to Set
     pub struct SetFavoriteGames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavoriteGames<S> {}
     impl<S: State> State for SetFavoriteGames<S> {
-        type TitleColors = S::TitleColors;
-        type UseSusieProphecy = S::UseSusieProphecy;
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = S::FavoriteAlbums;
         type FavoriteGames = Set<members::favorite_games>;
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `favorite_albums` field to Set
+    pub struct SetFavoriteAlbums<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteAlbums<S> {}
+    impl<S: State> State for SetFavoriteAlbums<S> {
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteGames = S::FavoriteGames;
+        type FavoriteAlbums = Set<members::favorite_albums>;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `use_susie_prophecy` field to Set
+    pub struct SetUseSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
+    impl<S: State> State for SetUseSusieProphecy<S> {
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteGames = S::FavoriteGames;
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type UseSusieProphecy = Set<members::use_susie_prophecy>;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `favorite_deltarune_characters` field to Set
+    pub struct SetFavoriteDeltaruneCharacters<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<S> {}
+    impl<S: State> State for SetFavoriteDeltaruneCharacters<S> {
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteGames = S::FavoriteGames;
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `title_colors` field to Set
+    pub struct SetTitleColors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitleColors<S> {}
+    impl<S: State> State for SetTitleColors<S> {
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteGames = S::FavoriteGames;
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = Set<members::title_colors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title_colors` field
-        pub struct title_colors(());
-        ///Marker type for the `use_susie_prophecy` field
-        pub struct use_susie_prophecy(());
         ///Marker type for the `favorite_artists` field
         pub struct favorite_artists(());
-        ///Marker type for the `favorite_deltarune_characters` field
-        pub struct favorite_deltarune_characters(());
-        ///Marker type for the `favorite_albums` field
-        pub struct favorite_albums(());
         ///Marker type for the `favorite_games` field
         pub struct favorite_games(());
+        ///Marker type for the `favorite_albums` field
+        pub struct favorite_albums(());
+        ///Marker type for the `use_susie_prophecy` field
+        pub struct use_susie_prophecy(());
+        ///Marker type for the `favorite_deltarune_characters` field
+        pub struct favorite_deltarune_characters(());
+        ///Marker type for the `title_colors` field
+        pub struct title_colors(());
     }
 }
 
@@ -348,12 +348,12 @@ where
 impl<'a, S> OutputBuilder<'a, S>
 where
     S: output_state::State,
-    S::TitleColors: output_state::IsSet,
-    S::UseSusieProphecy: output_state::IsSet,
     S::FavoriteArtists: output_state::IsSet,
-    S::FavoriteDeltaruneCharacters: output_state::IsSet,
-    S::FavoriteAlbums: output_state::IsSet,
     S::FavoriteGames: output_state::IsSet,
+    S::FavoriteAlbums: output_state::IsSet,
+    S::UseSusieProphecy: output_state::IsSet,
+    S::FavoriteDeltaruneCharacters: output_state::IsSet,
+    S::TitleColors: output_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Output<'a> {
@@ -371,7 +371,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Output<'a> {
@@ -502,7 +502,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: None,
@@ -511,17 +511,17 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("output"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("output"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("useSusieProphecy"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("titleColors"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("favoriteGames"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("favoriteArtists"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("favoriteAlbums"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("favoriteDeltaruneCharacters")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("useSusieProphecy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("titleColors"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteGames"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteArtists"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteAlbums"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("favoriteDeltaruneCharacters")
                         ],
                     ),
                     nullable: None,
@@ -529,7 +529,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "favoriteAlbums",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -551,7 +551,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "favoriteArtists",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -573,7 +573,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "favoriteDeltaruneCharacters",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -595,7 +595,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "favoriteGames",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -617,7 +617,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "titleColors",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -638,7 +638,7 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "useSusieProphecy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {

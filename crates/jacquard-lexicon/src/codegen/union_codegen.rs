@@ -45,9 +45,13 @@ impl<'a> UnionGenContext<'a> {
             is_current_namespace: bool,
         }
 
+        let mut seen_refs = HashSet::new();
         let mut variant_infos = Vec::new();
         for ref_str in refs {
             let normalized_ref = RefPath::normalize(ref_str, self.current_nsid);
+            if !seen_refs.insert(normalized_ref.clone()) {
+                continue;
+            }
             let ref_path = RefPath::parse(&normalized_ref, None);
             let ref_nsid_str = ref_path.nsid();
             let ref_def = ref_path.def();

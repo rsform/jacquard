@@ -35,37 +35,37 @@ pub mod export_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Component;
         type Type;
+        type Component;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Component = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `component` field to Set
-    pub struct SetComponent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComponent<S> {}
-    impl<S: State> State for SetComponent<S> {
-        type Component = Set<members::component>;
-        type Type = S::Type;
+        type Component = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Component = S::Component;
         type Type = Set<members::r#type>;
+        type Component = S::Component;
+    }
+    ///State transition - sets the `component` field to Set
+    pub struct SetComponent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComponent<S> {}
+    impl<S: State> State for SetComponent<S> {
+        type Type = S::Type;
+        type Component = Set<members::component>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `component` field
-        pub struct component(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `component` field
+        pub struct component(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> ExportBuilder<'a, S>
 where
     S: export_state::State,
-    S::Component: export_state::IsSet,
     S::Type: export_state::IsSet,
+    S::Component: export_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Export<'a> {
@@ -153,7 +153,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Export<'a> {
@@ -174,13 +174,13 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("export"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("export"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("component")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("component")
                         ],
                     ),
                     nullable: None,
@@ -188,7 +188,7 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "component",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -211,7 +211,9 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -236,7 +238,7 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -248,8 +250,8 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("exports")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("exports")
                             ],
                         ),
                         nullable: None,
@@ -257,7 +259,7 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -276,7 +278,9 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("exports"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "exports",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -292,7 +296,9 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -370,37 +376,37 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Exports;
         type Name;
+        type Exports;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Exports = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `exports` field to Set
-    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExports<S> {}
-    impl<S: State> State for SetExports<S> {
-        type Exports = Set<members::exports>;
-        type Name = S::Name;
+        type Exports = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Exports = S::Exports;
         type Name = Set<members::name>;
+        type Exports = S::Exports;
+    }
+    ///State transition - sets the `exports` field to Set
+    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExports<S> {}
+    impl<S: State> State for SetExports<S> {
+        type Name = S::Name;
+        type Exports = Set<members::exports>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `exports` field
-        pub struct exports(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `exports` field
+        pub struct exports(());
     }
 }
 
@@ -493,8 +499,8 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
-    S::Exports: pack_state::IsSet,
     S::Name: pack_state::IsSet,
+    S::Exports: pack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pack<'a> {
@@ -509,7 +515,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Pack<'a> {

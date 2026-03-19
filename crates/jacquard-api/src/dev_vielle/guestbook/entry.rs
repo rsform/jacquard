@@ -151,7 +151,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Entry<'a> {
@@ -252,7 +252,7 @@ fn lexicon_doc_dev_vielle_guestbook_entry() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("nsid")),
@@ -260,8 +260,8 @@ fn lexicon_doc_dev_vielle_guestbook_entry() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("book"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("contents")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("book"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("contents")
                             ],
                         ),
                         nullable: None,
@@ -269,7 +269,9 @@ fn lexicon_doc_dev_vielle_guestbook_entry() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("book"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "book",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -286,7 +288,7 @@ fn lexicon_doc_dev_vielle_guestbook_entry() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "contents",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

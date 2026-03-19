@@ -37,49 +37,49 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SelectedOptions;
+        type CreatedAt;
         type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SelectedOptions = Unset;
+        type CreatedAt = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SelectedOptions = S::SelectedOptions;
-        type Poll = S::Poll;
     }
     ///State transition - sets the `selected_options` field to Set
     pub struct SetSelectedOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSelectedOptions<S> {}
     impl<S: State> State for SetSelectedOptions<S> {
-        type CreatedAt = S::CreatedAt;
         type SelectedOptions = Set<members::selected_options>;
+        type CreatedAt = S::CreatedAt;
+        type Poll = S::Poll;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SelectedOptions = S::SelectedOptions;
+        type CreatedAt = Set<members::created_at>;
         type Poll = S::Poll;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
-        type CreatedAt = S::CreatedAt;
         type SelectedOptions = S::SelectedOptions;
+        type CreatedAt = S::CreatedAt;
         type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `selected_options` field
         pub struct selected_options(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `poll` field
         pub struct poll(());
     }
@@ -174,8 +174,8 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::CreatedAt: vote_state::IsSet,
     S::SelectedOptions: vote_state::IsSet,
+    S::CreatedAt: vote_state::IsSet,
     S::Poll: vote_state::IsSet,
 {
     /// Build the final struct
@@ -191,7 +191,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Vote<'a> {
@@ -306,7 +306,7 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -318,9 +318,9 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("poll"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("selectedOptions"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("poll"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("selectedOptions"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -328,7 +328,7 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -349,7 +349,9 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("poll"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "poll",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -370,7 +372,7 @@ fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "selectedOptions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {

@@ -48,67 +48,67 @@ pub mod wiki_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Target;
         type LinkType;
         type Source;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Target = Unset;
         type LinkType = Unset;
         type Source = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type LinkType = S::LinkType;
-        type Source = S::Source;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `link_type` field to Set
-    pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinkType<S> {}
-    impl<S: State> State for SetLinkType<S> {
-        type Target = S::Target;
-        type LinkType = Set<members::link_type>;
-        type Source = S::Source;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Target = S::Target;
-        type LinkType = S::LinkType;
-        type Source = Set<members::source>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Target = S::Target;
         type LinkType = S::LinkType;
         type Source = S::Source;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type CreatedAt = S::CreatedAt;
+        type Target = Set<members::target>;
+        type LinkType = S::LinkType;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `link_type` field to Set
+    pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLinkType<S> {}
+    impl<S: State> State for SetLinkType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+        type LinkType = Set<members::link_type>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+        type LinkType = S::LinkType;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `target` field
         pub struct target(());
         ///Marker type for the `link_type` field
         pub struct link_type(());
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -278,10 +278,10 @@ impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
 impl<'a, S> WikiLinkBuilder<'a, S>
 where
     S: wiki_link_state::State,
+    S::CreatedAt: wiki_link_state::IsSet,
     S::Target: wiki_link_state::IsSet,
     S::LinkType: wiki_link_state::IsSet,
     S::Source: wiki_link_state::IsSet,
-    S::CreatedAt: wiki_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiLink<'a> {
@@ -300,7 +300,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> WikiLink<'a> {
@@ -541,7 +541,7 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -549,10 +549,10 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("target"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("linkType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("target"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("linkType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -560,7 +560,9 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("context"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "context",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -579,7 +581,7 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -598,7 +600,7 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "linkType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -615,7 +617,9 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "source",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -632,7 +636,7 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sourceAnchor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -653,7 +657,9 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("target"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "target",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -670,7 +676,7 @@ fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "targetAnchor",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

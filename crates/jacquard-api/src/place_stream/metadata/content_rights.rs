@@ -324,55 +324,61 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("all-rights-reserved"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "all-rights-reserved",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc-by-nc-nd_4__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "cc-by-nc-nd_4__0",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc-by-nc-sa_4__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "cc-by-nc-sa_4__0",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc-by-nc_4__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-nc_4__0"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc-by-nd_4__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-nd_4__0"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc-by-sa_4__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-sa_4__0"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc-by_4__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by_4__0"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cc0_1__0"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc0_1__0"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -385,7 +391,7 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "copyrightNotice",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -406,7 +412,7 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "copyrightYear",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -419,7 +425,9 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "creator",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -438,7 +446,7 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "creditLine",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -459,7 +467,9 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("license"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "license",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

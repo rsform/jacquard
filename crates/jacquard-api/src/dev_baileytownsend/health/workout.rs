@@ -45,104 +45,104 @@ pub mod workout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type CaloriesBurned;
         type EndTime;
-        type Duration;
+        type CaloriesBurned;
         type Activity;
         type StartTime;
+        type Duration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type CaloriesBurned = Unset;
         type EndTime = Unset;
-        type Duration = Unset;
+        type CaloriesBurned = Unset;
         type Activity = Unset;
         type StartTime = Unset;
+        type Duration = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type EndTime = S::EndTime;
         type CaloriesBurned = S::CaloriesBurned;
-        type EndTime = S::EndTime;
-        type Duration = S::Duration;
         type Activity = S::Activity;
         type StartTime = S::StartTime;
-    }
-    ///State transition - sets the `calories_burned` field to Set
-    pub struct SetCaloriesBurned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCaloriesBurned<S> {}
-    impl<S: State> State for SetCaloriesBurned<S> {
-        type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = Set<members::calories_burned>;
-        type EndTime = S::EndTime;
         type Duration = S::Duration;
-        type Activity = S::Activity;
-        type StartTime = S::StartTime;
     }
     ///State transition - sets the `end_time` field to Set
     pub struct SetEndTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndTime<S> {}
     impl<S: State> State for SetEndTime<S> {
         type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
         type EndTime = Set<members::end_time>;
-        type Duration = S::Duration;
-        type Activity = S::Activity;
-        type StartTime = S::StartTime;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
         type CaloriesBurned = S::CaloriesBurned;
-        type EndTime = S::EndTime;
-        type Duration = Set<members::duration>;
         type Activity = S::Activity;
         type StartTime = S::StartTime;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `calories_burned` field to Set
+    pub struct SetCaloriesBurned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCaloriesBurned<S> {}
+    impl<S: State> State for SetCaloriesBurned<S> {
+        type CreatedAt = S::CreatedAt;
+        type EndTime = S::EndTime;
+        type CaloriesBurned = Set<members::calories_burned>;
+        type Activity = S::Activity;
+        type StartTime = S::StartTime;
+        type Duration = S::Duration;
     }
     ///State transition - sets the `activity` field to Set
     pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivity<S> {}
     impl<S: State> State for SetActivity<S> {
         type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
         type EndTime = S::EndTime;
-        type Duration = S::Duration;
+        type CaloriesBurned = S::CaloriesBurned;
         type Activity = Set<members::activity>;
         type StartTime = S::StartTime;
+        type Duration = S::Duration;
     }
     ///State transition - sets the `start_time` field to Set
     pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartTime<S> {}
     impl<S: State> State for SetStartTime<S> {
         type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
         type EndTime = S::EndTime;
-        type Duration = S::Duration;
+        type CaloriesBurned = S::CaloriesBurned;
         type Activity = S::Activity;
         type StartTime = Set<members::start_time>;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type CreatedAt = S::CreatedAt;
+        type EndTime = S::EndTime;
+        type CaloriesBurned = S::CaloriesBurned;
+        type Activity = S::Activity;
+        type StartTime = S::StartTime;
+        type Duration = Set<members::duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `calories_burned` field
-        pub struct calories_burned(());
         ///Marker type for the `end_time` field
         pub struct end_time(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `calories_burned` field
+        pub struct calories_burned(());
         ///Marker type for the `activity` field
         pub struct activity(());
         ///Marker type for the `start_time` field
         pub struct start_time(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
     }
 }
 
@@ -313,11 +313,11 @@ impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
     S::CreatedAt: workout_state::IsSet,
-    S::CaloriesBurned: workout_state::IsSet,
     S::EndTime: workout_state::IsSet,
-    S::Duration: workout_state::IsSet,
+    S::CaloriesBurned: workout_state::IsSet,
     S::Activity: workout_state::IsSet,
     S::StartTime: workout_state::IsSet,
+    S::Duration: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
@@ -336,7 +336,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Workout<'a> {
@@ -442,7 +442,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("any")),
@@ -450,12 +450,12 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("activity"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("caloriesBurned"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("duration"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("startTime"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("endTime"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("activity"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("caloriesBurned"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("duration"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startTime"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("endTime"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -463,7 +463,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "activity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -484,7 +484,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "caloriesBurned",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -497,7 +497,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -516,7 +516,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "distance",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -537,7 +537,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "duration",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -558,7 +558,9 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("endTime"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "endTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -575,7 +577,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startTime",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

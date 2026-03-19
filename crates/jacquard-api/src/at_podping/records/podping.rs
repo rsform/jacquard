@@ -52,85 +52,85 @@ pub mod podping_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Medium;
-        type Version;
-        type Reason;
         type Timestamp;
+        type Reason;
         type Iris;
+        type Version;
+        type Medium;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Medium = Unset;
-        type Version = Unset;
-        type Reason = Unset;
         type Timestamp = Unset;
+        type Reason = Unset;
         type Iris = Unset;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedium<S> {}
-    impl<S: State> State for SetMedium<S> {
-        type Medium = Set<members::medium>;
-        type Version = S::Version;
-        type Reason = S::Reason;
-        type Timestamp = S::Timestamp;
-        type Iris = S::Iris;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Medium = S::Medium;
-        type Version = Set<members::version>;
-        type Reason = S::Reason;
-        type Timestamp = S::Timestamp;
-        type Iris = S::Iris;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Medium = S::Medium;
-        type Version = S::Version;
-        type Reason = Set<members::reason>;
-        type Timestamp = S::Timestamp;
-        type Iris = S::Iris;
+        type Version = Unset;
+        type Medium = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Medium = S::Medium;
-        type Version = S::Version;
-        type Reason = S::Reason;
         type Timestamp = Set<members::timestamp>;
+        type Reason = S::Reason;
         type Iris = S::Iris;
+        type Version = S::Version;
+        type Medium = S::Medium;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Timestamp = S::Timestamp;
+        type Reason = Set<members::reason>;
+        type Iris = S::Iris;
+        type Version = S::Version;
+        type Medium = S::Medium;
     }
     ///State transition - sets the `iris` field to Set
     pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIris<S> {}
     impl<S: State> State for SetIris<S> {
-        type Medium = S::Medium;
-        type Version = S::Version;
-        type Reason = S::Reason;
         type Timestamp = S::Timestamp;
+        type Reason = S::Reason;
         type Iris = Set<members::iris>;
+        type Version = S::Version;
+        type Medium = S::Medium;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Timestamp = S::Timestamp;
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Version = Set<members::version>;
+        type Medium = S::Medium;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedium<S> {}
+    impl<S: State> State for SetMedium<S> {
+        type Timestamp = S::Timestamp;
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Version = S::Version;
+        type Medium = Set<members::medium>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `medium` field
-        pub struct medium(());
-        ///Marker type for the `version` field
-        pub struct version(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `iris` field
         pub struct iris(());
+        ///Marker type for the `version` field
+        pub struct version(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
     }
 }
 
@@ -300,11 +300,11 @@ where
 impl<'a, S> PodpingBuilder<'a, S>
 where
     S: podping_state::State,
-    S::Medium: podping_state::IsSet,
-    S::Version: podping_state::IsSet,
-    S::Reason: podping_state::IsSet,
     S::Timestamp: podping_state::IsSet,
+    S::Reason: podping_state::IsSet,
     S::Iris: podping_state::IsSet,
+    S::Version: podping_state::IsSet,
+    S::Medium: podping_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podping<'a> {
@@ -323,7 +323,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Podping<'a> {
@@ -429,7 +429,7 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -441,11 +441,11 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("medium"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("reason"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("iris"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("timestamp")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("medium"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("iris"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp")
                             ],
                         ),
                         nullable: None,
@@ -453,7 +453,9 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("iris"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "iris",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -479,7 +481,9 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("medium"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "medium",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -498,7 +502,9 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "reason",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -517,7 +523,7 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "sessionId",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -538,7 +544,9 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "source",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -557,7 +565,7 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "timestamp",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -580,7 +588,9 @@ fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "version",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

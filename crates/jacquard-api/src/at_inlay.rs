@@ -167,7 +167,7 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("cachePolicy"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("cachePolicy"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -180,7 +180,9 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("life"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "life",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -199,7 +201,9 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "tags",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -223,7 +227,7 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("element"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("element"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -231,14 +235,18 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("type")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -257,13 +265,17 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("props"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "props",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -288,7 +300,7 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("response"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("response"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -297,8 +309,8 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("node"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("cache")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("node"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cache")
                         ],
                     ),
                     nullable: None,
@@ -306,14 +318,18 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cache"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cache",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#cachePolicy"),
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("node"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "node",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static("#element"),
@@ -324,7 +340,7 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("tagLink"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("tagLink"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -332,14 +348,18 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("subject")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("from"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "from",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -360,7 +380,9 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "subject",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -385,7 +407,7 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("tagRecord"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("tagRecord"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -393,14 +415,18 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -425,18 +451,22 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("viaValtown"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("viaValtown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("valId")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("valId")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("valId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "valId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Val Town val UUID"),
@@ -646,7 +676,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Element<'a> {
@@ -719,37 +749,37 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Cache;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Cache = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Cache = S::Cache;
+        type Node = Unset;
     }
     ///State transition - sets the `cache` field to Set
     pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCache<S> {}
     impl<S: State> State for SetCache<S> {
-        type Node = S::Node;
         type Cache = Set<members::cache>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Cache = S::Cache;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `cache` field
         pub struct cache(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
@@ -822,8 +852,8 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Node: response_state::IsSet,
     S::Cache: response_state::IsSet,
+    S::Node: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -837,7 +867,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Response<'a> {
@@ -1003,7 +1033,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TagLink<'a> {
@@ -1144,7 +1174,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TagRecord<'a> {

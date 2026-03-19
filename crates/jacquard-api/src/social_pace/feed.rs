@@ -297,51 +297,51 @@ pub mod split_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Distance;
         type Duration;
         type Order;
+        type Distance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Distance = Unset;
         type Duration = Unset;
         type Order = Unset;
-    }
-    ///State transition - sets the `distance` field to Set
-    pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDistance<S> {}
-    impl<S: State> State for SetDistance<S> {
-        type Distance = Set<members::distance>;
-        type Duration = S::Duration;
-        type Order = S::Order;
+        type Distance = Unset;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
-        type Distance = S::Distance;
         type Duration = Set<members::duration>;
         type Order = S::Order;
+        type Distance = S::Distance;
     }
     ///State transition - sets the `order` field to Set
     pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOrder<S> {}
     impl<S: State> State for SetOrder<S> {
-        type Distance = S::Distance;
         type Duration = S::Duration;
         type Order = Set<members::order>;
+        type Distance = S::Distance;
+    }
+    ///State transition - sets the `distance` field to Set
+    pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDistance<S> {}
+    impl<S: State> State for SetDistance<S> {
+        type Duration = S::Duration;
+        type Order = S::Order;
+        type Distance = Set<members::distance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `distance` field
-        pub struct distance(());
         ///Marker type for the `duration` field
         pub struct duration(());
         ///Marker type for the `order` field
         pub struct order(());
+        ///Marker type for the `distance` field
+        pub struct distance(());
     }
 }
 
@@ -434,9 +434,9 @@ where
 impl<'a, S> SplitBuilder<'a, S>
 where
     S: split_state::State,
-    S::Distance: split_state::IsSet,
     S::Duration: split_state::IsSet,
     S::Order: split_state::IsSet,
+    S::Distance: split_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Split<'a> {
@@ -451,7 +451,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Split<'a> {
@@ -475,7 +475,7 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("activityType"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("activityType"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -494,7 +494,7 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("split"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("split"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -503,9 +503,9 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("order"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("distance"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("duration")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("order"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("distance"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("duration")
                         ],
                     ),
                     nullable: None,
@@ -513,7 +513,9 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("distance"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "distance",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -532,7 +534,9 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("duration"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "duration",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -543,7 +547,9 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("order"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "order",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,

@@ -154,7 +154,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Mushies<'a> {
@@ -257,7 +257,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mushies<'a> {
         {
             let value = &self.common_name;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -287,7 +287,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mushies<'a> {
         }
         if let Some(ref value) = self.species {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -318,7 +318,7 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("it's a kind of fungus!"),
@@ -328,7 +328,7 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("commonName")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("commonName")
                             ],
                         ),
                         nullable: None,
@@ -336,7 +336,7 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "commonName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -353,7 +353,9 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("edible"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "edible",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -361,7 +363,9 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("species"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "species",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

@@ -42,7 +42,7 @@ pub fn impl_lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                             #[serde(skip_serializing_if = "Option::is_none")]
                             #[serde(default)]
                             pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
-                                ::jacquard_common::smol_str::SmolStr,
+                                ::jacquard_common::deps::smol_str::SmolStr,
                                 ::jacquard_common::types::value::Data<#lifetime>
                             >>
                         }
@@ -53,7 +53,7 @@ pub fn impl_lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                             #[serde(skip_serializing_if = "Option::is_none")]
                             #[serde(default)]
                             pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
-                                ::jacquard_common::smol_str::SmolStr,
+                                ::jacquard_common::deps::smol_str::SmolStr,
                                 ::jacquard_common::types::value::Data<#lifetime>
                             >>
                         }

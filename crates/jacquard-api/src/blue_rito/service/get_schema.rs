@@ -38,51 +38,51 @@ pub mod langs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lang;
-        type Title;
         type Moderation;
+        type Title;
+        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lang = Unset;
-        type Title = Unset;
         type Moderation = Unset;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Lang = Set<members::lang>;
-        type Title = S::Title;
-        type Moderation = S::Moderation;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Lang = S::Lang;
-        type Title = Set<members::title>;
-        type Moderation = S::Moderation;
+        type Title = Unset;
+        type Lang = Unset;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModeration<S> {}
     impl<S: State> State for SetModeration<S> {
-        type Lang = S::Lang;
-        type Title = S::Title;
         type Moderation = Set<members::moderation>;
+        type Title = S::Title;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Moderation = S::Moderation;
+        type Title = Set<members::title>;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Moderation = S::Moderation;
+        type Title = S::Title;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lang` field
-        pub struct lang(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `lang` field
+        pub struct lang(());
     }
 }
 
@@ -192,9 +192,9 @@ where
 impl<'a, S> LangsBuilder<'a, S>
 where
     S: langs_state::State,
-    S::Lang: langs_state::IsSet,
-    S::Title: langs_state::IsSet,
     S::Moderation: langs_state::IsSet,
+    S::Title: langs_state::IsSet,
+    S::Lang: langs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Langs<'a> {
@@ -210,7 +210,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Langs<'a> {
@@ -235,14 +235,14 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("langs"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("langs"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("moderation")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("moderation")
                         ],
                     ),
                     nullable: None,
@@ -250,7 +250,9 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "comment",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -265,7 +267,9 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "lang",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -280,7 +284,7 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "moderation",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -302,7 +306,9 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -321,7 +327,7 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -335,7 +341,7 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("nsid")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("nsid")
                                     ],
                                 ),
                                 nullable: None,
@@ -343,7 +349,9 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("nsid"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "nsid",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: None,
                                             format: None,

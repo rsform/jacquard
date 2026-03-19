@@ -42,66 +42,66 @@ pub mod kidlisp_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type When;
-        type Ref;
         type Source;
         type Code;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type When = Unset;
-        type Ref = Unset;
         type Source = Unset;
         type Code = Unset;
+        type Ref = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type When = Set<members::when>;
+        type Source = S::Source;
+        type Code = S::Code;
         type Ref = S::Ref;
-        type Source = S::Source;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Ref = Set<members::r#ref>;
-        type Source = S::Source;
-        type Code = S::Code;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
         type When = S::When;
-        type Ref = S::Ref;
         type Source = Set<members::source>;
         type Code = S::Code;
+        type Ref = S::Ref;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
         type When = S::When;
-        type Ref = S::Ref;
         type Source = S::Source;
         type Code = Set<members::code>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type When = S::When;
+        type Source = S::Source;
+        type Code = S::Code;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `source` field
         pub struct source(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -215,9 +215,9 @@ impl<'a, S> KidlispBuilder<'a, S>
 where
     S: kidlisp_state::State,
     S::When: kidlisp_state::IsSet,
-    S::Ref: kidlisp_state::IsSet,
     S::Source: kidlisp_state::IsSet,
     S::Code: kidlisp_state::IsSet,
+    S::Ref: kidlisp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Kidlisp<'a> {
@@ -233,7 +233,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Kidlisp<'a> {
@@ -375,7 +375,7 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -387,10 +387,10 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ref")
                             ],
                         ),
                         nullable: None,
@@ -398,7 +398,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("code"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "code",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -417,7 +419,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ref",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -436,7 +440,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "source",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -455,7 +461,9 @@ fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("when"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "when",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

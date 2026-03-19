@@ -34,37 +34,37 @@ pub mod genre_with_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type Genre;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type Genre = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type Genre = S::Genre;
+        type Count = Unset;
     }
     ///State transition - sets the `genre` field to Set
     pub struct SetGenre<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGenre<S> {}
     impl<S: State> State for SetGenre<S> {
-        type Count = S::Count;
         type Genre = Set<members::genre>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Genre = S::Genre;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `genre` field
         pub struct genre(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> GenreWithCountBuilder<'a, S>
 where
     S: genre_with_count_state::State,
-    S::Count: genre_with_count_state::IsSet,
     S::Genre: genre_with_count_state::IsSet,
+    S::Count: genre_with_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GenreWithCount<'a> {
@@ -152,7 +152,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> GenreWithCount<'a> {
@@ -175,13 +175,13 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("genreWithCount"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("genreWithCount"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("genre"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("count")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("genre"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("count")
                         ],
                     ),
                     nullable: None,
@@ -189,7 +189,9 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "count",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -200,7 +202,9 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("genre"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "genre",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static("Genre name"),
@@ -221,7 +225,7 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -232,7 +236,9 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "limit",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -243,7 +249,7 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                         "minBooks",
                                     ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -256,7 +262,9 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("offset"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "offset",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,

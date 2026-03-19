@@ -42,50 +42,50 @@ pub mod enum_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Id;
         type Values;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Id = Unset;
         type Values = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Values = S::Values;
         type Id = S::Id;
-        type Values = S::Values;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Name = S::Name;
-        type Id = Set<members::id>;
-        type Values = S::Values;
     }
     ///State transition - sets the `values` field to Set
     pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValues<S> {}
     impl<S: State> State for SetValues<S> {
         type Name = S::Name;
-        type Id = S::Id;
         type Values = Set<members::values>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Values = S::Values;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `values` field
         pub struct values(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -187,8 +187,8 @@ impl<'a, S> EnumBuilder<'a, S>
 where
     S: enum_state::State,
     S::Name: enum_state::IsSet,
-    S::Id: enum_state::IsSet,
     S::Values: enum_state::IsSet,
+    S::Id: enum_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Enum<'a> {
@@ -203,7 +203,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Enum<'a> {
@@ -225,7 +225,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("enum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("enum"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -234,9 +234,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("values")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("values")
                         ],
                     ),
                     nullable: None,
@@ -244,7 +244,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -265,7 +265,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -274,7 +276,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("values"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "values",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -296,7 +300,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -308,10 +312,10 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("judgments"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("scoreComponents"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("defaultComponent")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("judgments"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scoreComponents"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("defaultComponent")
                             ],
                         ),
                         nullable: None,
@@ -319,7 +323,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "defaultComponent",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -342,7 +346,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "inputMethods",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -372,7 +376,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "judgments",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -392,7 +396,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("logo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "logo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -400,7 +406,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("modes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "modes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -428,7 +436,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -437,7 +447,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "scoreComponents",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -466,7 +476,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("percentage"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("percentage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -475,10 +485,10 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("maximum"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("precision")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("maximum"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("precision")
                         ],
                     ),
                     nullable: None,
@@ -486,7 +496,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -507,7 +517,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("maximum"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "maximum",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -518,7 +530,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -527,7 +541,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "precision",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -544,7 +558,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("points"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("points"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -553,8 +567,8 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("id")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id")
                         ],
                     ),
                     nullable: None,
@@ -562,7 +576,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -583,7 +597,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("maximum"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "maximum",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -594,7 +610,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -607,7 +625,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -616,8 +634,8 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("id")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id")
                         ],
                     ),
                     nullable: None,
@@ -625,7 +643,7 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -646,7 +664,9 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -757,8 +777,8 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DefaultComponent;
         type Judgments;
+        type DefaultComponent;
         type ScoreComponents;
         type Name;
     }
@@ -766,26 +786,26 @@ pub mod game_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DefaultComponent = Unset;
         type Judgments = Unset;
+        type DefaultComponent = Unset;
         type ScoreComponents = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `default_component` field to Set
-    pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
-    impl<S: State> State for SetDefaultComponent<S> {
-        type DefaultComponent = Set<members::default_component>;
-        type Judgments = S::Judgments;
-        type ScoreComponents = S::ScoreComponents;
-        type Name = S::Name;
     }
     ///State transition - sets the `judgments` field to Set
     pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJudgments<S> {}
     impl<S: State> State for SetJudgments<S> {
-        type DefaultComponent = S::DefaultComponent;
         type Judgments = Set<members::judgments>;
+        type DefaultComponent = S::DefaultComponent;
+        type ScoreComponents = S::ScoreComponents;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `default_component` field to Set
+    pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
+    impl<S: State> State for SetDefaultComponent<S> {
+        type Judgments = S::Judgments;
+        type DefaultComponent = Set<members::default_component>;
         type ScoreComponents = S::ScoreComponents;
         type Name = S::Name;
     }
@@ -793,8 +813,8 @@ pub mod game_state {
     pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
     impl<S: State> State for SetScoreComponents<S> {
-        type DefaultComponent = S::DefaultComponent;
         type Judgments = S::Judgments;
+        type DefaultComponent = S::DefaultComponent;
         type ScoreComponents = Set<members::score_components>;
         type Name = S::Name;
     }
@@ -802,18 +822,18 @@ pub mod game_state {
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type DefaultComponent = S::DefaultComponent;
         type Judgments = S::Judgments;
+        type DefaultComponent = S::DefaultComponent;
         type ScoreComponents = S::ScoreComponents;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `default_component` field
-        pub struct default_component(());
         ///Marker type for the `judgments` field
         pub struct judgments(());
+        ///Marker type for the `default_component` field
+        pub struct default_component(());
         ///Marker type for the `score_components` field
         pub struct score_components(());
         ///Marker type for the `name` field
@@ -998,8 +1018,8 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::DefaultComponent: game_state::IsSet,
     S::Judgments: game_state::IsSet,
+    S::DefaultComponent: game_state::IsSet,
     S::ScoreComponents: game_state::IsSet,
     S::Name: game_state::IsSet,
 {
@@ -1020,7 +1040,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Game<'a> {
@@ -1175,67 +1195,67 @@ pub mod percentage_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Maximum;
         type Name;
-        type Precision;
         type Id;
+        type Maximum;
+        type Precision;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Maximum = Unset;
         type Name = Unset;
-        type Precision = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `maximum` field to Set
-    pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaximum<S> {}
-    impl<S: State> State for SetMaximum<S> {
-        type Maximum = Set<members::maximum>;
-        type Name = S::Name;
-        type Precision = S::Precision;
-        type Id = S::Id;
+        type Maximum = Unset;
+        type Precision = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Maximum = S::Maximum;
         type Name = Set<members::name>;
-        type Precision = S::Precision;
         type Id = S::Id;
-    }
-    ///State transition - sets the `precision` field to Set
-    pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrecision<S> {}
-    impl<S: State> State for SetPrecision<S> {
         type Maximum = S::Maximum;
-        type Name = S::Name;
-        type Precision = Set<members::precision>;
-        type Id = S::Id;
+        type Precision = S::Precision;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Maximum = S::Maximum;
         type Name = S::Name;
-        type Precision = S::Precision;
         type Id = Set<members::id>;
+        type Maximum = S::Maximum;
+        type Precision = S::Precision;
+    }
+    ///State transition - sets the `maximum` field to Set
+    pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMaximum<S> {}
+    impl<S: State> State for SetMaximum<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Maximum = Set<members::maximum>;
+        type Precision = S::Precision;
+    }
+    ///State transition - sets the `precision` field to Set
+    pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrecision<S> {}
+    impl<S: State> State for SetPrecision<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Maximum = S::Maximum;
+        type Precision = Set<members::precision>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `maximum` field
-        pub struct maximum(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `precision` field
-        pub struct precision(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `maximum` field
+        pub struct maximum(());
+        ///Marker type for the `precision` field
+        pub struct precision(());
     }
 }
 
@@ -1356,10 +1376,10 @@ where
 impl<'a, S> PercentageBuilder<'a, S>
 where
     S: percentage_state::State,
-    S::Maximum: percentage_state::IsSet,
     S::Name: percentage_state::IsSet,
-    S::Precision: percentage_state::IsSet,
     S::Id: percentage_state::IsSet,
+    S::Maximum: percentage_state::IsSet,
+    S::Precision: percentage_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Percentage<'a> {
@@ -1375,7 +1395,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Percentage<'a> {
@@ -1609,7 +1629,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Points<'a> {
@@ -1698,37 +1718,37 @@ pub mod text_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Id;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Id = S::Id;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
         type Id = Set<members::id>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1809,8 +1829,8 @@ where
 impl<'a, S> TextBuilder<'a, S>
 where
     S: text_state::State,
-    S::Name: text_state::IsSet,
     S::Id: text_state::IsSet,
+    S::Name: text_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Text<'a> {
@@ -1824,7 +1844,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Text<'a> {

@@ -60,85 +60,85 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalChallenges;
-        type TotalSuccesses;
-        type CreatedAt;
-        type Level;
         type PlayerDid;
+        type TotalChallenges;
+        type Level;
+        type CreatedAt;
+        type TotalSuccesses;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalChallenges = Unset;
-        type TotalSuccesses = Unset;
-        type CreatedAt = Unset;
-        type Level = Unset;
         type PlayerDid = Unset;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type TotalChallenges = Set<members::total_challenges>;
-        type TotalSuccesses = S::TotalSuccesses;
-        type CreatedAt = S::CreatedAt;
-        type Level = S::Level;
-        type PlayerDid = S::PlayerDid;
-    }
-    ///State transition - sets the `total_successes` field to Set
-    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
-    impl<S: State> State for SetTotalSuccesses<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type TotalSuccesses = Set<members::total_successes>;
-        type CreatedAt = S::CreatedAt;
-        type Level = S::Level;
-        type PlayerDid = S::PlayerDid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type TotalSuccesses = S::TotalSuccesses;
-        type CreatedAt = Set<members::created_at>;
-        type Level = S::Level;
-        type PlayerDid = S::PlayerDid;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type TotalSuccesses = S::TotalSuccesses;
-        type CreatedAt = S::CreatedAt;
-        type Level = Set<members::level>;
-        type PlayerDid = S::PlayerDid;
+        type TotalChallenges = Unset;
+        type Level = Unset;
+        type CreatedAt = Unset;
+        type TotalSuccesses = Unset;
     }
     ///State transition - sets the `player_did` field to Set
     pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
     impl<S: State> State for SetPlayerDid<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type TotalSuccesses = S::TotalSuccesses;
-        type CreatedAt = S::CreatedAt;
-        type Level = S::Level;
         type PlayerDid = Set<members::player_did>;
+        type TotalChallenges = S::TotalChallenges;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalSuccesses = S::TotalSuccesses;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type PlayerDid = S::PlayerDid;
+        type TotalChallenges = Set<members::total_challenges>;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalSuccesses = S::TotalSuccesses;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type PlayerDid = S::PlayerDid;
+        type TotalChallenges = S::TotalChallenges;
+        type Level = Set<members::level>;
+        type CreatedAt = S::CreatedAt;
+        type TotalSuccesses = S::TotalSuccesses;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type PlayerDid = S::PlayerDid;
+        type TotalChallenges = S::TotalChallenges;
+        type Level = S::Level;
+        type CreatedAt = Set<members::created_at>;
+        type TotalSuccesses = S::TotalSuccesses;
+    }
+    ///State transition - sets the `total_successes` field to Set
+    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
+    impl<S: State> State for SetTotalSuccesses<S> {
+        type PlayerDid = S::PlayerDid;
+        type TotalChallenges = S::TotalChallenges;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalSuccesses = Set<members::total_successes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
-        ///Marker type for the `total_successes` field
-        pub struct total_successes(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `player_did` field
         pub struct player_did(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `total_successes` field
+        pub struct total_successes(());
     }
 }
 
@@ -376,11 +376,11 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::TotalChallenges: entry_state::IsSet,
-    S::TotalSuccesses: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
-    S::Level: entry_state::IsSet,
     S::PlayerDid: entry_state::IsSet,
+    S::TotalChallenges: entry_state::IsSet,
+    S::Level: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
+    S::TotalSuccesses: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -402,7 +402,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Entry<'a> {
@@ -569,7 +569,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -581,11 +581,11 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("playerDid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("level"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("totalSuccesses"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("totalChallenges"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("playerDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalSuccesses"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalChallenges"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -593,7 +593,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -616,7 +616,9 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("level"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "level",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -627,7 +629,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "percentage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -640,7 +642,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playerAvatar",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -663,7 +665,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playerDid",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -686,7 +688,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playerDisplayName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -707,7 +709,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "playerHandle",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -728,7 +730,9 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("postUri"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "postUri",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -749,7 +753,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "totalChallenges",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -762,7 +766,7 @@ fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "totalSuccesses",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {

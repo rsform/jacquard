@@ -42,85 +42,85 @@ pub mod pin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
-        type Latitude;
-        type Did;
         type PlacedAt;
         type Longitude;
+        type Did;
+        type Latitude;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
-        type Latitude = Unset;
-        type Did = Unset;
         type PlacedAt = Unset;
         type Longitude = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Latitude = S::Latitude;
-        type Did = S::Did;
-        type PlacedAt = S::PlacedAt;
-        type Longitude = S::Longitude;
-    }
-    ///State transition - sets the `latitude` field to Set
-    pub struct SetLatitude<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatitude<S> {}
-    impl<S: State> State for SetLatitude<S> {
-        type Description = S::Description;
-        type Latitude = Set<members::latitude>;
-        type Did = S::Did;
-        type PlacedAt = S::PlacedAt;
-        type Longitude = S::Longitude;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Description = S::Description;
-        type Latitude = S::Latitude;
-        type Did = Set<members::did>;
-        type PlacedAt = S::PlacedAt;
-        type Longitude = S::Longitude;
+        type Did = Unset;
+        type Latitude = Unset;
+        type Description = Unset;
     }
     ///State transition - sets the `placed_at` field to Set
     pub struct SetPlacedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlacedAt<S> {}
     impl<S: State> State for SetPlacedAt<S> {
-        type Description = S::Description;
-        type Latitude = S::Latitude;
-        type Did = S::Did;
         type PlacedAt = Set<members::placed_at>;
         type Longitude = S::Longitude;
+        type Did = S::Did;
+        type Latitude = S::Latitude;
+        type Description = S::Description;
     }
     ///State transition - sets the `longitude` field to Set
     pub struct SetLongitude<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLongitude<S> {}
     impl<S: State> State for SetLongitude<S> {
-        type Description = S::Description;
-        type Latitude = S::Latitude;
-        type Did = S::Did;
         type PlacedAt = S::PlacedAt;
         type Longitude = Set<members::longitude>;
+        type Did = S::Did;
+        type Latitude = S::Latitude;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type PlacedAt = S::PlacedAt;
+        type Longitude = S::Longitude;
+        type Did = Set<members::did>;
+        type Latitude = S::Latitude;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `latitude` field to Set
+    pub struct SetLatitude<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLatitude<S> {}
+    impl<S: State> State for SetLatitude<S> {
+        type PlacedAt = S::PlacedAt;
+        type Longitude = S::Longitude;
+        type Did = S::Did;
+        type Latitude = Set<members::latitude>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type PlacedAt = S::PlacedAt;
+        type Longitude = S::Longitude;
+        type Did = S::Did;
+        type Latitude = S::Latitude;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `latitude` field
-        pub struct latitude(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `placed_at` field
         pub struct placed_at(());
         ///Marker type for the `longitude` field
         pub struct longitude(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `latitude` field
+        pub struct latitude(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -270,11 +270,11 @@ impl<'a, S: pin_state::State> PinBuilder<'a, S> {
 impl<'a, S> PinBuilder<'a, S>
 where
     S: pin_state::State,
-    S::Description: pin_state::IsSet,
-    S::Latitude: pin_state::IsSet,
-    S::Did: pin_state::IsSet,
     S::PlacedAt: pin_state::IsSet,
     S::Longitude: pin_state::IsSet,
+    S::Did: pin_state::IsSet,
+    S::Latitude: pin_state::IsSet,
+    S::Description: pin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pin<'a> {
@@ -292,7 +292,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Pin<'a> {
@@ -448,7 +448,7 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -460,11 +460,11 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("longitude"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("placedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("longitude"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("latitude"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("placedAt")
                             ],
                         ),
                         nullable: None,
@@ -472,7 +472,7 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -489,7 +489,9 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "did",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -506,7 +508,7 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "latitude",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -523,7 +525,7 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "longitude",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -540,7 +542,7 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "placedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -559,7 +561,9 @@ fn lexicon_doc_io_whiteley_luke_ATlas_pin() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("website"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "website",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

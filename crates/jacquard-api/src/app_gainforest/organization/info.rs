@@ -65,127 +65,127 @@ pub mod info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ShortDescription;
+        type LongDescription;
         type Visibility;
         type DisplayName;
-        type LongDescription;
-        type Objectives;
         type Country;
-        type ShortDescription;
         type CreatedAt;
+        type Objectives;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ShortDescription = Unset;
+        type LongDescription = Unset;
         type Visibility = Unset;
         type DisplayName = Unset;
-        type LongDescription = Unset;
-        type Objectives = Unset;
         type Country = Unset;
-        type ShortDescription = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type DisplayName = S::DisplayName;
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type Country = S::Country;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Visibility = S::Visibility;
-        type DisplayName = Set<members::display_name>;
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type Country = S::Country;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `long_description` field to Set
-    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
-    impl<S: State> State for SetLongDescription<S> {
-        type Visibility = S::Visibility;
-        type DisplayName = S::DisplayName;
-        type LongDescription = Set<members::long_description>;
-        type Objectives = S::Objectives;
-        type Country = S::Country;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `objectives` field to Set
-    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectives<S> {}
-    impl<S: State> State for SetObjectives<S> {
-        type Visibility = S::Visibility;
-        type DisplayName = S::DisplayName;
-        type LongDescription = S::LongDescription;
-        type Objectives = Set<members::objectives>;
-        type Country = S::Country;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `country` field to Set
-    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountry<S> {}
-    impl<S: State> State for SetCountry<S> {
-        type Visibility = S::Visibility;
-        type DisplayName = S::DisplayName;
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type Country = Set<members::country>;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
+        type Objectives = Unset;
     }
     ///State transition - sets the `short_description` field to Set
     pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShortDescription<S> {}
     impl<S: State> State for SetShortDescription<S> {
+        type ShortDescription = Set<members::short_description>;
+        type LongDescription = S::LongDescription;
         type Visibility = S::Visibility;
         type DisplayName = S::DisplayName;
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
         type Country = S::Country;
-        type ShortDescription = Set<members::short_description>;
         type CreatedAt = S::CreatedAt;
+        type Objectives = S::Objectives;
+    }
+    ///State transition - sets the `long_description` field to Set
+    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
+    impl<S: State> State for SetLongDescription<S> {
+        type ShortDescription = S::ShortDescription;
+        type LongDescription = Set<members::long_description>;
+        type Visibility = S::Visibility;
+        type DisplayName = S::DisplayName;
+        type Country = S::Country;
+        type CreatedAt = S::CreatedAt;
+        type Objectives = S::Objectives;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type ShortDescription = S::ShortDescription;
+        type LongDescription = S::LongDescription;
+        type Visibility = Set<members::visibility>;
+        type DisplayName = S::DisplayName;
+        type Country = S::Country;
+        type CreatedAt = S::CreatedAt;
+        type Objectives = S::Objectives;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type ShortDescription = S::ShortDescription;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type DisplayName = Set<members::display_name>;
+        type Country = S::Country;
+        type CreatedAt = S::CreatedAt;
+        type Objectives = S::Objectives;
+    }
+    ///State transition - sets the `country` field to Set
+    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountry<S> {}
+    impl<S: State> State for SetCountry<S> {
+        type ShortDescription = S::ShortDescription;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type DisplayName = S::DisplayName;
+        type Country = Set<members::country>;
+        type CreatedAt = S::CreatedAt;
+        type Objectives = S::Objectives;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type ShortDescription = S::ShortDescription;
+        type LongDescription = S::LongDescription;
         type Visibility = S::Visibility;
         type DisplayName = S::DisplayName;
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
         type Country = S::Country;
-        type ShortDescription = S::ShortDescription;
         type CreatedAt = Set<members::created_at>;
+        type Objectives = S::Objectives;
+    }
+    ///State transition - sets the `objectives` field to Set
+    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObjectives<S> {}
+    impl<S: State> State for SetObjectives<S> {
+        type ShortDescription = S::ShortDescription;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type DisplayName = S::DisplayName;
+        type Country = S::Country;
+        type CreatedAt = S::CreatedAt;
+        type Objectives = Set<members::objectives>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
+        ///Marker type for the `long_description` field
+        pub struct long_description(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `long_description` field
-        pub struct long_description(());
-        ///Marker type for the `objectives` field
-        pub struct objectives(());
         ///Marker type for the `country` field
         pub struct country(());
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `objectives` field
+        pub struct objectives(());
     }
 }
 
@@ -450,13 +450,13 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
 impl<'a, S> InfoBuilder<'a, S>
 where
     S: info_state::State,
+    S::ShortDescription: info_state::IsSet,
+    S::LongDescription: info_state::IsSet,
     S::Visibility: info_state::IsSet,
     S::DisplayName: info_state::IsSet,
-    S::LongDescription: info_state::IsSet,
-    S::Objectives: info_state::IsSet,
     S::Country: info_state::IsSet,
-    S::ShortDescription: info_state::IsSet,
     S::CreatedAt: info_state::IsSet,
+    S::Objectives: info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Info<'a> {
@@ -479,7 +479,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Info<'a> {
@@ -667,7 +667,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -679,13 +679,13 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("displayName"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("shortDescription"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("longDescription"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("objectives"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("country"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("visibility"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("displayName"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("shortDescription"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("longDescription"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("objectives"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("country"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -693,7 +693,9 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("country"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "country",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -712,7 +714,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "coverImage",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -723,7 +725,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -746,7 +748,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "displayName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -767,7 +769,9 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("logo"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "logo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -776,7 +780,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "longDescription",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -797,7 +801,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "objectives",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -823,7 +827,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "shortDescription",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -844,7 +848,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -867,7 +871,7 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "visibility",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -888,7 +892,9 @@ fn lexicon_doc_app_gainforest_organization_info() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("website"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "website",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

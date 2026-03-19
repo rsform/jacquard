@@ -66,37 +66,37 @@ pub mod cl022_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
         type Id;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Id = S::Id;
+        type Description = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Description = S::Description;
         type Id = Set<members::id>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Id = S::Id;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -328,8 +328,8 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S> Cl022Builder<'a, S>
 where
     S: cl022_state::State,
-    S::Description: cl022_state::IsSet,
     S::Id: cl022_state::IsSet,
+    S::Description: cl022_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cl022<'a> {
@@ -352,7 +352,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Cl022<'a> {
@@ -506,7 +506,7 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Fertilizer codelist"),
@@ -518,8 +518,8 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                         ),
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("description")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description")
                             ],
                         ),
                         nullable: None,
@@ -527,7 +527,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("added"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "added",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -548,7 +550,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "comment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Comment"),
@@ -565,7 +569,7 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "denominator",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -578,7 +582,7 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -599,7 +603,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "id",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -608,7 +614,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("k2o"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "k2o",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -619,7 +627,7 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("n"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("n"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -630,7 +638,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("p2o5"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "p2o5",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -641,7 +651,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "type",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Fertlizer type"),
@@ -658,7 +670,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("unit"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "unit",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Unit "),
@@ -675,7 +689,9 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("updated"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "updated",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Date when updated"),

@@ -48,85 +48,85 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PushCount;
         type UpdatedAt;
         type OwnerDid;
-        type PullCount;
         type Repository;
-        type PushCount;
+        type PullCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PushCount = Unset;
         type UpdatedAt = Unset;
         type OwnerDid = Unset;
-        type PullCount = Unset;
         type Repository = Unset;
-        type PushCount = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type OwnerDid = S::OwnerDid;
-        type PullCount = S::PullCount;
-        type Repository = S::Repository;
-        type PushCount = S::PushCount;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type OwnerDid = Set<members::owner_did>;
-        type PullCount = S::PullCount;
-        type Repository = S::Repository;
-        type PushCount = S::PushCount;
-    }
-    ///State transition - sets the `pull_count` field to Set
-    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPullCount<S> {}
-    impl<S: State> State for SetPullCount<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type OwnerDid = S::OwnerDid;
-        type PullCount = Set<members::pull_count>;
-        type Repository = S::Repository;
-        type PushCount = S::PushCount;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type OwnerDid = S::OwnerDid;
-        type PullCount = S::PullCount;
-        type Repository = Set<members::repository>;
-        type PushCount = S::PushCount;
+        type PullCount = Unset;
     }
     ///State transition - sets the `push_count` field to Set
     pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPushCount<S> {}
     impl<S: State> State for SetPushCount<S> {
+        type PushCount = Set<members::push_count>;
         type UpdatedAt = S::UpdatedAt;
         type OwnerDid = S::OwnerDid;
-        type PullCount = S::PullCount;
         type Repository = S::Repository;
-        type PushCount = Set<members::push_count>;
+        type PullCount = S::PullCount;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type PushCount = S::PushCount;
+        type UpdatedAt = Set<members::updated_at>;
+        type OwnerDid = S::OwnerDid;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
+    impl<S: State> State for SetOwnerDid<S> {
+        type PushCount = S::PushCount;
+        type UpdatedAt = S::UpdatedAt;
+        type OwnerDid = Set<members::owner_did>;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type PushCount = S::PushCount;
+        type UpdatedAt = S::UpdatedAt;
+        type OwnerDid = S::OwnerDid;
+        type Repository = Set<members::repository>;
+        type PullCount = S::PullCount;
+    }
+    ///State transition - sets the `pull_count` field to Set
+    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPullCount<S> {}
+    impl<S: State> State for SetPullCount<S> {
+        type PushCount = S::PushCount;
+        type UpdatedAt = S::UpdatedAt;
+        type OwnerDid = S::OwnerDid;
+        type Repository = S::Repository;
+        type PullCount = Set<members::pull_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `push_count` field
+        pub struct push_count(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
-        ///Marker type for the `pull_count` field
-        pub struct pull_count(());
         ///Marker type for the `repository` field
         pub struct repository(());
-        ///Marker type for the `push_count` field
-        pub struct push_count(());
+        ///Marker type for the `pull_count` field
+        pub struct pull_count(());
     }
 }
 
@@ -299,11 +299,11 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
+    S::PushCount: stats_state::IsSet,
     S::UpdatedAt: stats_state::IsSet,
     S::OwnerDid: stats_state::IsSet,
-    S::PullCount: stats_state::IsSet,
     S::Repository: stats_state::IsSet,
-    S::PushCount: stats_state::IsSet,
+    S::PullCount: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
@@ -322,7 +322,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Stats<'a> {
@@ -463,7 +463,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -475,11 +475,11 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("ownerDid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("pullCount"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("pushCount"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ownerDid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("pullCount"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("pushCount"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                             ],
                         ),
                         nullable: None,
@@ -487,7 +487,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastPull",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -510,7 +510,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "lastPush",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -533,7 +533,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "ownerDid",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -556,7 +556,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "pullCount",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -569,7 +569,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "pushCount",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -582,7 +582,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "repository",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -603,7 +603,7 @@ fn lexicon_doc_io_atcr_hold_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

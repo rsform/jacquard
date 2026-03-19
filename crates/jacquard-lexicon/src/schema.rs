@@ -150,13 +150,13 @@ inventory::collect!(LexiconSchemaRef);
 #[derive(Debug, Clone)]
 pub struct SchemaRegistry {
     /// Schema documents indexed by NSID (concurrent access safe)
-    schemas: dashmap::DashMap<jacquard_common::smol_str::SmolStr, crate::lexicon::LexiconDoc<'static>>,
+    schemas: dashmap::DashMap<jacquard_common::deps::smol_str::SmolStr, crate::lexicon::LexiconDoc<'static>>,
 }
 
 impl SchemaRegistry {
     /// Build registry from inventory-collected schemas
     pub fn from_inventory() -> Self {
-        use jacquard_common::smol_str::ToSmolStr;
+        use jacquard_common::deps::smol_str::ToSmolStr;
         let schemas = dashmap::DashMap::new();
 
         for entry in inventory::iter::<LexiconSchemaRef> {
@@ -198,7 +198,7 @@ impl SchemaRegistry {
     }
 
     /// Insert or update a schema (for runtime schema loading)
-    pub fn insert(&self, nsid: jacquard_common::smol_str::SmolStr, doc: crate::lexicon::LexiconDoc<'static>) {
+    pub fn insert(&self, nsid: jacquard_common::deps::smol_str::SmolStr, doc: crate::lexicon::LexiconDoc<'static>) {
         self.schemas.insert(nsid, doc);
     }
 

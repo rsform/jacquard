@@ -37,37 +37,37 @@ pub mod code_type_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type ListId;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type ListId = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type ListId = S::ListId;
+        type Code = Unset;
     }
     ///State transition - sets the `list_id` field to Set
     pub struct SetListId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetListId<S> {}
     impl<S: State> State for SetListId<S> {
-        type Code = S::Code;
         type ListId = Set<members::list_id>;
+        type Code = S::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type ListId = S::ListId;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `list_id` field
         pub struct list_id(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
@@ -148,8 +148,8 @@ where
 impl<'a, S> CodeTypeBuilder<'a, S>
 where
     S: code_type_state::State,
-    S::Code: code_type_state::IsSet,
     S::ListId: code_type_state::IsSet,
+    S::Code: code_type_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CodeType<'a> {
@@ -163,7 +163,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CodeType<'a> {
@@ -186,7 +186,7 @@ fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::Le
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("codeType"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("codeType"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -195,8 +195,8 @@ fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::Le
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("listId"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("code")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("listId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("code")
                         ],
                     ),
                     nullable: None,
@@ -204,7 +204,9 @@ fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("code"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "code",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -221,7 +223,9 @@ fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("listId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "listId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

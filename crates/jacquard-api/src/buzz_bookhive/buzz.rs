@@ -39,67 +39,67 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parent;
         type CreatedAt;
-        type Book;
+        type Parent;
         type Comment;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parent = Unset;
         type CreatedAt = Unset;
-        type Book = Unset;
+        type Parent = Unset;
         type Comment = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
-        type Comment = S::Comment;
+        type Book = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Parent = S::Parent;
         type CreatedAt = Set<members::created_at>;
-        type Book = S::Book;
-        type Comment = S::Comment;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
         type Parent = S::Parent;
-        type CreatedAt = S::CreatedAt;
-        type Book = Set<members::book>;
         type Comment = S::Comment;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Parent = Set<members::parent>;
+        type Comment = S::Comment;
+        type Book = S::Book;
     }
     ///State transition - sets the `comment` field to Set
     pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComment<S> {}
     impl<S: State> State for SetComment<S> {
-        type Parent = S::Parent;
         type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
+        type Parent = S::Parent;
         type Comment = Set<members::comment>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type CreatedAt = S::CreatedAt;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parent` field
-        pub struct parent(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `book` field
-        pub struct book(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
         ///Marker type for the `comment` field
         pub struct comment(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
@@ -212,10 +212,10 @@ where
 impl<'a, S> BuzzBuilder<'a, S>
 where
     S: buzz_state::State,
-    S::Parent: buzz_state::IsSet,
     S::CreatedAt: buzz_state::IsSet,
-    S::Book: buzz_state::IsSet,
+    S::Parent: buzz_state::IsSet,
     S::Comment: buzz_state::IsSet,
+    S::Book: buzz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Buzz<'a> {
@@ -231,7 +231,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Buzz<'a> {
@@ -335,7 +335,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
         {
             let value = &self.comment;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -364,7 +364,7 @@ fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -376,10 +376,10 @@ fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("book"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("parent")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("comment"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("book"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("parent")
                             ],
                         ),
                         nullable: None,
@@ -387,7 +387,9 @@ fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("book"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "book",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -396,7 +398,9 @@ fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "comment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -415,7 +419,7 @@ fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -438,7 +442,9 @@ fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("parent"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "parent",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

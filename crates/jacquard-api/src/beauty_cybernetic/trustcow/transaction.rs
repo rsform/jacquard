@@ -53,67 +53,67 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type TransactionId;
         type ServiceConsumer;
         type ServiceProvider;
         type CreatedAt;
-        type TransactionId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type TransactionId = Unset;
         type ServiceConsumer = Unset;
         type ServiceProvider = Unset;
         type CreatedAt = Unset;
-        type TransactionId = Unset;
-    }
-    ///State transition - sets the `service_consumer` field to Set
-    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
-    impl<S: State> State for SetServiceConsumer<S> {
-        type ServiceConsumer = Set<members::service_consumer>;
-        type ServiceProvider = S::ServiceProvider;
-        type CreatedAt = S::CreatedAt;
-        type TransactionId = S::TransactionId;
-    }
-    ///State transition - sets the `service_provider` field to Set
-    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
-    impl<S: State> State for SetServiceProvider<S> {
-        type ServiceConsumer = S::ServiceConsumer;
-        type ServiceProvider = Set<members::service_provider>;
-        type CreatedAt = S::CreatedAt;
-        type TransactionId = S::TransactionId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ServiceConsumer = S::ServiceConsumer;
-        type ServiceProvider = S::ServiceProvider;
-        type CreatedAt = Set<members::created_at>;
-        type TransactionId = S::TransactionId;
     }
     ///State transition - sets the `transaction_id` field to Set
     pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransactionId<S> {}
     impl<S: State> State for SetTransactionId<S> {
+        type TransactionId = Set<members::transaction_id>;
         type ServiceConsumer = S::ServiceConsumer;
         type ServiceProvider = S::ServiceProvider;
         type CreatedAt = S::CreatedAt;
-        type TransactionId = Set<members::transaction_id>;
+    }
+    ///State transition - sets the `service_consumer` field to Set
+    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
+    impl<S: State> State for SetServiceConsumer<S> {
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = Set<members::service_consumer>;
+        type ServiceProvider = S::ServiceProvider;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `service_provider` field to Set
+    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
+    impl<S: State> State for SetServiceProvider<S> {
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = S::ServiceConsumer;
+        type ServiceProvider = Set<members::service_provider>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = S::ServiceConsumer;
+        type ServiceProvider = S::ServiceProvider;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `transaction_id` field
+        pub struct transaction_id(());
         ///Marker type for the `service_consumer` field
         pub struct service_consumer(());
         ///Marker type for the `service_provider` field
         pub struct service_provider(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `transaction_id` field
-        pub struct transaction_id(());
     }
 }
 
@@ -280,10 +280,10 @@ where
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
+    S::TransactionId: transaction_state::IsSet,
     S::ServiceConsumer: transaction_state::IsSet,
     S::ServiceProvider: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
-    S::TransactionId: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
@@ -302,7 +302,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Transaction<'a> {
@@ -447,7 +447,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -459,10 +459,10 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("serviceProvider"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("serviceConsumer"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("transactionId"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("serviceProvider"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("serviceConsumer"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("transactionId"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -470,7 +470,9 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("amount"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "amount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -489,7 +491,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -512,7 +514,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "currency",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -533,7 +535,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -554,7 +556,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "serviceConsumer",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -575,7 +577,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "serviceProvider",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -596,7 +598,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "transactionId",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

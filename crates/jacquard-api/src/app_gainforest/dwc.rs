@@ -272,7 +272,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("basisOfRecordEnum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "basisOfRecordEnum",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -291,7 +293,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("dublinCoreTypeEnum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "dublinCoreTypeEnum",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -310,7 +314,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("geolocation"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("geolocation"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -319,8 +323,8 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("decimalLatitude"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("decimalLongitude")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("decimalLatitude"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("decimalLongitude")
                         ],
                     ),
                     nullable: None,
@@ -328,7 +332,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "coordinateUncertaintyInMeters",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -341,7 +345,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "decimalLatitude",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -362,7 +366,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "decimalLongitude",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -383,7 +387,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "geodeticDatum",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -408,7 +412,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "nomenclaturalCodeEnum",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
@@ -429,7 +433,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("occurrenceStatusEnum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "occurrenceStatusEnum",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -448,7 +454,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("sexEnum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("sexEnum"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -467,7 +473,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("taxonIdentification"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "taxonIdentification",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -476,7 +484,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("scientificName")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scientificName")
                         ],
                     ),
                     nullable: None,
@@ -484,7 +492,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "dateIdentified",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -505,7 +513,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "gbifTaxonKey",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -526,7 +534,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identificationQualifier",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -547,7 +555,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identificationRemarks",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -568,7 +576,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identifiedBy",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -589,7 +597,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "identifiedByID",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -610,7 +618,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "scientificName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -635,7 +643,7 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("taxonRankEnum"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("taxonRankEnum"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -685,7 +693,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
         {
             let value = &self.decimal_latitude;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -704,7 +712,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
         {
             let value = &self.decimal_longitude;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -722,7 +730,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
         }
         if let Some(ref value) = self.geodetic_datum {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1073,7 +1081,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.date_identified {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1091,7 +1099,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.gbif_taxon_key {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1109,7 +1117,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identification_qualifier {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1127,7 +1135,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identification_remarks {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1145,7 +1153,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identified_by {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1163,7 +1171,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identified_by_id {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1182,7 +1190,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         {
             let value = &self.scientific_name;
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

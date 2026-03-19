@@ -34,37 +34,37 @@ pub mod root_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Doc;
         type Snapshot;
+        type Doc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Doc = Unset;
         type Snapshot = Unset;
-    }
-    ///State transition - sets the `doc` field to Set
-    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDoc<S> {}
-    impl<S: State> State for SetDoc<S> {
-        type Doc = Set<members::doc>;
-        type Snapshot = S::Snapshot;
+        type Doc = Unset;
     }
     ///State transition - sets the `snapshot` field to Set
     pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSnapshot<S> {}
     impl<S: State> State for SetSnapshot<S> {
-        type Doc = S::Doc;
         type Snapshot = Set<members::snapshot>;
+        type Doc = S::Doc;
+    }
+    ///State transition - sets the `doc` field to Set
+    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDoc<S> {}
+    impl<S: State> State for SetDoc<S> {
+        type Snapshot = S::Snapshot;
+        type Doc = Set<members::doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `doc` field
-        pub struct doc(());
         ///Marker type for the `snapshot` field
         pub struct snapshot(());
+        ///Marker type for the `doc` field
+        pub struct doc(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> RootBuilder<'a, S>
 where
     S: root_state::State,
-    S::Doc: root_state::IsSet,
     S::Snapshot: root_state::IsSet,
+    S::Doc: root_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Root<'a> {
@@ -152,7 +152,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Root<'a> {
@@ -253,7 +253,7 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -265,8 +265,8 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("doc"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("snapshot")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("doc"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("snapshot")
                             ],
                         ),
                         nullable: None,
@@ -274,7 +274,9 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("doc"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "doc",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -283,7 +285,7 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "snapshot",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {

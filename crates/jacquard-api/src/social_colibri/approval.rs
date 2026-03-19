@@ -37,50 +37,50 @@ pub mod approval_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Community;
-        type CreatedAt;
         type Membership;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Community = Unset;
-        type CreatedAt = Unset;
         type Membership = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `community` field to Set
     pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunity<S> {}
     impl<S: State> State for SetCommunity<S> {
         type Community = Set<members::community>;
+        type Membership = S::Membership;
         type CreatedAt = S::CreatedAt;
-        type Membership = S::Membership;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Community = S::Community;
-        type CreatedAt = Set<members::created_at>;
-        type Membership = S::Membership;
     }
     ///State transition - sets the `membership` field to Set
     pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembership<S> {}
     impl<S: State> State for SetMembership<S> {
         type Community = S::Community;
-        type CreatedAt = S::CreatedAt;
         type Membership = Set<members::membership>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Community = S::Community;
+        type Membership = S::Membership;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `community` field
         pub struct community(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `membership` field
         pub struct membership(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -174,8 +174,8 @@ impl<'a, S> ApprovalBuilder<'a, S>
 where
     S: approval_state::State,
     S::Community: approval_state::IsSet,
-    S::CreatedAt: approval_state::IsSet,
     S::Membership: approval_state::IsSet,
+    S::CreatedAt: approval_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Approval<'a> {
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Approval<'a> {
@@ -292,7 +292,7 @@ fn lexicon_doc_social_colibri_approval() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -300,9 +300,9 @@ fn lexicon_doc_social_colibri_approval() -> ::jacquard_lexicon::lexicon::Lexicon
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("membership"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("community"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("membership"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("community"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -310,7 +310,7 @@ fn lexicon_doc_social_colibri_approval() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "community",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -333,7 +333,7 @@ fn lexicon_doc_social_colibri_approval() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -352,7 +352,7 @@ fn lexicon_doc_social_colibri_approval() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "membership",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

@@ -33,51 +33,51 @@ pub mod calories_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Intake;
-        type Burned;
         type CreatedAt;
+        type Burned;
+        type Intake;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Intake = Unset;
-        type Burned = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `intake` field to Set
-    pub struct SetIntake<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIntake<S> {}
-    impl<S: State> State for SetIntake<S> {
-        type Intake = Set<members::intake>;
-        type Burned = S::Burned;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `burned` field to Set
-    pub struct SetBurned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBurned<S> {}
-    impl<S: State> State for SetBurned<S> {
-        type Intake = S::Intake;
-        type Burned = Set<members::burned>;
-        type CreatedAt = S::CreatedAt;
+        type Burned = Unset;
+        type Intake = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Intake = S::Intake;
-        type Burned = S::Burned;
         type CreatedAt = Set<members::created_at>;
+        type Burned = S::Burned;
+        type Intake = S::Intake;
+    }
+    ///State transition - sets the `burned` field to Set
+    pub struct SetBurned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBurned<S> {}
+    impl<S: State> State for SetBurned<S> {
+        type CreatedAt = S::CreatedAt;
+        type Burned = Set<members::burned>;
+        type Intake = S::Intake;
+    }
+    ///State transition - sets the `intake` field to Set
+    pub struct SetIntake<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIntake<S> {}
+    impl<S: State> State for SetIntake<S> {
+        type CreatedAt = S::CreatedAt;
+        type Burned = S::Burned;
+        type Intake = Set<members::intake>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `intake` field
-        pub struct intake(());
-        ///Marker type for the `burned` field
-        pub struct burned(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `burned` field
+        pub struct burned(());
+        ///Marker type for the `intake` field
+        pub struct intake(());
     }
 }
 
@@ -170,9 +170,9 @@ where
 impl<'a, S> CaloriesBuilder<'a, S>
 where
     S: calories_state::State,
-    S::Intake: calories_state::IsSet,
-    S::Burned: calories_state::IsSet,
     S::CreatedAt: calories_state::IsSet,
+    S::Burned: calories_state::IsSet,
+    S::Intake: calories_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Calories<'a> {
@@ -187,7 +187,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Calories<'a> {
@@ -289,7 +289,7 @@ fn lexicon_doc_dev_baileytownsend_health_calories() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -301,9 +301,9 @@ fn lexicon_doc_dev_baileytownsend_health_calories() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("intake"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("burned"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("intake"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("burned"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -311,7 +311,9 @@ fn lexicon_doc_dev_baileytownsend_health_calories() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("burned"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "burned",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -322,7 +324,7 @@ fn lexicon_doc_dev_baileytownsend_health_calories() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -341,7 +343,9 @@ fn lexicon_doc_dev_baileytownsend_health_calories() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("intake"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "intake",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

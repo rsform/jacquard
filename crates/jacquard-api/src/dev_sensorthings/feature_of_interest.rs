@@ -42,8 +42,8 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Feature;
         type EncodingType;
+        type Feature;
         type CreatedAt;
         type Name;
     }
@@ -51,26 +51,26 @@ pub mod feature_of_interest_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Feature = Unset;
         type EncodingType = Unset;
+        type Feature = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `feature` field to Set
-    pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeature<S> {}
-    impl<S: State> State for SetFeature<S> {
-        type Feature = Set<members::feature>;
-        type EncodingType = S::EncodingType;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
     }
     ///State transition - sets the `encoding_type` field to Set
     pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEncodingType<S> {}
     impl<S: State> State for SetEncodingType<S> {
-        type Feature = S::Feature;
         type EncodingType = Set<members::encoding_type>;
+        type Feature = S::Feature;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `feature` field to Set
+    pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeature<S> {}
+    impl<S: State> State for SetFeature<S> {
+        type EncodingType = S::EncodingType;
+        type Feature = Set<members::feature>;
         type CreatedAt = S::CreatedAt;
         type Name = S::Name;
     }
@@ -78,8 +78,8 @@ pub mod feature_of_interest_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Feature = S::Feature;
         type EncodingType = S::EncodingType;
+        type Feature = S::Feature;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
     }
@@ -87,18 +87,18 @@ pub mod feature_of_interest_state {
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Feature = S::Feature;
         type EncodingType = S::EncodingType;
+        type Feature = S::Feature;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `feature` field
-        pub struct feature(());
         ///Marker type for the `encoding_type` field
         pub struct encoding_type(());
+        ///Marker type for the `feature` field
+        pub struct feature(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
@@ -235,8 +235,8 @@ where
 impl<'a, S> FeatureOfInterestBuilder<'a, S>
 where
     S: feature_of_interest_state::State,
-    S::Feature: feature_of_interest_state::IsSet,
     S::EncodingType: feature_of_interest_state::IsSet,
+    S::Feature: feature_of_interest_state::IsSet,
     S::CreatedAt: feature_of_interest_state::IsSet,
     S::Name: feature_of_interest_state::IsSet,
 {
@@ -255,7 +255,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> FeatureOfInterest<'a> {
@@ -397,7 +397,7 @@ fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -409,10 +409,10 @@ fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("encodingType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("feature"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("encodingType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("feature"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -420,7 +420,7 @@ fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -439,7 +439,7 @@ fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -456,7 +456,7 @@ fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "encodingType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -477,13 +477,17 @@ fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("feature"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "feature",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                     description: None,
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

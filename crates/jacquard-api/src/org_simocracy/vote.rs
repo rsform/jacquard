@@ -38,50 +38,50 @@ pub mod vote_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Votes;
-        type CreatedAt;
         type Sim;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Votes = Unset;
-        type CreatedAt = Unset;
         type Sim = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `votes` field to Set
     pub struct SetVotes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVotes<S> {}
     impl<S: State> State for SetVotes<S> {
         type Votes = Set<members::votes>;
+        type Sim = S::Sim;
         type CreatedAt = S::CreatedAt;
-        type Sim = S::Sim;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Votes = S::Votes;
-        type CreatedAt = Set<members::created_at>;
-        type Sim = S::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
         type Votes = S::Votes;
-        type CreatedAt = S::CreatedAt;
         type Sim = Set<members::sim>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Votes = S::Votes;
+        type Sim = S::Sim;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `votes` field
         pub struct votes(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -175,8 +175,8 @@ impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
     S::Votes: vote_state::IsSet,
-    S::CreatedAt: vote_state::IsSet,
     S::Sim: vote_state::IsSet,
+    S::CreatedAt: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -191,7 +191,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Vote<'a> {
@@ -291,7 +291,7 @@ fn lexicon_doc_org_simocracy_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -303,9 +303,9 @@ fn lexicon_doc_org_simocracy_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("sim"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("votes"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sim"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("votes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -313,7 +313,7 @@ fn lexicon_doc_org_simocracy_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -336,7 +336,9 @@ fn lexicon_doc_org_simocracy_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("sim"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "sim",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -345,7 +347,9 @@ fn lexicon_doc_org_simocracy_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("votes"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "votes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

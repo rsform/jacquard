@@ -46,105 +46,105 @@ pub mod indexed_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
+        type Uri;
+        type Value;
+        type IndexedAt;
         type Collection;
         type Did;
-        type Uri;
-        type IndexedAt;
-        type Value;
-        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
+        type Uri = Unset;
+        type Value = Unset;
+        type IndexedAt = Unset;
         type Collection = Unset;
         type Did = Unset;
-        type Uri = Unset;
-        type IndexedAt = Unset;
-        type Value = Unset;
-        type Cid = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Did = S::Did;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Collection = S::Collection;
-        type Did = Set<members::did>;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Collection = S::Collection;
-        type Did = S::Did;
-        type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Collection = S::Collection;
-        type Did = S::Did;
-        type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Value = S::Value;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Collection = S::Collection;
-        type Did = S::Did;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Value = Set<members::value>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
         type Collection = S::Collection;
         type Did = S::Did;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
         type Value = S::Value;
-        type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
+        type Collection = S::Collection;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+        type Collection = S::Collection;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Value = S::Value;
+        type IndexedAt = Set<members::indexed_at>;
+        type Collection = S::Collection;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Collection = Set<members::collection>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Collection = S::Collection;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
     }
 }
 
@@ -297,12 +297,12 @@ where
 impl<'a, S> IndexedRecordBuilder<'a, S>
 where
     S: indexed_record_state::State,
+    S::Cid: indexed_record_state::IsSet,
+    S::Uri: indexed_record_state::IsSet,
+    S::Value: indexed_record_state::IsSet,
+    S::IndexedAt: indexed_record_state::IsSet,
     S::Collection: indexed_record_state::IsSet,
     S::Did: indexed_record_state::IsSet,
-    S::Uri: indexed_record_state::IsSet,
-    S::IndexedAt: indexed_record_state::IsSet,
-    S::Value: indexed_record_state::IsSet,
-    S::Cid: indexed_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndexedRecord<'a> {
@@ -320,7 +320,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> IndexedRecord<'a> {
@@ -349,17 +349,17 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("indexedRecord"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("indexedRecord"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -367,7 +367,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cid",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -388,7 +390,7 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "collection",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -411,7 +413,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -432,7 +436,7 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "indexedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -455,7 +459,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -476,7 +482,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -486,7 +494,7 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -500,7 +508,7 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("slice")
                                     ],
                                 ),
                                 nullable: None,
@@ -508,7 +516,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "cursor",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -527,7 +537,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("limit"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "limit",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                             description: None,
                                             default: None,
@@ -538,7 +550,9 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "slice",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -557,13 +571,17 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("sortBy"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "sortBy",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                             description: None,
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("where"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "where",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                             description: None,
                                         }),

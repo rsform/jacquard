@@ -33,51 +33,51 @@ pub mod color_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Red;
         type Blue;
         type Green;
+        type Red;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Red = Unset;
         type Blue = Unset;
         type Green = Unset;
-    }
-    ///State transition - sets the `red` field to Set
-    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRed<S> {}
-    impl<S: State> State for SetRed<S> {
-        type Red = Set<members::red>;
-        type Blue = S::Blue;
-        type Green = S::Green;
+        type Red = Unset;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlue<S> {}
     impl<S: State> State for SetBlue<S> {
-        type Red = S::Red;
         type Blue = Set<members::blue>;
         type Green = S::Green;
+        type Red = S::Red;
     }
     ///State transition - sets the `green` field to Set
     pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGreen<S> {}
     impl<S: State> State for SetGreen<S> {
-        type Red = S::Red;
         type Blue = S::Blue;
         type Green = Set<members::green>;
+        type Red = S::Red;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRed<S> {}
+    impl<S: State> State for SetRed<S> {
+        type Blue = S::Blue;
+        type Green = S::Green;
+        type Red = Set<members::red>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `red` field
-        pub struct red(());
         ///Marker type for the `blue` field
         pub struct blue(());
         ///Marker type for the `green` field
         pub struct green(());
+        ///Marker type for the `red` field
+        pub struct red(());
     }
 }
 
@@ -170,9 +170,9 @@ where
 impl<'a, S> ColorBuilder<'a, S>
 where
     S: color_state::State,
-    S::Red: color_state::IsSet,
     S::Blue: color_state::IsSet,
     S::Green: color_state::IsSet,
+    S::Red: color_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Color<'a> {
@@ -187,7 +187,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Color<'a> {
@@ -211,7 +211,7 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("color"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("color"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -220,9 +220,9 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("red"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("green"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("blue")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("red"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("green"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blue")
                         ],
                     ),
                     nullable: None,
@@ -230,7 +230,9 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("blue"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "blue",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -241,7 +243,9 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("green"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "green",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -252,7 +256,9 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("red"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "red",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -267,7 +273,7 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -283,7 +289,9 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("color"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "color",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static("#color"),
@@ -486,7 +494,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Profile<'a> {

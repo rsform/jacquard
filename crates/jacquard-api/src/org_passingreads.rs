@@ -167,7 +167,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Actor<'a> {
@@ -191,7 +191,7 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("actor"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("actor"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -199,14 +199,18 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "did",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -223,7 +227,7 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "displayName",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -240,7 +244,9 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "handle",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -261,7 +267,7 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("aspectRatio"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("aspectRatio"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -270,8 +276,8 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height")
                         ],
                     ),
                     nullable: None,
@@ -279,7 +285,9 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "height",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -290,7 +298,9 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "width",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -305,20 +315,22 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("bookIdEntry"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("bookIdEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("Book ID entry for SSG"),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("id")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -337,7 +349,7 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("locationEntry"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("locationEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -346,8 +358,8 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("h3"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("bookCount")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("h3"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("bookCount")
                         ],
                     ),
                     nullable: None,
@@ -355,7 +367,7 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "bookCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -368,7 +380,7 @@ fn lexicon_doc_org_passingreads_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("h3"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("h3"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -562,7 +574,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> AspectRatio<'a> {
@@ -678,37 +690,37 @@ pub mod location_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type H3;
         type BookCount;
+        type H3;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type H3 = Unset;
         type BookCount = Unset;
-    }
-    ///State transition - sets the `h3` field to Set
-    pub struct SetH3<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetH3<S> {}
-    impl<S: State> State for SetH3<S> {
-        type H3 = Set<members::h3>;
-        type BookCount = S::BookCount;
+        type H3 = Unset;
     }
     ///State transition - sets the `book_count` field to Set
     pub struct SetBookCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBookCount<S> {}
     impl<S: State> State for SetBookCount<S> {
-        type H3 = S::H3;
         type BookCount = Set<members::book_count>;
+        type H3 = S::H3;
+    }
+    ///State transition - sets the `h3` field to Set
+    pub struct SetH3<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetH3<S> {}
+    impl<S: State> State for SetH3<S> {
+        type BookCount = S::BookCount;
+        type H3 = Set<members::h3>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `h3` field
-        pub struct h3(());
         ///Marker type for the `book_count` field
         pub struct book_count(());
+        ///Marker type for the `h3` field
+        pub struct h3(());
     }
 }
 
@@ -781,8 +793,8 @@ where
 impl<'a, S> LocationEntryBuilder<'a, S>
 where
     S: location_entry_state::State,
-    S::H3: location_entry_state::IsSet,
     S::BookCount: location_entry_state::IsSet,
+    S::H3: location_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LocationEntry<'a> {
@@ -796,7 +808,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> LocationEntry<'a> {

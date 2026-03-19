@@ -34,7 +34,7 @@ pub struct Chart<'a> {
     pub jacket_artist: std::option::Option<jacquard_common::types::value::Data<'a>>,
     /// The md5 hashes of any versions of the chart that are up-to-date enough to be leaderboard-legal. Optional if you will not perform leaderboard resets upon any chart changes.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ranked_versions: std::option::Option<Vec<bytes::Bytes>>,
+    pub ranked_versions: std::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
     /// The numeric difficulty rating displayed to players, formatted as a string to support decimal or + difficulties.
     #[serde(borrow)]
     pub rating: jacquard_common::CowStr<'a>,
@@ -125,7 +125,7 @@ pub struct ChartBuilder<'a, S: chart_state::State> {
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<Vec<bytes::Bytes>>,
+        ::core::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ),
@@ -230,13 +230,16 @@ impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     /// Set the `rankedVersions` field (optional)
     pub fn ranked_versions(
         mut self,
-        value: impl Into<Option<Vec<bytes::Bytes>>>,
+        value: impl Into<Option<Vec<jacquard_common::deps::bytes::Bytes>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `rankedVersions` field to an Option value (optional)
-    pub fn maybe_ranked_versions(mut self, value: Option<Vec<bytes::Bytes>>) -> Self {
+    pub fn maybe_ranked_versions(
+        mut self,
+        value: Option<Vec<jacquard_common::deps::bytes::Bytes>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -305,7 +308,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Chart<'a> {
@@ -430,7 +433,7 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -442,10 +445,10 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("game"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("song"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("difficulty"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("rating")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("game"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("song"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("difficulty"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rating")
                             ],
                         ),
                         nullable: None,
@@ -453,7 +456,7 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "difficulty",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -470,7 +473,9 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("game"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "game",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -491,7 +496,9 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("jacket"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "jacket",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -499,7 +506,7 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "jacketArtist",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -510,7 +517,7 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "rankedVersions",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -529,7 +536,9 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rating",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -548,7 +557,9 @@ fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("song"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "song",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

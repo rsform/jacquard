@@ -188,49 +188,49 @@ pub mod fetch_records_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Strategy;
         type Uri;
+        type Strategy;
         type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Strategy = Unset;
         type Uri = Unset;
+        type Strategy = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStrategy<S> {}
-    impl<S: State> State for SetStrategy<S> {
-        type Strategy = Set<members::strategy>;
-        type Uri = S::Uri;
-        type Record = S::Record;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Strategy = S::Strategy;
         type Uri = Set<members::uri>;
+        type Strategy = S::Strategy;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStrategy<S> {}
+    impl<S: State> State for SetStrategy<S> {
+        type Uri = S::Uri;
+        type Strategy = Set<members::strategy>;
         type Record = S::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Strategy = S::Strategy;
         type Uri = S::Uri;
+        type Strategy = S::Strategy;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `strategy` field
-        pub struct strategy(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `strategy` field
+        pub struct strategy(());
         ///Marker type for the `record` field
         pub struct record(());
     }
@@ -325,8 +325,8 @@ where
 impl<'a, S> FetchRecordsResultBuilder<'a, S>
 where
     S: fetch_records_result_state::State,
-    S::Strategy: fetch_records_result_state::IsSet,
     S::Uri: fetch_records_result_state::IsSet,
+    S::Strategy: fetch_records_result_state::IsSet,
     S::Record: fetch_records_result_state::IsSet,
 {
     /// Build the final struct
@@ -342,7 +342,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> FetchRecordsResult<'a> {
@@ -366,7 +366,7 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -374,14 +374,16 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("uris")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("uris")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("uris"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "uris",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -411,7 +413,7 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("result"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("result"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -420,9 +422,9 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("strategy"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("record")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("strategy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record")
                         ],
                     ),
                     nullable: None,
@@ -430,13 +432,17 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "record",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("strategy"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "strategy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -445,7 +451,9 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

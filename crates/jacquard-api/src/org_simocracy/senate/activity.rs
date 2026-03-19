@@ -56,51 +56,51 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActivityType;
         type CreatedAt;
         type CommitteeSims;
+        type ActivityType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActivityType = Unset;
         type CreatedAt = Unset;
         type CommitteeSims = Unset;
-    }
-    ///State transition - sets the `activity_type` field to Set
-    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivityType<S> {}
-    impl<S: State> State for SetActivityType<S> {
-        type ActivityType = Set<members::activity_type>;
-        type CreatedAt = S::CreatedAt;
-        type CommitteeSims = S::CommitteeSims;
+        type ActivityType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ActivityType = S::ActivityType;
         type CreatedAt = Set<members::created_at>;
         type CommitteeSims = S::CommitteeSims;
+        type ActivityType = S::ActivityType;
     }
     ///State transition - sets the `committee_sims` field to Set
     pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
     impl<S: State> State for SetCommitteeSims<S> {
-        type ActivityType = S::ActivityType;
         type CreatedAt = S::CreatedAt;
         type CommitteeSims = Set<members::committee_sims>;
+        type ActivityType = S::ActivityType;
+    }
+    ///State transition - sets the `activity_type` field to Set
+    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivityType<S> {}
+    impl<S: State> State for SetActivityType<S> {
+        type CreatedAt = S::CreatedAt;
+        type CommitteeSims = S::CommitteeSims;
+        type ActivityType = Set<members::activity_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activity_type` field
-        pub struct activity_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `committee_sims` field
         pub struct committee_sims(());
+        ///Marker type for the `activity_type` field
+        pub struct activity_type(());
     }
 }
 
@@ -267,9 +267,9 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::ActivityType: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
     S::CommitteeSims: activity_state::IsSet,
+    S::ActivityType: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -288,7 +288,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Activity<'a> {
@@ -627,7 +627,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -639,9 +639,9 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("activityType"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("committeeSims"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("activityType"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("committeeSims"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -649,7 +649,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "activityType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -670,7 +670,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "committeeSims",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -690,7 +690,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -713,7 +713,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "evaluation",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -724,7 +724,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "proposalText",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -745,7 +745,7 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "resultSummary",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -766,7 +766,9 @@ fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "status",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

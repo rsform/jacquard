@@ -19,7 +19,7 @@ use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtprotoStr, Handle};
 use jacquard_common::types::uri::Uri;
 use jacquard_common::types::value::{AtDataError, Data};
-use jacquard_common::{CowStr, IntoStatic, smol_str};
+use jacquard_common::{CowStr, IntoStatic, deps::smol_str};
 use n0_future::time::Duration;
 use smol_str::SmolStr;
 use std::collections::BTreeMap;

@@ -35,37 +35,37 @@ pub mod measured_trees_cluster_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Shapefile;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Shapefile = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Shapefile = S::Shapefile;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `shapefile` field to Set
     pub struct SetShapefile<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShapefile<S> {}
     impl<S: State> State for SetShapefile<S> {
-        type CreatedAt = S::CreatedAt;
         type Shapefile = Set<members::shapefile>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Shapefile = S::Shapefile;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `shapefile` field
         pub struct shapefile(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -141,8 +141,8 @@ where
 impl<'a, S> MeasuredTreesClusterBuilder<'a, S>
 where
     S: measured_trees_cluster_state::State,
-    S::CreatedAt: measured_trees_cluster_state::IsSet,
     S::Shapefile: measured_trees_cluster_state::IsSet,
+    S::CreatedAt: measured_trees_cluster_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MeasuredTreesCluster<'a> {
@@ -156,7 +156,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> MeasuredTreesCluster<'a> {
@@ -259,7 +259,7 @@ fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -271,8 +271,8 @@ fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("shapefile"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("shapefile"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -280,7 +280,7 @@ fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -303,7 +303,7 @@ fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "shapefile",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

@@ -39,37 +39,37 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Query;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Query = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Query = S::Query;
+        type Did = Unset;
     }
     ///State transition - sets the `query` field to Set
     pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuery<S> {}
     impl<S: State> State for SetQuery<S> {
-        type Did = S::Did;
         type Query = Set<members::query>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Query = S::Query;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `query` field
         pub struct query(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -162,8 +162,8 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Did: list_state::IsSet,
     S::Query: list_state::IsSet,
+    S::Did: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -178,7 +178,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> List<'a> {
@@ -372,7 +372,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Page<'a> {
@@ -393,7 +393,7 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -407,8 +407,8 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("query"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("did")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("query"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
                                     ],
                                 ),
                                 nullable: None,
@@ -416,7 +416,9 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "did",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -437,13 +439,17 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("input"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "input",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                             description: None,
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static("query"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                            "query",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: Some(
                                                 ::jacquard_common::CowStr::new_static(
@@ -473,7 +479,7 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("page"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("page"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -481,14 +487,18 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         ),
                     ),
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("items")],
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cursor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -507,7 +517,9 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("items"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "items",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(

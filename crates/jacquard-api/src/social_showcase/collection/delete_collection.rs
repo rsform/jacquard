@@ -116,7 +116,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> DeleteCollection<'a> {
@@ -138,7 +138,7 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteCollectionOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 /// Response type for

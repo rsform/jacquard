@@ -8,7 +8,13 @@
 /// A report of inappropriate content on a beacon
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Report<'a> {
@@ -28,7 +34,7 @@ pub struct Report<'a> {
 
 pub mod report_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,50 +43,50 @@ pub mod report_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Reason;
         type BeaconUri;
+        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Reason = Unset;
         type BeaconUri = Unset;
+        type Reason = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type BeaconUri = S::BeaconUri;
         type Reason = S::Reason;
-        type BeaconUri = S::BeaconUri;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type CreatedAt = S::CreatedAt;
-        type Reason = Set<members::reason>;
-        type BeaconUri = S::BeaconUri;
     }
     ///State transition - sets the `beacon_uri` field to Set
     pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
     impl<S: State> State for SetBeaconUri<S> {
         type CreatedAt = S::CreatedAt;
-        type Reason = S::Reason;
         type BeaconUri = Set<members::beacon_uri>;
+        type Reason = S::Reason;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type CreatedAt = S::CreatedAt;
+        type BeaconUri = S::BeaconUri;
+        type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `beacon_uri` field
         pub struct beacon_uri(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
     }
 }
 
@@ -154,7 +160,10 @@ where
 
 impl<'a, S: report_state::State> ReportBuilder<'a, S> {
     /// Set the `details` field (optional)
-    pub fn details(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn details(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -188,8 +197,8 @@ impl<'a, S> ReportBuilder<'a, S>
 where
     S: report_state::State,
     S::CreatedAt: report_state::IsSet,
-    S::Reason: report_state::IsSet,
     S::BeaconUri: report_state::IsSet,
+    S::Reason: report_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Report<'a> {
@@ -205,7 +214,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Report<'a> {
@@ -241,7 +250,7 @@ pub enum ReportReason<'a> {
     Harassment,
     Impersonation,
     Other,
-    Unknown(jacquard_common::CowStr<'a>),
+    UnknownValue(jacquard_common::CowStr<'a>),
 }
 
 impl<'a> ReportReason<'a> {
@@ -253,7 +262,7 @@ impl<'a> ReportReason<'a> {
             Self::Harassment => "harassment",
             Self::Impersonation => "impersonation",
             Self::Other => "other",
-            Self::Unknown(s) => s.as_ref(),
+            Self::UnknownValue(s) => s.as_ref(),
         }
     }
 }
@@ -267,7 +276,7 @@ impl<'a> From<&'a str> for ReportReason<'a> {
             "harassment" => Self::Harassment,
             "impersonation" => Self::Impersonation,
             "other" => Self::Other,
-            _ => Self::Unknown(jacquard_common::CowStr::from(s)),
+            _ => Self::UnknownValue(jacquard_common::CowStr::from(s)),
         }
     }
 }
@@ -281,7 +290,7 @@ impl<'a> From<String> for ReportReason<'a> {
             "harassment" => Self::Harassment,
             "impersonation" => Self::Impersonation,
             "other" => Self::Other,
-            _ => Self::Unknown(jacquard_common::CowStr::from(s)),
+            _ => Self::UnknownValue(jacquard_common::CowStr::from(s)),
         }
     }
 }
@@ -322,7 +331,7 @@ where
 
 impl<'a> Default for ReportReason<'a> {
     fn default() -> Self {
-        Self::Unknown(Default::default())
+        Self::UnknownValue(Default::default())
     }
 }
 
@@ -336,14 +345,20 @@ impl jacquard_common::IntoStatic for ReportReason<'_> {
             ReportReason::Harassment => ReportReason::Harassment,
             ReportReason::Impersonation => ReportReason::Impersonation,
             ReportReason::Other => ReportReason::Other,
-            ReportReason::Unknown(v) => ReportReason::Unknown(v.into_static()),
+            ReportReason::UnknownValue(v) => ReportReason::UnknownValue(v.into_static()),
         }
     }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReportGetRecordOutput<'a> {
@@ -398,38 +413,38 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.details {
             {
-                let count =
-                    ::unicode_segmentation::UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
                 if count > 500usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "details",
-                            ),
-                            max: 500usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "details",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
                 }
             }
         }
         {
             let value = &self.reason;
             {
-                let count =
-                    ::unicode_segmentation::UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "reason",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "reason",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -437,7 +452,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.report"),
@@ -446,7 +463,7 @@ fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -458,9 +475,9 @@ fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDo
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("beaconUri"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("reason"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("beaconUri"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -468,7 +485,7 @@ fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDo
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "beaconUri",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -491,7 +508,7 @@ fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -514,7 +531,9 @@ fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("details"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "details",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -533,7 +552,9 @@ fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "reason",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

@@ -86,66 +86,66 @@ pub mod measurement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Value;
-        type Metric;
-        type Unit;
         type CreatedAt;
+        type Unit;
+        type Metric;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Value = Unset;
-        type Metric = Unset;
-        type Unit = Unset;
         type CreatedAt = Unset;
+        type Unit = Unset;
+        type Metric = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Value = Set<members::value>;
-        type Metric = S::Metric;
+        type CreatedAt = S::CreatedAt;
         type Unit = S::Unit;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type Value = S::Value;
-        type Metric = Set<members::metric>;
-        type Unit = S::Unit;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `unit` field to Set
-    pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnit<S> {}
-    impl<S: State> State for SetUnit<S> {
-        type Value = S::Value;
         type Metric = S::Metric;
-        type Unit = Set<members::unit>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Value = S::Value;
-        type Metric = S::Metric;
-        type Unit = S::Unit;
         type CreatedAt = Set<members::created_at>;
+        type Unit = S::Unit;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `unit` field to Set
+    pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnit<S> {}
+    impl<S: State> State for SetUnit<S> {
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+        type Unit = Set<members::unit>;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetric<S> {}
+    impl<S: State> State for SetMetric<S> {
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+        type Unit = S::Unit;
+        type Metric = Set<members::metric>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
-        ///Marker type for the `unit` field
-        pub struct unit(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `unit` field
+        pub struct unit(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
     }
 }
 
@@ -475,9 +475,9 @@ impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
     S::Value: measurement_state::IsSet,
-    S::Metric: measurement_state::IsSet,
-    S::Unit: measurement_state::IsSet,
     S::CreatedAt: measurement_state::IsSet,
+    S::Unit: measurement_state::IsSet,
+    S::Metric: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
@@ -503,7 +503,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Measurement<'a> {
@@ -615,7 +615,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.comment {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -745,7 +745,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -757,10 +757,10 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("metric"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("unit"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("value"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("metric"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("unit"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -768,7 +768,9 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "comment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -787,7 +789,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "commentFacets",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -807,7 +809,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -830,7 +832,9 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("endDate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "endDate",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -851,7 +855,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "evidenceURI",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -879,7 +883,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "locations",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -899,7 +903,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "measurers",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -919,7 +923,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "methodType",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -940,7 +944,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "methodURI",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -963,7 +967,9 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("metric"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "metric",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -982,7 +988,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1005,7 +1011,7 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "subjects",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -1025,7 +1031,9 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("unit"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "unit",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -1044,7 +1052,9 @@ fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "value",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

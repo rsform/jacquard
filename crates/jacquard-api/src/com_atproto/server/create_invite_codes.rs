@@ -33,37 +33,37 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Account;
         type Codes;
+        type Account;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Account = Unset;
         type Codes = Unset;
-    }
-    ///State transition - sets the `account` field to Set
-    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccount<S> {}
-    impl<S: State> State for SetAccount<S> {
-        type Account = Set<members::account>;
-        type Codes = S::Codes;
+        type Account = Unset;
     }
     ///State transition - sets the `codes` field to Set
     pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodes<S> {}
     impl<S: State> State for SetCodes<S> {
-        type Account = S::Account;
         type Codes = Set<members::codes>;
+        type Account = S::Account;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Codes = S::Codes;
+        type Account = Set<members::account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `account` field
-        pub struct account(());
         ///Marker type for the `codes` field
         pub struct codes(());
+        ///Marker type for the `account` field
+        pub struct account(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> AccountCodesBuilder<'a, S>
 where
     S: account_codes_state::State,
-    S::Account: account_codes_state::IsSet,
     S::Codes: account_codes_state::IsSet,
+    S::Account: account_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountCodes<'a> {
@@ -151,7 +151,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> AccountCodes<'a> {
@@ -176,13 +176,13 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("accountCodes"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("accountCodes"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("account"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("codes")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("account"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("codes")
                         ],
                     ),
                     nullable: None,
@@ -190,7 +190,9 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("account"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "account",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -205,7 +207,9 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("codes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "codes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -229,7 +233,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
@@ -243,8 +247,8 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                                 description: None,
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::smol_str::SmolStr::new_static("codeCount"),
-                                        ::jacquard_common::smol_str::SmolStr::new_static("useCount")
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("codeCount"),
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("useCount")
                                     ],
                                 ),
                                 nullable: None,
@@ -252,7 +256,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                                     #[allow(unused_mut)]
                                     let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "codeCount",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -265,7 +269,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "forAccounts",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -289,7 +293,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "useCount",
                                         ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -361,37 +365,37 @@ pub mod create_invite_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseCount;
         type CodeCount;
+        type UseCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseCount = Unset;
         type CodeCount = Unset;
-    }
-    ///State transition - sets the `use_count` field to Set
-    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseCount<S> {}
-    impl<S: State> State for SetUseCount<S> {
-        type UseCount = Set<members::use_count>;
-        type CodeCount = S::CodeCount;
+        type UseCount = Unset;
     }
     ///State transition - sets the `code_count` field to Set
     pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodeCount<S> {}
     impl<S: State> State for SetCodeCount<S> {
-        type UseCount = S::UseCount;
         type CodeCount = Set<members::code_count>;
+        type UseCount = S::UseCount;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseCount<S> {}
+    impl<S: State> State for SetUseCount<S> {
+        type CodeCount = S::CodeCount;
+        type UseCount = Set<members::use_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_count` field
-        pub struct use_count(());
         ///Marker type for the `code_count` field
         pub struct code_count(());
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
     }
 }
 
@@ -484,8 +488,8 @@ where
 impl<'a, S> CreateInviteCodesBuilder<'a, S>
 where
     S: create_invite_codes_state::State,
-    S::UseCount: create_invite_codes_state::IsSet,
     S::CodeCount: create_invite_codes_state::IsSet,
+    S::UseCount: create_invite_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateInviteCodes<'a> {
@@ -500,7 +504,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CreateInviteCodes<'a> {

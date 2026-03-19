@@ -94,51 +94,51 @@ pub mod collaboration_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Resource;
         type Participants;
         type Status;
+        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Resource = Unset;
         type Participants = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Resource = Set<members::resource>;
-        type Participants = S::Participants;
-        type Status = S::Status;
+        type Resource = Unset;
     }
     ///State transition - sets the `participants` field to Set
     pub struct SetParticipants<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParticipants<S> {}
     impl<S: State> State for SetParticipants<S> {
-        type Resource = S::Resource;
         type Participants = Set<members::participants>;
         type Status = S::Status;
+        type Resource = S::Resource;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Resource = S::Resource;
         type Participants = S::Participants;
         type Status = Set<members::status>;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Participants = S::Participants;
+        type Status = S::Status;
+        type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `participants` field
         pub struct participants(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
     }
 }
 
@@ -426,9 +426,9 @@ where
 impl<'a, S> CollaborationStateViewBuilder<'a, S>
 where
     S: collaboration_state_view_state::State,
-    S::Resource: collaboration_state_view_state::IsSet,
     S::Participants: collaboration_state_view_state::IsSet,
     S::Status: collaboration_state_view_state::IsSet,
+    S::Resource: collaboration_state_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollaborationStateView<'a> {
@@ -452,7 +452,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CollaborationStateView<'a> {
@@ -590,13 +590,13 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("chapter"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("chapter"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "collaborationStateView",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -607,9 +607,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("participants")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("participants")
                         ],
                     ),
                     nullable: None,
@@ -617,7 +617,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "canonicalUri",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -640,7 +640,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -659,7 +659,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "firstCollaboratorAddedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -678,7 +678,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "formerParticipants",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -698,7 +698,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasDivergence",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -708,7 +708,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasFormerCollaborators",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -718,7 +718,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasOrphanedVersions",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -728,7 +728,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "lastSyncedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -747,7 +747,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "participants",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -767,7 +767,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publishedVersions",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -783,7 +783,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "resource",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -792,7 +794,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "status",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -815,13 +819,13 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("entry"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("entry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "formerCollaboratorView",
                 ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -832,10 +836,10 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("wasActiveFrom"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("wasActiveUntil"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("endReason")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("user"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("wasActiveFrom"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("wasActiveUntil"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("endReason")
                         ],
                     ),
                     nullable: None,
@@ -843,7 +847,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "contributionCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -856,7 +860,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "endReason",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -873,7 +877,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "hasPublishedVersion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -883,7 +887,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publishedVersionUri",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -902,7 +906,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "user",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -911,7 +917,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "wasActiveFrom",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -930,7 +936,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "wasActiveUntil",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -953,7 +959,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("inviteView"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("inviteView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -962,13 +968,13 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("inviter"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("invitee"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("status")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("inviter"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("invitee"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
                         ],
                     ),
                     nullable: None,
@@ -976,7 +982,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "acceptUri",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -995,7 +1001,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "acceptedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1014,7 +1020,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cid",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1031,7 +1039,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1050,7 +1058,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "expiresAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1069,7 +1077,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("invitee"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "invitee",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -1078,7 +1088,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("inviter"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "inviter",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -1087,7 +1099,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "message",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1102,7 +1116,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "resource",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -1111,7 +1127,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "resourceTitle",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1128,7 +1144,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("scope"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "scope",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1143,7 +1161,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "status",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1158,7 +1178,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1179,13 +1201,15 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("participantStateView"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "participantStateView",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1194,9 +1218,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("role"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("status")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("user"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("role"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
                         ],
                     ),
                     nullable: None,
@@ -1204,7 +1228,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "acceptUri",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1227,7 +1251,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "endReason",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1248,7 +1272,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "firstEditAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1271,7 +1295,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "inviteUri",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1290,7 +1314,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "lastEditAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1309,7 +1333,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "publishedVersion",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1320,7 +1344,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "relationshipEndedAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1343,7 +1367,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("role"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "role",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1358,7 +1384,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "status",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -1377,7 +1405,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "user",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -1386,7 +1416,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "wasCollaborator",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -1400,7 +1430,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("sessionView"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("sessionView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -1409,11 +1439,11 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("nodeId"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("user"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("nodeId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -1421,7 +1451,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "createdAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1440,7 +1470,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "expiresAt",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1459,7 +1489,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("nodeId"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "nodeId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1474,7 +1506,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("relayUrl"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "relayUrl",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1491,7 +1525,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "resource",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -1500,7 +1536,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1517,7 +1555,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "user",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -1610,67 +1650,67 @@ pub mod former_collaborator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EndReason;
-        type WasActiveFrom;
         type User;
+        type EndReason;
         type WasActiveUntil;
+        type WasActiveFrom;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EndReason = Unset;
-        type WasActiveFrom = Unset;
         type User = Unset;
+        type EndReason = Unset;
         type WasActiveUntil = Unset;
-    }
-    ///State transition - sets the `end_reason` field to Set
-    pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndReason<S> {}
-    impl<S: State> State for SetEndReason<S> {
-        type EndReason = Set<members::end_reason>;
-        type WasActiveFrom = S::WasActiveFrom;
-        type User = S::User;
-        type WasActiveUntil = S::WasActiveUntil;
-    }
-    ///State transition - sets the `was_active_from` field to Set
-    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
-    impl<S: State> State for SetWasActiveFrom<S> {
-        type EndReason = S::EndReason;
-        type WasActiveFrom = Set<members::was_active_from>;
-        type User = S::User;
-        type WasActiveUntil = S::WasActiveUntil;
+        type WasActiveFrom = Unset;
     }
     ///State transition - sets the `user` field to Set
     pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUser<S> {}
     impl<S: State> State for SetUser<S> {
-        type EndReason = S::EndReason;
-        type WasActiveFrom = S::WasActiveFrom;
         type User = Set<members::user>;
+        type EndReason = S::EndReason;
         type WasActiveUntil = S::WasActiveUntil;
+        type WasActiveFrom = S::WasActiveFrom;
+    }
+    ///State transition - sets the `end_reason` field to Set
+    pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndReason<S> {}
+    impl<S: State> State for SetEndReason<S> {
+        type User = S::User;
+        type EndReason = Set<members::end_reason>;
+        type WasActiveUntil = S::WasActiveUntil;
+        type WasActiveFrom = S::WasActiveFrom;
     }
     ///State transition - sets the `was_active_until` field to Set
     pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
     impl<S: State> State for SetWasActiveUntil<S> {
-        type EndReason = S::EndReason;
-        type WasActiveFrom = S::WasActiveFrom;
         type User = S::User;
+        type EndReason = S::EndReason;
         type WasActiveUntil = Set<members::was_active_until>;
+        type WasActiveFrom = S::WasActiveFrom;
+    }
+    ///State transition - sets the `was_active_from` field to Set
+    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
+    impl<S: State> State for SetWasActiveFrom<S> {
+        type User = S::User;
+        type EndReason = S::EndReason;
+        type WasActiveUntil = S::WasActiveUntil;
+        type WasActiveFrom = Set<members::was_active_from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end_reason` field
-        pub struct end_reason(());
-        ///Marker type for the `was_active_from` field
-        pub struct was_active_from(());
         ///Marker type for the `user` field
         pub struct user(());
+        ///Marker type for the `end_reason` field
+        pub struct end_reason(());
         ///Marker type for the `was_active_until` field
         pub struct was_active_until(());
+        ///Marker type for the `was_active_from` field
+        pub struct was_active_from(());
     }
 }
 
@@ -1843,10 +1883,10 @@ where
 impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
 where
     S: former_collaborator_view_state::State,
-    S::EndReason: former_collaborator_view_state::IsSet,
-    S::WasActiveFrom: former_collaborator_view_state::IsSet,
     S::User: former_collaborator_view_state::IsSet,
+    S::EndReason: former_collaborator_view_state::IsSet,
     S::WasActiveUntil: former_collaborator_view_state::IsSet,
+    S::WasActiveFrom: former_collaborator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FormerCollaboratorView<'a> {
@@ -1865,7 +1905,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> FormerCollaboratorView<'a> {
@@ -2061,127 +2101,127 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Resource;
-        type Uri;
-        type CreatedAt;
-        type Inviter;
         type Invitee;
         type Status;
+        type Resource;
+        type Inviter;
+        type Cid;
+        type CreatedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Resource = Unset;
-        type Uri = Unset;
-        type CreatedAt = Unset;
-        type Inviter = Unset;
         type Invitee = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Resource = S::Resource;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Cid = S::Cid;
-        type Resource = Set<members::resource>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Resource = S::Resource;
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Cid = S::Cid;
-        type Resource = S::Resource;
-        type Uri = S::Uri;
-        type CreatedAt = Set<members::created_at>;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `inviter` field to Set
-    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInviter<S> {}
-    impl<S: State> State for SetInviter<S> {
-        type Cid = S::Cid;
-        type Resource = S::Resource;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Inviter = Set<members::inviter>;
-        type Invitee = S::Invitee;
-        type Status = S::Status;
+        type Resource = Unset;
+        type Inviter = Unset;
+        type Cid = Unset;
+        type CreatedAt = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `invitee` field to Set
     pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInvitee<S> {}
     impl<S: State> State for SetInvitee<S> {
-        type Cid = S::Cid;
-        type Resource = S::Resource;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Inviter = S::Inviter;
         type Invitee = Set<members::invitee>;
         type Status = S::Status;
+        type Resource = S::Resource;
+        type Inviter = S::Inviter;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Cid = S::Cid;
-        type Resource = S::Resource;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Inviter = S::Inviter;
         type Invitee = S::Invitee;
         type Status = Set<members::status>;
+        type Resource = S::Resource;
+        type Inviter = S::Inviter;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Invitee = S::Invitee;
+        type Status = S::Status;
+        type Resource = Set<members::resource>;
+        type Inviter = S::Inviter;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `inviter` field to Set
+    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInviter<S> {}
+    impl<S: State> State for SetInviter<S> {
+        type Invitee = S::Invitee;
+        type Status = S::Status;
+        type Resource = S::Resource;
+        type Inviter = Set<members::inviter>;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Invitee = S::Invitee;
+        type Status = S::Status;
+        type Resource = S::Resource;
+        type Inviter = S::Inviter;
+        type Cid = Set<members::cid>;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Invitee = S::Invitee;
+        type Status = S::Status;
+        type Resource = S::Resource;
+        type Inviter = S::Inviter;
+        type Cid = S::Cid;
+        type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Invitee = S::Invitee;
+        type Status = S::Status;
+        type Resource = S::Resource;
+        type Inviter = S::Inviter;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `inviter` field
-        pub struct inviter(());
         ///Marker type for the `invitee` field
         pub struct invitee(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `inviter` field
+        pub struct inviter(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -2479,13 +2519,13 @@ where
 impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
-    S::Cid: invite_view_state::IsSet,
-    S::Resource: invite_view_state::IsSet,
-    S::Uri: invite_view_state::IsSet,
-    S::CreatedAt: invite_view_state::IsSet,
-    S::Inviter: invite_view_state::IsSet,
     S::Invitee: invite_view_state::IsSet,
     S::Status: invite_view_state::IsSet,
+    S::Resource: invite_view_state::IsSet,
+    S::Inviter: invite_view_state::IsSet,
+    S::Cid: invite_view_state::IsSet,
+    S::CreatedAt: invite_view_state::IsSet,
+    S::Uri: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {
@@ -2510,7 +2550,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> InviteView<'a> {
@@ -2821,51 +2861,51 @@ pub mod participant_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Role;
         type User;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Role = Unset;
         type User = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Role = S::Role;
-        type User = S::User;
+        type Status = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Status = S::Status;
         type Role = Set<members::role>;
         type User = S::User;
+        type Status = S::Status;
     }
     ///State transition - sets the `user` field to Set
     pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUser<S> {}
     impl<S: State> State for SetUser<S> {
-        type Status = S::Status;
         type Role = S::Role;
         type User = Set<members::user>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Role = S::Role;
+        type User = S::User;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `role` field
         pub struct role(());
         ///Marker type for the `user` field
         pub struct user(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -3127,9 +3167,9 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S> ParticipantStateViewBuilder<'a, S>
 where
     S: participant_state_view_state::State,
-    S::Status: participant_state_view_state::IsSet,
     S::Role: participant_state_view_state::IsSet,
     S::User: participant_state_view_state::IsSet,
+    S::Status: participant_state_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ParticipantStateView<'a> {
@@ -3152,7 +3192,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ParticipantStateView<'a> {
@@ -3544,8 +3584,8 @@ pub mod session_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type User;
-        type CreatedAt;
         type NodeId;
+        type CreatedAt;
         type Resource;
         type Uri;
     }
@@ -3554,8 +3594,8 @@ pub mod session_view_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type User = Unset;
-        type CreatedAt = Unset;
         type NodeId = Unset;
+        type CreatedAt = Unset;
         type Resource = Unset;
         type Uri = Unset;
     }
@@ -3564,18 +3604,8 @@ pub mod session_view_state {
     impl<S: State> sealed::Sealed for SetUser<S> {}
     impl<S: State> State for SetUser<S> {
         type User = Set<members::user>;
+        type NodeId = S::NodeId;
         type CreatedAt = S::CreatedAt;
-        type NodeId = S::NodeId;
-        type Resource = S::Resource;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type User = S::User;
-        type CreatedAt = Set<members::created_at>;
-        type NodeId = S::NodeId;
         type Resource = S::Resource;
         type Uri = S::Uri;
     }
@@ -3584,8 +3614,18 @@ pub mod session_view_state {
     impl<S: State> sealed::Sealed for SetNodeId<S> {}
     impl<S: State> State for SetNodeId<S> {
         type User = S::User;
-        type CreatedAt = S::CreatedAt;
         type NodeId = Set<members::node_id>;
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type User = S::User;
+        type NodeId = S::NodeId;
+        type CreatedAt = Set<members::created_at>;
         type Resource = S::Resource;
         type Uri = S::Uri;
     }
@@ -3594,8 +3634,8 @@ pub mod session_view_state {
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
         type User = S::User;
-        type CreatedAt = S::CreatedAt;
         type NodeId = S::NodeId;
+        type CreatedAt = S::CreatedAt;
         type Resource = Set<members::resource>;
         type Uri = S::Uri;
     }
@@ -3604,8 +3644,8 @@ pub mod session_view_state {
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type User = S::User;
-        type CreatedAt = S::CreatedAt;
         type NodeId = S::NodeId;
+        type CreatedAt = S::CreatedAt;
         type Resource = S::Resource;
         type Uri = Set<members::uri>;
     }
@@ -3614,10 +3654,10 @@ pub mod session_view_state {
     pub mod members {
         ///Marker type for the `user` field
         pub struct user(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `resource` field
         pub struct resource(());
         ///Marker type for the `uri` field
@@ -3795,8 +3835,8 @@ impl<'a, S> SessionViewBuilder<'a, S>
 where
     S: session_view_state::State,
     S::User: session_view_state::IsSet,
-    S::CreatedAt: session_view_state::IsSet,
     S::NodeId: session_view_state::IsSet,
+    S::CreatedAt: session_view_state::IsSet,
     S::Resource: session_view_state::IsSet,
     S::Uri: session_view_state::IsSet,
 {
@@ -3817,7 +3857,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> SessionView<'a> {

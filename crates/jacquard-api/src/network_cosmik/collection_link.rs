@@ -55,66 +55,66 @@ pub mod collection_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AddedAt;
-        type AddedBy;
         type Collection;
         type Card;
+        type AddedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AddedAt = Unset;
-        type AddedBy = Unset;
         type Collection = Unset;
         type Card = Unset;
+        type AddedBy = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
         type AddedAt = Set<members::added_at>;
+        type Collection = S::Collection;
+        type Card = S::Card;
         type AddedBy = S::AddedBy;
-        type Collection = S::Collection;
-        type Card = S::Card;
-    }
-    ///State transition - sets the `added_by` field to Set
-    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
-    impl<S: State> State for SetAddedBy<S> {
-        type AddedAt = S::AddedAt;
-        type AddedBy = Set<members::added_by>;
-        type Collection = S::Collection;
-        type Card = S::Card;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type AddedAt = S::AddedAt;
-        type AddedBy = S::AddedBy;
         type Collection = Set<members::collection>;
         type Card = S::Card;
+        type AddedBy = S::AddedBy;
     }
     ///State transition - sets the `card` field to Set
     pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCard<S> {}
     impl<S: State> State for SetCard<S> {
         type AddedAt = S::AddedAt;
-        type AddedBy = S::AddedBy;
         type Collection = S::Collection;
         type Card = Set<members::card>;
+        type AddedBy = S::AddedBy;
+    }
+    ///State transition - sets the `added_by` field to Set
+    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
+    impl<S: State> State for SetAddedBy<S> {
+        type AddedAt = S::AddedAt;
+        type Collection = S::Collection;
+        type Card = S::Card;
+        type AddedBy = Set<members::added_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `added_at` field
         pub struct added_at(());
-        ///Marker type for the `added_by` field
-        pub struct added_by(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `card` field
         pub struct card(());
+        ///Marker type for the `added_by` field
+        pub struct added_by(());
     }
 }
 
@@ -288,9 +288,9 @@ impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
     S::AddedAt: collection_link_state::IsSet,
-    S::AddedBy: collection_link_state::IsSet,
     S::Collection: collection_link_state::IsSet,
     S::Card: collection_link_state::IsSet,
+    S::AddedBy: collection_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLink<'a> {
@@ -309,7 +309,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CollectionLink<'a> {
@@ -415,7 +415,7 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -427,10 +427,10 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("collection"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("card"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("addedBy"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("addedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("card"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("addedBy"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("addedAt")
                             ],
                         ),
                         nullable: None,
@@ -438,7 +438,9 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "addedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -459,7 +461,9 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("addedBy"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "addedBy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -478,7 +482,9 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("card"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "card",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -487,7 +493,7 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "collection",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -498,7 +504,7 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -521,7 +527,7 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "originalCard",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -532,7 +538,7 @@ fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "provenance",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

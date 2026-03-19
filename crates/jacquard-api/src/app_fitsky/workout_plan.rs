@@ -42,8 +42,8 @@ pub mod workout_plan_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Type;
         type Exercises;
+        type Type;
         type Name;
     }
     /// Empty state - all required fields are unset
@@ -51,8 +51,8 @@ pub mod workout_plan_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Type = Unset;
         type Exercises = Unset;
+        type Type = Unset;
         type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -60,17 +60,8 @@ pub mod workout_plan_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Exercises = S::Exercises;
         type Type = S::Type;
-        type Exercises = S::Exercises;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Exercises = S::Exercises;
         type Name = S::Name;
     }
     ///State transition - sets the `exercises` field to Set
@@ -78,8 +69,17 @@ pub mod workout_plan_state {
     impl<S: State> sealed::Sealed for SetExercises<S> {}
     impl<S: State> State for SetExercises<S> {
         type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Exercises = Set<members::exercises>;
+        type Type = S::Type;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Exercises = S::Exercises;
+        type Type = Set<members::r#type>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
@@ -87,8 +87,8 @@ pub mod workout_plan_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Exercises = S::Exercises;
+        type Type = S::Type;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -96,10 +96,10 @@ pub mod workout_plan_state {
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `exercises` field
         pub struct exercises(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -235,8 +235,8 @@ impl<'a, S> WorkoutPlanBuilder<'a, S>
 where
     S: workout_plan_state::State,
     S::CreatedAt: workout_plan_state::IsSet,
-    S::Type: workout_plan_state::IsSet,
     S::Exercises: workout_plan_state::IsSet,
+    S::Type: workout_plan_state::IsSet,
     S::Name: workout_plan_state::IsSet,
 {
     /// Build the final struct
@@ -254,7 +254,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> WorkoutPlan<'a> {
@@ -482,7 +482,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -494,10 +494,10 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("type"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("exercises"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("exercises"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -505,7 +505,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -524,7 +524,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "exercises",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -540,7 +540,9 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -555,7 +557,9 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("ogImage"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "ogImage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -563,7 +567,9 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "type",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -583,14 +589,14 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("planExercise"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("planExercise"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("targetSets"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("targetReps")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("targetSets"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("targetReps")
                         ],
                     ),
                     nullable: None,
@@ -598,7 +604,9 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -613,7 +621,9 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notes"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -628,7 +638,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "targetReps",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -641,7 +651,7 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "targetSets",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -693,49 +703,49 @@ pub mod plan_exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TargetSets;
         type TargetReps;
+        type TargetSets;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TargetSets = Unset;
         type TargetReps = Unset;
+        type TargetSets = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `target_sets` field to Set
-    pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSets<S> {}
-    impl<S: State> State for SetTargetSets<S> {
-        type TargetSets = Set<members::target_sets>;
-        type TargetReps = S::TargetReps;
-        type Name = S::Name;
     }
     ///State transition - sets the `target_reps` field to Set
     pub struct SetTargetReps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargetReps<S> {}
     impl<S: State> State for SetTargetReps<S> {
-        type TargetSets = S::TargetSets;
         type TargetReps = Set<members::target_reps>;
+        type TargetSets = S::TargetSets;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `target_sets` field to Set
+    pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetSets<S> {}
+    impl<S: State> State for SetTargetSets<S> {
+        type TargetReps = S::TargetReps;
+        type TargetSets = Set<members::target_sets>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type TargetSets = S::TargetSets;
         type TargetReps = S::TargetReps;
+        type TargetSets = S::TargetSets;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target_sets` field
-        pub struct target_sets(());
         ///Marker type for the `target_reps` field
         pub struct target_reps(());
+        ///Marker type for the `target_sets` field
+        pub struct target_sets(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -847,8 +857,8 @@ where
 impl<'a, S> PlanExerciseBuilder<'a, S>
 where
     S: plan_exercise_state::State,
-    S::TargetSets: plan_exercise_state::IsSet,
     S::TargetReps: plan_exercise_state::IsSet,
+    S::TargetSets: plan_exercise_state::IsSet,
     S::Name: plan_exercise_state::IsSet,
 {
     /// Build the final struct
@@ -865,7 +875,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> PlanExercise<'a> {

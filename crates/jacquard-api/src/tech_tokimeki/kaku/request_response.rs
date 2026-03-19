@@ -41,49 +41,49 @@ pub mod request_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Request;
         type CreatedAt;
+        type Request;
         type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Request = Unset;
         type CreatedAt = Unset;
+        type Request = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `request` field to Set
-    pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRequest<S> {}
-    impl<S: State> State for SetRequest<S> {
-        type Request = Set<members::request>;
-        type CreatedAt = S::CreatedAt;
-        type Post = S::Post;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Request = S::Request;
         type CreatedAt = Set<members::created_at>;
+        type Request = S::Request;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `request` field to Set
+    pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRequest<S> {}
+    impl<S: State> State for SetRequest<S> {
+        type CreatedAt = S::CreatedAt;
+        type Request = Set<members::request>;
         type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
-        type Request = S::Request;
         type CreatedAt = S::CreatedAt;
+        type Request = S::Request;
         type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `request` field
-        pub struct request(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `request` field
+        pub struct request(());
         ///Marker type for the `post` field
         pub struct post(());
     }
@@ -195,8 +195,8 @@ where
 impl<'a, S> RequestResponseBuilder<'a, S>
 where
     S: request_response_state::State,
-    S::Request: request_response_state::IsSet,
     S::CreatedAt: request_response_state::IsSet,
+    S::Request: request_response_state::IsSet,
     S::Post: request_response_state::IsSet,
 {
     /// Build the final struct
@@ -213,7 +213,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> RequestResponse<'a> {
@@ -315,7 +315,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponse<'a> {
         }
         if let Some(ref value) = self.message {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -346,7 +346,7 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexic
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -358,9 +358,9 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexic
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("request"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("request"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("post"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -368,7 +368,7 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexic
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -387,7 +387,9 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "message",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -406,7 +408,9 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "post",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -415,7 +419,9 @@ fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("request"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "request",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(

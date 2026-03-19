@@ -16,7 +16,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExportRepoOutput {
-    pub body: bytes::Bytes,
+    pub body: jacquard_common::deps::bytes::Bytes,
 }
 
 /// XRPC request marker type
@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcResp for ExportRepoResponse {
         Self::Output<'de>: serde::Deserialize<'de>,
     {
         Ok(ExportRepoOutput {
-            body: bytes::Bytes::copy_from_slice(body),
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
         })
     }
 }

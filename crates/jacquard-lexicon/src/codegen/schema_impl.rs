@@ -1,7 +1,8 @@
 //! Generate LexiconSchema trait implementations for generated types
 
 use crate::lexicon::{
-    LexInteger, LexObject, LexObjectProperty, LexRecordRecord, LexString, LexUserType, LexiconDoc,
+    LexInteger, LexObject, LexObjectProperty, LexRecordRecord, LexString, LexStringFormat,
+    LexUserType, LexiconDoc,
 };
 use crate::schema::from_ast::{ConstraintCheck, ValidationCheck};
 
@@ -122,6 +123,14 @@ fn extract_string_validations(
     is_required: bool,
 ) -> Vec<ValidationCheck> {
     let mut checks = Vec::new();
+
+    // Datetime maps to `chrono::DateTime<FixedOffset>` which does not implement
+    // `AsRef<str>`, so length checks cannot be emitted for it. All other formats
+    // (did, handle, at-uri, cid, nsid, tid, record-key, language, uri, etc.) use
+    // string-backed wrapper types that do implement `AsRef<str>`.
+    if matches!(string.format, Some(LexStringFormat::Datetime)) {
+        return checks;
+    }
 
     if let Some(max) = string.max_length {
         checks.push(ValidationCheck {

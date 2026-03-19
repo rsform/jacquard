@@ -15,18 +15,12 @@ license.workspace = true
 features = [ "bluesky", "other", "streaming" ]
 
 [dependencies]
-bon.workspace = true
-bytes = { workspace = true, features = ["serde"] }
 jacquard-common = { version = "0.9", path = "../jacquard-common" }
 jacquard-derive = { version = "0.9", path = "../jacquard-derive" }
 jacquard-lexicon = { version = "0.9", path = "../jacquard-lexicon", default-features = false }
 miette.workspace = true
-rustversion = "1.0"
 serde.workspace = true
-serde_ipld_dagcbor.workspace = true
 thiserror.workspace = true
-unicode-segmentation = "1.12"
-serde_bytes.workspace = true
 
 
 [lints.rust]
@@ -35,7 +29,7 @@ non_snake_case = "allow"
 
 [features]
 default = [ "minimal", "std"]
-std = ["serde/std", "serde_ipld_dagcbor/std", "serde_bytes/std"]
+std = ["serde/std", "jacquard-common/std"]
 minimal =  [ "com_atproto", "com_bad_example"]
 bluesky = [ "com_atproto", "app_bsky", "chat_bsky", "tools_ozone", "minimal"]
 other = ["sh_tangled", "site_standard", "sh_weaver", "pub_leaflet", "net_anisota", "network_slices", "com_whtwnd", "place_stream", "blog_pckt",  "minimal" ]

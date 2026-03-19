@@ -28,7 +28,7 @@ pub struct BrokerProof<'a> {
     /// Signature data (for inline proofs).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub signature: std::option::Option<bytes::Bytes>,
+    pub signature: std::option::Option<jacquard_common::deps::bytes::Bytes>,
 }
 
 pub mod broker_proof_state {
@@ -69,7 +69,7 @@ pub struct BrokerProofBuilder<'a, S: broker_proof_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -126,12 +126,18 @@ impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
 
 impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
     /// Set the `signature` field (optional)
-    pub fn signature(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+    pub fn signature(
+        mut self,
+        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `signature` field to an Option value (optional)
-    pub fn maybe_signature(mut self, value: Option<bytes::Bytes>) -> Self {
+    pub fn maybe_signature(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -155,7 +161,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> BrokerProof<'a> {
@@ -257,7 +263,7 @@ fn lexicon_doc_com_atprotofans_brokerProof() -> ::jacquard_lexicon::lexicon::Lex
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -268,14 +274,18 @@ fn lexicon_doc_com_atprotofans_brokerProof() -> ::jacquard_lexicon::lexicon::Lex
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec![::jacquard_common::smol_str::SmolStr::new_static("cid")],
+                            vec![
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cid")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "cid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -296,7 +306,9 @@ fn lexicon_doc_com_atprotofans_brokerProof() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "key",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -315,7 +327,7 @@ fn lexicon_doc_com_atprotofans_brokerProof() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "signature",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {

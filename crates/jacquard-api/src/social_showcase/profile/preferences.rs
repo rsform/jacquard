@@ -45,83 +45,83 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Privacy;
         type UpdatedAt;
         type Notifications;
         type Visibility;
-        type Privacy;
         type Activity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Privacy = Unset;
         type UpdatedAt = Unset;
         type Notifications = Unset;
         type Visibility = Unset;
-        type Privacy = Unset;
         type Activity = Unset;
+    }
+    ///State transition - sets the `privacy` field to Set
+    pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrivacy<S> {}
+    impl<S: State> State for SetPrivacy<S> {
+        type Privacy = Set<members::privacy>;
+        type UpdatedAt = S::UpdatedAt;
+        type Notifications = S::Notifications;
+        type Visibility = S::Visibility;
+        type Activity = S::Activity;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
+        type Privacy = S::Privacy;
         type UpdatedAt = Set<members::updated_at>;
         type Notifications = S::Notifications;
         type Visibility = S::Visibility;
-        type Privacy = S::Privacy;
         type Activity = S::Activity;
     }
     ///State transition - sets the `notifications` field to Set
     pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotifications<S> {}
     impl<S: State> State for SetNotifications<S> {
+        type Privacy = S::Privacy;
         type UpdatedAt = S::UpdatedAt;
         type Notifications = Set<members::notifications>;
         type Visibility = S::Visibility;
-        type Privacy = S::Privacy;
         type Activity = S::Activity;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
+        type Privacy = S::Privacy;
         type UpdatedAt = S::UpdatedAt;
         type Notifications = S::Notifications;
         type Visibility = Set<members::visibility>;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
-    }
-    ///State transition - sets the `privacy` field to Set
-    pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrivacy<S> {}
-    impl<S: State> State for SetPrivacy<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
-        type Visibility = S::Visibility;
-        type Privacy = Set<members::privacy>;
         type Activity = S::Activity;
     }
     ///State transition - sets the `activity` field to Set
     pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivity<S> {}
     impl<S: State> State for SetActivity<S> {
+        type Privacy = S::Privacy;
         type UpdatedAt = S::UpdatedAt;
         type Notifications = S::Notifications;
         type Visibility = S::Visibility;
-        type Privacy = S::Privacy;
         type Activity = Set<members::activity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `privacy` field
+        pub struct privacy(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `notifications` field
         pub struct notifications(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
-        ///Marker type for the `privacy` field
-        pub struct privacy(());
         ///Marker type for the `activity` field
         pub struct activity(());
     }
@@ -290,10 +290,10 @@ where
 impl<'a, S> PreferencesBuilder<'a, S>
 where
     S: preferences_state::State,
+    S::Privacy: preferences_state::IsSet,
     S::UpdatedAt: preferences_state::IsSet,
     S::Notifications: preferences_state::IsSet,
     S::Visibility: preferences_state::IsSet,
-    S::Privacy: preferences_state::IsSet,
     S::Activity: preferences_state::IsSet,
 {
     /// Build the final struct
@@ -313,7 +313,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Preferences<'a> {
@@ -419,7 +419,7 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -431,11 +431,11 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("visibility"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("activity"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("notifications"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("privacy"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("activity"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("notifications"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("privacy"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
                             ],
                         ),
                         nullable: None,
@@ -443,7 +443,7 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "activity",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -454,7 +454,9 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("display"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "display",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -463,7 +465,7 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "notifications",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -474,7 +476,9 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("privacy"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "privacy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -483,7 +487,7 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "schemaVersion",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -496,7 +500,7 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -515,7 +519,7 @@ fn lexicon_doc_social_showcase_profile_preferences() -> ::jacquard_lexicon::lexi
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "visibility",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {

@@ -45,104 +45,104 @@ pub mod lfg_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Active;
         type Tags;
         type StartsAt;
-        type EndsAt;
+        type Active;
         type Location;
+        type EndsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Active = Unset;
         type Tags = Unset;
         type StartsAt = Unset;
-        type EndsAt = Unset;
+        type Active = Unset;
         type Location = Unset;
+        type EndsAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Tags = S::Tags;
+        type StartsAt = S::StartsAt;
         type Active = S::Active;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
         type Location = S::Location;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type CreatedAt = S::CreatedAt;
-        type Active = Set<members::active>;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
         type EndsAt = S::EndsAt;
-        type Location = S::Location;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
         type CreatedAt = S::CreatedAt;
-        type Active = S::Active;
         type Tags = Set<members::tags>;
         type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
+        type Active = S::Active;
         type Location = S::Location;
+        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `starts_at` field to Set
     pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartsAt<S> {}
     impl<S: State> State for SetStartsAt<S> {
         type CreatedAt = S::CreatedAt;
-        type Active = S::Active;
         type Tags = S::Tags;
         type StartsAt = Set<members::starts_at>;
-        type EndsAt = S::EndsAt;
-        type Location = S::Location;
-    }
-    ///State transition - sets the `ends_at` field to Set
-    pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndsAt<S> {}
-    impl<S: State> State for SetEndsAt<S> {
-        type CreatedAt = S::CreatedAt;
         type Active = S::Active;
+        type Location = S::Location;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type CreatedAt = S::CreatedAt;
         type Tags = S::Tags;
         type StartsAt = S::StartsAt;
-        type EndsAt = Set<members::ends_at>;
+        type Active = Set<members::active>;
         type Location = S::Location;
+        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
         type CreatedAt = S::CreatedAt;
-        type Active = S::Active;
         type Tags = S::Tags;
         type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
+        type Active = S::Active;
         type Location = Set<members::location>;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `ends_at` field to Set
+    pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndsAt<S> {}
+    impl<S: State> State for SetEndsAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type StartsAt = S::StartsAt;
+        type Active = S::Active;
+        type Location = S::Location;
+        type EndsAt = Set<members::ends_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `active` field
-        pub struct active(());
         ///Marker type for the `tags` field
         pub struct tags(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
-        ///Marker type for the `ends_at` field
-        pub struct ends_at(());
+        ///Marker type for the `active` field
+        pub struct active(());
         ///Marker type for the `location` field
         pub struct location(());
+        ///Marker type for the `ends_at` field
+        pub struct ends_at(());
     }
 }
 
@@ -296,11 +296,11 @@ impl<'a, S> LfgBuilder<'a, S>
 where
     S: lfg_state::State,
     S::CreatedAt: lfg_state::IsSet,
-    S::Active: lfg_state::IsSet,
     S::Tags: lfg_state::IsSet,
     S::StartsAt: lfg_state::IsSet,
-    S::EndsAt: lfg_state::IsSet,
+    S::Active: lfg_state::IsSet,
     S::Location: lfg_state::IsSet,
+    S::EndsAt: lfg_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lfg<'a> {
@@ -318,7 +318,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Lfg<'a> {
@@ -462,7 +462,7 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -474,12 +474,12 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("location"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("startsAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("endsAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("active")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("location"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startsAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("endsAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("active")
                             ],
                         ),
                         nullable: None,
@@ -487,7 +487,9 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("active"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "active",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -495,7 +497,7 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -518,7 +520,9 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("endsAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "endsAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -539,7 +543,7 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "location",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -556,7 +560,7 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startsAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -579,7 +583,9 @@ fn lexicon_doc_events_smokesignal_lfg() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(

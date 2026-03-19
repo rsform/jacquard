@@ -7,7 +7,7 @@ use crate::codegen::builder_gen::BuilderSchema;
 use crate::codegen::builder_gen::state_mod::RequiredField;
 use crate::codegen::utils::make_ident;
 use heck::ToSnakeCase;
-use jacquard_common::smol_str::SmolStr;
+use jacquard_common::deps::smol_str::SmolStr;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
@@ -74,7 +74,7 @@ pub fn generate_build_method(
                 pub fn build_with_data(
                     self,
                     extra_data: std::collections::BTreeMap<
-                        jacquard_common::smol_str::SmolStr,
+                        jacquard_common::deps::smol_str::SmolStr,
                         jacquard_common::types::value::Data #lifetime_generic
                     >,
                 ) -> #type_ident #lifetime_generic {

@@ -40,83 +40,83 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Period;
-        type StartDate;
         type CreatedAt;
+        type StartDate;
         type Metric;
+        type Period;
         type TargetValue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Period = Unset;
-        type StartDate = Unset;
         type CreatedAt = Unset;
+        type StartDate = Unset;
         type Metric = Unset;
+        type Period = Unset;
         type TargetValue = Unset;
     }
-    ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeriod<S> {}
-    impl<S: State> State for SetPeriod<S> {
-        type Period = Set<members::period>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
         type Metric = S::Metric;
+        type Period = S::Period;
         type TargetValue = S::TargetValue;
     }
     ///State transition - sets the `start_date` field to Set
     pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartDate<S> {}
     impl<S: State> State for SetStartDate<S> {
-        type Period = S::Period;
-        type StartDate = Set<members::start_date>;
         type CreatedAt = S::CreatedAt;
+        type StartDate = Set<members::start_date>;
         type Metric = S::Metric;
-        type TargetValue = S::TargetValue;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Period = S::Period;
-        type StartDate = S::StartDate;
-        type CreatedAt = Set<members::created_at>;
-        type Metric = S::Metric;
         type TargetValue = S::TargetValue;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
-        type Period = S::Period;
-        type StartDate = S::StartDate;
         type CreatedAt = S::CreatedAt;
+        type StartDate = S::StartDate;
         type Metric = Set<members::metric>;
+        type Period = S::Period;
+        type TargetValue = S::TargetValue;
+    }
+    ///State transition - sets the `period` field to Set
+    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeriod<S> {}
+    impl<S: State> State for SetPeriod<S> {
+        type CreatedAt = S::CreatedAt;
+        type StartDate = S::StartDate;
+        type Metric = S::Metric;
+        type Period = Set<members::period>;
         type TargetValue = S::TargetValue;
     }
     ///State transition - sets the `target_value` field to Set
     pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargetValue<S> {}
     impl<S: State> State for SetTargetValue<S> {
-        type Period = S::Period;
-        type StartDate = S::StartDate;
         type CreatedAt = S::CreatedAt;
+        type StartDate = S::StartDate;
         type Metric = S::Metric;
+        type Period = S::Period;
         type TargetValue = Set<members::target_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `period` field
-        pub struct period(());
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
         ///Marker type for the `metric` field
         pub struct metric(());
+        ///Marker type for the `period` field
+        pub struct period(());
         ///Marker type for the `target_value` field
         pub struct target_value(());
     }
@@ -271,10 +271,10 @@ where
 impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
-    S::Period: goal_state::IsSet,
-    S::StartDate: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
+    S::StartDate: goal_state::IsSet,
     S::Metric: goal_state::IsSet,
+    S::Period: goal_state::IsSet,
     S::TargetValue: goal_state::IsSet,
 {
     /// Build the final struct
@@ -293,7 +293,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Goal<'a> {
@@ -625,7 +625,7 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -637,11 +637,11 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("metric"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("targetValue"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("period"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("startDate"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("metric"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("targetValue"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("period"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startDate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -649,7 +649,7 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -668,7 +668,9 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("endDate"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "endDate",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -685,7 +687,9 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("metric"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "metric",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -700,7 +704,9 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("period"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "period",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -715,7 +721,7 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "startDate",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -734,7 +740,7 @@ fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "targetValue",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {

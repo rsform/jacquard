@@ -43,104 +43,104 @@ pub mod question_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Tags;
-        type Forum;
         type IsOpen;
+        type CreatedAt;
+        type Forum;
         type Title;
         type Content;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Tags = Unset;
-        type Forum = Unset;
         type IsOpen = Unset;
+        type CreatedAt = Unset;
+        type Forum = Unset;
         type Title = Unset;
         type Content = Unset;
-        type CreatedAt = Unset;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
         type Tags = Set<members::tags>;
+        type IsOpen = S::IsOpen;
+        type CreatedAt = S::CreatedAt;
         type Forum = S::Forum;
-        type IsOpen = S::IsOpen;
         type Title = S::Title;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `forum` field to Set
-    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForum<S> {}
-    impl<S: State> State for SetForum<S> {
-        type Tags = S::Tags;
-        type Forum = Set<members::forum>;
-        type IsOpen = S::IsOpen;
-        type Title = S::Title;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `is_open` field to Set
     pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsOpen<S> {}
     impl<S: State> State for SetIsOpen<S> {
         type Tags = S::Tags;
-        type Forum = S::Forum;
         type IsOpen = Set<members::is_open>;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
         type Title = S::Title;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Tags = S::Tags;
-        type Forum = S::Forum;
-        type IsOpen = S::IsOpen;
-        type Title = Set<members::title>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Tags = S::Tags;
-        type Forum = S::Forum;
-        type IsOpen = S::IsOpen;
-        type Title = S::Title;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Tags = S::Tags;
-        type Forum = S::Forum;
         type IsOpen = S::IsOpen;
+        type CreatedAt = Set<members::created_at>;
+        type Forum = S::Forum;
         type Title = S::Title;
         type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `forum` field to Set
+    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForum<S> {}
+    impl<S: State> State for SetForum<S> {
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type CreatedAt = S::CreatedAt;
+        type Forum = Set<members::forum>;
+        type Title = S::Title;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
+        type Title = Set<members::title>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
+        type Title = S::Title;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `tags` field
         pub struct tags(());
-        ///Marker type for the `forum` field
-        pub struct forum(());
         ///Marker type for the `is_open` field
         pub struct is_open(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `forum` field
+        pub struct forum(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -314,11 +314,11 @@ impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
     S::Tags: question_state::IsSet,
-    S::Forum: question_state::IsSet,
     S::IsOpen: question_state::IsSet,
+    S::CreatedAt: question_state::IsSet,
+    S::Forum: question_state::IsSet,
     S::Title: question_state::IsSet,
     S::Content: question_state::IsSet,
-    S::CreatedAt: question_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Question<'a> {
@@ -337,7 +337,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Question<'a> {
@@ -510,7 +510,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -522,12 +522,12 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("forum"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("isOpen")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("forum"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("isOpen")
                             ],
                         ),
                         nullable: None,
@@ -535,7 +535,9 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "content",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -550,7 +552,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -569,7 +571,9 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("forum"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "forum",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -586,7 +590,9 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("isOpen"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "isOpen",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -594,7 +600,9 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "tags",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -614,7 +622,9 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -629,7 +639,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "updatedAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

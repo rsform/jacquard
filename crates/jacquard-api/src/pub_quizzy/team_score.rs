@@ -193,7 +193,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> TeamScore<'a> {
@@ -308,7 +308,7 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -320,9 +320,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("quizBegin"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("team"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("answers")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quizBegin"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("team"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("answers")
                             ],
                         ),
                         nullable: None,
@@ -330,7 +330,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("answers"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "answers",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -348,7 +350,7 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "quizBegin",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -359,7 +361,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("team"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "team",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
@@ -373,7 +377,7 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("scoredAnswer"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("scoredAnswer"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -382,8 +386,8 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("answer"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("scores")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scores")
                         ],
                     ),
                     nullable: None,
@@ -391,7 +395,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("answer"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "answer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -400,7 +406,7 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "commentary",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -421,7 +427,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("scores"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "scores",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -622,7 +630,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> ScoredAnswer<'a> {
@@ -662,7 +670,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
         }
         if let Some(ref value) = self.commentary {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

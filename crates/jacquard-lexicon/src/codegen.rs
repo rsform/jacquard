@@ -244,7 +244,7 @@ impl<'c> CodeGenerator<'c> {
                 let (rust_type, needs_lifetime) = match def {
                     LexUserType::Boolean(_) => (quote! { bool }, false),
                     LexUserType::Integer(_) => (quote! { i64 }, false),
-                    LexUserType::Bytes(_) => (quote! { bytes::Bytes }, false),
+                    LexUserType::Bytes(_) => (quote! { jacquard_common::deps::bytes::Bytes }, false),
                     LexUserType::CidLink(_) => {
                         (quote! { jacquard_common::types::cid::CidLink<'a> }, true)
                     }

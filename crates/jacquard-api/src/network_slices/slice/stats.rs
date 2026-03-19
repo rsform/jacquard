@@ -36,51 +36,51 @@ pub mod collection_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
-        type RecordCount;
         type UniqueActors;
+        type RecordCount;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
-        type RecordCount = Unset;
         type UniqueActors = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type RecordCount = S::RecordCount;
-        type UniqueActors = S::UniqueActors;
-    }
-    ///State transition - sets the `record_count` field to Set
-    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
-    impl<S: State> State for SetRecordCount<S> {
-        type Collection = S::Collection;
-        type RecordCount = Set<members::record_count>;
-        type UniqueActors = S::UniqueActors;
+        type RecordCount = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `unique_actors` field to Set
     pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
     impl<S: State> State for SetUniqueActors<S> {
-        type Collection = S::Collection;
-        type RecordCount = S::RecordCount;
         type UniqueActors = Set<members::unique_actors>;
+        type RecordCount = S::RecordCount;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `record_count` field to Set
+    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
+    impl<S: State> State for SetRecordCount<S> {
+        type UniqueActors = S::UniqueActors;
+        type RecordCount = Set<members::record_count>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type UniqueActors = S::UniqueActors;
+        type RecordCount = S::RecordCount;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `record_count` field
-        pub struct record_count(());
         ///Marker type for the `unique_actors` field
         pub struct unique_actors(());
+        ///Marker type for the `record_count` field
+        pub struct record_count(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -173,9 +173,9 @@ where
 impl<'a, S> CollectionStatsBuilder<'a, S>
 where
     S: collection_stats_state::State,
-    S::Collection: collection_stats_state::IsSet,
-    S::RecordCount: collection_stats_state::IsSet,
     S::UniqueActors: collection_stats_state::IsSet,
+    S::RecordCount: collection_stats_state::IsSet,
+    S::Collection: collection_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionStats<'a> {
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> CollectionStats<'a> {
@@ -214,14 +214,16 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("collectionStats"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "collectionStats",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("recordCount"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("uniqueActors")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("recordCount"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uniqueActors")
                         ],
                     ),
                     nullable: None,
@@ -229,7 +231,7 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "collection",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -250,7 +252,7 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "recordCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -263,7 +265,7 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "uniqueActors",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -280,7 +282,7 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -288,14 +290,16 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                             description: None,
                             required: Some(
                                 vec![
-                                    ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("slice")
                                 ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                        "slice",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: Some(
                                             ::jacquard_common::CowStr::new_static(

@@ -56,67 +56,67 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Timestamp;
         type Rounds;
         type Locales;
         type Title;
-        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Timestamp = Unset;
         type Rounds = Unset;
         type Locales = Unset;
         type Title = Unset;
-        type Timestamp = Unset;
-    }
-    ///State transition - sets the `rounds` field to Set
-    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRounds<S> {}
-    impl<S: State> State for SetRounds<S> {
-        type Rounds = Set<members::rounds>;
-        type Locales = S::Locales;
-        type Title = S::Title;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `locales` field to Set
-    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocales<S> {}
-    impl<S: State> State for SetLocales<S> {
-        type Rounds = S::Rounds;
-        type Locales = Set<members::locales>;
-        type Title = S::Title;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Rounds = S::Rounds;
-        type Locales = S::Locales;
-        type Title = Set<members::title>;
-        type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
+        type Timestamp = Set<members::timestamp>;
         type Rounds = S::Rounds;
         type Locales = S::Locales;
         type Title = S::Title;
-        type Timestamp = Set<members::timestamp>;
+    }
+    ///State transition - sets the `rounds` field to Set
+    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRounds<S> {}
+    impl<S: State> State for SetRounds<S> {
+        type Timestamp = S::Timestamp;
+        type Rounds = Set<members::rounds>;
+        type Locales = S::Locales;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `locales` field to Set
+    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocales<S> {}
+    impl<S: State> State for SetLocales<S> {
+        type Timestamp = S::Timestamp;
+        type Rounds = S::Rounds;
+        type Locales = Set<members::locales>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Timestamp = S::Timestamp;
+        type Rounds = S::Rounds;
+        type Locales = S::Locales;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `rounds` field
         pub struct rounds(());
         ///Marker type for the `locales` field
         pub struct locales(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
     }
 }
 
@@ -297,10 +297,10 @@ where
 impl<'a, S> QuizBuilder<'a, S>
 where
     S: quiz_state::State,
+    S::Timestamp: quiz_state::IsSet,
     S::Rounds: quiz_state::IsSet,
     S::Locales: quiz_state::IsSet,
     S::Title: quiz_state::IsSet,
-    S::Timestamp: quiz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quiz<'a> {
@@ -320,7 +320,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Quiz<'a> {
@@ -426,7 +426,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
         }
         if let Some(ref value) = self.description {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -507,7 +507,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -519,10 +519,10 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("rounds"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("locales"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("timestamp")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rounds"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("locales"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp")
                             ],
                         ),
                         nullable: None,
@@ -530,7 +530,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "description",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -551,7 +551,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasAudio",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -561,7 +561,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "hasVisuals",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -571,7 +571,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("locales"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "locales",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -597,7 +599,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "revisionOf",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -608,7 +610,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("rounds"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "rounds",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -624,7 +628,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "timestamp",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -647,7 +651,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "title",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
@@ -671,7 +677,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("questionRef"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("questionRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -680,7 +686,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("question")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("question")
                         ],
                     ),
                     nullable: None,
@@ -688,7 +694,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -707,7 +715,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("points"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "points",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -718,7 +728,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("question"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "question",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -731,14 +743,14 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("round"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("round"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
                         ::jacquard_common::CowStr::new_static("A round within a quiz"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("questions")
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("questions")
                         ],
                     ),
                     nullable: None,
@@ -746,7 +758,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "questions",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -764,7 +776,9 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
@@ -942,7 +956,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> QuestionRef<'a> {
@@ -982,7 +996,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
         }
         if let Some(ref value) = self.name {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
@@ -1147,7 +1161,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Round<'a> {
@@ -1212,7 +1226,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
         }
         if let Some(ref value) = self.title {
             {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )

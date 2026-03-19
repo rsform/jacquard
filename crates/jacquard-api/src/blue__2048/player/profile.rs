@@ -36,49 +36,49 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SoloPlay;
         type SyncStatus;
+        type SoloPlay;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SoloPlay = Unset;
         type SyncStatus = Unset;
+        type SoloPlay = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `solo_play` field to Set
-    pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
-    impl<S: State> State for SetSoloPlay<S> {
-        type SoloPlay = Set<members::solo_play>;
-        type SyncStatus = S::SyncStatus;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `sync_status` field to Set
     pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
     impl<S: State> State for SetSyncStatus<S> {
-        type SoloPlay = S::SoloPlay;
         type SyncStatus = Set<members::sync_status>;
+        type SoloPlay = S::SoloPlay;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `solo_play` field to Set
+    pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
+    impl<S: State> State for SetSoloPlay<S> {
+        type SyncStatus = S::SyncStatus;
+        type SoloPlay = Set<members::solo_play>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SoloPlay = S::SoloPlay;
         type SyncStatus = S::SyncStatus;
+        type SoloPlay = S::SoloPlay;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `solo_play` field
-        pub struct solo_play(());
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
+        ///Marker type for the `solo_play` field
+        pub struct solo_play(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -173,8 +173,8 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::SoloPlay: profile_state::IsSet,
     S::SyncStatus: profile_state::IsSet,
+    S::SoloPlay: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
@@ -190,7 +190,7 @@ where
     pub fn build_with_data(
         self,
         extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
+            jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Profile<'a> {
@@ -292,7 +292,7 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
@@ -304,9 +304,9 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("soloPlay"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("soloPlay"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("syncStatus"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -314,7 +314,7 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "createdAt",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -333,7 +333,7 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "soloPlay",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -343,7 +343,7 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "syncStatus",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
