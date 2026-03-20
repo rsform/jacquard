@@ -32,8 +32,11 @@ thiserror = { workspace = true }
 serde_html_form = { workspace = true }
 miette = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
+p384 = { version = "0.13", features = ["ecdsa"] }
+k256 = { version = "0.13", features = ["ecdsa"] }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
 jose-jwa = "0.1"
-jose-jwk = { workspace = true, features = ["p256"] }
+jose-jwk = { workspace = true, features = ["p256", "p384"] }
 chrono.workspace = true
 elliptic-curve = "0.13.8"
 http.workspace = true

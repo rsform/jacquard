@@ -16,9 +16,9 @@ use smol_str::SmolStr;
 
 use crate::{
     jose::{
-        create_signed_jwt,
         jws::RegisteredHeader,
         jwt::{Claims, PublicClaims, RegisteredClaims},
+        signing,
     },
     session::DpopDataSource,
 };
@@ -800,7 +800,7 @@ pub fn build_dpop_proof<'s>(
             nonce: nonce,
         },
     };
-    Ok(create_signed_jwt(
+    Ok(signing::create_signed_jwt_es256(
         SigningKey::from(secret.clone()),
         header.into(),
         claims,

@@ -34,6 +34,13 @@
 - `knownValues` generation now aligned with AT Protocol spec and triggers more frequently
 - Improved feature dependency tracking for API crate features
 
+**Additional signing algorithms** (`jacquard-oauth`)
+- Keyset signing now supports ES384 (P-384), ES256K (secp256k1), and EdDSA (Ed25519) in addition to ES256
+- `Keyset::create_jwt` now accepts `&[Signing]` (from `jose_jwa`) instead of string-based algorithm names
+
+**Documentation** (`jacquard-oauth`, `jacquard-identity`)
+- Doc comments across all public items in both crates (thanks Claude, but I played editor pretty heavily)
+
 ### Fixed
 
 **Identity resolution** (`jacquard-identity`)

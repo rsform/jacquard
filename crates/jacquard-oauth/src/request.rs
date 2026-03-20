@@ -15,6 +15,8 @@ use serde::Serialize;
 use serde_json::Value;
 use smol_str::ToSmolStr;
 
+use jose_jwa::Signing;
+
 use crate::{
     FALLBACK_ALG,
     atproto::atproto_client_metadata,
@@ -886,11 +888,15 @@ fn build_auth<'a>(
                     .is_some_and(|v| v.contains(&CowStr::new_static("private_key_jwt"))) =>
             {
                 if let Some(keyset) = &keyset {
-                    let mut algs = server_metadata
+                    let mut alg_strs = server_metadata
                         .token_endpoint_auth_signing_alg_values_supported
                         .clone()
                         .unwrap_or(vec![FALLBACK_ALG.into()]);
-                    algs.sort_by(compare_algos);
+                    alg_strs.sort_by(compare_algos);
+                    let algs: Vec<Signing> = alg_strs
+                        .iter()
+                        .filter_map(|s| crate::keyset::parse_signing_alg(s))
+                        .collect();
                     let iat = Utc::now().timestamp();
                     return Ok(ClientAuth {
                         client_id: client_id.clone(),

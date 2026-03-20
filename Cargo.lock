@@ -1254,6 +1254,7 @@ dependencies = [
  "ff",
  "generic-array",
  "group",
+ "hkdf",
  "pem-rfc7468",
  "pkcs8",
  "rand_core 0.6.4",
@@ -1956,6 +1957,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "hkdf"
+version = "0.12.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b5f8eb2ad728638ea2c7d47a21db23b7b58a72ed6a38256b8a1849f15fbbdf7"
+dependencies = [
+ "hmac",
+]
+
+[[package]]
 name = "hmac"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2615,15 +2625,18 @@ dependencies = [
  "bytes",
  "chrono",
  "dashmap",
+ "ed25519-dalek",
  "elliptic-curve",
  "http",
  "jacquard-common",
  "jacquard-identity",
  "jose-jwa",
  "jose-jwk",
+ "k256",
  "miette",
  "n0-future",
  "p256",
+ "p384",
  "rand 0.8.5",
  "rouille",
  "serde",
@@ -3546,8 +3559,10 @@ version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe42f1670a52a47d448f14b6a5c61dd78fce51856e68edaa38f7ae3a46b8d6b6"
 dependencies = [
+ "ecdsa",
  "elliptic-curve",
  "primeorder",
+ "sha2",
 ]
 
 [[package]]

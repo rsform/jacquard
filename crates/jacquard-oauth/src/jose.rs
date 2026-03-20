@@ -2,7 +2,7 @@
 pub mod jws;
 /// JWT (JSON Web Token) claims types.
 pub mod jwt;
-/// Signed JWT creation using ES256 keys.
+/// Signed JWT creation for supported algorithms (ES256, ES384, ES256K, EdDSA).
 pub mod signing;
 
 use serde::{Deserialize, Serialize};
@@ -18,4 +18,3 @@ pub enum Header<'a> {
     Jws(jws::Header<'a>),
 }
 
-pub use self::signing::create_signed_jwt;
