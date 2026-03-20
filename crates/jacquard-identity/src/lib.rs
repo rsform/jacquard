@@ -913,7 +913,7 @@ impl IdentityResolver for JacquardResolver {
             // Invalidate on error
             #[cfg(feature = "cache")]
             self.invalidate_did_chain(did).await;
-            Err(IdentityError::unsupported_did_method(s))
+            Err(IdentityError::handle_resolution_exhausted())
         }
     }
 }
