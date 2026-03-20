@@ -385,6 +385,51 @@ where
                     Ok(CidLink::cow_str(v.to_cowstr()).into_static())
                 }
 
+                fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Cid::new_owned(v).map(CidLink).map_err(E::custom)
+                }
+
+                fn visit_byte_buf<E>(self, v: alloc::vec::Vec<u8>) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    self.visit_bytes(&v)
+                }
+
+                fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+                where
+                    D: serde::de::Deserializer<'de>,
+                {
+                    // serde_ipld_dagcbor buffers CBOR tag-42 CIDs as a newtype struct wrapping
+                    // raw CID bytes when deserializing through internally-tagged enums (Content).
+                    // Must use deserialize_bytes (not Vec<u8>'s deserialize_seq) to avoid
+                    // "byte array, expected a sequence" from ContentDeserializer.
+                    struct BytesVisitor;
+                    impl<'de> Visitor<'de> for BytesVisitor {
+                        type Value = alloc::vec::Vec<u8>;
+                        fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                            f.write_str("CID bytes")
+                        }
+                        fn visit_bytes<E: serde::de::Error>(
+                            self,
+                            v: &[u8],
+                        ) -> Result<Self::Value, E> {
+                            Ok(v.to_vec())
+                        }
+                        fn visit_byte_buf<E: serde::de::Error>(
+                            self,
+                            v: alloc::vec::Vec<u8>,
+                        ) -> Result<Self::Value, E> {
+                            Ok(v)
+                        }
+                    }
+                    let bytes = deserializer.deserialize_bytes(BytesVisitor)?;
+                    self.visit_byte_buf(bytes)
+                }
+
                 fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
                 where
                     A: serde::de::MapAccess<'de>,

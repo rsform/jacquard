@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.1] - 2026-03-20 (`jacquard-common`)
+
+### Fixed
+
+**CID deserialization** (`jacquard-common`)
+- Fixed `CidLink` deserialization from CBOR tag-42 bytes through internally-tagged enums (reported by @natalie.sh, fixed by adorable robot)
+- `serde_ipld_dagcbor` buffers tag-42 CIDs as a newtype struct wrapping raw bytes when deserializing through `Content`; the visitor now handles `visit_bytes`, `visit_byte_buf`, and `visit_newtype_struct` to cover this path
+
 ## [0.10.0] - 2026-03-20
 
 ### Breaking changes
@@ -20,7 +28,7 @@
 - `jacquard-api` gains feature gating for `std`/`no_std` usage
 
 **Datetime improvements** (`jacquard-common`)
-- [PR from @blyoom.dev](https://tangled.org/nonbinary.computer/jacquard/pulls/6/round/0) exposing timestamps directly on `Datetime` type
+- [PR from @blyoom.dev](https://tangled.org/nonbinary.computer/jacquard/pulls/6/) exposing timestamps directly on `Datetime` type
 - Naming aligned with `chrono` conventions
 
 **Handle normalization** (`jacquard-common`)
@@ -44,7 +52,7 @@
 ### Fixed
 
 **Identity resolution** (`jacquard-identity`)
-- [PR from @alephcubed.com](https://tangled.org/nonbinary.computer/jacquard/pulls/7/round/0) fixing `DidDocument::handles()` always failing when parsed from `MiniDoc`
+- [PR from @alephcubed.com](https://tangled.org/nonbinary.computer/jacquard/pulls/7/) fixing `DidDocument::handles()` always failing when parsed from `MiniDoc`
 
 **Error handling** (`jacquard-common`, `jacquard`, `jacquard-oauth`)
 - Big error quality-of-life pass with richer, more actionable diagnostics
