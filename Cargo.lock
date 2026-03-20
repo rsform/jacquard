@@ -2426,7 +2426,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.10.0"
+version = "0.10.2"
 dependencies = [
  "jacquard-common",
  "jacquard-derive",

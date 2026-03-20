@@ -1,8 +1,10 @@
 /target
 /result
 /result-lib
-.direnv
-.claude
+.**
+!.tangled
+!.github
+!.cargo
 /.pre-commit-config.yaml
 crates/jacquard-lexicon/target
 /plans
