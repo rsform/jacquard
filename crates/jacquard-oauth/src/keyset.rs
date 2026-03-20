@@ -8,27 +8,40 @@ use jose_jwk::{Jwk, JwkSet, Key};
 use std::collections::HashSet;
 use thiserror::Error;
 
+/// Errors that can occur when constructing or using a [`Keyset`].
 #[derive(Error, Debug)]
 #[non_exhaustive]
 pub enum Error {
+    /// Two keys in the set share the same `kid`, which would make key selection ambiguous.
     #[error("duplicate kid: {0}")]
     DuplicateKid(String),
+    /// A keyset with no keys cannot sign anything.
     #[error("keys must not be empty")]
     EmptyKeys,
+    /// Each key must carry a `kid` so it can be referenced in JWS headers.
     #[error("key at index {0} must have a `kid`")]
     EmptyKid(usize),
+    /// No key in the set matches any of the requested signing algorithms.
     #[error("no signing key found for algorithms: {0:?}")]
     NotFound(Vec<CowStr<'static>>),
+    /// Only secret (private) keys may be used for signing; a public key was provided.
     #[error("key for signing must be a secret key")]
     PublicKey,
+    /// An error from the underlying JWK cryptographic operation.
     #[error("crypto error: {0:?}")]
     JwkCrypto(crypto::Error),
+    /// JSON serialization of a JWT header or claims payload failed.
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
 }
 
+/// Convenience result type for keyset operations.
 pub type Result<T> = core::result::Result<T, Error>;
 
+/// A validated collection of JWK secret keys used for signing DPoP proofs and client assertions.
+///
+/// Key selection follows a preference order defined in [`PREFERRED_SIGNING_ALGORITHMS`](Self::PREFERRED_SIGNING_ALGORITHMS),
+/// though currently only P-256 (ES256) keys are supported.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Keyset(Vec<Jwk>);
 
@@ -36,6 +49,7 @@ impl Keyset {
     const PREFERRED_SIGNING_ALGORITHMS: [&'static str; 9] = [
         "EdDSA", "ES256K", "ES256", "PS256", "PS384", "PS512", "HS256", "HS384", "HS512",
     ];
+    /// Returns a [`JwkSet`] containing the public halves of all keys in this keyset.
     pub fn public_jwks(&self) -> JwkSet {
         let mut keys = Vec::with_capacity(self.0.len());
         for mut key in self.0.clone() {
@@ -49,6 +63,9 @@ impl Keyset {
         }
         JwkSet { keys }
     }
+    /// Signs a JWT with the best available key that matches one of the requested algorithms.
+    ///
+    /// Returns [`Error::NotFound`] if no key in the keyset supports any of the given algorithms.
     pub fn create_jwt(&self, algs: &[CowStr], claims: Claims) -> Result<CowStr<'static>> {
         let Some(jwk) = self.find_key(algs, Class::Signing) else {
             return Err(Error::NotFound(algs.to_vec().into_static()));

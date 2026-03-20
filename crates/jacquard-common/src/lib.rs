@@ -190,7 +190,7 @@
 //! It's also not too bad to write, once you're aware of the pattern and why it works. If you run
 //! into a lifetime/borrowing inference issue in jacquard, please contact the crate author. She'd
 //! be happy to debug, and if it's using a method from one of the jacquard crates and seems like
-//! it *should* just work, that is a bug in jacquard, and you should [file an issue](https://tangled.org/@nonbinary.computer/jacquard/).
+//! it *should* just work, that is a bug in jacquard, and you should [file an issue](https://tangled.org/nonbinary.computer/jacquard/).
 
 #![no_std]
 #![warn(missing_docs)]

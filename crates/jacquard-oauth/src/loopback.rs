@@ -59,17 +59,25 @@ use rouille::Server;
 use std::net::SocketAddr;
 use tokio::sync::mpsc;
 
+/// Port selection strategy for the loopback OAuth callback server.
 #[derive(Clone, Debug)]
 pub enum LoopbackPort {
+    /// Bind to a specific port number.
     Fixed(u16),
+    /// Let the OS assign an available port.
     Ephemeral,
 }
 
+/// Configuration for the loopback OAuth callback server.
 #[derive(Clone, Debug)]
 pub struct LoopbackConfig {
+    /// The host address to bind to (e.g., `"127.0.0.1"`).
     pub host: String,
+    /// Port selection strategy.
     pub port: LoopbackPort,
+    /// Whether to attempt opening the authorization URL in the user's browser.
     pub open_browser: bool,
+    /// How long to wait for the callback before timing out, in milliseconds.
     pub timeout_ms: u64,
 }
 
@@ -84,10 +92,14 @@ impl Default for LoopbackConfig {
     }
 }
 
+/// Attempts to open the given URL in the user's default browser.
+///
+/// Returns `true` if the browser was opened successfully, `false` otherwise.
 #[cfg(feature = "browser-open")]
 pub fn try_open_in_browser(url: &str) -> bool {
     webbrowser::open(url).is_ok()
 }
+/// Stub for when the `browser-open` feature is disabled. Always returns `false`.
 #[cfg(not(feature = "browser-open"))]
 pub fn try_open_in_browser(_url: &str) -> bool {
     false
@@ -114,6 +126,7 @@ fn create_callback_router(
     )
 }
 
+/// Handle to a running loopback callback server, used to await the OAuth redirect.
 pub struct CallbackHandle {
     #[allow(dead_code)]
     server_handle: std::thread::JoinHandle<()>,

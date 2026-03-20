@@ -23,6 +23,7 @@ use crate::{
     session::DpopDataSource,
 };
 
+/// The `typ` header value required in all DPoP proof JWTs, per RFC 9449.
 pub const JWT_HEADER_TYP_DPOP: &str = "dpop+jwt";
 
 #[derive(serde::Deserialize)]
@@ -332,23 +333,33 @@ impl From<DpopError> for jacquard_common::error::ClientError {
 
 type Result<T> = core::result::Result<T, DpopError>;
 
+/// An HTTP client capable of making DPoP-protected requests to both auth servers and resource servers.
+///
+/// Implementors must be able to attach a DPoP proof header, handle nonce challenges, and
+/// retry transparently on `use_dpop_nonce` errors.
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait DpopClient: HttpClient {
+    /// Send a DPoP-protected request to an authorization server (token endpoint, PAR, etc.).
     fn dpop_server(
         &self,
         request: Request<Vec<u8>>,
     ) -> impl Future<Output = Result<Response<Vec<u8>>>>;
+    /// Send a DPoP-protected request to a resource server (PDS, AppView, etc.).
     fn dpop_client(
         &self,
         request: Request<Vec<u8>>,
     ) -> impl Future<Output = Result<Response<Vec<u8>>>>;
+    /// Send a DPoP-protected request, inferring the target type from the request context.
     fn wrap_request(
         &self,
         request: Request<Vec<u8>>,
     ) -> impl Future<Output = Result<Response<Vec<u8>>>>;
 }
 
+/// Extension trait for any [`HttpClient`] that adds builder methods for constructing
+/// DPoP-protected request calls without requiring a full [`DpopClient`] implementation.
 pub trait DpopExt: HttpClient {
+    /// Begin building a DPoP-protected request targeting an authorization server.
     fn dpop_server_call<'r, D>(&'r self, data_source: &'r mut D) -> DpopCall<'r, Self, D>
     where
         Self: Sized,
@@ -357,6 +368,7 @@ pub trait DpopExt: HttpClient {
         DpopCall::server(self, data_source)
     }
 
+    /// Begin building a DPoP-protected request targeting a resource server.
     fn dpop_call<'r, N>(&'r self, data_source: &'r mut N) -> DpopCall<'r, Self, N>
     where
         Self: Sized,
@@ -366,13 +378,22 @@ pub trait DpopExt: HttpClient {
     }
 }
 
+/// A builder for a single DPoP-protected HTTP request, holding references to the underlying
+/// client and the session data source that supplies nonces and the DPoP signing key.
 pub struct DpopCall<'r, C: HttpClient, D: DpopDataSource> {
+    /// The HTTP client that will send the request.
     pub client: &'r C,
+    /// Whether the request targets an authorization server rather than a resource server.
+    ///
+    /// This controls which nonce slot is read from and written to, and how `use_dpop_nonce`
+    /// errors are detected in the response.
     pub is_to_auth_server: bool,
+    /// The session data source providing the DPoP key and current nonces.
     pub data_source: &'r mut D,
 }
 
 impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
+    /// Create a call builder targeting an authorization server.
     pub fn server(client: &'r C, data_source: &'r mut N) -> Self {
         Self {
             client,
@@ -381,6 +402,7 @@ impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
         }
     }
 
+    /// Create a call builder targeting a resource server.
     pub fn client(client: &'r C, data_source: &'r mut N) -> Self {
         Self {
             client,
@@ -389,6 +411,7 @@ impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
         }
     }
 
+    /// Send the request with a DPoP proof, retrying once if the server provides a new nonce.
     pub async fn send(self, request: Request<Vec<u8>>) -> Result<Response<Vec<u8>>> {
         wrap_request_with_dpop(
             self.client,
@@ -399,6 +422,7 @@ impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
         .await
     }
 
+    /// Sends the request with DPoP proof and returns a streaming response.
     #[cfg(feature = "streaming")]
     pub async fn send_streaming(
         self,
@@ -416,6 +440,7 @@ impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
         .await
     }
 
+    /// Sends the request with DPoP proof using bidirectional streaming.
     #[cfg(feature = "streaming")]
     pub async fn send_bidirectional(
         self,
@@ -470,6 +495,11 @@ fn store_nonce<N: DpopDataSource>(
     }
 }
 
+/// Attach a DPoP proof to `request`, send it, and transparently retry once if the server
+/// responds with a `use_dpop_nonce` error and a fresh nonce.
+///
+/// The nonce is read from and written back to `data_source` based on `is_to_auth_server`,
+/// keeping the two nonce slots (auth server vs. resource server) independent.
 pub async fn wrap_request_with_dpop<T, N>(
     client: &T,
     data_source: &mut N,
@@ -531,6 +561,11 @@ where
     Ok(response)
 }
 
+/// Wraps an HTTP request with a DPoP proof and returns a streaming response.
+///
+/// Like [`wrap_request_with_dpop`], but returns a [`StreamingResponse`](jacquard_common::xrpc::StreamingResponse)
+/// instead of buffering the body. Nonce retry is limited to status/header inspection
+/// since the body stream cannot be rewound.
 #[cfg(feature = "streaming")]
 pub async fn wrap_request_with_dpop_streaming<T, N>(
     client: &T,
@@ -600,6 +635,10 @@ where
     Ok(StreamingResponse::new(parts, body))
 }
 
+/// Wraps an HTTP request with a DPoP proof using bidirectional streaming.
+///
+/// Similar to [`wrap_request_with_dpop_streaming`] but accepts a [`ByteStream`](jacquard_common::stream::ByteStream)
+/// request body for upload streaming scenarios.
 #[cfg(feature = "streaming")]
 pub async fn wrap_request_with_dpop_bidirectional<T, N>(
     client: &T,

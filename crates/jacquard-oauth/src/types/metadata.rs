@@ -1,67 +1,122 @@
 use jacquard_common::{CowStr, IntoStatic, types::string::Language};
 use serde::{Deserialize, Serialize};
 
+/// Authorization server metadata, as returned from the
+/// `.well-known/oauth-authorization-server` discovery document.
+///
+/// Defined by [RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414#section-2)
+/// with extensions from OpenID Connect Discovery, RFC 9126 (PAR), RFC 9207,
+/// RFC 9449 (DPoP), and the ATProto client ID metadata document draft.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct OAuthAuthorizationServerMetadata<'s> {
-    // https://datatracker.ietf.org/doc/html/rfc8414#section-2
+    /// The issuer identifier URL of the authorization server.
+    ///
+    /// <https://datatracker.ietf.org/doc/html/rfc8414#section-2>
     #[serde(borrow)]
     pub issuer: CowStr<'s>,
+    /// The URL of the authorization endpoint.
     pub authorization_endpoint: CowStr<'s>, // optional?
-    pub token_endpoint: CowStr<'s>,         // optional?
+    /// The URL of the token endpoint.
+    pub token_endpoint: CowStr<'s>, // optional?
+    /// URL of the authorization server's JWK Set document.
     pub jwks_uri: Option<CowStr<'s>>,
+    /// URL of the dynamic client registration endpoint, if supported.
     pub registration_endpoint: Option<CowStr<'s>>,
+    /// List of OAuth 2.0 scope values the server supports.
     pub scopes_supported: Vec<CowStr<'s>>,
+    /// List of OAuth 2.0 response type values the server supports.
     pub response_types_supported: Vec<CowStr<'s>>,
+    /// List of OAuth 2.0 response mode values the server supports.
     pub response_modes_supported: Option<Vec<CowStr<'s>>>,
+    /// List of OAuth 2.0 grant type values the server supports.
     pub grant_types_supported: Option<Vec<CowStr<'s>>>,
+    /// List of client authentication methods supported at the token endpoint.
     pub token_endpoint_auth_methods_supported: Option<Vec<CowStr<'s>>>,
+    /// List of JWS signing algorithms supported for token endpoint auth.
     pub token_endpoint_auth_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    /// URL of a page with human-readable information about the server.
     pub service_documentation: Option<CowStr<'s>>,
+    /// BCP 47 language tags for UI locales the server supports.
     pub ui_locales_supported: Option<Vec<Language>>,
+    /// URL of the authorization server's privacy policy.
     pub op_policy_uri: Option<CowStr<'s>>,
+    /// URL of the authorization server's terms of service.
     pub op_tos_uri: Option<CowStr<'s>>,
+    /// URL of the token revocation endpoint (RFC 7009).
     pub revocation_endpoint: Option<CowStr<'s>>,
+    /// List of client authentication methods supported at the revocation endpoint.
     pub revocation_endpoint_auth_methods_supported: Option<Vec<CowStr<'s>>>,
+    /// List of JWS signing algorithms supported for revocation endpoint auth.
     pub revocation_endpoint_auth_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    /// URL of the token introspection endpoint (RFC 7662).
     pub introspection_endpoint: Option<CowStr<'s>>,
+    /// List of client authentication methods supported at the introspection endpoint.
     pub introspection_endpoint_auth_methods_supported: Option<Vec<CowStr<'s>>>,
+    /// List of JWS signing algorithms supported for introspection endpoint auth.
     pub introspection_endpoint_auth_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    /// PKCE code challenge methods supported by the server.
     pub code_challenge_methods_supported: Option<Vec<CowStr<'s>>>,
 
-    // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+    /// Subject identifier types supported (`public` or `pairwise`).
+    ///
+    /// <https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata>
     pub subject_types_supported: Option<Vec<CowStr<'s>>>,
+    /// If `true`, clients must pre-register `request_uri` values.
     pub require_request_uri_registration: Option<bool>,
 
-    // https://datatracker.ietf.org/doc/html/rfc9126#section-5
+    /// URL of the Pushed Authorization Request (PAR) endpoint (RFC 9126).
+    ///
+    /// <https://datatracker.ietf.org/doc/html/rfc9126#section-5>
     pub pushed_authorization_request_endpoint: Option<CowStr<'s>>,
+    /// If `true`, all authorization requests must use PAR.
     pub require_pushed_authorization_requests: Option<bool>,
 
-    // https://datatracker.ietf.org/doc/html/rfc9207#section-3
+    /// If `true`, the server includes `iss` in authorization responses to prevent mix-up attacks.
+    ///
+    /// <https://datatracker.ietf.org/doc/html/rfc9207#section-3>
     pub authorization_response_iss_parameter_supported: Option<bool>,
 
-    // https://datatracker.ietf.org/doc/html/rfc9449#section-5.1
+    /// DPoP JWS signing algorithms supported by this server (RFC 9449).
+    ///
+    /// <https://datatracker.ietf.org/doc/html/rfc9449#section-5.1>
     pub dpop_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
 
-    // https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#section-5
+    /// If `true`, the server supports the ATProto client ID metadata document extension.
+    ///
+    /// <https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#section-5>
     pub client_id_metadata_document_supported: Option<bool>,
 
-    // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
+    /// Protected resources associated with this authorization server.
+    ///
+    /// <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada>
     pub protected_resources: Option<Vec<CowStr<'s>>>,
 }
 
-// https://datatracker.ietf.org/doc/draft-ietf-oauth-resource-metadata/
-// https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#section-2
+/// Protected resource metadata, returned from `.well-known/oauth-protected-resource`.
+///
+/// Allows clients to discover which authorization servers protect a given resource
+/// and what scopes and bearer methods are accepted. Defined by
+/// [draft-ietf-oauth-resource-metadata](https://datatracker.ietf.org/doc/draft-ietf-oauth-resource-metadata/).
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct OAuthProtectedResourceMetadata<'s> {
+    /// The URL of the protected resource itself.
     #[serde(borrow)]
     pub resource: CowStr<'s>,
+    /// URLs of authorization servers that can issue tokens for this resource.
     pub authorization_servers: Option<Vec<CowStr<'s>>>,
+    /// URL of the resource server's JWK Set document.
     pub jwks_uri: Option<CowStr<'s>>,
+    /// List of OAuth 2.0 scope values the resource server supports.
     pub scopes_supported: Vec<CowStr<'s>>,
+    /// Bearer token presentation methods supported (`header`, `body`, `query`).
     pub bearer_methods_supported: Option<Vec<CowStr<'s>>>,
+    /// JWS signing algorithms supported for resource-bound tokens.
     pub resource_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    /// URL of a page with human-readable information about the resource.
     pub resource_documentation: Option<CowStr<'s>>,
+    /// URL of the resource server's privacy policy.
     pub resource_policy_uri: Option<CowStr<'s>>,
+    /// URL of the resource server's terms of service.
     pub resource_tos_uri: Option<CowStr<'s>>,
 }
 

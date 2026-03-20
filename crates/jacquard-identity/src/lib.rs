@@ -65,8 +65,7 @@
 //!
 //! Both support `.parse()` for borrowing and validation.
 
-// use crate::CowStr; // not currently needed directly here
-
+#![warn(missing_docs)]
 #![cfg_attr(target_arch = "wasm32", allow(unused))]
 pub mod lexicon_resolver;
 pub mod resolver;
@@ -284,14 +283,19 @@ impl CacheConfig {
 #[cfg(feature = "cache")]
 #[derive(Clone)]
 pub struct ResolverCaches {
+    /// Cache mapping handles to their resolved DIDs.
     pub handle_to_did: cache_impl::Cache<Handle<'static>, Did<'static>>,
+    /// Cache mapping DIDs to their full DID documents.
     pub did_to_doc: cache_impl::Cache<Did<'static>, Arc<DidDocResponse>>,
+    /// Cache mapping authority strings (e.g., PDS hosts) to DIDs.
     pub authority_to_did: cache_impl::Cache<SmolStr, Did<'static>>,
+    /// Cache mapping NSIDs to their resolved lexicon schemas.
     pub nsid_to_schema: cache_impl::Cache<Nsid<'static>, Arc<ResolvedLexiconSchema<'static>>>,
 }
 
 #[cfg(feature = "cache")]
 impl ResolverCaches {
+    /// Creates a new set of resolver caches from the given configuration.
     pub fn new(config: &CacheConfig) -> Self {
         Self {
             handle_to_did: cache_impl::new_cache(
@@ -1182,7 +1186,7 @@ impl MiniDocResponse {
 /// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
 pub type PublicResolver = JacquardResolver;
 
-impl Default for PublicResolver {
+impl Default for JacquardResolver {
     /// Build a resolver with:
     /// - reqwest HTTP client
     /// - Public fallbacks enabled for handle resolution
@@ -1190,8 +1194,8 @@ impl Default for PublicResolver {
     ///
     /// Example
     /// ```ignore
-    /// use jacquard::identity::resolver::PublicResolver;
-    /// let resolver = PublicResolver::default();
+    /// use jacquard::identity::resolver::JacquardResolver;
+    /// let resolver = JacquardResolver::default();
     /// ```
     fn default() -> Self {
         let http = reqwest::Client::new();
@@ -1207,7 +1211,7 @@ impl Default for PublicResolver {
 
 /// Build a resolver configured to use Slingshot (`https://slingshot.microcosm.blue`) for PLC and
 /// mini-doc fallbacks, unauthenticated by default.
-pub fn slingshot_resolver_default() -> PublicResolver {
+pub fn slingshot_resolver_default() -> JacquardResolver {
     let http = reqwest::Client::new();
     let mut opts = ResolverOptions::default();
     opts.plc_source = PlcSource::slingshot_default();

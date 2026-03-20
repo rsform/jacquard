@@ -1,5 +1,6 @@
 //! AT Protocol OAuth scopes
-//! Derived from <https://tangled.org/@smokesignal.events/atproto-identity-rs/raw/main/crates/atproto-oauth/src/scopes.rs>
+//!
+//! Derived from <https://tangled.org/smokesignal.events/atproto-identity-rs/raw/main/crates/atproto-oauth/src/scopes.rs>
 //!
 //! This module provides comprehensive support for AT Protocol OAuth scopes,
 //! including parsing, serialization, normalization, and permission checking.
@@ -1035,6 +1036,7 @@ pub enum ParseError {
     InvalidAction(String),
     /// Invalid MIME type
     InvalidMimeType(String),
+    /// An AT Protocol string type (DID, NSID, etc.) failed validation during scope parsing.
     ParseError(#[from] AtStrError),
 }
 

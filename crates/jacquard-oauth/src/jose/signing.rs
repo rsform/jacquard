@@ -5,6 +5,7 @@ use p256::ecdsa::{Signature, SigningKey, signature::Signer};
 
 use super::{Header, jwt::Claims};
 
+/// Creates a compact-serialized signed JWT using an ES256 (P-256 ECDSA) key.
 pub fn create_signed_jwt(
     key: SigningKey,
     header: Header,

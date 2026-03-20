@@ -34,18 +34,24 @@ use jose_jwk::JwkSet;
 use std::{future::Future, sync::Arc};
 use tokio::sync::RwLock;
 
+/// The top-level OAuth client responsible for driving the authorization flow.
 pub struct OAuthClient<T, S>
 where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
+    /// Shared session registry that mediates access to the backing auth store.
     pub registry: Arc<SessionRegistry<T, S>>,
+    /// Default call options applied to every outgoing XRPC request.
     pub options: RwLock<CallOptions<'static>>,
+    /// Override for the XRPC base URI; falls back to the public Bluesky AppView when `None`.
     pub endpoint: RwLock<Option<Uri<String>>>,
+    /// Underlying HTTP/identity/OAuth resolver used for all network operations.
     pub client: Arc<T>,
 }
 
 impl<S: ClientAuthStore> OAuthClient<JacquardResolver, S> {
+    /// Create an `OAuthClient` using the default [`JacquardResolver`] for identity and metadata resolution.
     pub fn new(store: S, client_data: ClientData<'static>) -> Self {
         let client = JacquardResolver::default();
         Self::new_from_resolver(store, client, client_data)
@@ -103,6 +109,7 @@ where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
+    /// Create an OAuth client from an explicit resolver instance, taking ownership of both.
     pub fn new_from_resolver(store: S, client: T, client_data: ClientData<'static>) -> Self {
         // #[cfg(feature = "tracing")]
         // tracing::info!(
@@ -122,6 +129,7 @@ where
         }
     }
 
+    /// Create an OAuth client from already-`Arc`-wrapped store and resolver.
     pub fn new_with_shared(
         store: Arc<S>,
         client: Arc<T>,
@@ -146,6 +154,7 @@ where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
+    /// Return the public JWK set for this client's keyset, or an empty set if no keyset is configured.
     pub fn jwks(&self) -> JwkSet {
         self.registry
             .client_data
@@ -154,6 +163,14 @@ where
             .map(|keyset| keyset.public_jwks())
             .unwrap_or_default()
     }
+    /// Begin an OAuth authorization flow and return the URL to which the user should be redirected.
+    ///
+    /// This resolves OAuth metadata for the given `input` (a handle, DID, or PDS/entryway URL),
+    /// performs a Pushed Authorization Request (PAR) to the authorization server, persists the
+    /// resulting state for later callback verification, and returns a fully-constructed
+    /// authorization endpoint URL.
+    ///
+    /// The caller is responsible for redirecting the user's browser to the returned URL.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self, input), fields(input = input.as_ref())))]
     pub async fn start_auth(
         &self,
@@ -205,6 +222,11 @@ where
             .unwrap())
     }
 
+    /// Complete the OAuth authorization flow after the authorization server redirects back to the client.
+    ///
+    /// Validates the `state` and optional `iss` parameters, exchanges the authorization code for
+    /// tokens via the token endpoint, verifies the `sub` claim against the expected issuer, and
+    /// persists the resulting session. On success returns an [`OAuthSession`] ready for API calls.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "info", skip_all, fields(state = params.state.as_ref().map(|s| s.as_ref()))))]
     pub async fn callback(&self, params: CallbackParams<'_>) -> Result<OAuthSession<T, S>> {
         let Some(state_key) = params.state else {
@@ -294,11 +316,17 @@ where
         ))
     }
 
+    /// Restore a previously created session from the backing store, refreshing tokens if needed.
     pub async fn restore(&self, did: &Did<'_>, session_id: &str) -> Result<OAuthSession<T, S>> {
         self.create_session(self.registry.get(did, session_id, true).await?)
             .await
     }
 
+    /// Revoke a session by deleting it from the backing store.
+    ///
+    /// Note: this removes the session from local storage but does **not** call the authorization
+    /// server's revocation endpoint. To also invalidate the token server-side, prefer
+    /// [`OAuthSession::logout`], which calls `revoke` on the token before deleting the session.
     pub async fn revoke(&self, did: &Did<'_>, session_id: &str) -> Result<()> {
         Ok(self.registry.del(did, session_id).await?)
     }
@@ -398,15 +426,27 @@ where
     }
 }
 
+/// An active OAuth session for a specific account, used to make authenticated API requests.
+///
+/// `OAuthSession` holds the DPoP-bound token set for one account and handles transparent
+/// token refresh on `401 invalid_token` responses. The optional `W` type parameter allows
+/// attaching a WebSocket client (defaults to `()` when WebSocket support is not needed).
+///
+/// Obtain an `OAuthSession` from [`OAuthClient::callback`] or [`OAuthClient::restore`].
 pub struct OAuthSession<T, S, W = ()>
 where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
+    /// Shared registry used to persist and retrieve session data across refresh operations.
     pub registry: Arc<SessionRegistry<T, S>>,
+    /// Underlying HTTP/identity/OAuth resolver shared with the parent `OAuthClient`.
     pub client: Arc<T>,
+    /// Optional WebSocket client; `()` when WebSocket support is not required.
     pub ws_client: W,
+    /// Mutable session data including DPoP key, nonces, and token set.
     pub data: RwLock<ClientSessionData<'static>>,
+    /// Default call options applied to every outgoing XRPC request from this session.
     pub options: RwLock<CallOptions<'static>>,
 }
 
@@ -415,6 +455,10 @@ where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
+    /// Create a new session without a WebSocket client.
+    ///
+    /// This is the standard constructor used by [`OAuthClient::callback`] and
+    /// [`OAuthClient::restore`]. For WebSocket support use [`OAuthSession::new_with_ws`].
     pub fn new(
         registry: Arc<SessionRegistry<T, S>>,
         client: Arc<T>,
@@ -435,6 +479,11 @@ where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
+    /// Create a new session with an attached WebSocket client.
+    ///
+    /// Use this variant when the session needs to support WebSocket subscriptions in addition
+    /// to standard XRPC calls. The `ws_client` is exposed via [`OAuthSession::ws_client`] and
+    /// is used by the `WebSocketClient` impl when the `websocket` feature is enabled.
     pub fn new_with_ws(
         registry: Arc<SessionRegistry<T, S>>,
         client: Arc<T>,
@@ -450,6 +499,10 @@ where
         }
     }
 
+    /// Consume this session and return a new one with the given call options pre-applied.
+    ///
+    /// Useful for setting request-level defaults (e.g., `atproto-proxy` or custom headers) once
+    /// at construction time rather than passing them to every individual XRPC call.
     pub fn with_options(self, options: CallOptions<'_>) -> Self {
         Self {
             registry: self.registry,
@@ -465,23 +518,37 @@ where
         &self.ws_client
     }
 
+    /// Replace the default call options for this session without consuming it.
     pub async fn set_options(&self, options: CallOptions<'_>) {
         *self.options.write().await = options.into_static();
     }
 
+    /// Return the DID and session ID for this session.
+    ///
+    /// The session ID is the random `state` token generated during the PAR flow and can
+    /// be used together with the DID to restore the session via [`OAuthClient::restore`].
     pub async fn session_info(&self) -> (Did<'_>, CowStr<'_>) {
         let data = self.data.read().await;
         (data.account_did.clone(), data.session_id.clone())
     }
 
+    /// Return the resource server (PDS) base URI for this session.
     pub async fn endpoint(&self) -> Uri<String> {
         self.data.read().await.host_url.clone()
     }
 
+    /// Return the current DPoP-bound access token for this session.
+    ///
+    /// The token may be stale if it has expired; use [`OAuthSession::refresh`] or
+    /// rely on the automatic refresh performed by `send_with_opts` to obtain a fresh one.
     pub async fn access_token(&self) -> AuthorizationToken<'_> {
         AuthorizationToken::Dpop(self.data.read().await.token_set.access_token.clone())
     }
 
+    /// Return the current refresh token for this session, if one is present.
+    ///
+    /// Not all authorization servers issue refresh tokens. When `None` is returned,
+    /// the session cannot be silently renewed and the user must re-authenticate.
     pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
         self.data
             .read()
@@ -492,6 +559,10 @@ where
             .map(|t| AuthorizationToken::Dpop(t.clone()))
     }
 
+    /// Derive an unauthenticated [`OAuthClient`] that shares the same registry and resolver.
+    ///
+    /// Useful when you need to initiate a new authorization flow from within an existing
+    /// session context (e.g., to add a second account) without constructing a fresh client.
     pub fn to_client(&self) -> OAuthClient<T, S> {
         OAuthClient::from_session(self)
     }
@@ -501,6 +572,11 @@ where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
+    /// Revoke the access token at the authorization server and delete the session from the store.
+    ///
+    /// Revocation is best-effort: if the server does not advertise a revocation endpoint, or if
+    /// the revocation call fails, the session is still deleted locally. This prevents a dangling
+    /// session record from blocking future logins for the same account.
     pub async fn logout(&self) -> Result<()> {
         use crate::request::{OAuthMetadata, revoke};
         let mut data = self.data.write().await;
@@ -525,6 +601,10 @@ where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
+    /// Construct an `OAuthClient` that shares the registry and resolver of an existing session.
+    ///
+    /// Equivalent to [`OAuthSession::to_client`]; provided on `OAuthClient` for symmetry so
+    /// callers can obtain an unauthenticated client without holding a session reference.
     pub fn from_session<W>(session: &OAuthSession<T, S, W>) -> Self {
         Self {
             registry: session.registry.clone(),
@@ -539,6 +619,14 @@ where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
+    /// Explicitly refresh the access token using the stored refresh token.
+    ///
+    /// On success the new token set is written back into both the in-memory session data and
+    /// the backing store. The returned `AuthorizationToken` is the new access token, which
+    /// callers can immediately use to retry a failed request.
+    ///
+    /// The actual token exchange is serialized per `(DID, session_id)` pair via a `Mutex` inside
+    /// the registry, so concurrent refresh attempts will not result in duplicate token exchanges.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
     pub async fn refresh(&self) -> Result<AuthorizationToken<'_>> {
         // Read identifiers without holding the lock across await

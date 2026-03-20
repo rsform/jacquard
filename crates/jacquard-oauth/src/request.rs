@@ -41,6 +41,7 @@ const CLIENT_ASSERTION_TYPE_JWT_BEARER: &str =
 
 use smol_str::SmolStr;
 
+/// Convenience alias for a heap-allocated, thread-safe, `'static` error value.
 pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// OAuth request error for token operations and auth flows
@@ -130,7 +131,12 @@ pub enum RequestErrorKind {
         code(jacquard_oauth::request::http_status_body),
         help("server returned error JSON; inspect fields like `error`, `error_description`")
     )]
-    HttpStatusWithBody { status: StatusCode, body: Value },
+    HttpStatusWithBody {
+        /// HTTP status code returned by the server.
+        status: StatusCode,
+        /// Parsed JSON body containing OAuth error fields such as `error` and `error_description`.
+        body: Value,
+    },
 
     /// Identity resolution error
     #[error("identity error")]
@@ -413,18 +419,26 @@ impl From<crate::atproto::Error> for RequestError {
     }
 }
 
+/// Convenience `Result` type for OAuth request operations, defaulting to [`RequestError`].
 pub type Result<T> = core::result::Result<T, RequestError>;
 
+/// Represents the different OAuth token-endpoint request types sent by this crate.
 #[allow(dead_code)]
 pub enum OAuthRequest<'a> {
+    /// Standard authorization-code token exchange.
     Token(TokenRequestParameters<'a>),
+    /// Refresh-token grant to obtain a fresh access token.
     Refresh(RefreshRequestParameters<'a>),
+    /// Token revocation request (RFC 7009).
     Revocation(RevocationRequestParameters<'a>),
+    /// Token introspection request (RFC 7662).
     Introspection,
+    /// Pushed authorization request (RFC 9126) for pre-registering auth parameters.
     PushedAuthorizationRequest(ParParameters<'a>),
 }
 
 impl OAuthRequest<'_> {
+    /// Return a human-readable name for this request variant, used in error messages.
     pub fn name(&self) -> CowStr<'static> {
         CowStr::new_static(match self {
             Self::Token(_) => "token",
@@ -434,6 +448,7 @@ impl OAuthRequest<'_> {
             Self::PushedAuthorizationRequest(_) => "pushed_authorization_request",
         })
     }
+    /// Returns the HTTP status code that a successful response to this request should carry.
     pub fn expected_status(&self) -> StatusCode {
         match self {
             Self::Token(_) | Self::Refresh(_) => StatusCode::OK,
@@ -445,28 +460,47 @@ impl OAuthRequest<'_> {
     }
 }
 
+/// The serialized body of an OAuth token-endpoint request.
 #[derive(Debug, Serialize)]
 pub struct RequestPayload<'a, T>
 where
     T: Serialize,
 {
+    /// The OAuth `client_id` advertised in the client metadata document.
     client_id: CowStr<'a>,
+    /// The assertion type URI; set to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+    /// when using `private_key_jwt` client authentication.
     #[serde(skip_serializing_if = "Option::is_none")]
     client_assertion_type: Option<CowStr<'a>>,
+    /// A JWT signed with the client's private key, proving client identity to the server.
     #[serde(skip_serializing_if = "Option::is_none")]
     client_assertion: Option<CowStr<'a>>,
+    /// The grant-specific parameters (token request, refresh, PAR, etc.) flattened into the body.
     #[serde(flatten)]
     parameters: T,
 }
 
+/// Bundled OAuth metadata needed to perform token-endpoint operations.
+///
+/// Aggregates the server's authorization server metadata, the client's own registered metadata,
+/// and the optional signing keyset into a single value that is passed to helper functions such
+/// as [`par`], [`exchange_code`], [`refresh`], and [`revoke`].
 #[derive(Debug, Clone)]
 pub struct OAuthMetadata {
+    /// Metadata fetched from the authorization server's `/.well-known/oauth-authorization-server` document.
     pub server_metadata: OAuthAuthorizationServerMetadata<'static>,
+    /// This client's registered metadata, derived from [`crate::atproto::AtprotoClientMetadata`].
     pub client_metadata: OAuthClientMetadata<'static>,
+    /// Optional signing keyset; required for `private_key_jwt` client authentication.
     pub keyset: Option<Keyset>,
 }
 
 impl OAuthMetadata {
+    /// Fetch server metadata and assemble an `OAuthMetadata` from an active session context.
+    ///
+    /// Contacts the authorization server recorded in `session_data` to retrieve its current
+    /// metadata, then combines it with the client configuration. This is the preferred way to
+    /// build an `OAuthMetadata` during token refresh or revocation.
     pub async fn new<'r, T: HttpClient + OAuthResolver + Send + Sync>(
         client: &T,
         ClientData { keyset, config }: &ClientData<'r>,
@@ -484,6 +518,12 @@ impl OAuthMetadata {
     }
 }
 
+/// Perform a Pushed Authorization Request (PAR) and return the resulting state for the auth flow.
+///
+/// Generates a PKCE code challenge, a fresh DPoP key, and a random `state` token, then POSTs
+/// them to the authorization server's PAR endpoint. The returned [`AuthRequestData`] must be
+/// persisted (e.g., in the auth store) so it can be retrieved and verified during
+/// [`crate::client::OAuthClient::callback`].
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all, fields(login_hint = login_hint.as_ref().map(|h| h.as_ref()))))]
 pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     client: &T,
@@ -562,6 +602,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     }
 }
 
+/// Exchange a refresh token for a fresh token set and update the session data in place.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all, fields(did = %session_data.account_did)))]
 pub async fn refresh<'r, T>(
     client: &T,
@@ -621,6 +662,12 @@ where
     Ok(session_data)
 }
 
+/// Exchange an authorization code for a token set and return a fully-verified [`TokenSet`].
+///
+/// Per the AT Protocol OAuth spec, the `sub` claim in the token response **must** be verified
+/// against the expected authorization server issuer before the token can be trusted. This
+/// function performs that verification as part of the exchange, so callers receive a token
+/// set that is safe to persist.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
 pub async fn exchange_code<'r, T, D>(
     client: &T,
@@ -680,6 +727,11 @@ where
     })
 }
 
+/// Send a token revocation request (RFC 7009) to the authorization server.
+///
+/// This function is called by [`crate::client::OAuthSession::logout`] when a revocation endpoint is advertised
+/// by the server. The caller is responsible for deleting the session from local storage regardless
+/// of whether revocation succeeds.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
 pub async fn revoke<'r, T, D>(
     client: &T,
@@ -703,6 +755,12 @@ where
     Ok(())
 }
 
+/// Low-level function for sending an OAuth token-endpoint request and deserializing the response.
+///
+/// Selects the correct server endpoint for `request`, builds the form-encoded body with
+/// client authentication, performs the DPoP-wrapped HTTP POST, and deserializes the response
+/// body into `O`. The type parameter `O` is inferred from the call site; use `()` for requests
+/// where the response body is empty (e.g., revocation).
 pub async fn oauth_request<'de: 'r, 'r, O, T, D>(
     client: &T,
     data_source: &'r mut D,
@@ -784,14 +842,23 @@ where
     })?)
 }
 
+/// Client identity fields appended to every token-endpoint request body.
+///
+/// Encapsulates the result of choosing a client authentication method (`none` vs.
+/// `private_key_jwt`). The `build_auth` helper selects the appropriate variant based
+/// on server capabilities and client configuration.
 #[derive(Debug, Clone, Default)]
 pub struct ClientAuth<'a> {
+    /// The OAuth `client_id` for this client.
     client_id: CowStr<'a>,
-    assertion_type: Option<CowStr<'a>>, // either none or `CLIENT_ASSERTION_TYPE_JWT_BEARER`
+    /// Either absent (for `none` auth) or `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`.
+    assertion_type: Option<CowStr<'a>>,
+    /// A signed JWT proving client identity; present only for `private_key_jwt` auth.
     assertion: Option<CowStr<'a>>,
 }
 
 impl<'s> ClientAuth<'s> {
+    /// Construct a `ClientAuth` with only a `client_id` and no assertion (the `none` method).
     pub fn new_id(client_id: CowStr<'s>) -> Self {
         Self {
             client_id,

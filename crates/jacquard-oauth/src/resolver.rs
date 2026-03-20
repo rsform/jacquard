@@ -14,6 +14,7 @@ use jacquard_common::{http_client::HttpClient, types::did::Did};
 use jacquard_identity::resolver::{IdentityError, IdentityResolver};
 use smol_str::SmolStr;
 
+/// Convenience alias for a heap-allocated, thread-safe, `'static` error value.
 pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// OAuth resolver error for identity and metadata resolution
@@ -613,8 +614,19 @@ async fn get_resource_server_metadata_impl<T: OAuthResolver + ?Sized>(
     Ok(as_metadata)
 }
 
+/// Resolver trait for the AT Protocol OAuth flow.
+///
+/// `OAuthResolver` extends [`IdentityResolver`] and [`HttpClient`] with the methods needed to
+/// drive the full OAuth flow: resolving an AT identifier (handle or DID) to the authorization
+/// server that protects its PDS, fetching server metadata, and verifying that a token's `sub`
+/// claim is authorized by the expected issuer.
+///
+/// A default implementation based on [`jacquard_identity::JacquardResolver`] is provided.
+/// Custom implementations are possible for testing or for environments that require
+/// non-standard identity resolution (e.g., federated or offline setups).
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait OAuthResolver: IdentityResolver + HttpClient {
+    /// Verify that the authorization server in `server_metadata` is the correct issuer for `sub`.
     #[cfg(not(target_arch = "wasm32"))]
     fn verify_issuer(
         &self,
@@ -627,6 +639,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         verify_issuer_impl(self, server_metadata, sub)
     }
 
+    /// Verify that the authorization server in `server_metadata` is the correct issuer for `sub`.
     #[cfg(target_arch = "wasm32")]
     fn verify_issuer(
         &self,
@@ -636,6 +649,12 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         verify_issuer_impl(self, server_metadata, sub)
     }
 
+    /// Resolve `input` (a handle, DID, PDS URL, or entryway URL) to OAuth metadata.
+    ///
+    /// When `input` starts with `https://`, it is treated as a service URL and resolved
+    /// directly via [`OAuthResolver::resolve_from_service`]. Otherwise it is treated as an
+    /// AT identifier and resolved via [`OAuthResolver::resolve_from_identity`]. Returns the
+    /// authorization server metadata and, when `input` was an identity, the resolved DID document.
     #[cfg(not(target_arch = "wasm32"))]
     fn resolve_oauth(
         &self,
@@ -652,6 +671,12 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         resolve_oauth_impl(self, input)
     }
 
+    /// Resolve `input` (a handle, DID, PDS URL, or entryway URL) to OAuth metadata.
+    ///
+    /// When `input` starts with `https://`, it is treated as a service URL and resolved
+    /// directly via [`OAuthResolver::resolve_from_service`]. Otherwise it is treated as an
+    /// AT identifier and resolved via [`OAuthResolver::resolve_from_identity`]. Returns the
+    /// authorization server metadata and, when `input` was an identity, the resolved DID document.
     #[cfg(target_arch = "wasm32")]
     fn resolve_oauth(
         &self,
@@ -665,6 +690,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         resolve_oauth_impl(self, input)
     }
 
+    /// Resolve a service URL (PDS or entryway) to its authorization server metadata.
+    ///
+    /// First attempts to fetch the PDS's protected resource metadata; if that fails, falls back
+    /// to treating the URL as an entryway and fetching authorization server metadata directly.
     #[cfg(not(target_arch = "wasm32"))]
     fn resolve_from_service(
         &self,
@@ -676,6 +705,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         resolve_from_service_impl(self, input)
     }
 
+    /// Resolve a service URL to its authorization server metadata.
+    ///
+    /// First attempts to fetch the PDS's protected resource metadata; if that fails, falls back
+    /// to treating the URL as an entryway and fetching authorization server metadata directly.
     #[cfg(target_arch = "wasm32")]
     fn resolve_from_service(
         &self,
@@ -684,6 +717,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         resolve_from_service_impl(self, input)
     }
 
+    /// Resolve an AT identifier (handle or DID) to its authorization server metadata and DID document.
     #[cfg(not(target_arch = "wasm32"))]
     fn resolve_from_identity(
         &self,
@@ -700,6 +734,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         resolve_from_identity_impl(self, input)
     }
 
+    /// Resolve an AT identifier to its authorization server metadata and DID document.
     #[cfg(target_arch = "wasm32")]
     fn resolve_from_identity(
         &self,
@@ -713,6 +748,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         resolve_from_identity_impl(self, input)
     }
 
+    /// Fetch and validate the authorization server metadata for the given issuer URL.
+    ///
+    /// Retrieves the `/.well-known/oauth-authorization-server` document and confirms that
+    /// the `issuer` field in the response matches the requested URL, as required by RFC 8414 §3.3.
     #[cfg(not(target_arch = "wasm32"))]
     fn get_authorization_server_metadata(
         &self,
@@ -724,6 +763,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         get_authorization_server_metadata_impl(self, issuer)
     }
 
+    /// Fetch and validate the authorization server metadata for the given issuer URL.
+    ///
+    /// Retrieves the `/.well-known/oauth-authorization-server` document and confirms that
+    /// the `issuer` field in the response matches the requested URL, as required by RFC 8414 §3.3.
     #[cfg(target_arch = "wasm32")]
     fn get_authorization_server_metadata(
         &self,
@@ -732,6 +775,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         get_authorization_server_metadata_impl(self, issuer)
     }
 
+    /// Resolve a PDS base URL to its authorization server metadata.
     #[cfg(not(target_arch = "wasm32"))]
     fn get_resource_server_metadata(
         &self,
@@ -743,6 +787,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         get_resource_server_metadata_impl(self, pds)
     }
 
+    /// Resolve a PDS base URL to its authorization server metadata.
     #[cfg(target_arch = "wasm32")]
     fn get_resource_server_metadata(
         &self,
@@ -752,6 +797,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     }
 }
 
+/// Fetch and validate the `/.well-known/oauth-authorization-server` document for `server`.
+///
+/// Per RFC 8414 §3.3 the `issuer` field in the response must equal the `server` URL exactly;
+/// this prevents a compromised server from claiming to be a different issuer.
 pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     client: &T,
     server: &CowStr<'_>,
@@ -772,9 +821,7 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     if res.status() == StatusCode::OK {
         let metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
-        // Accept semantically equivalent issuer (normalize to the requested URL form)
         if metadata.issuer == server.as_str() {
-            // if equivalent, keep the canonical form
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::authorization_server_metadata(
@@ -786,6 +833,10 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     }
 }
 
+/// Fetch the `/.well-known/oauth-protected-resource` document for `server`.
+///
+/// The `resource` field in the response must equal the requested `server` URL, ensuring
+/// that the metadata belongs to the PDS we queried and not a different resource.
 pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     client: &T,
     server: &CowStr<'_>,
@@ -806,9 +857,7 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     if res.status() == StatusCode::OK {
         let metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
-        // Accept semantically equivalent resource URL (normalize to the requested URL form)
         if metadata.resource == server.as_str() {
-            // if equivalent, keep the canonical form
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::authorization_server_metadata(

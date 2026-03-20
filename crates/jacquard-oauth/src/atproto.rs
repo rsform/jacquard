@@ -7,49 +7,74 @@ use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 use thiserror::Error;
 
+/// Errors that can occur when building AT Protocol OAuth client metadata.
 #[derive(Error, Debug)]
 #[non_exhaustive]
 pub enum Error {
+    /// The `client_id` is not a valid URL.
     #[error("`client_id` must be a valid URL")]
     InvalidClientId,
+    /// The `grant_types` list does not include `authorization_code`, which is required by atproto.
     #[error("`grant_types` must include `authorization_code`")]
     InvalidGrantTypes,
+    /// The `scope` list does not include `atproto`, which is required for all atproto clients.
     #[error("`scope` must not include `atproto`")]
     InvalidScope,
+    /// No redirect URIs were provided; at least one is required.
     #[error("`redirect_uris` must not be empty")]
     EmptyRedirectUris,
+    /// The `private_key_jwt` auth method was requested but no JWK keys were provided.
     #[error("`private_key_jwt` auth method requires `jwks` keys")]
     EmptyJwks,
+    /// Signing algorithm mismatch: `private_key_jwt` requires `token_endpoint_auth_signing_alg`,
+    /// and non-`private_key_jwt` methods must not provide it.
     #[error(
         "`private_key_jwt` auth method requires `token_endpoint_auth_signing_alg`, otherwise must not be provided"
     )]
     AuthSigningAlg,
+    /// HTML form serialization of the loopback `client_id` query string failed.
     #[error(transparent)]
     SerdeHtmlForm(#[from] serde_html_form::ser::Error),
+    /// A localhost-specific validation error occurred.
     #[error(transparent)]
     LocalhostClient(#[from] LocalhostClientError),
 }
 
+/// Errors specific to validating a loopback (localhost) OAuth client's redirect URIs.
+///
+/// The AT Protocol spec has specific requirements for loopback clients: redirect URIs must
+/// use the `http` scheme and must point to actual loopback addresses (not the hostname `localhost`).
 #[derive(Error, Debug)]
 #[non_exhaustive]
 pub enum LocalhostClientError {
+    /// The redirect URI could not be parsed.
     #[error("invalid redirect_uri: {0}")]
     Invalid(#[from] jacquard_common::deps::fluent_uri::ParseError),
+    /// Loopback redirect URIs must use `http:`, not `https:` or any other scheme.
     #[error("loopback client_id must use `http:` redirect_uri")]
     NotHttpScheme,
+    /// The hostname `localhost` is not allowed; use a numeric loopback address instead.
     #[error("loopback client_id must not use `localhost` as redirect_uri hostname")]
     Localhost,
+    /// The redirect URI host is not a loopback address (127.x.x.x or ::1).
     #[error("loopback client_id must not use loopback addresses as redirect_uri")]
     NotLoopbackHost,
 }
 
+/// Convenience result type for AT Protocol client metadata operations.
 pub type Result<T> = core::result::Result<T, Error>;
 
+/// The token endpoint authentication method for an OAuth client.
+///
+/// AT Protocol clients either authenticate with no client secret (public/loopback clients)
+/// or with a private key JWT signed by a key from the client's JWK set.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AuthMethod {
+    /// No client authentication; used for public and loopback clients.
     None,
-    // https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+    /// Authenticate using a JWT signed with a private key from the client's JWK set.
+    /// <https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication>
     PrivateKeyJwt,
 }
 
@@ -62,10 +87,13 @@ impl From<AuthMethod> for CowStr<'static> {
     }
 }
 
+/// OAuth 2.0 grant types supported by AT Protocol clients.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GrantType {
+    /// Standard authorization code grant, required by atproto.
     AuthorizationCode,
+    /// Refresh token grant, used to obtain new access tokens without re-authorization.
     RefreshToken,
 }
 
@@ -78,18 +106,34 @@ impl From<GrantType> for CowStr<'static> {
     }
 }
 
+/// AT Protocol-specific OAuth client metadata, used to describe a client before converting to
+/// the generic [`OAuthClientMetadata`] format for server registration.
+///
+/// This type provides a validated, atproto-aware view of client registration data, with
+/// typed fields for URIs and scopes rather than raw strings. Use [`atproto_client_metadata`]
+/// to convert this into the wire format expected by OAuth servers.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AtprotoClientMetadata<'m> {
+    /// The unique identifier for this client, typically the URL of its metadata document.
     pub client_id: Uri<String>,
+    /// The URI of the client's homepage or information page.
     pub client_uri: Option<Uri<String>>,
+    /// The list of allowed redirect URIs for the authorization code flow.
     pub redirect_uris: Vec<Uri<String>>,
+    /// The grant types this client will use.
     pub grant_types: Vec<GrantType>,
+    /// The OAuth scopes this client requests; must include `atproto`.
     #[serde(borrow)]
     pub scopes: Vec<Scope<'m>>,
+    /// URI pointing to the client's JWK Set; mutually exclusive with inline `jwks`.
     pub jwks_uri: Option<Uri<String>>,
+    /// Human-readable display name for the client.
     pub client_name: Option<SmolStr>,
+    /// URI of the client's logo image.
     pub logo_uri: Option<Uri<String>>,
+    /// URI of the client's terms of service document.
     pub tos_uri: Option<Uri<String>>,
+    /// URI of the client's privacy policy document.
     pub privacy_policy_uri: Option<Uri<String>>,
 }
 
@@ -112,6 +156,10 @@ impl<'m> IntoStatic for AtprotoClientMetadata<'m> {
 }
 
 impl<'m> AtprotoClientMetadata<'m> {
+    /// Attach optional production branding fields to the metadata.
+    ///
+    /// Chainable builder method for setting display name, logo, and policy URLs after
+    /// constructing the base metadata.
     pub fn with_prod_info(
         mut self,
         client_name: &str,
@@ -126,6 +174,11 @@ impl<'m> AtprotoClientMetadata<'m> {
         self
     }
 
+    /// Create a default loopback client metadata with the `atproto` and `transition:generic` scopes.
+    ///
+    /// This is a convenience constructor for local development and CLI tools. The resulting
+    /// metadata uses `http://localhost` as the `client_id` with both IPv4 and IPv6 loopback
+    /// redirect URIs.
     pub fn default_localhost() -> Self {
         Self::new_localhost(
             None,
@@ -133,6 +186,12 @@ impl<'m> AtprotoClientMetadata<'m> {
         )
     }
 
+    /// Create loopback client metadata with optional custom redirect URIs and scopes.
+    ///
+    /// Encodes non-default redirect URIs and scopes into the `client_id` query string as
+    /// required by the AT Protocol loopback client specification. When `redirect_uris` or
+    /// `scopes` are `None`, sensible defaults (IPv4 + IPv6 loopback addresses, `atproto` scope)
+    /// are used.
     pub fn new_localhost(
         redirect_uris: Option<Vec<Uri<String>>>,
         scopes: Option<Vec<Scope<'static>>>,
@@ -181,11 +240,16 @@ impl<'m> AtprotoClientMetadata<'m> {
     }
 }
 
+/// Convert [`AtprotoClientMetadata`] into the [`OAuthClientMetadata`] wire format.
+///
+/// Validates all atproto-specific constraints (required scopes, grant types, redirect URIs),
+/// selects the appropriate `token_endpoint_auth_method` based on whether a keyset is provided,
+/// and serializes scopes and grant types into their string representations. Returns an error
+/// if any required field is missing or invalid.
 pub fn atproto_client_metadata<'m>(
     metadata: AtprotoClientMetadata<'m>,
     keyset: &Option<Keyset>,
 ) -> Result<OAuthClientMetadata<'static>> {
-    // For non-loopback clients, require a keyset/JWKs.
     let is_loopback = metadata.client_id.scheme().as_str() == "http"
         && metadata.client_id.authority().map(|a| a.host()) == Some("localhost");
     let application_type = if is_loopback {
@@ -193,9 +257,6 @@ pub fn atproto_client_metadata<'m>(
     } else {
         Some(CowStr::new_static("web"))
     };
-    // if !is_loopback && keyset.is_none() {
-    //     return Err(Error::EmptyJwks);
-    // }
     if metadata.redirect_uris.is_empty() {
         return Err(Error::EmptyRedirectUris);
     }

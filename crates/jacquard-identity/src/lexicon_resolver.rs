@@ -67,6 +67,7 @@ pub struct LexiconResolutionError {
 }
 
 impl LexiconResolutionError {
+    /// Create a new error with the given kind and optional source.
     pub fn new(
         kind: LexiconResolutionErrorKind,
         source: Option<Box<dyn std::error::Error + Send + Sync>>,
@@ -78,6 +79,7 @@ impl LexiconResolutionError {
         }
     }
 
+    /// Return the error kind.
     pub fn kind(&self) -> &LexiconResolutionErrorKind {
         &self.kind
     }
@@ -93,6 +95,7 @@ impl LexiconResolutionError {
         self.context.as_deref()
     }
 
+    /// Create an error for a failed DNS TXT lookup while resolving a lexicon authority.
     pub fn dns_lookup_failed(
         authority: impl Into<SmolStr>,
         source: impl std::error::Error + Send + Sync + 'static,
@@ -105,6 +108,7 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for when DNS records exist but contain no `did=...` entry.
     pub fn no_did_found(authority: impl Into<SmolStr>) -> Self {
         Self::new(
             LexiconResolutionErrorKind::NoDIDFound {
@@ -114,6 +118,7 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for a syntactically invalid DID found in DNS for the given authority.
     pub fn invalid_did(authority: impl Into<SmolStr>, value: impl Into<SmolStr>) -> Self {
         Self::new(
             LexiconResolutionErrorKind::InvalidDID {
@@ -124,10 +129,12 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for when DNS is not available (feature disabled or WASM target).
     pub fn dns_not_configured() -> Self {
         Self::new(LexiconResolutionErrorKind::DnsNotConfigured, None)
     }
 
+    /// Create an error for a failure to fetch the lexicon record for an NSID.
     pub fn fetch_failed(
         nsid: impl Into<SmolStr>,
         source: impl std::error::Error + Send + Sync + 'static,
@@ -138,6 +145,7 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for a failure to parse a fetched lexicon schema document.
     pub fn parse_failed(
         nsid: impl Into<SmolStr>,
         source: impl std::error::Error + Send + Sync + 'static,
@@ -148,6 +156,7 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create a generic resolution failure error with a descriptive message.
     pub fn resolution_failed(nsid: impl Into<SmolStr>, message: impl Into<SmolStr>) -> Self {
         Self::new(
             LexiconResolutionErrorKind::ResolutionFailed {
@@ -158,6 +167,7 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for a non-success HTTP status received while fetching a lexicon.
     pub fn http_error(nsid: impl Into<SmolStr>, status: u16) -> Self {
         Self::new(
             LexiconResolutionErrorKind::HttpError {
@@ -168,6 +178,7 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for a required field missing from the XRPC response.
     pub fn missing_response_field(nsid: impl Into<SmolStr>, field: &'static str) -> Self {
         Self::new(
             LexiconResolutionErrorKind::MissingResponseField {
@@ -178,10 +189,12 @@ impl LexiconResolutionError {
         )
     }
 
+    /// Create an error for an invalid lexicon collection NSID.
     pub fn invalid_collection() -> Self {
         Self::new(LexiconResolutionErrorKind::InvalidCollection, None)
     }
 
+    /// Create an error for a lexicon record response that is missing its CID.
     pub fn missing_cid(nsid: impl Into<SmolStr>) -> Self {
         Self::new(
             LexiconResolutionErrorKind::MissingCID { nsid: nsid.into() },
@@ -200,21 +213,36 @@ impl From<IdentityError> for LexiconResolutionError {
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 #[non_exhaustive]
 pub enum LexiconResolutionErrorKind {
+    /// DNS TXT lookup for the lexicon authority failed.
     #[error("DNS lookup failed for authority {authority}")]
     #[diagnostic(code(jacquard::lexicon::dns_lookup_failed))]
-    DnsLookupFailed { authority: SmolStr },
+    DnsLookupFailed {
+        /// The NSID authority segment that was being looked up.
+        authority: SmolStr,
+    },
 
+    /// DNS records were reachable but contained no `did=...` entry.
     #[error("no DID found in DNS for authority {authority}")]
     #[diagnostic(
         code(jacquard::lexicon::no_did_found),
         help("ensure _lexicon.{{reversed-authority}} TXT record exists with did=...")
     )]
-    NoDIDFound { authority: SmolStr },
+    NoDIDFound {
+        /// The NSID authority segment that was being looked up.
+        authority: SmolStr,
+    },
 
+    /// DNS returned a `did=...` entry but its value is not a valid DID.
     #[error("invalid DID in DNS for authority {authority}: {value}")]
     #[diagnostic(code(jacquard::lexicon::invalid_did))]
-    InvalidDID { authority: SmolStr, value: SmolStr },
+    InvalidDID {
+        /// The NSID authority segment.
+        authority: SmolStr,
+        /// The raw invalid DID string found in DNS.
+        value: SmolStr,
+    },
 
+    /// DNS is not available on this build (the `dns` feature is disabled or target is WASM).
     #[error("DNS not configured (dns feature disabled or WASM target)")]
     #[diagnostic(
         code(jacquard::lexicon::dns_not_configured),
@@ -222,39 +250,69 @@ pub enum LexiconResolutionErrorKind {
     )]
     DnsNotConfigured,
 
+    /// XRPC or HTTP request to fetch the lexicon record failed.
     #[error("failed to fetch lexicon record for {nsid}")]
     #[diagnostic(code(jacquard::lexicon::fetch_failed))]
-    FetchFailed { nsid: SmolStr },
+    FetchFailed {
+        /// The NSID of the lexicon that could not be fetched.
+        nsid: SmolStr,
+    },
 
+    /// The fetched lexicon record could not be deserialized as a `LexiconDoc`.
     #[error("failed to parse lexicon schema for {nsid}")]
     #[diagnostic(code(jacquard::lexicon::parse_failed))]
-    ParseFailed { nsid: SmolStr },
+    ParseFailed {
+        /// The NSID of the lexicon that could not be parsed.
+        nsid: SmolStr,
+    },
 
+    /// Generic resolution failure with a descriptive message.
     #[error("failed to parse lexicon schema for {nsid}")]
     #[diagnostic(code(jacquard::lexicon::resolution_failed))]
-    ResolutionFailed { nsid: SmolStr, message: SmolStr },
+    ResolutionFailed {
+        /// The NSID of the lexicon being resolved.
+        nsid: SmolStr,
+        /// Human-readable description of what went wrong.
+        message: SmolStr,
+    },
 
-    /// HTTP non-success status from lexicon fetch
+    /// HTTP non-success status from lexicon fetch.
     #[error("HTTP {status} fetching lexicon {nsid}")]
     #[diagnostic(code(jacquard::lexicon::http_error))]
-    HttpError { nsid: SmolStr, status: u16 },
+    HttpError {
+        /// The NSID of the lexicon being fetched.
+        nsid: SmolStr,
+        /// The HTTP status code received.
+        status: u16,
+    },
 
-    /// Required field missing in XRPC response
+    /// Required field missing in XRPC response.
     #[error("missing '{field}' field in response for {nsid}")]
     #[diagnostic(
         code(jacquard::lexicon::missing_response_field),
         help("the XRPC response is missing a required field")
     )]
-    MissingResponseField { nsid: SmolStr, field: &'static str },
+    MissingResponseField {
+        /// The NSID of the lexicon being fetched.
+        nsid: SmolStr,
+        /// Name of the missing field.
+        field: &'static str,
+    },
 
+    /// The lexicon collection NSID was not valid.
     #[error("invalid collection NSID")]
     #[diagnostic(code(jacquard::lexicon::invalid_collection))]
     InvalidCollection,
 
+    /// The `getRecord` response did not include a CID for the lexicon record.
     #[error("record missing CID for {nsid}")]
     #[diagnostic(code(jacquard::lexicon::missing_cid))]
-    MissingCID { nsid: SmolStr },
+    MissingCID {
+        /// The NSID of the lexicon whose record was missing a CID.
+        nsid: SmolStr,
+    },
 
+    /// Identity resolution failed while locating the PDS that hosts the lexicon.
     #[error(transparent)]
     #[diagnostic(code(jacquard::lexicon::identity_resolution_failed))]
     IdentityResolution(#[from] crate::resolver::IdentityError),

@@ -661,7 +661,9 @@ pub enum IdentityErrorKind {
         help("document id differs from requested DID; do not trust this document")
     )]
     DocIdMismatch {
+        /// The DID that was requested and expected to appear as the document `id`.
         expected: Did<'static>,
+        /// The DID document we *actually* got
         doc: DidDocument<'static>,
     },
 }

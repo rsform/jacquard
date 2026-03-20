@@ -47,21 +47,36 @@
 //! See [`atproto`] module for AT Protocol-specific metadata helpers.
 
 #![warn(missing_docs)]
+/// AT Protocol-specific OAuth client metadata helpers and builder types.
 pub mod atproto;
+/// Storage trait and in-memory implementation for OAuth client auth state.
 pub mod authstore;
+/// High-level OAuth client for driving the full authorization code flow.
 pub mod client;
+/// DPoP (Demonstrating Proof-of-Possession) key generation and request signing.
 pub mod dpop;
+/// Top-level OAuth error types for the authorization flow.
 pub mod error;
+/// JOSE primitives: JWS headers, JWT claims, and signing utilities.
 pub mod jose;
+/// JWK keyset management for signing keys used in DPoP and client auth.
 pub mod keyset;
+/// Low-level OAuth request helpers: PAR, token exchange, and refresh.
 pub mod request;
+/// OAuth server metadata resolution: authorization server and protected resource discovery.
 pub mod resolver;
+///
 pub mod scopes;
+/// OAuth session types, token storage, and DPoP session state.
 pub mod session;
+/// OAuth protocol types: client metadata, token sets, and server metadata.
 pub mod types;
+/// Miscellaneous cryptographic utilities: key generation, PKCE, and hashing helpers.
 pub mod utils;
 
+/// Fallback signing algorithm used when no preferred algorithm is negotiated with the server.
 pub const FALLBACK_ALG: &str = "ES256";
 
+/// Loopback server helpers for the local redirect-based OAuth flow.
 #[cfg(feature = "loopback")]
 pub mod loopback;
