@@ -41,67 +41,67 @@ pub mod verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Handle;
         type Subject;
         type DisplayName;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Handle = Unset;
         type Subject = Unset;
         type DisplayName = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Subject = S::Subject;
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Handle = S::Handle;
-        type Subject = Set<members::subject>;
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Handle = S::Handle;
-        type Subject = S::Subject;
-        type DisplayName = Set<members::display_name>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Handle = S::Handle;
         type Subject = S::Subject;
         type DisplayName = S::DisplayName;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Handle = Set<members::handle>;
+        type Subject = S::Subject;
+        type DisplayName = S::DisplayName;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
+        type Subject = Set<members::subject>;
+        type DisplayName = S::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
+        type Subject = S::Subject;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `handle` field
         pub struct handle(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -214,10 +214,10 @@ where
 impl<'a, S> VerificationBuilder<'a, S>
 where
     S: verification_state::State,
+    S::CreatedAt: verification_state::IsSet,
     S::Handle: verification_state::IsSet,
     S::Subject: verification_state::IsSet,
     S::DisplayName: verification_state::IsSet,
-    S::CreatedAt: verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Verification<'a> {

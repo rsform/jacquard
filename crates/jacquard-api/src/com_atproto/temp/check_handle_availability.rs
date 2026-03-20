@@ -704,37 +704,37 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Method;
         type Handle;
+        type Method;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Method = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `method` field to Set
-    pub struct SetMethod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMethod<S> {}
-    impl<S: State> State for SetMethod<S> {
-        type Method = Set<members::method>;
-        type Handle = S::Handle;
+        type Method = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Method = S::Method;
         type Handle = Set<members::handle>;
+        type Method = S::Method;
+    }
+    ///State transition - sets the `method` field to Set
+    pub struct SetMethod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMethod<S> {}
+    impl<S: State> State for SetMethod<S> {
+        type Handle = S::Handle;
+        type Method = Set<members::method>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `method` field
-        pub struct method(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `method` field
+        pub struct method(());
     }
 }
 
@@ -807,8 +807,8 @@ where
 impl<'a, S> SuggestionBuilder<'a, S>
 where
     S: suggestion_state::State,
-    S::Method: suggestion_state::IsSet,
     S::Handle: suggestion_state::IsSet,
+    S::Method: suggestion_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Suggestion<'a> {

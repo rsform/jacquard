@@ -35,37 +35,37 @@ pub mod favorites_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Dids;
         type UpdatedAt;
+        type Dids;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Dids = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `dids` field to Set
-    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDids<S> {}
-    impl<S: State> State for SetDids<S> {
-        type Dids = Set<members::dids>;
-        type UpdatedAt = S::UpdatedAt;
+        type Dids = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Dids = S::Dids;
         type UpdatedAt = Set<members::updated_at>;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Dids = Set<members::dids>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `dids` field
-        pub struct dids(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `dids` field
+        pub struct dids(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> FavoritesBuilder<'a, S>
 where
     S: favorites_state::State,
-    S::Dids: favorites_state::IsSet,
     S::UpdatedAt: favorites_state::IsSet,
+    S::Dids: favorites_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorites<'a> {

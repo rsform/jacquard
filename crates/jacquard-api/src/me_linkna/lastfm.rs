@@ -53,51 +53,51 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ArtistNames;
         type CreatedAt;
         type TrackName;
+        type ArtistNames;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ArtistNames = Unset;
         type CreatedAt = Unset;
         type TrackName = Unset;
-    }
-    ///State transition - sets the `artist_names` field to Set
-    pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtistNames<S> {}
-    impl<S: State> State for SetArtistNames<S> {
-        type ArtistNames = Set<members::artist_names>;
-        type CreatedAt = S::CreatedAt;
-        type TrackName = S::TrackName;
+        type ArtistNames = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ArtistNames = S::ArtistNames;
         type CreatedAt = Set<members::created_at>;
         type TrackName = S::TrackName;
+        type ArtistNames = S::ArtistNames;
     }
     ///State transition - sets the `track_name` field to Set
     pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTrackName<S> {}
     impl<S: State> State for SetTrackName<S> {
-        type ArtistNames = S::ArtistNames;
         type CreatedAt = S::CreatedAt;
         type TrackName = Set<members::track_name>;
+        type ArtistNames = S::ArtistNames;
+    }
+    ///State transition - sets the `artist_names` field to Set
+    pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtistNames<S> {}
+    impl<S: State> State for SetArtistNames<S> {
+        type CreatedAt = S::CreatedAt;
+        type TrackName = S::TrackName;
+        type ArtistNames = Set<members::artist_names>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist_names` field
-        pub struct artist_names(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `track_name` field
         pub struct track_name(());
+        ///Marker type for the `artist_names` field
+        pub struct artist_names(());
     }
 }
 
@@ -270,9 +270,9 @@ where
 impl<'a, S> LastfmBuilder<'a, S>
 where
     S: lastfm_state::State,
-    S::ArtistNames: lastfm_state::IsSet,
     S::CreatedAt: lastfm_state::IsSet,
     S::TrackName: lastfm_state::IsSet,
+    S::ArtistNames: lastfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lastfm<'a> {

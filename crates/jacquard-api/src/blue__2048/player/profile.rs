@@ -20,14 +20,14 @@
 pub struct Profile<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Does not want to show up anywhere. Keep stats to your PDS. Defaults to `false`.
-    #[serde(default = "_default_solo_play")]
+    #[serde(default = "_default_profile_solo_play")]
     pub solo_play: bool,
     ///The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
     pub sync_status: crate::blue__2048::SyncStatus<'a>,
 }
 
-fn _default_solo_play() -> bool {
+fn _default_profile_solo_play() -> bool {
     false
 }
 
@@ -42,50 +42,50 @@ pub mod profile_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SoloPlay;
-        type SyncStatus;
         type CreatedAt;
+        type SyncStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SoloPlay = Unset;
-        type SyncStatus = Unset;
         type CreatedAt = Unset;
+        type SyncStatus = Unset;
     }
     ///State transition - sets the `solo_play` field to Set
     pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
     impl<S: State> State for SetSoloPlay<S> {
         type SoloPlay = Set<members::solo_play>;
+        type CreatedAt = S::CreatedAt;
         type SyncStatus = S::SyncStatus;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
-    impl<S: State> State for SetSyncStatus<S> {
-        type SoloPlay = S::SoloPlay;
-        type SyncStatus = Set<members::sync_status>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type SoloPlay = S::SoloPlay;
-        type SyncStatus = S::SyncStatus;
         type CreatedAt = Set<members::created_at>;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type SoloPlay = S::SoloPlay;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = Set<members::sync_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `solo_play` field
         pub struct solo_play(());
-        ///Marker type for the `sync_status` field
-        pub struct sync_status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
     }
 }
 
@@ -179,8 +179,8 @@ impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
     S::SoloPlay: profile_state::IsSet,
-    S::SyncStatus: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
+    S::SyncStatus: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {

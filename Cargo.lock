@@ -2392,7 +2392,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "jacquard"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "bytes",
  "clap",
@@ -2523,7 +2523,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "heck 0.5.0",
  "inventory",
@@ -2563,7 +2563,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexgen"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2821,7 +2821,7 @@ dependencies = [
 
 [[package]]
 name = "lazy-collections"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "buffer",
  "bytes",

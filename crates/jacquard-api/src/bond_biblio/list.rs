@@ -47,85 +47,85 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Librarians;
-        type Books;
         type Duedate;
         type Title;
+        type Librarians;
+        type Books;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Librarians = Unset;
-        type Books = Unset;
         type Duedate = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
-        type Duedate = S::Duedate;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `librarians` field to Set
-    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
-    impl<S: State> State for SetLibrarians<S> {
-        type CreatedAt = S::CreatedAt;
-        type Librarians = Set<members::librarians>;
-        type Books = S::Books;
-        type Duedate = S::Duedate;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type CreatedAt = S::CreatedAt;
-        type Librarians = S::Librarians;
-        type Books = Set<members::books>;
-        type Duedate = S::Duedate;
-        type Title = S::Title;
+        type Librarians = Unset;
+        type Books = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `duedate` field to Set
     pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuedate<S> {}
     impl<S: State> State for SetDuedate<S> {
-        type CreatedAt = S::CreatedAt;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
         type Duedate = Set<members::duedate>;
         type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Books = S::Books;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
         type Duedate = S::Duedate;
         type Title = Set<members::title>;
+        type Librarians = S::Librarians;
+        type Books = S::Books;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `librarians` field to Set
+    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
+    impl<S: State> State for SetLibrarians<S> {
+        type Duedate = S::Duedate;
+        type Title = S::Title;
+        type Librarians = Set<members::librarians>;
+        type Books = S::Books;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type Duedate = S::Duedate;
+        type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Books = Set<members::books>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Duedate = S::Duedate;
+        type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Books = S::Books;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
-        ///Marker type for the `books` field
-        pub struct books(());
         ///Marker type for the `duedate` field
         pub struct duedate(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
+        ///Marker type for the `books` field
+        pub struct books(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -278,11 +278,11 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::CreatedAt: list_state::IsSet,
-    S::Librarians: list_state::IsSet,
-    S::Books: list_state::IsSet,
     S::Duedate: list_state::IsSet,
     S::Title: list_state::IsSet,
+    S::Librarians: list_state::IsSet,
+    S::Books: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {

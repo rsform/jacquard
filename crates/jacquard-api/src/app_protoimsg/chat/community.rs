@@ -20,7 +20,7 @@
 pub struct CommunityGroup<'a> {
     ///Whether this is an inner circle group for presence visibility. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_is_inner_circle")]
+    #[serde(default = "_default_community_group_is_inner_circle")]
     pub is_inner_circle: std::option::Option<bool>,
     ///DIDs of group members.
     #[serde(borrow)]
@@ -30,7 +30,7 @@ pub struct CommunityGroup<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-fn _default_is_inner_circle() -> std::option::Option<bool> {
+fn _default_community_group_is_inner_circle() -> std::option::Option<bool> {
     Some(false)
 }
 
@@ -44,37 +44,37 @@ pub mod community_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Members;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Members = S::Members;
+        type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
-        type Name = S::Name;
         type Members = Set<members::members>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Members = S::Members;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -163,8 +163,8 @@ where
 impl<'a, S> CommunityGroupBuilder<'a, S>
 where
     S: community_group_state::State,
-    S::Name: community_group_state::IsSet,
     S::Members: community_group_state::IsSet,
+    S::Name: community_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityGroup<'a> {

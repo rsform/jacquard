@@ -54,67 +54,67 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Topic;
-        type CreatedAt;
         type Name;
         type Purpose;
+        type CreatedAt;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Topic = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
         type Purpose = Unset;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Topic = Set<members::topic>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Topic = S::Topic;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
+        type CreatedAt = Unset;
+        type Topic = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Topic = S::Topic;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
+        type Topic = S::Topic;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
-        type Topic = S::Topic;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Purpose = Set<members::purpose>;
+        type CreatedAt = S::CreatedAt;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Purpose = S::Purpose;
+        type CreatedAt = Set<members::created_at>;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type Name = S::Name;
+        type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
@@ -284,10 +284,10 @@ where
 impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
-    S::Topic: room_state::IsSet,
-    S::CreatedAt: room_state::IsSet,
     S::Name: room_state::IsSet,
     S::Purpose: room_state::IsSet,
+    S::CreatedAt: room_state::IsSet,
+    S::Topic: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {
@@ -821,15 +821,15 @@ fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::Lexicon
 pub struct RoomSettings<'a> {
     ///When true, only users on the room allowlist can send messages. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_allowlist_enabled")]
+    #[serde(default = "_default_room_settings_allowlist_enabled")]
     pub allowlist_enabled: std::option::Option<bool>,
     ///Minimum atproto account age in days to participate. Defaults to `0`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_min_account_age_days")]
+    #[serde(default = "_default_room_settings_min_account_age_days")]
     pub min_account_age_days: std::option::Option<i64>,
     ///Minimum seconds between messages per user. 0 = disabled. Defaults to `0`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_slow_mode_seconds")]
+    #[serde(default = "_default_room_settings_slow_mode_seconds")]
     pub slow_mode_seconds: std::option::Option<i64>,
     ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -837,15 +837,15 @@ pub struct RoomSettings<'a> {
     pub visibility: std::option::Option<RoomSettingsVisibility<'a>>,
 }
 
-fn _default_allowlist_enabled() -> std::option::Option<bool> {
+fn _default_room_settings_allowlist_enabled() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_min_account_age_days() -> std::option::Option<i64> {
+fn _default_room_settings_min_account_age_days() -> std::option::Option<i64> {
     Some(0i64)
 }
 
-fn _default_slow_mode_seconds() -> std::option::Option<i64> {
+fn _default_room_settings_slow_mode_seconds() -> std::option::Option<i64> {
     Some(0i64)
 }
 

@@ -46,37 +46,37 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PostedAt;
         type Blob;
+        type PostedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PostedAt = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `posted_at` field to Set
-    pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostedAt<S> {}
-    impl<S: State> State for SetPostedAt<S> {
-        type PostedAt = Set<members::posted_at>;
-        type Blob = S::Blob;
+        type PostedAt = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type PostedAt = S::PostedAt;
         type Blob = Set<members::blob>;
+        type PostedAt = S::PostedAt;
+    }
+    ///State transition - sets the `posted_at` field to Set
+    pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostedAt<S> {}
+    impl<S: State> State for SetPostedAt<S> {
+        type Blob = S::Blob;
+        type PostedAt = Set<members::posted_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `posted_at` field
-        pub struct posted_at(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `posted_at` field
+        pub struct posted_at(());
     }
 }
 
@@ -197,8 +197,8 @@ impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
 impl<'a, S> ButtonBuilder<'a, S>
 where
     S: button_state::State,
-    S::PostedAt: button_state::IsSet,
     S::Blob: button_state::IsSet,
+    S::PostedAt: button_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Button<'a> {

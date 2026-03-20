@@ -681,43 +681,43 @@ fn lexicon_doc_site_standard_publication() -> ::jacquard_lexicon::lexicon::Lexic
 pub struct Preferences<'a> {
     ///Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_show_comments")]
+    #[serde(default = "_default_preferences_show_comments")]
     pub show_comments: std::option::Option<bool>,
     ///Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_show_in_discover")]
+    #[serde(default = "_default_preferences_show_in_discover")]
     pub show_in_discover: std::option::Option<bool>,
     ///Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_show_mentions")]
+    #[serde(default = "_default_preferences_show_mentions")]
     pub show_mentions: std::option::Option<bool>,
     ///Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_show_prev_next")]
+    #[serde(default = "_default_preferences_show_prev_next")]
     pub show_prev_next: std::option::Option<bool>,
     ///Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_show_recommends")]
+    #[serde(default = "_default_preferences_show_recommends")]
     pub show_recommends: std::option::Option<bool>,
 }
 
-fn _default_show_comments() -> std::option::Option<bool> {
+fn _default_preferences_show_comments() -> std::option::Option<bool> {
     Some(true)
 }
 
-fn _default_show_in_discover() -> std::option::Option<bool> {
+fn _default_preferences_show_in_discover() -> std::option::Option<bool> {
     Some(true)
 }
 
-fn _default_show_mentions() -> std::option::Option<bool> {
+fn _default_preferences_show_mentions() -> std::option::Option<bool> {
     Some(true)
 }
 
-fn _default_show_prev_next() -> std::option::Option<bool> {
+fn _default_preferences_show_prev_next() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_show_recommends() -> std::option::Option<bool> {
+fn _default_preferences_show_recommends() -> std::option::Option<bool> {
     Some(true)
 }
 

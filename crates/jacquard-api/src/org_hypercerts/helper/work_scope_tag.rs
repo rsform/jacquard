@@ -58,51 +58,51 @@ pub mod work_scope_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Label;
         type Key;
+        type Label;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Label = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Label = S::Label;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type CreatedAt = S::CreatedAt;
-        type Label = Set<members::label>;
-        type Key = S::Key;
+        type Label = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type CreatedAt = S::CreatedAt;
-        type Label = S::Label;
         type Key = Set<members::key>;
+        type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabel<S> {}
+    impl<S: State> State for SetLabel<S> {
+        type Key = S::Key;
+        type Label = Set<members::label>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Key = S::Key;
+        type Label = S::Label;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `label` field
-        pub struct label(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `label` field
+        pub struct label(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -292,9 +292,9 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
 impl<'a, S> WorkScopeTagBuilder<'a, S>
 where
     S: work_scope_tag_state::State,
-    S::CreatedAt: work_scope_tag_state::IsSet,
-    S::Label: work_scope_tag_state::IsSet,
     S::Key: work_scope_tag_state::IsSet,
+    S::Label: work_scope_tag_state::IsSet,
+    S::CreatedAt: work_scope_tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkScopeTag<'a> {

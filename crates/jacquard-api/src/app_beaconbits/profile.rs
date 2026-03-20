@@ -39,7 +39,7 @@ pub struct Profile<'a> {
     pub distance_unit: std::option::Option<ProfileDistanceUnit<'a>>,
     ///Whether to hide past beacons from public view Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_hide_past_beacons")]
+    #[serde(default = "_default_profile_hide_past_beacons")]
     pub hide_past_beacons: std::option::Option<bool>,
     ///Preferred language setting
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -51,17 +51,17 @@ pub struct Profile<'a> {
     pub marker_color: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether to include beacon links in Bluesky posts Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_post_beacon_links")]
+    #[serde(default = "_default_profile_post_beacon_links")]
     pub post_beacon_links: std::option::Option<bool>,
     ///Timestamp when settings were last updated
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
-fn _default_hide_past_beacons() -> std::option::Option<bool> {
+fn _default_profile_hide_past_beacons() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_post_beacon_links() -> std::option::Option<bool> {
+fn _default_profile_post_beacon_links() -> std::option::Option<bool> {
     Some(true)
 }
 

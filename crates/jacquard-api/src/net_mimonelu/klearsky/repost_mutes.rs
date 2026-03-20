@@ -35,37 +35,37 @@ pub mod repost_mutes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subjects;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subjects = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subjects = S::Subjects;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
-        type CreatedAt = S::CreatedAt;
         type Subjects = Set<members::subjects>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subjects = S::Subjects;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -140,8 +140,8 @@ where
 impl<'a, S> RepostMutesBuilder<'a, S>
 where
     S: repost_mutes_state::State,
-    S::CreatedAt: repost_mutes_state::IsSet,
     S::Subjects: repost_mutes_state::IsSet,
+    S::CreatedAt: repost_mutes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepostMutes<'a> {

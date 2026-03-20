@@ -24,12 +24,14 @@ pub struct RequestCrew<'a> {
     pub permissions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Requested role (default: 'member') Defaults to `"member"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_role")]
+    #[serde(default = "_default_request_crew_role")]
     #[serde(borrow)]
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_role() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_request_crew_role() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
     Some(jacquard_common::CowStr::from("member"))
 }
 

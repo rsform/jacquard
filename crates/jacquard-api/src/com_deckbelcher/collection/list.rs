@@ -35,37 +35,37 @@ pub mod card_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type AddedAt;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type AddedAt = S::AddedAt;
+        type Ref = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Ref = S::Ref;
         type AddedAt = Set<members::added_at>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type AddedAt = S::AddedAt;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> CardItemBuilder<'a, S>
 where
     S: card_item_state::State,
-    S::Ref: card_item_state::IsSet,
     S::AddedAt: card_item_state::IsSet,
+    S::Ref: card_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardItem<'a> {
@@ -650,50 +650,50 @@ pub mod list_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Items;
         type CreatedAt;
+        type Items;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Items = Unset;
         type CreatedAt = Unset;
+        type Items = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
         type Items = S::Items;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
-        type Name = S::Name;
-        type Items = Set<members::items>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Items = S::Items;
         type CreatedAt = Set<members::created_at>;
+        type Items = S::Items;
+    }
+    ///State transition - sets the `items` field to Set
+    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItems<S> {}
+    impl<S: State> State for SetItems<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Items = Set<members::items>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `items` field
-        pub struct items(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `items` field
+        pub struct items(());
     }
 }
 
@@ -827,8 +827,8 @@ impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
     S::Name: list_state::IsSet,
-    S::Items: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
+    S::Items: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {

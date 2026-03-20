@@ -328,7 +328,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
 pub struct Settings<'a> {
     ///Enable clean URL routing. When enabled, '/about' will attempt to serve '/about.html' or '/about/index.html' automatically. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_clean_urls")]
+    #[serde(default = "_default_settings_clean_urls")]
     pub clean_urls: std::option::Option<bool>,
     ///Custom 404 error page file path. Incompatible with directoryListing and spaMode.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -336,7 +336,7 @@ pub struct Settings<'a> {
     pub custom404: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Enable directory listing mode for paths that resolve to directories without an index file. Incompatible with spaMode. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_directory_listing")]
+    #[serde(default = "_default_settings_directory_listing")]
     pub directory_listing: std::option::Option<bool>,
     ///Custom HTTP headers to set on responses
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -352,11 +352,11 @@ pub struct Settings<'a> {
     pub spa_mode: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_clean_urls() -> std::option::Option<bool> {
+fn _default_settings_clean_urls() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_directory_listing() -> std::option::Option<bool> {
+fn _default_settings_directory_listing() -> std::option::Option<bool> {
     Some(false)
 }
 

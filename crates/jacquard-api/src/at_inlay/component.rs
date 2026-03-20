@@ -1187,37 +1187,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Accepts;
         type Prop;
+        type Accepts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Accepts = Unset;
         type Prop = Unset;
-    }
-    ///State transition - sets the `accepts` field to Set
-    pub struct SetAccepts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccepts<S> {}
-    impl<S: State> State for SetAccepts<S> {
-        type Accepts = Set<members::accepts>;
-        type Prop = S::Prop;
+        type Accepts = Unset;
     }
     ///State transition - sets the `prop` field to Set
     pub struct SetProp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProp<S> {}
     impl<S: State> State for SetProp<S> {
-        type Accepts = S::Accepts;
         type Prop = Set<members::prop>;
+        type Accepts = S::Accepts;
+    }
+    ///State transition - sets the `accepts` field to Set
+    pub struct SetAccepts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccepts<S> {}
+    impl<S: State> State for SetAccepts<S> {
+        type Prop = S::Prop;
+        type Accepts = Set<members::accepts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `accepts` field
-        pub struct accepts(());
         ///Marker type for the `prop` field
         pub struct prop(());
+        ///Marker type for the `accepts` field
+        pub struct accepts(());
     }
 }
 
@@ -1290,8 +1290,8 @@ where
 impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
-    S::Accepts: view_state::IsSet,
     S::Prop: view_state::IsSet,
+    S::Accepts: view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> View<'a> {

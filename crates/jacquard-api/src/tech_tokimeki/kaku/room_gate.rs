@@ -22,14 +22,14 @@ pub struct RoomGate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Whether the room is closed for new replies Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_is_closed")]
+    #[serde(default = "_default_room_gate_is_closed")]
     pub is_closed: std::option::Option<bool>,
     ///Reference to the ROOM post
     #[serde(borrow)]
     pub room: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-fn _default_is_closed() -> std::option::Option<bool> {
+fn _default_room_gate_is_closed() -> std::option::Option<bool> {
     Some(false)
 }
 

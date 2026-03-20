@@ -21,11 +21,11 @@ pub struct List<'a> {
     pub items: Vec<ListItemsItem<'a>>,
     ///Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_ordered")]
+    #[serde(default = "_default_list_ordered")]
     pub ordered: std::option::Option<bool>,
 }
 
-fn _default_ordered() -> std::option::Option<bool> {
+fn _default_list_ordered() -> std::option::Option<bool> {
     Some(false)
 }
 

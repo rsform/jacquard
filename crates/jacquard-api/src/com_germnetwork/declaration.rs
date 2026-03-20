@@ -49,37 +49,37 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Version;
         type CurrentKey;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Version = Unset;
         type CurrentKey = Unset;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Version = Set<members::version>;
-        type CurrentKey = S::CurrentKey;
+        type Version = Unset;
     }
     ///State transition - sets the `current_key` field to Set
     pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
     impl<S: State> State for SetCurrentKey<S> {
-        type Version = S::Version;
         type CurrentKey = Set<members::current_key>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type CurrentKey = S::CurrentKey;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `current_key` field
         pub struct current_key(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -212,8 +212,8 @@ where
 impl<'a, S> DeclarationBuilder<'a, S>
 where
     S: declaration_state::State,
-    S::Version: declaration_state::IsSet,
     S::CurrentKey: declaration_state::IsSet,
+    S::Version: declaration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {

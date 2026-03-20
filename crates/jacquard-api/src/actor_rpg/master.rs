@@ -55,51 +55,51 @@ pub mod master_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type System;
-        type Player;
         type CreatedAt;
+        type Player;
+        type System;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type System = Unset;
-        type Player = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `system` field to Set
-    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSystem<S> {}
-    impl<S: State> State for SetSystem<S> {
-        type System = Set<members::system>;
-        type Player = S::Player;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `player` field to Set
-    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayer<S> {}
-    impl<S: State> State for SetPlayer<S> {
-        type System = S::System;
-        type Player = Set<members::player>;
-        type CreatedAt = S::CreatedAt;
+        type Player = Unset;
+        type System = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type System = S::System;
-        type Player = S::Player;
         type CreatedAt = Set<members::created_at>;
+        type Player = S::Player;
+        type System = S::System;
+    }
+    ///State transition - sets the `player` field to Set
+    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayer<S> {}
+    impl<S: State> State for SetPlayer<S> {
+        type CreatedAt = S::CreatedAt;
+        type Player = Set<members::player>;
+        type System = S::System;
+    }
+    ///State transition - sets the `system` field to Set
+    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSystem<S> {}
+    impl<S: State> State for SetSystem<S> {
+        type CreatedAt = S::CreatedAt;
+        type Player = S::Player;
+        type System = Set<members::system>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `system` field
-        pub struct system(());
-        ///Marker type for the `player` field
-        pub struct player(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `player` field
+        pub struct player(());
+        ///Marker type for the `system` field
+        pub struct system(());
     }
 }
 
@@ -289,9 +289,9 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S> MasterBuilder<'a, S>
 where
     S: master_state::State,
-    S::System: master_state::IsSet,
-    S::Player: master_state::IsSet,
     S::CreatedAt: master_state::IsSet,
+    S::Player: master_state::IsSet,
+    S::System: master_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Master<'a> {

@@ -43,37 +43,37 @@ pub mod resolve_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Actor;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Actor = S::Actor;
+        type Name = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
-        type Name = S::Name;
         type Actor = Set<members::actor>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Actor = S::Actor;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -180,8 +180,8 @@ where
 impl<'a, S> ResolveNotebookBuilder<'a, S>
 where
     S: resolve_notebook_state::State,
-    S::Name: resolve_notebook_state::IsSet,
     S::Actor: resolve_notebook_state::IsSet,
+    S::Name: resolve_notebook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveNotebook<'a> {

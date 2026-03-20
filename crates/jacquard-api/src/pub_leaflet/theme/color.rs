@@ -32,51 +32,51 @@ pub mod rgb_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type R;
-        type B;
         type G;
+        type B;
+        type R;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type R = Unset;
-        type B = Unset;
         type G = Unset;
-    }
-    ///State transition - sets the `r` field to Set
-    pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetR<S> {}
-    impl<S: State> State for SetR<S> {
-        type R = Set<members::r>;
-        type B = S::B;
-        type G = S::G;
-    }
-    ///State transition - sets the `b` field to Set
-    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetB<S> {}
-    impl<S: State> State for SetB<S> {
-        type R = S::R;
-        type B = Set<members::b>;
-        type G = S::G;
+        type B = Unset;
+        type R = Unset;
     }
     ///State transition - sets the `g` field to Set
     pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetG<S> {}
     impl<S: State> State for SetG<S> {
-        type R = S::R;
-        type B = S::B;
         type G = Set<members::g>;
+        type B = S::B;
+        type R = S::R;
+    }
+    ///State transition - sets the `b` field to Set
+    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetB<S> {}
+    impl<S: State> State for SetB<S> {
+        type G = S::G;
+        type B = Set<members::b>;
+        type R = S::R;
+    }
+    ///State transition - sets the `r` field to Set
+    pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetR<S> {}
+    impl<S: State> State for SetR<S> {
+        type G = S::G;
+        type B = S::B;
+        type R = Set<members::r>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `r` field
-        pub struct r(());
-        ///Marker type for the `b` field
-        pub struct b(());
         ///Marker type for the `g` field
         pub struct g(());
+        ///Marker type for the `b` field
+        pub struct b(());
+        ///Marker type for the `r` field
+        pub struct r(());
     }
 }
 
@@ -160,9 +160,9 @@ where
 impl<'a, S> RgbBuilder<'a, S>
 where
     S: rgb_state::State,
-    S::R: rgb_state::IsSet,
-    S::B: rgb_state::IsSet,
     S::G: rgb_state::IsSet,
+    S::B: rgb_state::IsSet,
+    S::R: rgb_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgb<'a> {
@@ -438,67 +438,67 @@ pub mod rgba_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type R;
         type B;
         type A;
         type G;
-        type R;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type R = Unset;
         type B = Unset;
         type A = Unset;
         type G = Unset;
-        type R = Unset;
-    }
-    ///State transition - sets the `b` field to Set
-    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetB<S> {}
-    impl<S: State> State for SetB<S> {
-        type B = Set<members::b>;
-        type A = S::A;
-        type G = S::G;
-        type R = S::R;
-    }
-    ///State transition - sets the `a` field to Set
-    pub struct SetA<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetA<S> {}
-    impl<S: State> State for SetA<S> {
-        type B = S::B;
-        type A = Set<members::a>;
-        type G = S::G;
-        type R = S::R;
-    }
-    ///State transition - sets the `g` field to Set
-    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetG<S> {}
-    impl<S: State> State for SetG<S> {
-        type B = S::B;
-        type A = S::A;
-        type G = Set<members::g>;
-        type R = S::R;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetR<S> {}
     impl<S: State> State for SetR<S> {
+        type R = Set<members::r>;
         type B = S::B;
         type A = S::A;
         type G = S::G;
-        type R = Set<members::r>;
+    }
+    ///State transition - sets the `b` field to Set
+    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetB<S> {}
+    impl<S: State> State for SetB<S> {
+        type R = S::R;
+        type B = Set<members::b>;
+        type A = S::A;
+        type G = S::G;
+    }
+    ///State transition - sets the `a` field to Set
+    pub struct SetA<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetA<S> {}
+    impl<S: State> State for SetA<S> {
+        type R = S::R;
+        type B = S::B;
+        type A = Set<members::a>;
+        type G = S::G;
+    }
+    ///State transition - sets the `g` field to Set
+    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetG<S> {}
+    impl<S: State> State for SetG<S> {
+        type R = S::R;
+        type B = S::B;
+        type A = S::A;
+        type G = Set<members::g>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `r` field
+        pub struct r(());
         ///Marker type for the `b` field
         pub struct b(());
         ///Marker type for the `a` field
         pub struct a(());
         ///Marker type for the `g` field
         pub struct g(());
-        ///Marker type for the `r` field
-        pub struct r(());
     }
 }
 
@@ -599,10 +599,10 @@ where
 impl<'a, S> RgbaBuilder<'a, S>
 where
     S: rgba_state::State,
+    S::R: rgba_state::IsSet,
     S::B: rgba_state::IsSet,
     S::A: rgba_state::IsSet,
     S::G: rgba_state::IsSet,
-    S::R: rgba_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgba<'a> {

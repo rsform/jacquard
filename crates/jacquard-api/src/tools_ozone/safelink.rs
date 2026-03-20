@@ -144,151 +144,151 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedBy;
-        type EventType;
-        type Url;
-        type CreatedAt;
-        type Pattern;
-        type Reason;
-        type Id;
         type Action;
+        type CreatedBy;
+        type Url;
+        type Pattern;
+        type EventType;
+        type Reason;
+        type CreatedAt;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedBy = Unset;
-        type EventType = Unset;
-        type Url = Unset;
-        type CreatedAt = Unset;
-        type Pattern = Unset;
-        type Reason = Unset;
-        type Id = Unset;
         type Action = Unset;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type CreatedBy = Set<members::created_by>;
-        type EventType = S::EventType;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Id = S::Id;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `event_type` field to Set
-    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventType<S> {}
-    impl<S: State> State for SetEventType<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = Set<members::event_type>;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Id = S::Id;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = S::EventType;
-        type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Id = S::Id;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = S::EventType;
-        type Url = S::Url;
-        type CreatedAt = Set<members::created_at>;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Id = S::Id;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPattern<S> {}
-    impl<S: State> State for SetPattern<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = S::EventType;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = Set<members::pattern>;
-        type Reason = S::Reason;
-        type Id = S::Id;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = S::EventType;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = S::Pattern;
-        type Reason = Set<members::reason>;
-        type Id = S::Id;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = S::EventType;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Id = Set<members::id>;
-        type Action = S::Action;
+        type CreatedBy = Unset;
+        type Url = Unset;
+        type Pattern = Unset;
+        type EventType = Unset;
+        type Reason = Unset;
+        type CreatedAt = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `action` field to Set
     pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAction<S> {}
     impl<S: State> State for SetAction<S> {
-        type CreatedBy = S::CreatedBy;
-        type EventType = S::EventType;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Id = S::Id;
         type Action = Set<members::action>;
+        type CreatedBy = S::CreatedBy;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type EventType = S::EventType;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Action = S::Action;
+        type CreatedBy = Set<members::created_by>;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type EventType = S::EventType;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type Url = Set<members::url>;
+        type Pattern = S::Pattern;
+        type EventType = S::EventType;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPattern<S> {}
+    impl<S: State> State for SetPattern<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type Url = S::Url;
+        type Pattern = Set<members::pattern>;
+        type EventType = S::EventType;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type EventType = Set<members::event_type>;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type EventType = S::EventType;
+        type Reason = Set<members::reason>;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type EventType = S::EventType;
+        type Reason = S::Reason;
+        type CreatedAt = Set<members::created_at>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type EventType = S::EventType;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
-        ///Marker type for the `event_type` field
-        pub struct event_type(());
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `pattern` field
-        pub struct pattern(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `action` field
         pub struct action(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `pattern` field
+        pub struct pattern(());
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -508,14 +508,14 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::CreatedBy: event_state::IsSet,
-    S::EventType: event_state::IsSet,
-    S::Url: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
-    S::Pattern: event_state::IsSet,
-    S::Reason: event_state::IsSet,
-    S::Id: event_state::IsSet,
     S::Action: event_state::IsSet,
+    S::CreatedBy: event_state::IsSet,
+    S::Url: event_state::IsSet,
+    S::Pattern: event_state::IsSet,
+    S::EventType: event_state::IsSet,
+    S::Reason: event_state::IsSet,
+    S::CreatedAt: event_state::IsSet,
+    S::Id: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -1277,127 +1277,127 @@ pub mod url_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
-        type Pattern;
+        type Action;
         type CreatedBy;
         type CreatedAt;
-        type UpdatedAt;
-        type Action;
+        type Url;
         type Reason;
+        type UpdatedAt;
+        type Pattern;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
-        type Pattern = Unset;
+        type Action = Unset;
         type CreatedBy = Unset;
         type CreatedAt = Unset;
-        type UpdatedAt = Unset;
-        type Action = Unset;
+        type Url = Unset;
         type Reason = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Pattern = S::Pattern;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Action = S::Action;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPattern<S> {}
-    impl<S: State> State for SetPattern<S> {
-        type Url = S::Url;
-        type Pattern = Set<members::pattern>;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Action = S::Action;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
-        type CreatedBy = Set<members::created_by>;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Action = S::Action;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type Action = S::Action;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Action = S::Action;
-        type Reason = S::Reason;
+        type UpdatedAt = Unset;
+        type Pattern = Unset;
     }
     ///State transition - sets the `action` field to Set
     pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAction<S> {}
     impl<S: State> State for SetAction<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
+        type Action = Set<members::action>;
         type CreatedBy = S::CreatedBy;
         type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Action = Set<members::action>;
+        type Url = S::Url;
         type Reason = S::Reason;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Action = S::Action;
+        type CreatedBy = Set<members::created_by>;
+        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
+        type Reason = S::Reason;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = Set<members::created_at>;
+        type Url = S::Url;
+        type Reason = S::Reason;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Url = Set<members::url>;
+        type Reason = S::Reason;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
+        type Action = S::Action;
         type CreatedBy = S::CreatedBy;
         type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Action = S::Action;
+        type Url = S::Url;
         type Reason = Set<members::reason>;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
+        type Reason = S::Reason;
+        type UpdatedAt = Set<members::updated_at>;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPattern<S> {}
+    impl<S: State> State for SetPattern<S> {
+        type Action = S::Action;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
+        type Reason = S::Reason;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = Set<members::pattern>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `pattern` field
-        pub struct pattern(());
+        ///Marker type for the `action` field
+        pub struct action(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `action` field
-        pub struct action(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `reason` field
         pub struct reason(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `pattern` field
+        pub struct pattern(());
     }
 }
 
@@ -1587,13 +1587,13 @@ where
 impl<'a, S> UrlRuleBuilder<'a, S>
 where
     S: url_rule_state::State,
-    S::Url: url_rule_state::IsSet,
-    S::Pattern: url_rule_state::IsSet,
+    S::Action: url_rule_state::IsSet,
     S::CreatedBy: url_rule_state::IsSet,
     S::CreatedAt: url_rule_state::IsSet,
-    S::UpdatedAt: url_rule_state::IsSet,
-    S::Action: url_rule_state::IsSet,
+    S::Url: url_rule_state::IsSet,
     S::Reason: url_rule_state::IsSet,
+    S::UpdatedAt: url_rule_state::IsSet,
+    S::Pattern: url_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UrlRule<'a> {

@@ -33,37 +33,37 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Codes;
         type Account;
+        type Codes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Codes = Unset;
         type Account = Unset;
-    }
-    ///State transition - sets the `codes` field to Set
-    pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodes<S> {}
-    impl<S: State> State for SetCodes<S> {
-        type Codes = Set<members::codes>;
-        type Account = S::Account;
+        type Codes = Unset;
     }
     ///State transition - sets the `account` field to Set
     pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccount<S> {}
     impl<S: State> State for SetAccount<S> {
-        type Codes = S::Codes;
         type Account = Set<members::account>;
+        type Codes = S::Codes;
+    }
+    ///State transition - sets the `codes` field to Set
+    pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodes<S> {}
+    impl<S: State> State for SetCodes<S> {
+        type Account = S::Account;
+        type Codes = Set<members::codes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `codes` field
-        pub struct codes(());
         ///Marker type for the `account` field
         pub struct account(());
+        ///Marker type for the `codes` field
+        pub struct codes(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> AccountCodesBuilder<'a, S>
 where
     S: account_codes_state::State,
-    S::Codes: account_codes_state::IsSet,
     S::Account: account_codes_state::IsSet,
+    S::Codes: account_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountCodes<'a> {
@@ -349,7 +349,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodes<'a> {
     ///Defaults to `1`.
-    #[serde(default = "_default_code_count")]
+    #[serde(default = "_default_create_invite_codes_code_count")]
     pub code_count: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -357,7 +357,7 @@ pub struct CreateInviteCodes<'a> {
     pub use_count: i64,
 }
 
-fn _default_code_count() -> i64 {
+fn _default_create_invite_codes_code_count() -> i64 {
     1i64
 }
 
@@ -371,37 +371,37 @@ pub mod create_invite_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseCount;
         type CodeCount;
+        type UseCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseCount = Unset;
         type CodeCount = Unset;
-    }
-    ///State transition - sets the `use_count` field to Set
-    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseCount<S> {}
-    impl<S: State> State for SetUseCount<S> {
-        type UseCount = Set<members::use_count>;
-        type CodeCount = S::CodeCount;
+        type UseCount = Unset;
     }
     ///State transition - sets the `code_count` field to Set
     pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodeCount<S> {}
     impl<S: State> State for SetCodeCount<S> {
-        type UseCount = S::UseCount;
         type CodeCount = Set<members::code_count>;
+        type UseCount = S::UseCount;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseCount<S> {}
+    impl<S: State> State for SetUseCount<S> {
+        type CodeCount = S::CodeCount;
+        type UseCount = Set<members::use_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_count` field
-        pub struct use_count(());
         ///Marker type for the `code_count` field
         pub struct code_count(());
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
     }
 }
 
@@ -494,8 +494,8 @@ where
 impl<'a, S> CreateInviteCodesBuilder<'a, S>
 where
     S: create_invite_codes_state::State,
-    S::UseCount: create_invite_codes_state::IsSet,
     S::CodeCount: create_invite_codes_state::IsSet,
+    S::UseCount: create_invite_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateInviteCodes<'a> {

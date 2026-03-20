@@ -39,12 +39,12 @@ pub struct Post<'a> {
     pub title: jacquard_common::CowStr<'a>,
     ///Tells the visibility of the article to AppView. Defaults to `"public"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_visibility")]
+    #[serde(default = "_default_post_visibility")]
     #[serde(borrow)]
     pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_post_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("public"))
 }
 
@@ -58,8 +58,8 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
+        type CreatedAt;
         type Content;
         type Slug;
     }
@@ -67,26 +67,26 @@ pub mod post_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
         type Content = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Content = S::Content;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
         type Content = S::Content;
         type Slug = S::Slug;
     }
@@ -94,8 +94,8 @@ pub mod post_state {
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
         type Slug = S::Slug;
     }
@@ -103,18 +103,18 @@ pub mod post_state {
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
         type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `slug` field
@@ -338,8 +338,8 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
     S::Title: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
     S::Content: post_state::IsSet,
     S::Slug: post_state::IsSet,
 {

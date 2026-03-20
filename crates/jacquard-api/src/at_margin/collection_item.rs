@@ -41,50 +41,50 @@ pub mod collection_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type Annotation;
         type CreatedAt;
+        type Annotation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type Annotation = Unset;
         type CreatedAt = Unset;
+        type Annotation = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Collection = Set<members::collection>;
+        type CreatedAt = S::CreatedAt;
         type Annotation = S::Annotation;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `annotation` field to Set
-    pub struct SetAnnotation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnnotation<S> {}
-    impl<S: State> State for SetAnnotation<S> {
-        type Collection = S::Collection;
-        type Annotation = Set<members::annotation>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Collection = S::Collection;
-        type Annotation = S::Annotation;
         type CreatedAt = Set<members::created_at>;
+        type Annotation = S::Annotation;
+    }
+    ///State transition - sets the `annotation` field to Set
+    pub struct SetAnnotation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnnotation<S> {}
+    impl<S: State> State for SetAnnotation<S> {
+        type Collection = S::Collection;
+        type CreatedAt = S::CreatedAt;
+        type Annotation = Set<members::annotation>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `annotation` field
-        pub struct annotation(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `annotation` field
+        pub struct annotation(());
     }
 }
 
@@ -192,8 +192,8 @@ impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
     S::Collection: collection_item_state::IsSet,
-    S::Annotation: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
+    S::Annotation: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {

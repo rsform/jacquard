@@ -28,11 +28,11 @@ pub struct Ingredient<'a> {
     pub id: jacquard_common::CowStr<'a>,
     ///Whether this ingredient is detached (doesn't count towards recipe completeness) Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_is_detached")]
+    #[serde(default = "_default_ingredient_is_detached")]
     pub is_detached: std::option::Option<bool>,
     ///Whether this ingredient is optional Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_is_optional")]
+    #[serde(default = "_default_ingredient_is_optional")]
     pub is_optional: std::option::Option<bool>,
     ///Ingredient name
     #[serde(borrow)]
@@ -43,11 +43,11 @@ pub struct Ingredient<'a> {
     pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_is_detached() -> std::option::Option<bool> {
+fn _default_ingredient_is_detached() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_is_optional() -> std::option::Option<bool> {
+fn _default_ingredient_is_optional() -> std::option::Option<bool> {
     Some(false)
 }
 
@@ -61,49 +61,49 @@ pub mod ingredient_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Grams;
+        type Name;
         type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Grams = Unset;
+        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Grams = S::Grams;
-        type Id = S::Id;
     }
     ///State transition - sets the `grams` field to Set
     pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGrams<S> {}
     impl<S: State> State for SetGrams<S> {
-        type Name = S::Name;
         type Grams = Set<members::grams>;
+        type Name = S::Name;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Grams = S::Grams;
+        type Name = Set<members::name>;
         type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
         type Grams = S::Grams;
+        type Name = S::Name;
         type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `grams` field
         pub struct grams(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
     }
@@ -260,8 +260,8 @@ impl<'a, S: ingredient_state::State> IngredientBuilder<'a, S> {
 impl<'a, S> IngredientBuilder<'a, S>
 where
     S: ingredient_state::State,
-    S::Name: ingredient_state::IsSet,
     S::Grams: ingredient_state::IsSet,
+    S::Name: ingredient_state::IsSet,
     S::Id: ingredient_state::IsSet,
 {
     /// Build the final struct
@@ -873,7 +873,7 @@ pub struct Recipe<'a> {
     >,
     ///Whether this recipe is private (only visible to household members) Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_is_private")]
+    #[serde(default = "_default_recipe_is_private")]
     pub is_private: std::option::Option<bool>,
     ///Recipe name
     #[serde(borrow)]
@@ -882,7 +882,7 @@ pub struct Recipe<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub prep_time_minutes: std::option::Option<i64>,
     ///Number of servings this recipe makes Defaults to `1`.
-    #[serde(default = "_default_servings")]
+    #[serde(default = "_default_recipe_servings")]
     pub servings: i64,
     ///Source name (book, magazine, blog)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -897,11 +897,11 @@ pub struct Recipe<'a> {
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
-fn _default_is_private() -> std::option::Option<bool> {
+fn _default_recipe_is_private() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_servings() -> i64 {
+fn _default_recipe_servings() -> i64 {
     1i64
 }
 

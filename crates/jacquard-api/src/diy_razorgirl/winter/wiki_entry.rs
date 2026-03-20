@@ -57,8 +57,8 @@ pub mod wiki_entry_state {
         type Slug;
         type Title;
         type Content;
-        type CreatedAt;
         type LastUpdated;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -67,8 +67,8 @@ pub mod wiki_entry_state {
         type Slug = Unset;
         type Title = Unset;
         type Content = Unset;
-        type CreatedAt = Unset;
         type LastUpdated = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
@@ -77,8 +77,8 @@ pub mod wiki_entry_state {
         type Slug = Set<members::slug>;
         type Title = S::Title;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type LastUpdated = S::LastUpdated;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -87,8 +87,8 @@ pub mod wiki_entry_state {
         type Slug = S::Slug;
         type Title = Set<members::title>;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type LastUpdated = S::LastUpdated;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
@@ -97,18 +97,8 @@ pub mod wiki_entry_state {
         type Slug = S::Slug;
         type Title = S::Title;
         type Content = Set<members::content>;
+        type LastUpdated = S::LastUpdated;
         type CreatedAt = S::CreatedAt;
-        type LastUpdated = S::LastUpdated;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slug = S::Slug;
-        type Title = S::Title;
-        type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
-        type LastUpdated = S::LastUpdated;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
@@ -117,8 +107,18 @@ pub mod wiki_entry_state {
         type Slug = S::Slug;
         type Title = S::Title;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type LastUpdated = Set<members::last_updated>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slug = S::Slug;
+        type Title = S::Title;
+        type Content = S::Content;
+        type LastUpdated = S::LastUpdated;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -129,10 +129,10 @@ pub mod wiki_entry_state {
         pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -370,8 +370,8 @@ where
     S::Slug: wiki_entry_state::IsSet,
     S::Title: wiki_entry_state::IsSet,
     S::Content: wiki_entry_state::IsSet,
-    S::CreatedAt: wiki_entry_state::IsSet,
     S::LastUpdated: wiki_entry_state::IsSet,
+    S::CreatedAt: wiki_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiEntry<'a> {

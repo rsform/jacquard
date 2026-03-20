@@ -40,49 +40,49 @@ pub mod group_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type AddedAt;
+        type Image;
         type Group;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type AddedAt = Unset;
+        type Image = Unset;
         type Group = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type AddedAt = S::AddedAt;
-        type Group = S::Group;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Image = S::Image;
         type AddedAt = Set<members::added_at>;
+        type Image = S::Image;
+        type Group = S::Group;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type AddedAt = S::AddedAt;
+        type Image = Set<members::image>;
         type Group = S::Group;
     }
     ///State transition - sets the `group` field to Set
     pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGroup<S> {}
     impl<S: State> State for SetGroup<S> {
-        type Image = S::Image;
         type AddedAt = S::AddedAt;
+        type Image = S::Image;
         type Group = Set<members::group>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `image` field
+        pub struct image(());
         ///Marker type for the `group` field
         pub struct group(());
     }
@@ -194,8 +194,8 @@ impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
 impl<'a, S> GroupItemBuilder<'a, S>
 where
     S: group_item_state::State,
-    S::Image: group_item_state::IsSet,
     S::AddedAt: group_item_state::IsSet,
+    S::Image: group_item_state::IsSet,
     S::Group: group_item_state::IsSet,
 {
     /// Build the final struct

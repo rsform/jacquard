@@ -20,35 +20,35 @@
 pub struct ContentTypes<'a> {
     ///Mute regular posts from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_posts")]
+    #[serde(default = "_default_content_types_posts")]
     pub posts: std::option::Option<bool>,
     ///Mute quote posts from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_quotes")]
+    #[serde(default = "_default_content_types_quotes")]
     pub quotes: std::option::Option<bool>,
     ///Mute replies from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_replies")]
+    #[serde(default = "_default_content_types_replies")]
     pub replies: std::option::Option<bool>,
     ///Mute reposts from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_reposts")]
+    #[serde(default = "_default_content_types_reposts")]
     pub reposts: std::option::Option<bool>,
 }
 
-fn _default_posts() -> std::option::Option<bool> {
+fn _default_content_types_posts() -> std::option::Option<bool> {
     Some(true)
 }
 
-fn _default_quotes() -> std::option::Option<bool> {
+fn _default_content_types_quotes() -> std::option::Option<bool> {
     Some(true)
 }
 
-fn _default_replies() -> std::option::Option<bool> {
+fn _default_content_types_replies() -> std::option::Option<bool> {
     Some(true)
 }
 
-fn _default_reposts() -> std::option::Option<bool> {
+fn _default_content_types_reposts() -> std::option::Option<bool> {
     Some(true)
 }
 

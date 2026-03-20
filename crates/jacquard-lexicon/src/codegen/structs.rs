@@ -389,7 +389,7 @@ impl<'c> CodeGenerator<'c> {
 
         // Extract schema default and generate companion function + serde attr.
         let (default_doc, serde_default_attr, default_fn) =
-            self.extract_field_default(field_name, field_type, is_optional);
+            self.extract_field_default(parent_type_name, field_name, field_type, is_optional);
 
         // Combine description with default doc suffix.
         let combined_desc = match (description, &default_doc) {
@@ -449,11 +449,16 @@ impl<'c> CodeGenerator<'c> {
     /// Returns (doc_suffix, serde_attr, companion_fn).
     fn extract_field_default(
         &self,
+        parent_type_name: &str,
         field_name: &str,
         field_type: &LexObjectProperty<'static>,
         is_optional: bool,
     ) -> (Option<String>, Option<TokenStream>, Option<TokenStream>) {
-        let fn_name = format!("_default_{}", field_name.to_snake_case());
+        let fn_name = format!(
+            "_default_{}_{}",
+            parent_type_name.to_snake_case(),
+            field_name.to_snake_case()
+        );
         let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
         let serde_attr = quote! { #[serde(default = #fn_name)] };
 

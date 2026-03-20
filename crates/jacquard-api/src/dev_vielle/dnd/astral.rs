@@ -18,13 +18,13 @@
 #[serde(rename_all = "camelCase")]
 pub struct Astral<'a> {
     ///Defaults to `0`.
-    #[serde(default = "_default_points")]
+    #[serde(default = "_default_astral_points")]
     pub points: i64,
     #[serde(borrow)]
     pub powers: Vec<crate::dev_vielle::dnd::astral::Power<'a>>,
 }
 
-fn _default_points() -> i64 {
+fn _default_astral_points() -> i64 {
     0i64
 }
 

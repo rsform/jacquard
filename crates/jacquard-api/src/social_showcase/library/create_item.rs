@@ -49,67 +49,67 @@ pub mod create_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
-        type Images;
         type Title;
         type Tags;
+        type Images;
+        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
-        type Images = Unset;
         type Title = Unset;
         type Tags = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Visibility = S::Visibility;
-        type Images = Set<members::images>;
-        type Title = S::Title;
-        type Tags = S::Tags;
+        type Images = Unset;
+        type Visibility = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Visibility = S::Visibility;
-        type Images = S::Images;
         type Title = Set<members::title>;
         type Tags = S::Tags;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
-        type Visibility = S::Visibility;
-        type Images = S::Images;
         type Title = S::Title;
         type Tags = Set<members::tags>;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Title = S::Title;
+        type Tags = S::Tags;
+        type Images = Set<members::images>;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Title = S::Title;
+        type Tags = S::Tags;
+        type Images = S::Images;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
-        ///Marker type for the `images` field
-        pub struct images(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `images` field
+        pub struct images(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
     }
 }
 
@@ -299,10 +299,10 @@ where
 impl<'a, S> CreateItemBuilder<'a, S>
 where
     S: create_item_state::State,
-    S::Visibility: create_item_state::IsSet,
-    S::Images: create_item_state::IsSet,
     S::Title: create_item_state::IsSet,
     S::Tags: create_item_state::IsSet,
+    S::Images: create_item_state::IsSet,
+    S::Visibility: create_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateItem<'a> {

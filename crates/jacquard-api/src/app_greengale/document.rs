@@ -473,7 +473,7 @@ pub struct Document<'a> {
     pub content: jacquard_common::CowStr<'a>,
     ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_latex")]
+    #[serde(default = "_default_document_latex")]
     pub latex: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -501,16 +501,18 @@ pub struct Document<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
     ///Controls who can view this document Defaults to `"public"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_visibility")]
+    #[serde(default = "_default_document_visibility")]
     #[serde(borrow)]
     pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_latex() -> std::option::Option<bool> {
+fn _default_document_latex() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_document_visibility() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
     Some(jacquard_common::CowStr::from("public"))
 }
 
@@ -525,9 +527,9 @@ pub mod document_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type PublishedAt;
-        type Content;
         type Title;
         type Url;
+        type Content;
         type Path;
     }
     /// Empty state - all required fields are unset
@@ -535,9 +537,9 @@ pub mod document_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type PublishedAt = Unset;
-        type Content = Unset;
         type Title = Unset;
         type Url = Unset;
+        type Content = Unset;
         type Path = Unset;
     }
     ///State transition - sets the `published_at` field to Set
@@ -545,19 +547,9 @@ pub mod document_state {
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
         type PublishedAt = Set<members::published_at>;
+        type Title = S::Title;
+        type Url = S::Url;
         type Content = S::Content;
-        type Title = S::Title;
-        type Url = S::Url;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type PublishedAt = S::PublishedAt;
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type Url = S::Url;
         type Path = S::Path;
     }
     ///State transition - sets the `title` field to Set
@@ -565,9 +557,9 @@ pub mod document_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type PublishedAt = S::PublishedAt;
-        type Content = S::Content;
         type Title = Set<members::title>;
         type Url = S::Url;
+        type Content = S::Content;
         type Path = S::Path;
     }
     ///State transition - sets the `url` field to Set
@@ -575,9 +567,19 @@ pub mod document_state {
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
         type PublishedAt = S::PublishedAt;
-        type Content = S::Content;
         type Title = S::Title;
         type Url = Set<members::url>;
+        type Content = S::Content;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
+        type Url = S::Url;
+        type Content = Set<members::content>;
         type Path = S::Path;
     }
     ///State transition - sets the `path` field to Set
@@ -585,9 +587,9 @@ pub mod document_state {
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
         type PublishedAt = S::PublishedAt;
-        type Content = S::Content;
         type Title = S::Title;
         type Url = S::Url;
+        type Content = S::Content;
         type Path = Set<members::path>;
     }
     /// Marker types for field names
@@ -595,12 +597,12 @@ pub mod document_state {
     pub mod members {
         ///Marker type for the `published_at` field
         pub struct published_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `path` field
         pub struct path(());
     }
@@ -880,9 +882,9 @@ impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
     S::PublishedAt: document_state::IsSet,
-    S::Content: document_state::IsSet,
     S::Title: document_state::IsSet,
     S::Url: document_state::IsSet,
+    S::Content: document_state::IsSet,
     S::Path: document_state::IsSet,
 {
     /// Build the final struct

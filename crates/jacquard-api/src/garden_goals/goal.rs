@@ -87,8 +87,8 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type GoalId;
+        type Name;
         type Year;
         type CreatedAt;
     }
@@ -96,26 +96,26 @@ pub mod goal_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type GoalId = Unset;
+        type Name = Unset;
         type Year = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type GoalId = S::GoalId;
-        type Year = S::Year;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `goal_id` field to Set
     pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGoalId<S> {}
     impl<S: State> State for SetGoalId<S> {
-        type Name = S::Name;
         type GoalId = Set<members::goal_id>;
+        type Name = S::Name;
+        type Year = S::Year;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type GoalId = S::GoalId;
+        type Name = Set<members::name>;
         type Year = S::Year;
         type CreatedAt = S::CreatedAt;
     }
@@ -123,8 +123,8 @@ pub mod goal_state {
     pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
-        type Name = S::Name;
         type GoalId = S::GoalId;
+        type Name = S::Name;
         type Year = Set<members::year>;
         type CreatedAt = S::CreatedAt;
     }
@@ -132,18 +132,18 @@ pub mod goal_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type GoalId = S::GoalId;
+        type Name = S::Name;
         type Year = S::Year;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `year` field
         pub struct year(());
         ///Marker type for the `created_at` field
@@ -487,8 +487,8 @@ where
 impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
-    S::Name: goal_state::IsSet,
     S::GoalId: goal_state::IsSet,
+    S::Name: goal_state::IsSet,
     S::Year: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
 {

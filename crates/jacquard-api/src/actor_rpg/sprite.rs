@@ -20,7 +20,7 @@
 pub struct Sprite<'a> {
     ///Milliseconds per frame for animation playback Defaults to `200`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_animation_speed")]
+    #[serde(default = "_default_sprite_animation_speed")]
     pub animation_speed: std::option::Option<i64>,
     ///Number of columns per animation cycle
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -60,7 +60,7 @@ pub struct Sprite<'a> {
     pub width: std::option::Option<i64>,
 }
 
-fn _default_animation_speed() -> std::option::Option<i64> {
+fn _default_sprite_animation_speed() -> std::option::Option<i64> {
     Some(200i64)
 }
 
@@ -74,51 +74,51 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Engine;
         type SpriteSheet;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Engine = Unset;
         type SpriteSheet = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Engine = Set<members::engine>;
-        type SpriteSheet = S::SpriteSheet;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
-    impl<S: State> State for SetSpriteSheet<S> {
-        type Engine = S::Engine;
-        type SpriteSheet = Set<members::sprite_sheet>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Engine = S::Engine;
         type SpriteSheet = S::SpriteSheet;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type CreatedAt = S::CreatedAt;
+        type Engine = Set<members::engine>;
+        type SpriteSheet = S::SpriteSheet;
+    }
+    ///State transition - sets the `sprite_sheet` field to Set
+    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
+    impl<S: State> State for SetSpriteSheet<S> {
+        type CreatedAt = S::CreatedAt;
+        type Engine = S::Engine;
+        type SpriteSheet = Set<members::sprite_sheet>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `engine` field
         pub struct engine(());
         ///Marker type for the `sprite_sheet` field
         pub struct sprite_sheet(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -374,9 +374,9 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S> SpriteBuilder<'a, S>
 where
     S: sprite_state::State,
+    S::CreatedAt: sprite_state::IsSet,
     S::Engine: sprite_state::IsSet,
     S::SpriteSheet: sprite_state::IsSet,
-    S::CreatedAt: sprite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sprite<'a> {

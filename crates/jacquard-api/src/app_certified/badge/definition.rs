@@ -49,8 +49,8 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Icon;
+        type Title;
         type CreatedAt;
         type BadgeType;
     }
@@ -58,26 +58,26 @@ pub mod definition_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Icon = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
         type BadgeType = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Icon = S::Icon;
-        type CreatedAt = S::CreatedAt;
-        type BadgeType = S::BadgeType;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIcon<S> {}
     impl<S: State> State for SetIcon<S> {
-        type Title = S::Title;
         type Icon = Set<members::icon>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type BadgeType = S::BadgeType;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Icon = S::Icon;
+        type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
         type BadgeType = S::BadgeType;
     }
@@ -85,8 +85,8 @@ pub mod definition_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type Icon = S::Icon;
+        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
         type BadgeType = S::BadgeType;
     }
@@ -94,18 +94,18 @@ pub mod definition_state {
     pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeType<S> {}
     impl<S: State> State for SetBadgeType<S> {
-        type Title = S::Title;
         type Icon = S::Icon;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type BadgeType = Set<members::badge_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `icon` field
         pub struct icon(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `badge_type` field
@@ -262,8 +262,8 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Title: definition_state::IsSet,
     S::Icon: definition_state::IsSet,
+    S::Title: definition_state::IsSet,
     S::CreatedAt: definition_state::IsSet,
     S::BadgeType: definition_state::IsSet,
 {

@@ -37,37 +37,37 @@ pub mod put_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Rkey;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Rkey = S::Rkey;
+        type Record = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Record = S::Record;
         type Rkey = Set<members::rkey>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Rkey = S::Rkey;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -148,8 +148,8 @@ where
 impl<'a, S> PutNoteBuilder<'a, S>
 where
     S: put_note_state::State,
-    S::Record: put_note_state::IsSet,
     S::Rkey: put_note_state::IsSet,
+    S::Record: put_note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutNote<'a> {

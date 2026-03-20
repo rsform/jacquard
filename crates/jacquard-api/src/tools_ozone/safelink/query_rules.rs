@@ -32,7 +32,7 @@ pub struct QueryRules<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Maximum number of results to return Defaults to `50`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_limit")]
+    #[serde(default = "_default_query_rules_limit")]
     pub limit: std::option::Option<i64>,
     ///Filter by pattern type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -52,7 +52,7 @@ pub struct QueryRules<'a> {
     pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_query_rules_limit() -> std::option::Option<i64> {
     Some(50i64)
 }
 

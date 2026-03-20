@@ -761,67 +761,67 @@ pub mod edit_branch_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastUpdated;
-        type Head;
-        type Author;
         type Length;
+        type LastUpdated;
+        type Author;
+        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastUpdated = Unset;
-        type Head = Unset;
-        type Author = Unset;
         type Length = Unset;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type LastUpdated = Set<members::last_updated>;
-        type Head = S::Head;
-        type Author = S::Author;
-        type Length = S::Length;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHead<S> {}
-    impl<S: State> State for SetHead<S> {
-        type LastUpdated = S::LastUpdated;
-        type Head = Set<members::head>;
-        type Author = S::Author;
-        type Length = S::Length;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type LastUpdated = S::LastUpdated;
-        type Head = S::Head;
-        type Author = Set<members::author>;
-        type Length = S::Length;
+        type LastUpdated = Unset;
+        type Author = Unset;
+        type Head = Unset;
     }
     ///State transition - sets the `length` field to Set
     pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLength<S> {}
     impl<S: State> State for SetLength<S> {
-        type LastUpdated = S::LastUpdated;
-        type Head = S::Head;
-        type Author = S::Author;
         type Length = Set<members::length>;
+        type LastUpdated = S::LastUpdated;
+        type Author = S::Author;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Length = S::Length;
+        type LastUpdated = Set<members::last_updated>;
+        type Author = S::Author;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Length = S::Length;
+        type LastUpdated = S::LastUpdated;
+        type Author = Set<members::author>;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Length = S::Length;
+        type LastUpdated = S::LastUpdated;
+        type Author = S::Author;
+        type Head = Set<members::head>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
-        ///Marker type for the `head` field
-        pub struct head(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `length` field
         pub struct length(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `head` field
+        pub struct head(());
     }
 }
 
@@ -988,10 +988,10 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
 impl<'a, S> EditBranchViewBuilder<'a, S>
 where
     S: edit_branch_view_state::State,
-    S::LastUpdated: edit_branch_view_state::IsSet,
-    S::Head: edit_branch_view_state::IsSet,
-    S::Author: edit_branch_view_state::IsSet,
     S::Length: edit_branch_view_state::IsSet,
+    S::LastUpdated: edit_branch_view_state::IsSet,
+    S::Author: edit_branch_view_state::IsSet,
+    S::Head: edit_branch_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditBranchView<'a> {
@@ -1094,84 +1094,84 @@ pub mod edit_history_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
+        type Cid;
         type Author;
         type Type;
         type CreatedAt;
-        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
+        type Cid = Unset;
         type Author = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
-        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
         type Author = S::Author;
         type Type = S::Type;
         type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Type = S::Type;
-        type CreatedAt = Set<members::created_at>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
+        type Cid = Set<members::cid>;
         type Author = S::Author;
         type Type = S::Type;
         type CreatedAt = S::CreatedAt;
-        type Cid = Set<members::cid>;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Type = Set<members::r#type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Type = S::Type;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
     }
 }
 
@@ -1389,10 +1389,10 @@ impl<'a, S> EditHistoryEntryBuilder<'a, S>
 where
     S: edit_history_entry_state::State,
     S::Uri: edit_history_entry_state::IsSet,
+    S::Cid: edit_history_entry_state::IsSet,
     S::Author: edit_history_entry_state::IsSet,
     S::Type: edit_history_entry_state::IsSet,
     S::CreatedAt: edit_history_entry_state::IsSet,
-    S::Cid: edit_history_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditHistoryEntry<'a> {

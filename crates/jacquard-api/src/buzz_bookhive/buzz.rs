@@ -39,67 +39,67 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parent;
-        type CreatedAt;
         type Book;
+        type Parent;
         type Comment;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parent = Unset;
-        type CreatedAt = Unset;
         type Book = Unset;
+        type Parent = Unset;
         type Comment = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
-        type Comment = S::Comment;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Parent = S::Parent;
-        type CreatedAt = Set<members::created_at>;
-        type Book = S::Book;
-        type Comment = S::Comment;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
-        type Parent = S::Parent;
-        type CreatedAt = S::CreatedAt;
         type Book = Set<members::book>;
+        type Parent = S::Parent;
         type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Book = S::Book;
+        type Parent = Set<members::parent>;
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `comment` field to Set
     pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComment<S> {}
     impl<S: State> State for SetComment<S> {
-        type Parent = S::Parent;
-        type CreatedAt = S::CreatedAt;
         type Book = S::Book;
+        type Parent = S::Parent;
         type Comment = Set<members::comment>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Book = S::Book;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parent` field
-        pub struct parent(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `book` field
         pub struct book(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
         ///Marker type for the `comment` field
         pub struct comment(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -212,10 +212,10 @@ where
 impl<'a, S> BuzzBuilder<'a, S>
 where
     S: buzz_state::State,
-    S::Parent: buzz_state::IsSet,
-    S::CreatedAt: buzz_state::IsSet,
     S::Book: buzz_state::IsSet,
+    S::Parent: buzz_state::IsSet,
     S::Comment: buzz_state::IsSet,
+    S::CreatedAt: buzz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Buzz<'a> {

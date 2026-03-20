@@ -46,51 +46,51 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Vary;
         type Service;
         type Subject;
+        type Vary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Vary = Unset;
         type Service = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `vary` field to Set
-    pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVary<S> {}
-    impl<S: State> State for SetVary<S> {
-        type Vary = Set<members::vary>;
-        type Service = S::Service;
-        type Subject = S::Subject;
+        type Vary = Unset;
     }
     ///State transition - sets the `service` field to Set
     pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetService<S> {}
     impl<S: State> State for SetService<S> {
-        type Vary = S::Vary;
         type Service = Set<members::service>;
         type Subject = S::Subject;
+        type Vary = S::Vary;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Vary = S::Vary;
         type Service = S::Service;
         type Subject = Set<members::subject>;
+        type Vary = S::Vary;
+    }
+    ///State transition - sets the `vary` field to Set
+    pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVary<S> {}
+    impl<S: State> State for SetVary<S> {
+        type Service = S::Service;
+        type Subject = S::Subject;
+        type Vary = Set<members::vary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `vary` field
-        pub struct vary(());
         ///Marker type for the `service` field
         pub struct service(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `vary` field
+        pub struct vary(());
     }
 }
 
@@ -183,9 +183,9 @@ where
 impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
-    S::Vary: source_state::IsSet,
     S::Service: source_state::IsSet,
     S::Subject: source_state::IsSet,
+    S::Vary: source_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Source<'a> {

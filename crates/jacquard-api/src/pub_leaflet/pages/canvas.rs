@@ -40,66 +40,66 @@ pub mod block_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Block;
-        type Y;
-        type Width;
         type X;
+        type Width;
+        type Y;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Block = Unset;
-        type Y = Unset;
-        type Width = Unset;
         type X = Unset;
+        type Width = Unset;
+        type Y = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlock<S> {}
     impl<S: State> State for SetBlock<S> {
         type Block = Set<members::block>;
-        type Y = S::Y;
+        type X = S::X;
         type Width = S::Width;
-        type X = S::X;
-    }
-    ///State transition - sets the `y` field to Set
-    pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetY<S> {}
-    impl<S: State> State for SetY<S> {
-        type Block = S::Block;
-        type Y = Set<members::y>;
-        type Width = S::Width;
-        type X = S::X;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Block = S::Block;
         type Y = S::Y;
-        type Width = Set<members::width>;
-        type X = S::X;
     }
     ///State transition - sets the `x` field to Set
     pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetX<S> {}
     impl<S: State> State for SetX<S> {
         type Block = S::Block;
-        type Y = S::Y;
-        type Width = S::Width;
         type X = Set<members::x>;
+        type Width = S::Width;
+        type Y = S::Y;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Block = S::Block;
+        type X = S::X;
+        type Width = Set<members::width>;
+        type Y = S::Y;
+    }
+    ///State transition - sets the `y` field to Set
+    pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetY<S> {}
+    impl<S: State> State for SetY<S> {
+        type Block = S::Block;
+        type X = S::X;
+        type Width = S::Width;
+        type Y = Set<members::y>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `block` field
         pub struct block(());
-        ///Marker type for the `y` field
-        pub struct y(());
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `x` field
         pub struct x(());
+        ///Marker type for the `width` field
+        pub struct width(());
+        ///Marker type for the `y` field
+        pub struct y(());
     }
 }
 
@@ -235,9 +235,9 @@ impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
     S::Block: block_state::IsSet,
-    S::Y: block_state::IsSet,
-    S::Width: block_state::IsSet,
     S::X: block_state::IsSet,
+    S::Width: block_state::IsSet,
+    S::Y: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
@@ -964,37 +964,37 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Start = Set<members::start>;
-        type End = S::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnd<S> {}
     impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
         type End = Set<members::end>;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type End = S::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -1067,8 +1067,8 @@ where
 impl<'a, S> QuoteBuilder<'a, S>
 where
     S: quote_state::State,
-    S::Start: quote_state::IsSet,
     S::End: quote_state::IsSet,
+    S::Start: quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {

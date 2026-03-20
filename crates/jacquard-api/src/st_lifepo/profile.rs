@@ -38,37 +38,37 @@ pub mod life_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type StartDate;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type StartDate = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type StartDate = S::StartDate;
+        type Title = Unset;
     }
     ///State transition - sets the `start_date` field to Set
     pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartDate<S> {}
     impl<S: State> State for SetStartDate<S> {
-        type Title = S::Title;
         type StartDate = Set<members::start_date>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type StartDate = S::StartDate;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `start_date` field
         pub struct start_date(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -181,8 +181,8 @@ where
 impl<'a, S> LifeEventBuilder<'a, S>
 where
     S: life_event_state::State,
-    S::Title: life_event_state::IsSet,
     S::StartDate: life_event_state::IsSet,
+    S::Title: life_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LifeEvent<'a> {

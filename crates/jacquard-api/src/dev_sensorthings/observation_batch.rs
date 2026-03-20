@@ -528,65 +528,65 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Datastream;
-        type Observations;
         type WindowStart;
+        type Observations;
+        type Datastream;
         type WindowEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Datastream = Unset;
-        type Observations = Unset;
         type WindowStart = Unset;
+        type Observations = Unset;
+        type Datastream = Unset;
         type WindowEnd = Unset;
     }
-    ///State transition - sets the `datastream` field to Set
-    pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDatastream<S> {}
-    impl<S: State> State for SetDatastream<S> {
-        type Datastream = Set<members::datastream>;
+    ///State transition - sets the `window_start` field to Set
+    pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWindowStart<S> {}
+    impl<S: State> State for SetWindowStart<S> {
+        type WindowStart = Set<members::window_start>;
         type Observations = S::Observations;
-        type WindowStart = S::WindowStart;
+        type Datastream = S::Datastream;
         type WindowEnd = S::WindowEnd;
     }
     ///State transition - sets the `observations` field to Set
     pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservations<S> {}
     impl<S: State> State for SetObservations<S> {
-        type Datastream = S::Datastream;
-        type Observations = Set<members::observations>;
         type WindowStart = S::WindowStart;
+        type Observations = Set<members::observations>;
+        type Datastream = S::Datastream;
         type WindowEnd = S::WindowEnd;
     }
-    ///State transition - sets the `window_start` field to Set
-    pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWindowStart<S> {}
-    impl<S: State> State for SetWindowStart<S> {
-        type Datastream = S::Datastream;
+    ///State transition - sets the `datastream` field to Set
+    pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDatastream<S> {}
+    impl<S: State> State for SetDatastream<S> {
+        type WindowStart = S::WindowStart;
         type Observations = S::Observations;
-        type WindowStart = Set<members::window_start>;
+        type Datastream = Set<members::datastream>;
         type WindowEnd = S::WindowEnd;
     }
     ///State transition - sets the `window_end` field to Set
     pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
     impl<S: State> State for SetWindowEnd<S> {
-        type Datastream = S::Datastream;
-        type Observations = S::Observations;
         type WindowStart = S::WindowStart;
+        type Observations = S::Observations;
+        type Datastream = S::Datastream;
         type WindowEnd = Set<members::window_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `datastream` field
-        pub struct datastream(());
-        ///Marker type for the `observations` field
-        pub struct observations(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
+        ///Marker type for the `observations` field
+        pub struct observations(());
+        ///Marker type for the `datastream` field
+        pub struct datastream(());
         ///Marker type for the `window_end` field
         pub struct window_end(());
     }
@@ -703,9 +703,9 @@ where
 impl<'a, S> ObservationBatchBuilder<'a, S>
 where
     S: observation_batch_state::State,
-    S::Datastream: observation_batch_state::IsSet,
-    S::Observations: observation_batch_state::IsSet,
     S::WindowStart: observation_batch_state::IsSet,
+    S::Observations: observation_batch_state::IsSet,
+    S::Datastream: observation_batch_state::IsSet,
     S::WindowEnd: observation_batch_state::IsSet,
 {
     /// Build the final struct

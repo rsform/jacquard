@@ -19,7 +19,7 @@
 pub struct ImageCarousel<'a> {
     ///Auto-advance slides Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_autoplay")]
+    #[serde(default = "_default_image_carousel_autoplay")]
     pub autoplay: std::option::Option<bool>,
     ///Carousel caption
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -30,15 +30,15 @@ pub struct ImageCarousel<'a> {
     pub images: Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
     ///Milliseconds between slides Defaults to `3000`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_interval")]
+    #[serde(default = "_default_image_carousel_interval")]
     pub interval: std::option::Option<i64>,
 }
 
-fn _default_autoplay() -> std::option::Option<bool> {
+fn _default_image_carousel_autoplay() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_interval() -> std::option::Option<i64> {
+fn _default_image_carousel_interval() -> std::option::Option<i64> {
     Some(3000i64)
 }
 

@@ -622,13 +622,13 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
 #[serde(rename_all = "camelCase")]
 pub struct ModlistRef<'a> {
     ///Defaults to `false`.
-    #[serde(default = "_default_active")]
+    #[serde(default = "_default_modlist_ref_active")]
     pub active: bool,
     #[serde(borrow)]
     pub users: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
-fn _default_active() -> bool {
+fn _default_modlist_ref_active() -> bool {
     false
 }
 

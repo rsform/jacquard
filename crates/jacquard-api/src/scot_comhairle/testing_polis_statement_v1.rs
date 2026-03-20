@@ -39,50 +39,50 @@ pub mod testing_polis_statement_v1_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Poll;
         type Text;
+        type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Poll = Unset;
         type Text = Unset;
+        type Poll = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
         type Poll = S::Poll;
-        type Text = S::Text;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type CreatedAt = S::CreatedAt;
-        type Poll = Set<members::poll>;
-        type Text = S::Text;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type CreatedAt = S::CreatedAt;
-        type Poll = S::Poll;
         type Text = Set<members::text>;
+        type Poll = S::Poll;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `poll` field
-        pub struct poll(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
     }
 }
 
@@ -193,8 +193,8 @@ impl<'a, S> TestingPolisStatementV1Builder<'a, S>
 where
     S: testing_polis_statement_v1_state::State,
     S::CreatedAt: testing_polis_statement_v1_state::IsSet,
-    S::Poll: testing_polis_statement_v1_state::IsSet,
     S::Text: testing_polis_statement_v1_state::IsSet,
+    S::Poll: testing_polis_statement_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisStatementV1<'a> {

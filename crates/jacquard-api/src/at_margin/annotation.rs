@@ -20,7 +20,7 @@
 pub struct Body<'a> {
     ///MIME type of the body content Defaults to `"text/plain"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_format")]
+    #[serde(default = "_default_body_format")]
     #[serde(borrow)]
     pub format: std::option::Option<jacquard_common::CowStr<'a>>,
     ///BCP47 language tag
@@ -37,7 +37,7 @@ pub struct Body<'a> {
     pub value: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_format() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_body_format() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("text/plain"))
 }
 
@@ -1780,37 +1780,37 @@ pub mod range_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EndSelector;
         type StartSelector;
+        type EndSelector;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EndSelector = Unset;
         type StartSelector = Unset;
-    }
-    ///State transition - sets the `end_selector` field to Set
-    pub struct SetEndSelector<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndSelector<S> {}
-    impl<S: State> State for SetEndSelector<S> {
-        type EndSelector = Set<members::end_selector>;
-        type StartSelector = S::StartSelector;
+        type EndSelector = Unset;
     }
     ///State transition - sets the `start_selector` field to Set
     pub struct SetStartSelector<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartSelector<S> {}
     impl<S: State> State for SetStartSelector<S> {
-        type EndSelector = S::EndSelector;
         type StartSelector = Set<members::start_selector>;
+        type EndSelector = S::EndSelector;
+    }
+    ///State transition - sets the `end_selector` field to Set
+    pub struct SetEndSelector<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndSelector<S> {}
+    impl<S: State> State for SetEndSelector<S> {
+        type StartSelector = S::StartSelector;
+        type EndSelector = Set<members::end_selector>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end_selector` field
-        pub struct end_selector(());
         ///Marker type for the `start_selector` field
         pub struct start_selector(());
+        ///Marker type for the `end_selector` field
+        pub struct end_selector(());
     }
 }
 
@@ -1900,8 +1900,8 @@ impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
 impl<'a, S> RangeSelectorBuilder<'a, S>
 where
     S: range_selector_state::State,
-    S::EndSelector: range_selector_state::IsSet,
     S::StartSelector: range_selector_state::IsSet,
+    S::EndSelector: range_selector_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RangeSelector<'a> {

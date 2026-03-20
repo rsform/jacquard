@@ -42,12 +42,12 @@ pub struct Entry<'a> {
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Tells the visibility of the article to AppView. Defaults to `"public"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_visibility")]
+    #[serde(default = "_default_entry_visibility")]
     #[serde(borrow)]
     pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_entry_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("public"))
 }
 

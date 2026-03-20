@@ -393,37 +393,37 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type InterestedParties;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type InterestedParties = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type InterestedParties = S::InterestedParties;
+        type Title = Unset;
     }
     ///State transition - sets the `interested_parties` field to Set
     pub struct SetInterestedParties<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInterestedParties<S> {}
     impl<S: State> State for SetInterestedParties<S> {
-        type Title = S::Title;
         type InterestedParties = Set<members::interested_parties>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type InterestedParties = S::InterestedParties;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `interested_parties` field
         pub struct interested_parties(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -515,8 +515,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Title: song_state::IsSet,
     S::InterestedParties: song_state::IsSet,
+    S::Title: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {

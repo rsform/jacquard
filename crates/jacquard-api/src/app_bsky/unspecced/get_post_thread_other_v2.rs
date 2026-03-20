@@ -189,51 +189,51 @@ pub mod thread_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Uri;
         type Depth;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Uri = Unset;
         type Depth = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Uri = S::Uri;
-        type Depth = S::Depth;
+        type Value = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Value = S::Value;
         type Uri = Set<members::uri>;
         type Depth = S::Depth;
+        type Value = S::Value;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDepth<S> {}
     impl<S: State> State for SetDepth<S> {
-        type Value = S::Value;
         type Uri = S::Uri;
         type Depth = Set<members::depth>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Depth = S::Depth;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `depth` field
         pub struct depth(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -326,9 +326,9 @@ where
 impl<'a, S> ThreadItemBuilder<'a, S>
 where
     S: thread_item_state::State,
-    S::Value: thread_item_state::IsSet,
     S::Uri: thread_item_state::IsSet,
     S::Depth: thread_item_state::IsSet,
+    S::Value: thread_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItem<'a> {

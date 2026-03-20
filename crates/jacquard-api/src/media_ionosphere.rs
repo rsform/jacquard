@@ -29,25 +29,25 @@ pub struct Broadcast<'a> {
     pub bearer: crate::media_ionosphere::Bearer<'a>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods Defaults to `0`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_cost")]
+    #[serde(default = "_default_broadcast_cost")]
     pub cost: std::option::Option<i64>,
     ///The datetime from which this method is available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub from: std::option::Option<jacquard_common::types::string::Datetime>,
     ///Offset in milliseconds compared to other bearers Defaults to `0`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_offset")]
+    #[serde(default = "_default_broadcast_offset")]
     pub offset: std::option::Option<i64>,
     ///The datetime where this method is no longer available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub until: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-fn _default_cost() -> std::option::Option<i64> {
+fn _default_broadcast_cost() -> std::option::Option<i64> {
     Some(0i64)
 }
 
-fn _default_offset() -> std::option::Option<i64> {
+fn _default_broadcast_offset() -> std::option::Option<i64> {
     Some(0i64)
 }
 
@@ -811,37 +811,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entity;
         type Role;
+        type Entity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entity = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `entity` field to Set
-    pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntity<S> {}
-    impl<S: State> State for SetEntity<S> {
-        type Entity = Set<members::entity>;
-        type Role = S::Role;
+        type Entity = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Entity = S::Entity;
         type Role = Set<members::role>;
+        type Entity = S::Entity;
+    }
+    ///State transition - sets the `entity` field to Set
+    pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntity<S> {}
+    impl<S: State> State for SetEntity<S> {
+        type Role = S::Role;
+        type Entity = Set<members::entity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entity` field
-        pub struct entity(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `entity` field
+        pub struct entity(());
     }
 }
 
@@ -914,8 +914,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Entity: credit_state::IsSet,
     S::Role: credit_state::IsSet,
+    S::Entity: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -1371,7 +1371,7 @@ pub struct Recording<'a> {
     pub bearer: crate::media_ionosphere::Bearer<'a>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods Defaults to `0`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_cost")]
+    #[serde(default = "_default_recording_cost")]
     pub cost: std::option::Option<i64>,
     ///The datetime from which this method is available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -1381,7 +1381,7 @@ pub struct Recording<'a> {
     pub until: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-fn _default_cost() -> std::option::Option<i64> {
+fn _default_recording_cost() -> std::option::Option<i64> {
     Some(0i64)
 }
 
@@ -1599,37 +1599,37 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artists;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artists = S::Artists;
+        type Title = Unset;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type Title = S::Title;
         type Artists = Set<members::artists>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artists = S::Artists;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1719,8 +1719,8 @@ where
 impl<'a, S> TrackBuilder<'a, S>
 where
     S: track_state::State,
-    S::Title: track_state::IsSet,
     S::Artists: track_state::IsSet,
+    S::Title: track_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Track<'a> {

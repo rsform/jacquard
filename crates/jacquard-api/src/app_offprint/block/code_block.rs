@@ -27,11 +27,11 @@ pub struct CodeBlock<'a> {
     pub language: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether to display line numbers Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_show_line_numbers")]
+    #[serde(default = "_default_code_block_show_line_numbers")]
     pub show_line_numbers: std::option::Option<bool>,
 }
 
-fn _default_show_line_numbers() -> std::option::Option<bool> {
+fn _default_code_block_show_line_numbers() -> std::option::Option<bool> {
     Some(false)
 }
 

@@ -23,7 +23,7 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Whether the post is published or draft Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_published")]
+    #[serde(default = "_default_post_published")]
     pub published: std::option::Option<bool>,
     ///Optional summary/excerpt of the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -40,7 +40,7 @@ pub struct Post<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-fn _default_published() -> std::option::Option<bool> {
+fn _default_post_published() -> std::option::Option<bool> {
     Some(false)
 }
 

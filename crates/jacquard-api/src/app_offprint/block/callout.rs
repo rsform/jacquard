@@ -24,7 +24,7 @@ pub struct Callout<'a> {
     pub color: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Emoji icon for the callout Defaults to `"💡"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_emoji")]
+    #[serde(default = "_default_callout_emoji")]
     #[serde(borrow)]
     pub emoji: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Facets for text formatting
@@ -36,7 +36,7 @@ pub struct Callout<'a> {
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
-fn _default_emoji() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_callout_emoji() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("💡"))
 }
 

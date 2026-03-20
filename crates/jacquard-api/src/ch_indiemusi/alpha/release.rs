@@ -313,51 +313,51 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Recordings;
         type Title;
         type Artists;
+        type Recordings;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Recordings = Unset;
         type Title = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `recordings` field to Set
-    pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordings<S> {}
-    impl<S: State> State for SetRecordings<S> {
-        type Recordings = Set<members::recordings>;
-        type Title = S::Title;
-        type Artists = S::Artists;
+        type Recordings = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Recordings = S::Recordings;
         type Title = Set<members::title>;
         type Artists = S::Artists;
+        type Recordings = S::Recordings;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type Recordings = S::Recordings;
         type Title = S::Title;
         type Artists = Set<members::artists>;
+        type Recordings = S::Recordings;
+    }
+    ///State transition - sets the `recordings` field to Set
+    pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordings<S> {}
+    impl<S: State> State for SetRecordings<S> {
+        type Title = S::Title;
+        type Artists = S::Artists;
+        type Recordings = Set<members::recordings>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `recordings` field
-        pub struct recordings(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `recordings` field
+        pub struct recordings(());
     }
 }
 
@@ -509,9 +509,9 @@ where
 impl<'a, S> ReleaseBuilder<'a, S>
 where
     S: release_state::State,
-    S::Recordings: release_state::IsSet,
     S::Title: release_state::IsSet,
     S::Artists: release_state::IsSet,
+    S::Recordings: release_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Release<'a> {

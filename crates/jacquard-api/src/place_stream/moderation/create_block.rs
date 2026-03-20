@@ -39,37 +39,37 @@ pub mod create_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Subject;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Subject = S::Subject;
+        type Streamer = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Streamer = S::Streamer;
         type Subject = Set<members::subject>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Subject = S::Subject;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -159,8 +159,8 @@ where
 impl<'a, S> CreateBlockBuilder<'a, S>
 where
     S: create_block_state::State,
-    S::Streamer: create_block_state::IsSet,
     S::Subject: create_block_state::IsSet,
+    S::Streamer: create_block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateBlock<'a> {

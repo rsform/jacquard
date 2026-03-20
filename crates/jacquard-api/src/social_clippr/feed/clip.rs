@@ -40,22 +40,22 @@ pub struct Clip<'a> {
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///Whether the bookmark can be used for feed indexing and aggregation Defaults to `false`.
-    #[serde(default = "_default_unlisted")]
+    #[serde(default = "_default_clip_unlisted")]
     pub unlisted: bool,
     ///Whether the bookmark has been read by the user Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_unread")]
+    #[serde(default = "_default_clip_unread")]
     pub unread: std::option::Option<bool>,
     ///The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
-fn _default_unlisted() -> bool {
+fn _default_clip_unlisted() -> bool {
     false
 }
 
-fn _default_unread() -> std::option::Option<bool> {
+fn _default_clip_unread() -> std::option::Option<bool> {
     Some(true)
 }
 
@@ -69,85 +69,85 @@ pub mod clip_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
+        type Title;
         type Unlisted;
         type CreatedAt;
+        type Url;
         type Description;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
+        type Title = Unset;
         type Unlisted = Unset;
         type CreatedAt = Unset;
+        type Url = Unset;
         type Description = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Unlisted = S::Unlisted;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `unlisted` field to Set
-    pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnlisted<S> {}
-    impl<S: State> State for SetUnlisted<S> {
-        type Url = S::Url;
-        type Unlisted = Set<members::unlisted>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
-        type Unlisted = S::Unlisted;
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Url = S::Url;
-        type Unlisted = S::Unlisted;
-        type CreatedAt = S::CreatedAt;
-        type Description = Set<members::description>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
+        type Title = Set<members::title>;
         type Unlisted = S::Unlisted;
         type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
         type Description = S::Description;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `unlisted` field to Set
+    pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnlisted<S> {}
+    impl<S: State> State for SetUnlisted<S> {
+        type Title = S::Title;
+        type Unlisted = Set<members::unlisted>;
+        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = Set<members::created_at>;
+        type Url = S::Url;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = S::CreatedAt;
+        type Url = Set<members::url>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `unlisted` field
         pub struct unlisted(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
@@ -363,11 +363,11 @@ where
 impl<'a, S> ClipBuilder<'a, S>
 where
     S: clip_state::State,
-    S::Url: clip_state::IsSet,
+    S::Title: clip_state::IsSet,
     S::Unlisted: clip_state::IsSet,
     S::CreatedAt: clip_state::IsSet,
+    S::Url: clip_state::IsSet,
     S::Description: clip_state::IsSet,
-    S::Title: clip_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Clip<'a> {

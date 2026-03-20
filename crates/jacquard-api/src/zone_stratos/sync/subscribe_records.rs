@@ -42,9 +42,9 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
-        type Did;
         type Time;
+        type Did;
+        type Seq;
         type Rev;
         type Ops;
     }
@@ -52,19 +52,19 @@ pub mod commit_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
-        type Did = Unset;
         type Time = Unset;
+        type Did = Unset;
+        type Seq = Unset;
         type Rev = Unset;
         type Ops = Unset;
     }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Seq = Set<members::seq>;
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Time = Set<members::time>;
         type Did = S::Did;
-        type Time = S::Time;
+        type Seq = S::Seq;
         type Rev = S::Rev;
         type Ops = S::Ops;
     }
@@ -72,19 +72,19 @@ pub mod commit_state {
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Seq = S::Seq;
-        type Did = Set<members::did>;
         type Time = S::Time;
+        type Did = Set<members::did>;
+        type Seq = S::Seq;
         type Rev = S::Rev;
         type Ops = S::Ops;
     }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Seq = S::Seq;
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Time = S::Time;
         type Did = S::Did;
-        type Time = Set<members::time>;
+        type Seq = Set<members::seq>;
         type Rev = S::Rev;
         type Ops = S::Ops;
     }
@@ -92,9 +92,9 @@ pub mod commit_state {
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Seq = S::Seq;
-        type Did = S::Did;
         type Time = S::Time;
+        type Did = S::Did;
+        type Seq = S::Seq;
         type Rev = Set<members::rev>;
         type Ops = S::Ops;
     }
@@ -102,21 +102,21 @@ pub mod commit_state {
     pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOps<S> {}
     impl<S: State> State for SetOps<S> {
-        type Seq = S::Seq;
-        type Did = S::Did;
         type Time = S::Time;
+        type Did = S::Did;
+        type Seq = S::Seq;
         type Rev = S::Rev;
         type Ops = Set<members::ops>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `ops` field
@@ -255,9 +255,9 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
-    S::Seq: commit_state::IsSet,
-    S::Did: commit_state::IsSet,
     S::Time: commit_state::IsSet,
+    S::Did: commit_state::IsSet,
+    S::Seq: commit_state::IsSet,
     S::Rev: commit_state::IsSet,
     S::Ops: commit_state::IsSet,
 {

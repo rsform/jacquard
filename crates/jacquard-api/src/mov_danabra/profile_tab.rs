@@ -19,7 +19,7 @@
 pub struct ProfileTab<'a> {
     ///Defaults to `10`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_limit")]
+    #[serde(default = "_default_profile_tab_limit")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -28,7 +28,7 @@ pub struct ProfileTab<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_profile_tab_limit() -> std::option::Option<i64> {
     Some(10i64)
 }
 

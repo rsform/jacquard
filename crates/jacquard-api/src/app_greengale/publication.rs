@@ -24,7 +24,7 @@ pub struct Publication<'a> {
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     ///When enabled, also publishes to site.standard.publication and site.standard.document collections for cross-platform compatibility Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_enable_site_standard")]
+    #[serde(default = "_default_publication_enable_site_standard")]
     pub enable_site_standard: std::option::Option<bool>,
     ///Publication/blog title
     #[serde(borrow)]
@@ -42,7 +42,7 @@ pub struct Publication<'a> {
     pub voice_theme: std::option::Option<crate::app_greengale::blog::VoiceTheme<'a>>,
 }
 
-fn _default_enable_site_standard() -> std::option::Option<bool> {
+fn _default_publication_enable_site_standard() -> std::option::Option<bool> {
     Some(false)
 }
 
@@ -56,37 +56,37 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Name;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Name = S::Name;
+        type Url = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Url = S::Url;
         type Name = Set<members::name>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Name = S::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -233,8 +233,8 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::Url: publication_state::IsSet,
     S::Name: publication_state::IsSet,
+    S::Url: publication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {

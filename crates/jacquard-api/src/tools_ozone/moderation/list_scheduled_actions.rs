@@ -26,7 +26,7 @@ pub struct ListScheduledActions<'a> {
     pub ends_before: std::option::Option<jacquard_common::types::string::Datetime>,
     ///Maximum number of results to return Defaults to `50`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_limit")]
+    #[serde(default = "_default_list_scheduled_actions_limit")]
     pub limit: std::option::Option<i64>,
     ///Filter actions scheduled to execute after this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -40,7 +40,7 @@ pub struct ListScheduledActions<'a> {
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_list_scheduled_actions_limit() -> std::option::Option<i64> {
     Some(50i64)
 }
 

@@ -36,51 +36,51 @@ pub mod selected_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type QuestionRef;
         type AnswerRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type QuestionRef = Unset;
         type AnswerRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type QuestionRef = S::QuestionRef;
-        type AnswerRef = S::AnswerRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `question_ref` field to Set
     pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
     impl<S: State> State for SetQuestionRef<S> {
-        type CreatedAt = S::CreatedAt;
         type QuestionRef = Set<members::question_ref>;
         type AnswerRef = S::AnswerRef;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `answer_ref` field to Set
     pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
     impl<S: State> State for SetAnswerRef<S> {
-        type CreatedAt = S::CreatedAt;
         type QuestionRef = S::QuestionRef;
         type AnswerRef = Set<members::answer_ref>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type QuestionRef = S::QuestionRef;
+        type AnswerRef = S::AnswerRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `question_ref` field
         pub struct question_ref(());
         ///Marker type for the `answer_ref` field
         pub struct answer_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -173,9 +173,9 @@ where
 impl<'a, S> SelectedAnswerBuilder<'a, S>
 where
     S: selected_answer_state::State,
-    S::CreatedAt: selected_answer_state::IsSet,
     S::QuestionRef: selected_answer_state::IsSet,
     S::AnswerRef: selected_answer_state::IsSet,
+    S::CreatedAt: selected_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SelectedAnswer<'a> {

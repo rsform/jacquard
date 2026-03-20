@@ -24,11 +24,11 @@ pub struct Quiz<'a> {
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     ///This quiz includes questions with audio, eg. a music round Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_has_audio")]
+    #[serde(default = "_default_quiz_has_audio")]
     pub has_audio: std::option::Option<bool>,
     ///This quiz includes questions with visuals, eg. a picture round Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_has_visuals")]
+    #[serde(default = "_default_quiz_has_visuals")]
     pub has_visuals: std::option::Option<bool>,
     ///Dominant language(s) of the quiz
     pub locales: Vec<jacquard_common::types::string::Language>,
@@ -48,11 +48,11 @@ pub struct Quiz<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
-fn _default_has_audio() -> std::option::Option<bool> {
+fn _default_quiz_has_audio() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_has_visuals() -> std::option::Option<bool> {
+fn _default_quiz_has_visuals() -> std::option::Option<bool> {
     Some(false)
 }
 
@@ -66,67 +66,67 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rounds;
+        type Locales;
         type Timestamp;
         type Title;
-        type Locales;
+        type Rounds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rounds = Unset;
+        type Locales = Unset;
         type Timestamp = Unset;
         type Title = Unset;
-        type Locales = Unset;
-    }
-    ///State transition - sets the `rounds` field to Set
-    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRounds<S> {}
-    impl<S: State> State for SetRounds<S> {
-        type Rounds = Set<members::rounds>;
-        type Timestamp = S::Timestamp;
-        type Title = S::Title;
-        type Locales = S::Locales;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Rounds = S::Rounds;
-        type Timestamp = Set<members::timestamp>;
-        type Title = S::Title;
-        type Locales = S::Locales;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Rounds = S::Rounds;
-        type Timestamp = S::Timestamp;
-        type Title = Set<members::title>;
-        type Locales = S::Locales;
+        type Rounds = Unset;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocales<S> {}
     impl<S: State> State for SetLocales<S> {
-        type Rounds = S::Rounds;
+        type Locales = Set<members::locales>;
         type Timestamp = S::Timestamp;
         type Title = S::Title;
-        type Locales = Set<members::locales>;
+        type Rounds = S::Rounds;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Locales = S::Locales;
+        type Timestamp = Set<members::timestamp>;
+        type Title = S::Title;
+        type Rounds = S::Rounds;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Locales = S::Locales;
+        type Timestamp = S::Timestamp;
+        type Title = Set<members::title>;
+        type Rounds = S::Rounds;
+    }
+    ///State transition - sets the `rounds` field to Set
+    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRounds<S> {}
+    impl<S: State> State for SetRounds<S> {
+        type Locales = S::Locales;
+        type Timestamp = S::Timestamp;
+        type Title = S::Title;
+        type Rounds = Set<members::rounds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rounds` field
-        pub struct rounds(());
+        ///Marker type for the `locales` field
+        pub struct locales(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `locales` field
-        pub struct locales(());
+        ///Marker type for the `rounds` field
+        pub struct rounds(());
     }
 }
 
@@ -307,10 +307,10 @@ where
 impl<'a, S> QuizBuilder<'a, S>
 where
     S: quiz_state::State,
-    S::Rounds: quiz_state::IsSet,
+    S::Locales: quiz_state::IsSet,
     S::Timestamp: quiz_state::IsSet,
     S::Title: quiz_state::IsSet,
-    S::Locales: quiz_state::IsSet,
+    S::Rounds: quiz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quiz<'a> {
@@ -834,13 +834,13 @@ pub struct QuestionRef<'a> {
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Points awarded for complete correctness Defaults to `1`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_points")]
+    #[serde(default = "_default_question_ref_points")]
     pub points: std::option::Option<i64>,
     #[serde(borrow)]
     pub question: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-fn _default_points() -> std::option::Option<i64> {
+fn _default_question_ref_points() -> std::option::Option<i64> {
     Some(1i64)
 }
 

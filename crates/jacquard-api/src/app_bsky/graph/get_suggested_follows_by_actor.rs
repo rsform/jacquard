@@ -136,7 +136,7 @@ where
 pub struct GetSuggestedFollowsByActorOutput<'a> {
     ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_is_fallback")]
+    #[serde(default = "_default_get_suggested_follows_by_actor_output_is_fallback")]
     pub is_fallback: std::option::Option<bool>,
     ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -149,7 +149,9 @@ pub struct GetSuggestedFollowsByActorOutput<'a> {
     pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
 }
 
-fn _default_is_fallback() -> std::option::Option<bool> {
+fn _default_get_suggested_follows_by_actor_output_is_fallback() -> std::option::Option<
+    bool,
+> {
     Some(false)
 }
 

@@ -58,85 +58,85 @@ pub mod tool_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type InputSchema;
+        type Description;
+        type CreatedAt;
         type Name;
         type Code;
-        type Description;
-        type InputSchema;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type InputSchema = Unset;
+        type Description = Unset;
+        type CreatedAt = Unset;
         type Name = Unset;
         type Code = Unset;
-        type Description = Unset;
-        type InputSchema = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Code = S::Code;
-        type Description = S::Description;
-        type InputSchema = S::InputSchema;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Name = S::Name;
-        type Code = Set<members::code>;
-        type Description = S::Description;
-        type InputSchema = S::InputSchema;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Name = S::Name;
-        type Code = S::Code;
-        type Description = Set<members::description>;
-        type InputSchema = S::InputSchema;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `input_schema` field to Set
     pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInputSchema<S> {}
     impl<S: State> State for SetInputSchema<S> {
+        type InputSchema = Set<members::input_schema>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Code = S::Code;
-        type Description = S::Description;
-        type InputSchema = Set<members::input_schema>;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type InputSchema = S::InputSchema;
+        type Description = Set<members::description>;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Code = S::Code;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type InputSchema = S::InputSchema;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type Code = S::Code;
-        type Description = S::Description;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
         type InputSchema = S::InputSchema;
-        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Code = S::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type InputSchema = S::InputSchema;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `input_schema` field
+        pub struct input_schema(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `input_schema` field
-        pub struct input_schema(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -404,11 +404,11 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S> ToolBuilder<'a, S>
 where
     S: tool_state::State,
+    S::InputSchema: tool_state::IsSet,
+    S::Description: tool_state::IsSet,
+    S::CreatedAt: tool_state::IsSet,
     S::Name: tool_state::IsSet,
     S::Code: tool_state::IsSet,
-    S::Description: tool_state::IsSet,
-    S::InputSchema: tool_state::IsSet,
-    S::CreatedAt: tool_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tool<'a> {

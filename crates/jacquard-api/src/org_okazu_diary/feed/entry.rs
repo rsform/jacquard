@@ -23,7 +23,7 @@ pub struct Entry<'a> {
     pub datetime: jacquard_common::CowStr<'a>,
     ///If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_had_hiatus")]
+    #[serde(default = "_default_entry_had_hiatus")]
     pub had_hiatus: std::option::Option<bool>,
     ///Self-label values for this post. Effectively content warnings for the note and tags.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -53,7 +53,7 @@ pub struct Entry<'a> {
     pub visibility: std::option::Option<EntryVisibility<'a>>,
 }
 
-fn _default_had_hiatus() -> std::option::Option<bool> {
+fn _default_entry_had_hiatus() -> std::option::Option<bool> {
     Some(false)
 }
 

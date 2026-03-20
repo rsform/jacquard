@@ -5,15 +5,15 @@ members = ["crates/*"]
 
 [workspace.package]
 edition = "2024"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["Orual <orual@nonbinary.computer>"]
 #repository = "https://github.com/rsform/jacquard"
-repository = "https://tangled.org/@nonbinary.computer/jacquard"
+repository = "https://tangled.org/nonbinary.computer/jacquard"
 keywords = ["atproto", "at", "bluesky", "api", "client"]
 categories = ["api-bindings", "web-programming::http-client"]
 readme = "README.md"
 exclude = [".direnv"]
-homepage = "https://tangled.org/@nonbinary.computer/jacquard"
+homepage = "https://tangled.org/nonbinary.computer/jacquard"
 license = "MPL-2.0"
 
 description = "Simple and powerful AT Protocol client library for Rust"

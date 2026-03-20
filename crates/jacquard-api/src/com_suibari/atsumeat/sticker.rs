@@ -72,8 +72,8 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OriginalOwner;
         type Model;
+        type OriginalOwner;
         type ObtainedAt;
         type Signature;
         type Image;
@@ -83,30 +83,30 @@ pub mod sticker_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OriginalOwner = Unset;
         type Model = Unset;
+        type OriginalOwner = Unset;
         type ObtainedAt = Unset;
         type Signature = Unset;
         type Image = Unset;
         type SignedPayload = Unset;
     }
-    ///State transition - sets the `original_owner` field to Set
-    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
-    impl<S: State> State for SetOriginalOwner<S> {
-        type OriginalOwner = Set<members::original_owner>;
-        type Model = S::Model;
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type Model = Set<members::model>;
+        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = S::ObtainedAt;
         type Signature = S::Signature;
         type Image = S::Image;
         type SignedPayload = S::SignedPayload;
     }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type OriginalOwner = S::OriginalOwner;
-        type Model = Set<members::model>;
+    ///State transition - sets the `original_owner` field to Set
+    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
+    impl<S: State> State for SetOriginalOwner<S> {
+        type Model = S::Model;
+        type OriginalOwner = Set<members::original_owner>;
         type ObtainedAt = S::ObtainedAt;
         type Signature = S::Signature;
         type Image = S::Image;
@@ -116,8 +116,8 @@ pub mod sticker_state {
     pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
     impl<S: State> State for SetObtainedAt<S> {
-        type OriginalOwner = S::OriginalOwner;
         type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = Set<members::obtained_at>;
         type Signature = S::Signature;
         type Image = S::Image;
@@ -127,8 +127,8 @@ pub mod sticker_state {
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
-        type OriginalOwner = S::OriginalOwner;
         type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = S::ObtainedAt;
         type Signature = Set<members::signature>;
         type Image = S::Image;
@@ -138,8 +138,8 @@ pub mod sticker_state {
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type OriginalOwner = S::OriginalOwner;
         type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = S::ObtainedAt;
         type Signature = S::Signature;
         type Image = Set<members::image>;
@@ -149,8 +149,8 @@ pub mod sticker_state {
     pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
     impl<S: State> State for SetSignedPayload<S> {
-        type OriginalOwner = S::OriginalOwner;
         type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = S::ObtainedAt;
         type Signature = S::Signature;
         type Image = S::Image;
@@ -159,10 +159,10 @@ pub mod sticker_state {
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `original_owner` field
-        pub struct original_owner(());
         ///Marker type for the `model` field
         pub struct model(());
+        ///Marker type for the `original_owner` field
+        pub struct original_owner(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
         ///Marker type for the `signature` field
@@ -459,8 +459,8 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::OriginalOwner: sticker_state::IsSet,
     S::Model: sticker_state::IsSet,
+    S::OriginalOwner: sticker_state::IsSet,
     S::ObtainedAt: sticker_state::IsSet,
     S::Signature: sticker_state::IsSet,
     S::Image: sticker_state::IsSet,

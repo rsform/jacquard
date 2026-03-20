@@ -61,8 +61,8 @@ pub mod episode_state {
     pub trait State: sealed::Sealed {
         type Show;
         type Title;
-        type CreatedAt;
         type AudioUrl;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -70,8 +70,8 @@ pub mod episode_state {
     impl State for Empty {
         type Show = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
         type AudioUrl = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `show` field to Set
     pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
@@ -79,8 +79,8 @@ pub mod episode_state {
     impl<S: State> State for SetShow<S> {
         type Show = Set<members::show>;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type AudioUrl = S::AudioUrl;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -88,17 +88,8 @@ pub mod episode_state {
     impl<S: State> State for SetTitle<S> {
         type Show = S::Show;
         type Title = Set<members::title>;
+        type AudioUrl = S::AudioUrl;
         type CreatedAt = S::CreatedAt;
-        type AudioUrl = S::AudioUrl;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Show = S::Show;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type AudioUrl = S::AudioUrl;
     }
     ///State transition - sets the `audio_url` field to Set
     pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
@@ -106,8 +97,17 @@ pub mod episode_state {
     impl<S: State> State for SetAudioUrl<S> {
         type Show = S::Show;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type AudioUrl = Set<members::audio_url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Show = S::Show;
+        type Title = S::Title;
+        type AudioUrl = S::AudioUrl;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -116,10 +116,10 @@ pub mod episode_state {
         pub struct show(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `audio_url` field
         pub struct audio_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -359,8 +359,8 @@ where
     S: episode_state::State,
     S::Show: episode_state::IsSet,
     S::Title: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
     S::AudioUrl: episode_state::IsSet,
+    S::CreatedAt: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {

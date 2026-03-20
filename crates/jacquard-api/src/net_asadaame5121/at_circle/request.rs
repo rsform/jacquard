@@ -47,67 +47,67 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ring;
         type SiteUrl;
-        type CreatedAt;
         type SiteTitle;
+        type CreatedAt;
+        type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ring = Unset;
         type SiteUrl = Unset;
-        type CreatedAt = Unset;
         type SiteTitle = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type Ring = Set<members::ring>;
-        type SiteUrl = S::SiteUrl;
-        type CreatedAt = S::CreatedAt;
-        type SiteTitle = S::SiteTitle;
+        type CreatedAt = Unset;
+        type Ring = Unset;
     }
     ///State transition - sets the `site_url` field to Set
     pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiteUrl<S> {}
     impl<S: State> State for SetSiteUrl<S> {
-        type Ring = S::Ring;
         type SiteUrl = Set<members::site_url>;
+        type SiteTitle = S::SiteTitle;
         type CreatedAt = S::CreatedAt;
-        type SiteTitle = S::SiteTitle;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Ring = S::Ring;
-        type SiteUrl = S::SiteUrl;
-        type CreatedAt = Set<members::created_at>;
-        type SiteTitle = S::SiteTitle;
     }
     ///State transition - sets the `site_title` field to Set
     pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiteTitle<S> {}
     impl<S: State> State for SetSiteTitle<S> {
-        type Ring = S::Ring;
         type SiteUrl = S::SiteUrl;
-        type CreatedAt = S::CreatedAt;
         type SiteTitle = Set<members::site_title>;
+        type CreatedAt = S::CreatedAt;
+        type Ring = S::Ring;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SiteUrl = S::SiteUrl;
+        type SiteTitle = S::SiteTitle;
+        type CreatedAt = Set<members::created_at>;
+        type Ring = S::Ring;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type SiteUrl = S::SiteUrl;
+        type SiteTitle = S::SiteTitle;
+        type CreatedAt = S::CreatedAt;
+        type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ring` field
-        pub struct ring(());
         ///Marker type for the `site_url` field
         pub struct site_url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site_title` field
         pub struct site_title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `ring` field
+        pub struct ring(());
     }
 }
 
@@ -257,10 +257,10 @@ where
 impl<'a, S> RequestBuilder<'a, S>
 where
     S: request_state::State,
-    S::Ring: request_state::IsSet,
     S::SiteUrl: request_state::IsSet,
-    S::CreatedAt: request_state::IsSet,
     S::SiteTitle: request_state::IsSet,
+    S::CreatedAt: request_state::IsSet,
+    S::Ring: request_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Request<'a> {

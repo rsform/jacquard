@@ -24,7 +24,7 @@ pub struct Paste<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Programming language for syntax highlighting Defaults to `"text"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_language")]
+    #[serde(default = "_default_paste_language")]
     #[serde(borrow)]
     pub language: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional title for the paste
@@ -36,7 +36,7 @@ pub struct Paste<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-fn _default_language() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_paste_language() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("text"))
 }
 
@@ -50,37 +50,37 @@ pub mod paste_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
+        type Content = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -207,8 +207,8 @@ impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
 impl<'a, S> PasteBuilder<'a, S>
 where
     S: paste_state::State,
-    S::Content: paste_state::IsSet,
     S::CreatedAt: paste_state::IsSet,
+    S::Content: paste_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Paste<'a> {

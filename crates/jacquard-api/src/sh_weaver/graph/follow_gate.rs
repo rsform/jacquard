@@ -21,19 +21,19 @@ pub struct FollowGate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_invalidate_prior")]
+    #[serde(default = "_default_follow_gate_invalidate_prior")]
     pub invalidate_prior: std::option::Option<bool>,
     ///If true, follows require manual acceptance. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_require_approval")]
+    #[serde(default = "_default_follow_gate_require_approval")]
     pub require_approval: std::option::Option<bool>,
 }
 
-fn _default_invalidate_prior() -> std::option::Option<bool> {
+fn _default_follow_gate_invalidate_prior() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_require_approval() -> std::option::Option<bool> {
+fn _default_follow_gate_require_approval() -> std::option::Option<bool> {
     Some(false)
 }
 

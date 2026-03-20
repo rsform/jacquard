@@ -57,49 +57,49 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type When;
+        type Code;
         type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type When = Unset;
+        type Code = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type When = S::When;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Code = S::Code;
         type When = Set<members::when>;
+        type Code = S::Code;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type When = S::When;
+        type Code = Set<members::code>;
         type Slug = S::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Code = S::Code;
         type When = S::When;
+        type Code = S::Code;
         type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `slug` field
         pub struct slug(());
     }
@@ -285,8 +285,8 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::Code: tape_state::IsSet,
     S::When: tape_state::IsSet,
+    S::Code: tape_state::IsSet,
     S::Slug: tape_state::IsSet,
 {
     /// Build the final struct

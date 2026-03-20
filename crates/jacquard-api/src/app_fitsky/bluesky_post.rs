@@ -35,49 +35,49 @@ pub mod bluesky_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PostUri;
         type WorkoutUri;
+        type PostUri;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PostUri = Unset;
         type WorkoutUri = Unset;
+        type PostUri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `post_uri` field to Set
-    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostUri<S> {}
-    impl<S: State> State for SetPostUri<S> {
-        type PostUri = Set<members::post_uri>;
-        type WorkoutUri = S::WorkoutUri;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `workout_uri` field to Set
     pub struct SetWorkoutUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkoutUri<S> {}
     impl<S: State> State for SetWorkoutUri<S> {
-        type PostUri = S::PostUri;
         type WorkoutUri = Set<members::workout_uri>;
+        type PostUri = S::PostUri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `post_uri` field to Set
+    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostUri<S> {}
+    impl<S: State> State for SetPostUri<S> {
+        type WorkoutUri = S::WorkoutUri;
+        type PostUri = Set<members::post_uri>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type PostUri = S::PostUri;
         type WorkoutUri = S::WorkoutUri;
+        type PostUri = S::PostUri;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post_uri` field
-        pub struct post_uri(());
         ///Marker type for the `workout_uri` field
         pub struct workout_uri(());
+        ///Marker type for the `post_uri` field
+        pub struct post_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -172,8 +172,8 @@ where
 impl<'a, S> BlueskyPostBuilder<'a, S>
 where
     S: bluesky_post_state::State,
-    S::PostUri: bluesky_post_state::IsSet,
     S::WorkoutUri: bluesky_post_state::IsSet,
+    S::PostUri: bluesky_post_state::IsSet,
     S::CreatedAt: bluesky_post_state::IsSet,
 {
     /// Build the final struct

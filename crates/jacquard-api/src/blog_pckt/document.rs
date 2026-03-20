@@ -33,37 +33,37 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Document;
         type Site;
+        type Document;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Document = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `document` field to Set
-    pub struct SetDocument<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDocument<S> {}
-    impl<S: State> State for SetDocument<S> {
-        type Document = Set<members::document>;
-        type Site = S::Site;
+        type Document = Unset;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type Document = S::Document;
         type Site = Set<members::site>;
+        type Document = S::Document;
+    }
+    ///State transition - sets the `document` field to Set
+    pub struct SetDocument<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDocument<S> {}
+    impl<S: State> State for SetDocument<S> {
+        type Site = S::Site;
+        type Document = Set<members::document>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `document` field
-        pub struct document(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `document` field
+        pub struct document(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Document: document_state::IsSet,
     S::Site: document_state::IsSet,
+    S::Document: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {

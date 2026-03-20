@@ -81,66 +81,66 @@ pub mod inventory_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AcquiredAt;
-        type ItemId;
         type Quantity;
         type CreatedAt;
+        type ItemId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AcquiredAt = Unset;
-        type ItemId = Unset;
         type Quantity = Unset;
         type CreatedAt = Unset;
+        type ItemId = Unset;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
     impl<S: State> State for SetAcquiredAt<S> {
         type AcquiredAt = Set<members::acquired_at>;
+        type Quantity = S::Quantity;
+        type CreatedAt = S::CreatedAt;
         type ItemId = S::ItemId;
-        type Quantity = S::Quantity;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `item_id` field to Set
-    pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemId<S> {}
-    impl<S: State> State for SetItemId<S> {
-        type AcquiredAt = S::AcquiredAt;
-        type ItemId = Set<members::item_id>;
-        type Quantity = S::Quantity;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
         type AcquiredAt = S::AcquiredAt;
-        type ItemId = S::ItemId;
         type Quantity = Set<members::quantity>;
         type CreatedAt = S::CreatedAt;
+        type ItemId = S::ItemId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type AcquiredAt = S::AcquiredAt;
-        type ItemId = S::ItemId;
         type Quantity = S::Quantity;
         type CreatedAt = Set<members::created_at>;
+        type ItemId = S::ItemId;
+    }
+    ///State transition - sets the `item_id` field to Set
+    pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItemId<S> {}
+    impl<S: State> State for SetItemId<S> {
+        type AcquiredAt = S::AcquiredAt;
+        type Quantity = S::Quantity;
+        type CreatedAt = S::CreatedAt;
+        type ItemId = Set<members::item_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
-        ///Marker type for the `item_id` field
-        pub struct item_id(());
         ///Marker type for the `quantity` field
         pub struct quantity(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `item_id` field
+        pub struct item_id(());
     }
 }
 
@@ -470,9 +470,9 @@ impl<'a, S> InventoryBuilder<'a, S>
 where
     S: inventory_state::State,
     S::AcquiredAt: inventory_state::IsSet,
-    S::ItemId: inventory_state::IsSet,
     S::Quantity: inventory_state::IsSet,
     S::CreatedAt: inventory_state::IsSet,
+    S::ItemId: inventory_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Inventory<'a> {

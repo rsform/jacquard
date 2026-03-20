@@ -21,7 +21,7 @@ pub struct Grid<'a> {
     pub children: jacquard_common::types::value::Data<'a>,
     ///Number of equal columns. Defaults to `3`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_columns")]
+    #[serde(default = "_default_grid_columns")]
     pub columns: std::option::Option<i64>,
     ///Space between children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -29,7 +29,7 @@ pub struct Grid<'a> {
     pub gap: std::option::Option<GridGap<'a>>,
 }
 
-fn _default_columns() -> std::option::Option<i64> {
+fn _default_grid_columns() -> std::option::Option<i64> {
     Some(3i64)
 }
 

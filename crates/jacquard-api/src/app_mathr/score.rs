@@ -41,67 +41,67 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type TotalSuccesses;
-        type TotalChallenges;
         type Level;
+        type TotalChallenges;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type TotalSuccesses = Unset;
-        type TotalChallenges = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = S::TotalChallenges;
-        type Level = S::Level;
+        type TotalChallenges = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `total_successes` field to Set
     pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
     impl<S: State> State for SetTotalSuccesses<S> {
-        type CreatedAt = S::CreatedAt;
         type TotalSuccesses = Set<members::total_successes>;
+        type Level = S::Level;
         type TotalChallenges = S::TotalChallenges;
-        type Level = S::Level;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
         type CreatedAt = S::CreatedAt;
-        type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = Set<members::total_challenges>;
-        type Level = S::Level;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type CreatedAt = S::CreatedAt;
         type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = S::TotalChallenges;
         type Level = Set<members::level>;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type TotalSuccesses = S::TotalSuccesses;
+        type Level = S::Level;
+        type TotalChallenges = Set<members::total_challenges>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type TotalSuccesses = S::TotalSuccesses;
+        type Level = S::Level;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -228,10 +228,10 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::CreatedAt: score_state::IsSet,
     S::TotalSuccesses: score_state::IsSet,
-    S::TotalChallenges: score_state::IsSet,
     S::Level: score_state::IsSet,
+    S::TotalChallenges: score_state::IsSet,
+    S::CreatedAt: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {

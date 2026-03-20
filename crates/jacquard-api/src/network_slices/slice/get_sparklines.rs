@@ -19,12 +19,12 @@
 pub struct GetSparklines<'a> {
     ///Time range to fetch data for Defaults to `"24h"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_duration")]
+    #[serde(default = "_default_get_sparklines_duration")]
     #[serde(borrow)]
     pub duration: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Time interval for data points Defaults to `"hour"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_interval")]
+    #[serde(default = "_default_get_sparklines_interval")]
     #[serde(borrow)]
     pub interval: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of slice AT-URIs to get sparkline data for
@@ -32,11 +32,15 @@ pub struct GetSparklines<'a> {
     pub slices: Vec<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_duration() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_get_sparklines_duration() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
     Some(jacquard_common::CowStr::from("24h"))
 }
 
-fn _default_interval() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_get_sparklines_interval() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
     Some(jacquard_common::CowStr::from("hour"))
 }
 

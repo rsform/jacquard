@@ -35,51 +35,51 @@ pub mod clone_opts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Submodules;
         type Skip;
         type Depth;
-        type Submodules;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Submodules = Unset;
         type Skip = Unset;
         type Depth = Unset;
-        type Submodules = Unset;
-    }
-    ///State transition - sets the `skip` field to Set
-    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSkip<S> {}
-    impl<S: State> State for SetSkip<S> {
-        type Skip = Set<members::skip>;
-        type Depth = S::Depth;
-        type Submodules = S::Submodules;
-    }
-    ///State transition - sets the `depth` field to Set
-    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDepth<S> {}
-    impl<S: State> State for SetDepth<S> {
-        type Skip = S::Skip;
-        type Depth = Set<members::depth>;
-        type Submodules = S::Submodules;
     }
     ///State transition - sets the `submodules` field to Set
     pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubmodules<S> {}
     impl<S: State> State for SetSubmodules<S> {
+        type Submodules = Set<members::submodules>;
         type Skip = S::Skip;
         type Depth = S::Depth;
-        type Submodules = Set<members::submodules>;
+    }
+    ///State transition - sets the `skip` field to Set
+    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSkip<S> {}
+    impl<S: State> State for SetSkip<S> {
+        type Submodules = S::Submodules;
+        type Skip = Set<members::skip>;
+        type Depth = S::Depth;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDepth<S> {}
+    impl<S: State> State for SetDepth<S> {
+        type Submodules = S::Submodules;
+        type Skip = S::Skip;
+        type Depth = Set<members::depth>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `submodules` field
+        pub struct submodules(());
         ///Marker type for the `skip` field
         pub struct skip(());
         ///Marker type for the `depth` field
         pub struct depth(());
-        ///Marker type for the `submodules` field
-        pub struct submodules(());
     }
 }
 
@@ -172,9 +172,9 @@ where
 impl<'a, S> CloneOptsBuilder<'a, S>
 where
     S: clone_opts_state::State,
+    S::Submodules: clone_opts_state::IsSet,
     S::Skip: clone_opts_state::IsSet,
     S::Depth: clone_opts_state::IsSet,
-    S::Submodules: clone_opts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CloneOpts<'a> {
@@ -853,37 +853,37 @@ pub mod pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Workflows;
         type TriggerMetadata;
+        type Workflows;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Workflows = Unset;
         type TriggerMetadata = Unset;
-    }
-    ///State transition - sets the `workflows` field to Set
-    pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflows<S> {}
-    impl<S: State> State for SetWorkflows<S> {
-        type Workflows = Set<members::workflows>;
-        type TriggerMetadata = S::TriggerMetadata;
+        type Workflows = Unset;
     }
     ///State transition - sets the `trigger_metadata` field to Set
     pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
     impl<S: State> State for SetTriggerMetadata<S> {
-        type Workflows = S::Workflows;
         type TriggerMetadata = Set<members::trigger_metadata>;
+        type Workflows = S::Workflows;
+    }
+    ///State transition - sets the `workflows` field to Set
+    pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflows<S> {}
+    impl<S: State> State for SetWorkflows<S> {
+        type TriggerMetadata = S::TriggerMetadata;
+        type Workflows = Set<members::workflows>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `workflows` field
-        pub struct workflows(());
         ///Marker type for the `trigger_metadata` field
         pub struct trigger_metadata(());
+        ///Marker type for the `workflows` field
+        pub struct workflows(());
     }
 }
 
@@ -956,8 +956,8 @@ where
 impl<'a, S> PipelineBuilder<'a, S>
 where
     S: pipeline_state::State,
-    S::Workflows: pipeline_state::IsSet,
     S::TriggerMetadata: pipeline_state::IsSet,
+    S::Workflows: pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pipeline<'a> {
@@ -1572,67 +1572,67 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DefaultBranch;
+        type Did;
         type Repo;
         type Knot;
-        type Did;
+        type DefaultBranch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DefaultBranch = Unset;
+        type Did = Unset;
         type Repo = Unset;
         type Knot = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `default_branch` field to Set
-    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
-    impl<S: State> State for SetDefaultBranch<S> {
-        type DefaultBranch = Set<members::default_branch>;
-        type Repo = S::Repo;
-        type Knot = S::Knot;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type DefaultBranch = S::DefaultBranch;
-        type Repo = Set<members::repo>;
-        type Knot = S::Knot;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKnot<S> {}
-    impl<S: State> State for SetKnot<S> {
-        type DefaultBranch = S::DefaultBranch;
-        type Repo = S::Repo;
-        type Knot = Set<members::knot>;
-        type Did = S::Did;
+        type DefaultBranch = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type DefaultBranch = S::DefaultBranch;
+        type Did = Set<members::did>;
         type Repo = S::Repo;
         type Knot = S::Knot;
-        type Did = Set<members::did>;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Did = S::Did;
+        type Repo = Set<members::repo>;
+        type Knot = S::Knot;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type Did = S::Did;
+        type Repo = S::Repo;
+        type Knot = Set<members::knot>;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `default_branch` field to Set
+    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
+    impl<S: State> State for SetDefaultBranch<S> {
+        type Did = S::Did;
+        type Repo = S::Repo;
+        type Knot = S::Knot;
+        type DefaultBranch = Set<members::default_branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `default_branch` field
-        pub struct default_branch(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `knot` field
         pub struct knot(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `default_branch` field
+        pub struct default_branch(());
     }
 }
 
@@ -1745,10 +1745,10 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
-    S::DefaultBranch: trigger_repo_state::IsSet,
+    S::Did: trigger_repo_state::IsSet,
     S::Repo: trigger_repo_state::IsSet,
     S::Knot: trigger_repo_state::IsSet,
-    S::Did: trigger_repo_state::IsSet,
+    S::DefaultBranch: trigger_repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerRepo<'a> {
@@ -1827,65 +1827,65 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Raw;
         type Engine;
         type Name;
-        type Raw;
         type Clone;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Raw = Unset;
         type Engine = Unset;
         type Name = Unset;
-        type Raw = Unset;
         type Clone = Unset;
+    }
+    ///State transition - sets the `raw` field to Set
+    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRaw<S> {}
+    impl<S: State> State for SetRaw<S> {
+        type Raw = Set<members::raw>;
+        type Engine = S::Engine;
+        type Name = S::Name;
+        type Clone = S::Clone;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEngine<S> {}
     impl<S: State> State for SetEngine<S> {
+        type Raw = S::Raw;
         type Engine = Set<members::engine>;
         type Name = S::Name;
-        type Raw = S::Raw;
         type Clone = S::Clone;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Raw = S::Raw;
         type Engine = S::Engine;
         type Name = Set<members::name>;
-        type Raw = S::Raw;
-        type Clone = S::Clone;
-    }
-    ///State transition - sets the `raw` field to Set
-    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRaw<S> {}
-    impl<S: State> State for SetRaw<S> {
-        type Engine = S::Engine;
-        type Name = S::Name;
-        type Raw = Set<members::raw>;
         type Clone = S::Clone;
     }
     ///State transition - sets the `clone` field to Set
     pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClone<S> {}
     impl<S: State> State for SetClone<S> {
+        type Raw = S::Raw;
         type Engine = S::Engine;
         type Name = S::Name;
-        type Raw = S::Raw;
         type Clone = Set<members::clone>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `raw` field
+        pub struct raw(());
         ///Marker type for the `engine` field
         pub struct engine(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `raw` field
-        pub struct raw(());
         ///Marker type for the `clone` field
         pub struct clone(());
     }
@@ -2000,9 +2000,9 @@ where
 impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
+    S::Raw: workflow_state::IsSet,
     S::Engine: workflow_state::IsSet,
     S::Name: workflow_state::IsSet,
-    S::Raw: workflow_state::IsSet,
     S::Clone: workflow_state::IsSet,
 {
     /// Build the final struct

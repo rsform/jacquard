@@ -28,7 +28,7 @@ pub struct Entry<'a> {
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_latex")]
+    #[serde(default = "_default_entry_latex")]
     pub latex: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -44,16 +44,16 @@ pub struct Entry<'a> {
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Controls who can view this entry Defaults to `"public"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_visibility")]
+    #[serde(default = "_default_entry_visibility")]
     #[serde(borrow)]
     pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_latex() -> std::option::Option<bool> {
+fn _default_entry_latex() -> std::option::Option<bool> {
     Some(false)
 }
 
-fn _default_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_entry_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("public"))
 }
 

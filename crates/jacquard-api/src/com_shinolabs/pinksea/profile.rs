@@ -539,37 +539,37 @@ pub mod profile_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Link;
         type Name;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Link = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Link = Set<members::link>;
-        type Name = S::Name;
+        type Link = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Link = S::Link;
         type Name = Set<members::name>;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Name = S::Name;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `link` field
-        pub struct link(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
@@ -642,8 +642,8 @@ where
 impl<'a, S> ProfileLinkBuilder<'a, S>
 where
     S: profile_link_state::State,
-    S::Link: profile_link_state::IsSet,
     S::Name: profile_link_state::IsSet,
+    S::Link: profile_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileLink<'a> {

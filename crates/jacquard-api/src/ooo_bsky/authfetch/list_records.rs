@@ -251,51 +251,51 @@ pub mod record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Strategy;
-        type Uri;
         type Value;
+        type Uri;
+        type Strategy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Strategy = Unset;
-        type Uri = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStrategy<S> {}
-    impl<S: State> State for SetStrategy<S> {
-        type Strategy = Set<members::strategy>;
-        type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Strategy = S::Strategy;
-        type Uri = Set<members::uri>;
-        type Value = S::Value;
+        type Uri = Unset;
+        type Strategy = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Strategy = S::Strategy;
-        type Uri = S::Uri;
         type Value = Set<members::value>;
+        type Uri = S::Uri;
+        type Strategy = S::Strategy;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Value = S::Value;
+        type Uri = Set<members::uri>;
+        type Strategy = S::Strategy;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStrategy<S> {}
+    impl<S: State> State for SetStrategy<S> {
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type Strategy = Set<members::strategy>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `strategy` field
-        pub struct strategy(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `strategy` field
+        pub struct strategy(());
     }
 }
 
@@ -388,9 +388,9 @@ where
 impl<'a, S> RecordBuilder<'a, S>
 where
     S: record_state::State,
-    S::Strategy: record_state::IsSet,
-    S::Uri: record_state::IsSet,
     S::Value: record_state::IsSet,
+    S::Uri: record_state::IsSet,
+    S::Strategy: record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Record<'a> {

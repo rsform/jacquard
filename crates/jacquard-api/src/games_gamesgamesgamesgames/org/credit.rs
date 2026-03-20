@@ -43,51 +43,51 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Roles;
         type Org;
         type Game;
-        type Roles;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Roles = Unset;
         type Org = Unset;
         type Game = Unset;
-        type Roles = Unset;
-    }
-    ///State transition - sets the `org` field to Set
-    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrg<S> {}
-    impl<S: State> State for SetOrg<S> {
-        type Org = Set<members::org>;
-        type Game = S::Game;
-        type Roles = S::Roles;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Org = S::Org;
-        type Game = Set<members::game>;
-        type Roles = S::Roles;
     }
     ///State transition - sets the `roles` field to Set
     pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoles<S> {}
     impl<S: State> State for SetRoles<S> {
+        type Roles = Set<members::roles>;
         type Org = S::Org;
         type Game = S::Game;
-        type Roles = Set<members::roles>;
+    }
+    ///State transition - sets the `org` field to Set
+    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrg<S> {}
+    impl<S: State> State for SetOrg<S> {
+        type Roles = S::Roles;
+        type Org = Set<members::org>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Roles = S::Roles;
+        type Org = S::Org;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `roles` field
+        pub struct roles(());
         ///Marker type for the `org` field
         pub struct org(());
         ///Marker type for the `game` field
         pub struct game(());
-        ///Marker type for the `roles` field
-        pub struct roles(());
     }
 }
 
@@ -220,9 +220,9 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
+    S::Roles: credit_state::IsSet,
     S::Org: credit_state::IsSet,
     S::Game: credit_state::IsSet,
-    S::Roles: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {

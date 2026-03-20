@@ -56,49 +56,49 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActivityType;
         type CreatedAt;
+        type ActivityType;
         type CommitteeSims;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActivityType = Unset;
         type CreatedAt = Unset;
+        type ActivityType = Unset;
         type CommitteeSims = Unset;
-    }
-    ///State transition - sets the `activity_type` field to Set
-    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivityType<S> {}
-    impl<S: State> State for SetActivityType<S> {
-        type ActivityType = Set<members::activity_type>;
-        type CreatedAt = S::CreatedAt;
-        type CommitteeSims = S::CommitteeSims;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ActivityType = S::ActivityType;
         type CreatedAt = Set<members::created_at>;
+        type ActivityType = S::ActivityType;
+        type CommitteeSims = S::CommitteeSims;
+    }
+    ///State transition - sets the `activity_type` field to Set
+    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivityType<S> {}
+    impl<S: State> State for SetActivityType<S> {
+        type CreatedAt = S::CreatedAt;
+        type ActivityType = Set<members::activity_type>;
         type CommitteeSims = S::CommitteeSims;
     }
     ///State transition - sets the `committee_sims` field to Set
     pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
     impl<S: State> State for SetCommitteeSims<S> {
-        type ActivityType = S::ActivityType;
         type CreatedAt = S::CreatedAt;
+        type ActivityType = S::ActivityType;
         type CommitteeSims = Set<members::committee_sims>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activity_type` field
-        pub struct activity_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `activity_type` field
+        pub struct activity_type(());
         ///Marker type for the `committee_sims` field
         pub struct committee_sims(());
     }
@@ -267,8 +267,8 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::ActivityType: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
+    S::ActivityType: activity_state::IsSet,
     S::CommitteeSims: activity_state::IsSet,
 {
     /// Build the final struct

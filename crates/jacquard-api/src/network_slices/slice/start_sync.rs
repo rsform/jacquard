@@ -37,14 +37,14 @@ pub struct StartSync<'a> {
     pub repos: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     ///Skip lexicon validation during sync Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_skip_validation")]
+    #[serde(default = "_default_start_sync_skip_validation")]
     pub skip_validation: std::option::Option<bool>,
     ///AT-URI of the slice to sync data into
     #[serde(borrow)]
     pub slice: jacquard_common::CowStr<'a>,
 }
 
-fn _default_skip_validation() -> std::option::Option<bool> {
+fn _default_start_sync_skip_validation() -> std::option::Option<bool> {
     Some(false)
 }
 

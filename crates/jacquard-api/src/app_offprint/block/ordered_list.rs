@@ -298,11 +298,11 @@ pub struct OrderedList<'a> {
     pub children: Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
     ///Starting number for the list Defaults to `1`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_start")]
+    #[serde(default = "_default_ordered_list_start")]
     pub start: std::option::Option<i64>,
 }
 
-fn _default_start() -> std::option::Option<i64> {
+fn _default_ordered_list_start() -> std::option::Option<i64> {
     Some(1i64)
 }
 

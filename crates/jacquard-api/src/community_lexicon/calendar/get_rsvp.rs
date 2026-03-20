@@ -32,37 +32,37 @@ pub mod get_rsvp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Event;
         type Identity;
+        type Event;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Event = Unset;
         type Identity = Unset;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvent<S> {}
-    impl<S: State> State for SetEvent<S> {
-        type Event = Set<members::event>;
-        type Identity = S::Identity;
+        type Event = Unset;
     }
     ///State transition - sets the `identity` field to Set
     pub struct SetIdentity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIdentity<S> {}
     impl<S: State> State for SetIdentity<S> {
-        type Event = S::Event;
         type Identity = Set<members::identity>;
+        type Event = S::Event;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type Identity = S::Identity;
+        type Event = Set<members::event>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event` field
-        pub struct event(());
         ///Marker type for the `identity` field
         pub struct identity(());
+        ///Marker type for the `event` field
+        pub struct event(());
     }
 }
 
@@ -135,8 +135,8 @@ where
 impl<'a, S> GetRsvpBuilder<'a, S>
 where
     S: get_rsvp_state::State,
-    S::Event: get_rsvp_state::IsSet,
     S::Identity: get_rsvp_state::IsSet,
+    S::Event: get_rsvp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetRsvp<'a> {

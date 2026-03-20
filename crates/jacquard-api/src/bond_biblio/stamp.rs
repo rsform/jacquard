@@ -38,51 +38,51 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type List;
         type Book;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type List = Unset;
         type Book = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type List = S::List;
-        type Book = S::Book;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type CreatedAt = S::CreatedAt;
         type List = Set<members::list>;
         type Book = S::Book;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
-        type CreatedAt = S::CreatedAt;
         type List = S::List;
         type Book = Set<members::book>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type List = S::List;
+        type Book = S::Book;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `list` field
         pub struct list(());
         ///Marker type for the `book` field
         pub struct book(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -175,9 +175,9 @@ where
 impl<'a, S> StampBuilder<'a, S>
 where
     S: stamp_state::State,
-    S::CreatedAt: stamp_state::IsSet,
     S::List: stamp_state::IsSet,
     S::Book: stamp_state::IsSet,
+    S::CreatedAt: stamp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stamp<'a> {
