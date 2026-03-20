@@ -227,18 +227,17 @@ pub mod deps;
 pub mod error;
 pub mod http_client;
 pub mod macros;
+pub mod opt_serde_bytes_helper;
+pub mod serde_bytes_helper;
 #[cfg(feature = "service-auth")]
 pub mod service_auth;
 pub mod session;
+#[cfg(feature = "streaming")]
+pub mod stream;
 /// Compile-time TLD lookup for disambiguating handles from NSIDs.
 pub(crate) mod tld;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
-// XRPC protocol types and traits
-pub mod opt_serde_bytes_helper;
-pub mod serde_bytes_helper;
-#[cfg(feature = "streaming")]
-pub mod stream;
 pub mod xrpc;
 
 #[cfg(feature = "streaming")]
@@ -288,27 +287,4 @@ where
 {
     let value = T::deserialize(deserializer)?;
     Ok(value.into_static())
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::deps::bytes;
-    use crate::deps::chrono;
-    use crate::deps::smol_str::SmolStr;
-
-    #[test]
-    fn deps_smol_str() {
-        let s = SmolStr::new_static("test");
-        assert_eq!(s, "test");
-    }
-
-    #[test]
-    fn deps_bytes() {
-        let _x = bytes::Bytes::from_static(b"hello");
-    }
-
-    #[test]
-    fn deps_chrono() {
-        let _now = chrono::Utc::now();
-    }
 }

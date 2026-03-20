@@ -40,7 +40,7 @@ pub struct ValidationCheck {
     pub schema_name: String,
     /// Rust type path (for diagnostic purposes)
     pub field_type: String,
-    /// Is this field required (not Option<T>)?
+    /// Is this field required (not `Option<T>`)?
     pub is_required: bool,
     /// Is this validating an array length (vs string length)?
     pub is_array: bool,

@@ -46,6 +46,7 @@
 //!
 //! See [`atproto`] module for AT Protocol-specific metadata helpers.
 
+#![warn(missing_docs)]
 pub mod atproto;
 pub mod authstore;
 pub mod client;

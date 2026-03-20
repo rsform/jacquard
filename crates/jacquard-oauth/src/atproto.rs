@@ -93,29 +93,25 @@ pub struct AtprotoClientMetadata<'m> {
     pub privacy_policy_uri: Option<Uri<String>>,
 }
 
-impl<'m> AtprotoClientMetadata<'m> {
-    pub fn new(
-        client_id: Uri<String>,
-        client_uri: Option<Uri<String>>,
-        redirect_uris: Vec<Uri<String>>,
-        grant_types: Vec<GrantType>,
-        scopes: Vec<Scope<'m>>,
-        jwks_uri: Option<Uri<String>>,
-    ) -> Self {
-        Self {
-            client_id,
-            client_uri,
-            redirect_uris,
-            grant_types,
-            scopes,
-            jwks_uri,
-            client_name: None,
-            logo_uri: None,
-            tos_uri: None,
+impl<'m> IntoStatic for AtprotoClientMetadata<'m> {
+    type Output = AtprotoClientMetadata<'static>;
+    fn into_static(self) -> AtprotoClientMetadata<'static> {
+        AtprotoClientMetadata {
+            client_id: self.client_id,
+            client_uri: self.client_uri,
+            redirect_uris: self.redirect_uris,
+            grant_types: self.grant_types,
+            scopes: self.scopes.into_static(),
+            jwks_uri: self.jwks_uri,
+            client_name: self.client_name,
+            logo_uri: self.logo_uri,
+            tos_uri: self.tos_uri,
             privacy_policy_uri: None,
         }
     }
+}
 
+impl<'m> AtprotoClientMetadata<'m> {
     pub fn with_prod_info(
         mut self,
         client_name: &str,

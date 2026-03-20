@@ -2,7 +2,7 @@
 name = "jacquard-repo"
 description = "AT Protocol repository primitives: MST, commits, CAR I/O"
 edition.workspace = true
-version = "0.9.6"
+version = "0.10.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -16,9 +16,9 @@ default = []
 
 [dependencies]
 # Internal
-jacquard-common = { path = "../jacquard-common", version = "0.9", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
-jacquard-derive = { path = "../jacquard-derive", version = "0.9" }
-jacquard-api = { path = "../jacquard-api", version = "0.9", features = ["streaming"] }
+jacquard-common = { path = "../jacquard-common", version = "0.10", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
+jacquard-derive = { path = "../jacquard-derive", version = "0.10" }
+jacquard-api = { path = "../jacquard-api", version = "0.10", features = ["streaming"] }
 
 # Serialization
 serde.workspace = true

@@ -58,7 +58,7 @@ pub use subscription::{
 /// Normalize a base URI by removing trailing slashes.
 ///
 /// This is useful for XRPC clients where the base URI might be provided with
-/// a trailing slash (e.g., "https://bsky.social/") but needs to be normalized
+/// a trailing slash (e.g., "<https://bsky.social/>") but needs to be normalized
 /// for consistent path building. Since trimming a trailing slash from a valid URI
 /// always yields a valid URI, the result is guaranteed to be valid.
 pub fn normalize_base_uri(uri: Uri<String>) -> Uri<String> {

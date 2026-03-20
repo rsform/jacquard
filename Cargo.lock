@@ -2371,7 +2371,7 @@ checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
 
 [[package]]
 name = "jacquard"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "bytes",
  "clap",
@@ -2405,7 +2405,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "jacquard-common",
  "jacquard-derive",
@@ -2417,7 +2417,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-axum"
-version = "0.9.6"
+version = "0.10.0"
 dependencies = [
  "axum",
  "axum-macros",
@@ -2447,7 +2447,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2502,7 +2502,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "heck 0.5.0",
  "inventory",
@@ -2518,7 +2518,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-identity"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "bon",
  "bytes",
@@ -2542,7 +2542,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexgen"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2569,7 +2569,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "bytes",
  "cid",
@@ -2598,7 +2598,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.9.6"
+version = "0.10.0"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2629,7 +2629,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-repo"
-version = "0.9.6"
+version = "0.10.0"
 dependencies = [
  "anyhow",
  "bytes",
@@ -2770,7 +2770,7 @@ dependencies = [
 
 [[package]]
 name = "lazy-collections"
-version = "0.9.5"
+version = "0.10.0"
 dependencies = [
  "buffer",
  "bytes",

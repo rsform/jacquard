@@ -720,7 +720,7 @@ type StreamMessage<'a, R> = <R as SubscriptionResp>::Message<'a>;
 /// This exists primarily for server-side frameworks (like Axum) to extract
 /// typed subscription parameters without lifetime issues.
 pub trait SubscriptionEndpoint {
-    /// Fully-qualified path ('/xrpc/[nsid]') where this subscription endpoint lives
+    /// Fully-qualified path ('/xrpc/{nsid}') where this subscription endpoint lives
     const PATH: &'static str;
 
     /// Message encoding (JSON or DAG-CBOR)

@@ -262,7 +262,7 @@ fn extract_xrpc_nsid(attrs: &[Attribute]) -> syn::Result<Option<String>> {
     Ok(None)
 }
 
-/// Extract T from Option<T>, return (type, is_required)
+/// Extract T from `Option<T>`, return (type, is_required)
 pub fn extract_option_inner(ty: &syn::Type) -> (&syn::Type, bool) {
     if let syn::Type::Path(type_path) = ty {
         if let Some(segment) = type_path.path.segments.last() {
@@ -278,7 +278,7 @@ pub fn extract_option_inner(ty: &syn::Type) -> (&syn::Type, bool) {
     (ty, true)
 }
 
-/// Check if type has #[open_union] attribute
+/// Check if type has `#[open_union]` attribute
 pub fn has_open_union_attr(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| attr.path().is_ident("open_union"))
 }

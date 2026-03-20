@@ -1,6 +1,6 @@
 //! State module generation for builders
 //!
-//! Generates the state trait, Empty state, and SetX<S> transition types
+//! Generates the state trait, Empty state, and `SetX<S>` transition types
 //! that enable type-safe builder patterns.
 
 use std::collections::HashSet;

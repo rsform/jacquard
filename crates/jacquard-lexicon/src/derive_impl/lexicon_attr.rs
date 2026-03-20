@@ -1,4 +1,4 @@
-//! Implementation of #[lexicon] attribute macro
+//! Implementation of `#[lexicon]` attribute macro
 
 use proc_macro2::TokenStream;
 use quote::quote;

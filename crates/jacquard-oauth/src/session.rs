@@ -239,6 +239,16 @@ pub struct ClientData<'s> {
     pub config: AtprotoClientMetadata<'s>,
 }
 
+impl<'s> IntoStatic for ClientData<'s> {
+    type Output = ClientData<'static>;
+    fn into_static(self) -> ClientData<'static> {
+        ClientData {
+            keyset: self.keyset,
+            config: self.config.into_static(),
+        }
+    }
+}
+
 impl<'s> ClientData<'s> {
     pub fn new(keyset: Option<Keyset>, config: AtprotoClientMetadata<'s>) -> Self {
         Self { keyset, config }

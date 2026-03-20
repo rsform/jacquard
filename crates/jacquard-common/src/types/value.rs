@@ -1177,7 +1177,7 @@ impl<'s> QueryResult<'s> {
 /// A single match from a query operation
 #[derive(Debug, Clone, PartialEq)]
 pub struct QueryMatch<'s> {
-    /// Path where this value was found (e.g., "actors[0].handle")
+    /// Path where this value was found (e.g., "actors\[0\].handle")
     pub path: SmolStr,
     /// The value (None if field was missing during wildcard iteration)
     pub value: Option<&'s Data<'s>>,

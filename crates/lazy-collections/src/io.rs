@@ -137,7 +137,7 @@ pub trait Read {
     ///
     /// All bytes read from this source will be appended to the specified buffer
     /// `buf`. This function will continuously call [`read()`] to append more data to
-    /// `buf` until [`read()`] returns either [`Ok(0)`] or an error of
+    /// `buf` until [`read()`] returns either \[`Ok(0)`\] or an error of
     /// non-[`ErrorKind::Interrupted`] kind.
     ///
     /// If successful, this function will return the total number of bytes read.
@@ -323,7 +323,7 @@ pub trait Read {
     /// Creates an adaptor which will read at most `limit` bytes from it.
     ///
     /// This function returns a new instance of `Read` which will read at most
-    /// `limit` bytes, after which it will always return EOF ([`Ok(0)`]). Any
+    /// `limit` bytes, after which it will always return EOF (\[`Ok(0)`\]). Any
     /// read errors will not count towards the number of bytes read and future
     /// calls to [`read()`](Self::read) may succeed.
     fn take(self, limit: u64) -> Take<Self>

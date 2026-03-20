@@ -1,7 +1,7 @@
 //! XRPC client implementation for AT Protocol
 //!
 //! This module provides HTTP and XRPC client traits along with session management
-//! for both app-password and OAuth authentication.
+//! for both app password and OAuth authentication.
 //!
 //! ## Key types
 //!
@@ -15,9 +15,15 @@
 //! - [`credential_session`] - App-password session implementation
 //! - [`token`] - Token storage and persistence
 //! - [`vec_update`] - Trait for fetch-modify-put patterns on array endpoints
+//!
+//!
+//! "Agent" in this context is derived from Bluesky's own library usage of the term.
+//! It represents a (persistent) user session, and includes a number of helpful
+//! methods which are available via the `AgentSessionExt` extension trait
+//! on anything that implements `AgentSession` + `IdentityResolver`.
 
 //pub mod bff_session;
-/// App-password session implementation with auto-refresh
+/// App password session implementation with auto-refresh
 pub mod credential_session;
 /// Agent error type
 pub mod error;
@@ -801,7 +807,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     }
 
     /// Untyped, freeform record fetcher.
-    /// Hits [https://slingshot.microcosm.blue]
+    /// Hits <https://slingshot.microcosm.blue>
     fn fetch_record_slingshot(
         &self,
         uri: &AtUri<'_>,

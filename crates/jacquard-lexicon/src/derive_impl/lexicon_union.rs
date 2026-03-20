@@ -1,4 +1,4 @@
-//! Implementation of #[lexicon_union] attribute macro
+//! Implementation of `#[lexicon_union]` attribute macro
 
 use proc_macro2::TokenStream;
 use quote::quote;

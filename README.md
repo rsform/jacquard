@@ -22,55 +22,6 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
    - All the building blocks of the convenient abstractions are available
    - Use as much or as little from the crates as you need
 
-## 0.9.X Release Highlights:
-
-**`#[derive(LexiconSchema)]` + `#[lexicon_union]` macros**
-- Automatic schema generation for custom lexicons from Rust structs
-- Supports all lexicon constraints via attributes (max_length, max_graphemes, min/max, etc.)
-- Generates `LexiconDoc` at compile time for runtime validation
-
-**Runtime lexicon data validation**
-- Validation of structural and/or value contraints of data against a lexicon
-- caching for value validations
-- LexiconSchema trait generated implementations for runtime validation
-- detailed validation error results
-
-**Lexicon resolver**
-- Fetch lexicons at runtime for addition to schema registry
-
-**Query and path DSLs for `Data` and `RawData` value types**
-- Pattern-based querying of nested `Data` structures
-- `data.query(pattern)` with expressive syntax:
-  - `field.nested` - exact path navigation
-  - `[..]` - wildcard over collections (array elements or object values)
-  - `field..nested` - scoped recursion (find nested within field, expect one)
-  - `...field` - global recursion (find all occurrences anywhere)
-- `get_at_path()` for simple path-based field access on `Data` and `RawData`
-- Path syntax: `embed.images[0].alt` for navigating nested structures
-- `type_discriminator()` helper methods for AT Protocol union discrimination
-- Collection helper methods: `get()`, `contains_key()`, `len()`, `is_empty()`, `iter()`, `keys()`, `values()`
-- Index trait implemented: `obj["key"]` and `arr[0]`
-
-**Caching in identity/lexicon resolver**
-- Basic LRU in-memory cache implementation using `mini-moka`
-- Reduces number of network requests for certain operations
-- Works on both native and WebAssembly via vendored patched version of mini-moka
-
-
-**XRPC client improvements**
-- `set_options()` and `set_endpoint()` methods on `XrpcClient` trait
-- Default no-op implementations for stateless clients
-- Enables runtime reconfiguration of stateful clients
-- Better support for custom endpoint and option overrides
-- Fixed bug where setting a custom 'Content-Type' header wouldn't be respected
-
-**Major generated API compilation time improvements**
-- Generated code output now includes a typestate builder implementation, similar to the `bon` crate
-- Moves the substantial `syn` tax of generating the builders to code generation time, not compile time.
-
-**New `jacquard-lexgen` crate**
-- Moves binaries out of jacquard-lexicon to reduce size further
-- Flake app for `lex-fetch`
 
 ## Example
 
@@ -134,25 +85,37 @@ async fn main() -> miette::Result<()> {
 If you have `just` installed, you can run the [examples](https://tangled.org/nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
 
 > [!WARNING]
-> A lot of the streaming code is still pretty experimental. The examples work, though.\
-The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible.\
->I would also note the same for the repository crate until I've had more third parties test it.
+> The latest version swaps from the `url` crate to the lighter and quicker `fluent-uri`. It also moves the re-exported crate paths around and renames the `Uri<'_>` value type enum to `UriValue<'_>` to avoid confusion. This is likely to have broken some things. Migrating is pretty straightforward but consider yourself forewarned. This crate is *not* 1.0 for a reason.
 
 ### Changelog
 
 [CHANGELOG.md](./CHANGELOG.md)
 
-<!--### Testimonials
+#### 0.10 Release Highlights:
+
+**URL type migration**
+- Migrated from `url` crate to `fluent_uri` for validated URL/URI types
+- All `Url` types are now `Uri` from `fluent_uri`
+- Affects any code that constructs, passes, or pattern-matches on endpoint URLs
+
+**Re-exported crate paths**
+- Re-exported crates (including non-proc-macro dependencies of the generated API crate) are now centralized into a distinct module
+- Import paths for re-exported types have changed
+
+**`no_std` groundwork** 
+- Initial work toward allowing jacquard to function on platforms without access to the standard library.
+- `std` usage is now feature-gated. the library currently *does not compile* without `std` due to some remaining dependencies.
+
+### Testimonials
 
 - ["the most straightforward interface to atproto I've encountered so far."](https://bsky.app/profile/offline.mountainherder.xyz/post/3m3xwewzs3k2v) - @offline.mountainherder.xyz
-
-- "It has saved me a lot of time already! Well worth a few beers and or microcontrollers" - [@baileytownsend.dev](https://bsky.app/profile/baileytownsend.dev)-->
+- "It has saved me a lot of time already! Well worth a few beers and or microcontrollers" - [@baileytownsend.dev](https://bsky.app/profile/baileytownsend.dev)
 
 ### Projects using Jacquard
 
 - [skywatch-phash-rs](https://tangled.org/skywatch.blue/skywatch-phash-rs)
-- [Weaver](https://alpha.weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
-- [wisp.place CLI tool](https://docs.wisp.place/cli/)
+- [Weaver](https://weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
+- [wisp.place CLI tool](https://docs.wisp.place/cli/) - formerly
 - [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/baileytownsend.dev/pds-moover)
 
 ## Component crates
@@ -188,5 +151,7 @@ nix build
 ```
 
 There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
+
+
 
 [![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)

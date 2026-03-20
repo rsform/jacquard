@@ -10,7 +10,6 @@
 //! - [`corpus`] - Lexicon corpus management and namespace organization
 //! - [`lexicon`] - Schema parsing and validation
 //! - [`schema`] - Schema generation from Rust types (reverse codegen)
-//! - [`union_registry`] - Tracks union types for collision detection
 //! - [`fs`] - Filesystem utilities for lexicon storage
 //! - [`derive_impl`] - Implementation functions for derive macros (used by jacquard-derive)
 //! - [`validation`] - Runtime validation of Data against lexicon schemas

@@ -1,4 +1,4 @@
-//! Implementation of #[open_union] attribute macro
+//! Implementation of `#[open_union]` attribute macro
 
 use proc_macro2::TokenStream;
 use quote::quote;

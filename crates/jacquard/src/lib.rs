@@ -62,7 +62,7 @@
 //!     let session = oauth
 //!        .login_with_local_server(
 //!            args.input.clone(),
-//!            Default::default(),
+//!            AuthorizeOptions::default(),
 //!            LoopbackConfig::default(),
 //!        )
 //!        .await?;
