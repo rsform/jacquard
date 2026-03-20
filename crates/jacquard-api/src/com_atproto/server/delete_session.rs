@@ -15,7 +15,7 @@
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -57,7 +57,7 @@ impl core::fmt::Display for DeleteSessionError<'_> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct DeleteSession;
 /// Response type for
@@ -72,8 +72,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
     const NSID: &'static str = "com.atproto.server.deleteSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteSessionResponse;
 }
 
@@ -82,8 +83,9 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
 pub struct DeleteSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deleteSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteSession;
     type Response = DeleteSessionResponse;
 }

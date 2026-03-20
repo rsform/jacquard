@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeScanJobs {
@@ -16,7 +22,7 @@ pub struct SubscribeScanJobs {
 
 pub mod subscribe_scan_jobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -83,7 +89,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -99,19 +111,27 @@ impl<'a> SubscribeScanJobsMessage<'a> {
     pub fn decode_framed<'de: 'a>(
         bytes: &'de [u8],
     ) -> Result<SubscribeScanJobsMessage<'a>, jacquard_common::error::DecodeError> {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#scanJob" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::ScanJob(Box::new(variant)))
             }
             "#scanResult" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::ScanResult(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
@@ -126,7 +146,7 @@ impl<'a> SubscribeScanJobsMessage<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -156,24 +176,21 @@ impl core::fmt::Display for SubscribeScanJobsError<'_> {
 pub struct SubscribeScanJobsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeScanJobsStream {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<'de> = SubscribeScanJobsMessage<'de>;
     type Error<'de> = SubscribeScanJobsError<'de>;
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeScanJobs {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeScanJobsStream;
 }
 
 pub struct SubscribeScanJobsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeScanJobsEndpoint {
     const PATH: &'static str = "/xrpc/io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<'de> = SubscribeScanJobs;
     type Stream = SubscribeScanJobsStream;
 }
@@ -181,42 +198,48 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeScanJobsEndpoint {
 /// A scan job dispatched from hold to scanner. Sent as a JSON WebSocket message.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScanJob<'a> {
-    /// Manifest digest (e.g., sha256:abc123...)
+    ///Manifest digest (e.g., sha256:abc123...)
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
-    /// DID of the hold where the image is stored
+    ///DID of the hold where the image is stored
     #[serde(borrow)]
     pub hold_did: jacquard_common::types::string::Did<'a>,
-    /// HTTP endpoint of the hold for blob downloads
+    ///HTTP endpoint of the hold for blob downloads
     #[serde(borrow)]
     pub hold_endpoint: jacquard_common::types::string::UriValue<'a>,
-    /// Scan priority (lower = higher priority). Tier-based scheduling.
+    ///Scan priority (lower = higher priority). Tier-based scheduling.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub priority: std::option::Option<i64>,
-    /// Repository name (e.g., myapp)
+    ///Repository name (e.g., myapp)
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
-    /// Monotonic sequence number for cursor-based resumption
+    ///Monotonic sequence number for cursor-based resumption
     pub seq: i64,
-    /// Optional tag that triggered the scan
+    ///Optional tag that triggered the scan
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Message type discriminator
+    ///Message type discriminator
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
-    /// DID of the image owner
+    ///DID of the image owner
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod scan_job_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -225,11 +248,11 @@ pub mod scan_job_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Type;
+        type UserDid;
         type HoldDid;
         type HoldEndpoint;
-        type Seq;
         type Digest;
-        type UserDid;
+        type Seq;
         type Repository;
     }
     /// Empty state - all required fields are unset
@@ -237,11 +260,11 @@ pub mod scan_job_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Type = Unset;
+        type UserDid = Unset;
         type HoldDid = Unset;
         type HoldEndpoint = Unset;
-        type Seq = Unset;
         type Digest = Unset;
-        type UserDid = Unset;
+        type Seq = Unset;
         type Repository = Unset;
     }
     ///State transition - sets the `type` field to Set
@@ -249,59 +272,11 @@ pub mod scan_job_state {
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Type = Set<members::r#type>;
+        type UserDid = S::UserDid;
         type HoldDid = S::HoldDid;
         type HoldEndpoint = S::HoldEndpoint;
-        type Seq = S::Seq;
         type Digest = S::Digest;
-        type UserDid = S::UserDid;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `hold_did` field to Set
-    pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHoldDid<S> {}
-    impl<S: State> State for SetHoldDid<S> {
-        type Type = S::Type;
-        type HoldDid = Set<members::hold_did>;
-        type HoldEndpoint = S::HoldEndpoint;
         type Seq = S::Seq;
-        type Digest = S::Digest;
-        type UserDid = S::UserDid;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `hold_endpoint` field to Set
-    pub struct SetHoldEndpoint<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHoldEndpoint<S> {}
-    impl<S: State> State for SetHoldEndpoint<S> {
-        type Type = S::Type;
-        type HoldDid = S::HoldDid;
-        type HoldEndpoint = Set<members::hold_endpoint>;
-        type Seq = S::Seq;
-        type Digest = S::Digest;
-        type UserDid = S::UserDid;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Type = S::Type;
-        type HoldDid = S::HoldDid;
-        type HoldEndpoint = S::HoldEndpoint;
-        type Seq = Set<members::seq>;
-        type Digest = S::Digest;
-        type UserDid = S::UserDid;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Type = S::Type;
-        type HoldDid = S::HoldDid;
-        type HoldEndpoint = S::HoldEndpoint;
-        type Seq = S::Seq;
-        type Digest = Set<members::digest>;
-        type UserDid = S::UserDid;
         type Repository = S::Repository;
     }
     ///State transition - sets the `user_did` field to Set
@@ -309,11 +284,59 @@ pub mod scan_job_state {
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
         type Type = S::Type;
+        type UserDid = Set<members::user_did>;
         type HoldDid = S::HoldDid;
         type HoldEndpoint = S::HoldEndpoint;
-        type Seq = S::Seq;
         type Digest = S::Digest;
-        type UserDid = Set<members::user_did>;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `hold_did` field to Set
+    pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHoldDid<S> {}
+    impl<S: State> State for SetHoldDid<S> {
+        type Type = S::Type;
+        type UserDid = S::UserDid;
+        type HoldDid = Set<members::hold_did>;
+        type HoldEndpoint = S::HoldEndpoint;
+        type Digest = S::Digest;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `hold_endpoint` field to Set
+    pub struct SetHoldEndpoint<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHoldEndpoint<S> {}
+    impl<S: State> State for SetHoldEndpoint<S> {
+        type Type = S::Type;
+        type UserDid = S::UserDid;
+        type HoldDid = S::HoldDid;
+        type HoldEndpoint = Set<members::hold_endpoint>;
+        type Digest = S::Digest;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type Type = S::Type;
+        type UserDid = S::UserDid;
+        type HoldDid = S::HoldDid;
+        type HoldEndpoint = S::HoldEndpoint;
+        type Digest = Set<members::digest>;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Type = S::Type;
+        type UserDid = S::UserDid;
+        type HoldDid = S::HoldDid;
+        type HoldEndpoint = S::HoldEndpoint;
+        type Digest = S::Digest;
+        type Seq = Set<members::seq>;
         type Repository = S::Repository;
     }
     ///State transition - sets the `repository` field to Set
@@ -321,11 +344,11 @@ pub mod scan_job_state {
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
         type Type = S::Type;
+        type UserDid = S::UserDid;
         type HoldDid = S::HoldDid;
         type HoldEndpoint = S::HoldEndpoint;
-        type Seq = S::Seq;
         type Digest = S::Digest;
-        type UserDid = S::UserDid;
+        type Seq = S::Seq;
         type Repository = Set<members::repository>;
     }
     /// Marker types for field names
@@ -333,16 +356,16 @@ pub mod scan_job_state {
     pub mod members {
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
         ///Marker type for the `hold_did` field
         pub struct hold_did(());
         ///Marker type for the `hold_endpoint` field
         pub struct hold_endpoint(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
         ///Marker type for the `repository` field
         pub struct repository(());
     }
@@ -377,7 +400,17 @@ impl<'a> ScanJobBuilder<'a, scan_job_state::Empty> {
     pub fn new() -> Self {
         ScanJobBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -478,7 +511,10 @@ where
     S::Seq: scan_job_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> ScanJobBuilder<'a, scan_job_state::SetSeq<S>> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScanJobBuilder<'a, scan_job_state::SetSeq<S>> {
         self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         ScanJobBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -543,11 +579,11 @@ impl<'a, S> ScanJobBuilder<'a, S>
 where
     S: scan_job_state::State,
     S::Type: scan_job_state::IsSet,
+    S::UserDid: scan_job_state::IsSet,
     S::HoldDid: scan_job_state::IsSet,
     S::HoldEndpoint: scan_job_state::IsSet,
-    S::Seq: scan_job_state::IsSet,
     S::Digest: scan_job_state::IsSet,
-    S::UserDid: scan_job_state::IsSet,
+    S::Seq: scan_job_state::IsSet,
     S::Repository: scan_job_state::IsSet,
 {
     /// Build the final struct
@@ -588,8 +624,9 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.hold.subscribeScanJobs"),
@@ -974,89 +1011,89 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> ::jacquard_lexicon::lexicon::
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("vulnSummary"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("critical"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("high"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("medium"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("low"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("critical"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("high"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("low"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("medium"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("total")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "critical",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "high",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "low",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "medium",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "total",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -1081,7 +1118,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanJob<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("digest"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1092,7 +1131,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanJob<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("repository"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1102,7 +1143,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanJob<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tag"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tag",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1113,7 +1156,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanJob<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1126,32 +1171,38 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanJob<'a> {
 /// A scan result sent from scanner back to hold. Sent as a JSON WebSocket message.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScanResult<'a> {
-    /// Manifest digest that was scanned
+    ///Manifest digest that was scanned
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
-    /// Error message if scan failed
+    ///Error message if scan failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// SBOM blob (SPDX JSON format, max 100MB)
+    ///SBOM blob (SPDX JSON format, max 100MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub sbom: std::option::Option<jacquard_common::deps::bytes::Bytes>,
-    /// Scanner version string
+    ///Scanner version string
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub scanner_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Vulnerability count summary
+    ///Vulnerability count summary
     #[serde(borrow)]
     pub summary: crate::io_atcr::hold::subscribe_scan_jobs::VulnSummary<'a>,
-    /// Message type discriminator
+    ///Message type discriminator
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
-    /// Grype vulnerability report blob (JSON, max 100MB)
+    ///Grype vulnerability report blob (JSON, max 100MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub vuln_report: std::option::Option<jacquard_common::deps::bytes::Bytes>,
@@ -1159,7 +1210,7 @@ pub struct ScanResult<'a> {
 
 pub mod scan_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1167,51 +1218,51 @@ pub mod scan_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type Summary;
         type Digest;
+        type Summary;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type Summary = Unset;
         type Digest = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Summary = S::Summary;
-        type Digest = S::Digest;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Type = S::Type;
-        type Summary = Set<members::summary>;
-        type Digest = S::Digest;
+        type Summary = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type Type = S::Type;
-        type Summary = S::Summary;
         type Digest = Set<members::digest>;
+        type Summary = S::Summary;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type Digest = S::Digest;
+        type Summary = Set<members::summary>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Digest = S::Digest;
+        type Summary = S::Summary;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `digest` field
         pub struct digest(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -1223,7 +1274,9 @@ pub struct ScanResultBuilder<'a, S: scan_result_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::io_atcr::hold::subscribe_scan_jobs::VulnSummary<'a>>,
+        ::core::option::Option<
+            crate::io_atcr::hold::subscribe_scan_jobs::VulnSummary<'a>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ),
@@ -1269,7 +1322,10 @@ where
 
 impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn error(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -1282,12 +1338,18 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
 
 impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
     /// Set the `sbom` field (optional)
-    pub fn sbom(mut self, value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>) -> Self {
+    pub fn sbom(
+        mut self,
+        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `sbom` field to an Option value (optional)
-    pub fn maybe_sbom(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
+    pub fn maybe_sbom(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1303,7 +1365,10 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
         self
     }
     /// Set the `scannerVersion` field to an Option value (optional)
-    pub fn maybe_scanner_version(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_scanner_version(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1357,7 +1422,10 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
         self
     }
     /// Set the `vulnReport` field to an Option value (optional)
-    pub fn maybe_vuln_report(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
+    pub fn maybe_vuln_report(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -1366,9 +1434,9 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
 impl<'a, S> ScanResultBuilder<'a, S>
 where
     S: scan_result_state::State,
-    S::Type: scan_result_state::IsSet,
-    S::Summary: scan_result_state::IsSet,
     S::Digest: scan_result_state::IsSet,
+    S::Summary: scan_result_state::IsSet,
+    S::Type: scan_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScanResult<'a> {
@@ -1422,7 +1490,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("digest"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1432,7 +1502,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("error"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "error",
+                    ),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1455,7 +1527,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanResult<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1467,25 +1541,31 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScanResult<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VulnSummary<'a> {
-    /// Count of critical severity vulnerabilities
+    ///Count of critical severity vulnerabilities
     pub critical: i64,
-    /// Count of high severity vulnerabilities
+    ///Count of high severity vulnerabilities
     pub high: i64,
-    /// Count of low severity vulnerabilities
+    ///Count of low severity vulnerabilities
     pub low: i64,
-    /// Count of medium severity vulnerabilities
+    ///Count of medium severity vulnerabilities
     pub medium: i64,
-    /// Total vulnerability count
+    ///Total vulnerability count
     pub total: i64,
 }
 
 pub mod vuln_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1494,9 +1574,9 @@ pub mod vuln_summary_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Total;
+        type High;
         type Medium;
         type Critical;
-        type High;
         type Low;
     }
     /// Empty state - all required fields are unset
@@ -1504,9 +1584,9 @@ pub mod vuln_summary_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Total = Unset;
+        type High = Unset;
         type Medium = Unset;
         type Critical = Unset;
-        type High = Unset;
         type Low = Unset;
     }
     ///State transition - sets the `total` field to Set
@@ -1514,29 +1594,9 @@ pub mod vuln_summary_state {
     impl<S: State> sealed::Sealed for SetTotal<S> {}
     impl<S: State> State for SetTotal<S> {
         type Total = Set<members::total>;
+        type High = S::High;
         type Medium = S::Medium;
         type Critical = S::Critical;
-        type High = S::High;
-        type Low = S::Low;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedium<S> {}
-    impl<S: State> State for SetMedium<S> {
-        type Total = S::Total;
-        type Medium = Set<members::medium>;
-        type Critical = S::Critical;
-        type High = S::High;
-        type Low = S::Low;
-    }
-    ///State transition - sets the `critical` field to Set
-    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCritical<S> {}
-    impl<S: State> State for SetCritical<S> {
-        type Total = S::Total;
-        type Medium = S::Medium;
-        type Critical = Set<members::critical>;
-        type High = S::High;
         type Low = S::Low;
     }
     ///State transition - sets the `high` field to Set
@@ -1544,9 +1604,29 @@ pub mod vuln_summary_state {
     impl<S: State> sealed::Sealed for SetHigh<S> {}
     impl<S: State> State for SetHigh<S> {
         type Total = S::Total;
+        type High = Set<members::high>;
         type Medium = S::Medium;
         type Critical = S::Critical;
-        type High = Set<members::high>;
+        type Low = S::Low;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedium<S> {}
+    impl<S: State> State for SetMedium<S> {
+        type Total = S::Total;
+        type High = S::High;
+        type Medium = Set<members::medium>;
+        type Critical = S::Critical;
+        type Low = S::Low;
+    }
+    ///State transition - sets the `critical` field to Set
+    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCritical<S> {}
+    impl<S: State> State for SetCritical<S> {
+        type Total = S::Total;
+        type High = S::High;
+        type Medium = S::Medium;
+        type Critical = Set<members::critical>;
         type Low = S::Low;
     }
     ///State transition - sets the `low` field to Set
@@ -1554,9 +1634,9 @@ pub mod vuln_summary_state {
     impl<S: State> sealed::Sealed for SetLow<S> {}
     impl<S: State> State for SetLow<S> {
         type Total = S::Total;
+        type High = S::High;
         type Medium = S::Medium;
         type Critical = S::Critical;
-        type High = S::High;
         type Low = Set<members::low>;
     }
     /// Marker types for field names
@@ -1564,12 +1644,12 @@ pub mod vuln_summary_state {
     pub mod members {
         ///Marker type for the `total` field
         pub struct total(());
+        ///Marker type for the `high` field
+        pub struct high(());
         ///Marker type for the `medium` field
         pub struct medium(());
         ///Marker type for the `critical` field
         pub struct critical(());
-        ///Marker type for the `high` field
-        pub struct high(());
         ///Marker type for the `low` field
         pub struct low(());
     }
@@ -1705,9 +1785,9 @@ impl<'a, S> VulnSummaryBuilder<'a, S>
 where
     S: vuln_summary_state::State,
     S::Total: vuln_summary_state::IsSet,
+    S::High: vuln_summary_state::IsSet,
     S::Medium: vuln_summary_state::IsSet,
     S::Critical: vuln_summary_state::IsSet,
-    S::High: vuln_summary_state::IsSet,
     S::Low: vuln_summary_state::IsSet,
 {
     /// Build the final struct
@@ -1757,7 +1837,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VulnSummary<'a> {
             let value = &self.critical;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("critical"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "critical",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1767,7 +1849,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VulnSummary<'a> {
             let value = &self.high;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("high"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "high",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1777,7 +1861,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VulnSummary<'a> {
             let value = &self.low;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("low"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "low",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1787,7 +1873,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VulnSummary<'a> {
             let value = &self.medium;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("medium"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "medium",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1797,7 +1885,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VulnSummary<'a> {
             let value = &self.total;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("total"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

@@ -7,30 +7,36 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ForkStatus<'a> {
-    /// Branch to check status for
+    ///Branch to check status for
     #[serde(borrow)]
     pub branch: jacquard_common::CowStr<'a>,
-    /// DID of the fork owner
+    ///DID of the fork owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// Hidden ref to use for comparison
+    ///Hidden ref to use for comparison
     #[serde(borrow)]
     pub hidden_ref: jacquard_common::CowStr<'a>,
-    /// Name of the forked repository
+    ///Name of the forked repository
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Source repository URL
+    ///Source repository URL
     #[serde(borrow)]
     pub source: jacquard_common::CowStr<'a>,
 }
 
 pub mod fork_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,85 +44,85 @@ pub mod fork_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Branch;
-        type HiddenRef;
-        type Name;
         type Source;
+        type HiddenRef;
+        type Branch;
+        type Name;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Branch = Unset;
-        type HiddenRef = Unset;
-        type Name = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Branch = S::Branch;
-        type HiddenRef = S::HiddenRef;
-        type Name = S::Name;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Did = S::Did;
-        type Branch = Set<members::branch>;
-        type HiddenRef = S::HiddenRef;
-        type Name = S::Name;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `hidden_ref` field to Set
-    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
-    impl<S: State> State for SetHiddenRef<S> {
-        type Did = S::Did;
-        type Branch = S::Branch;
-        type HiddenRef = Set<members::hidden_ref>;
-        type Name = S::Name;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Did = S::Did;
-        type Branch = S::Branch;
-        type HiddenRef = S::HiddenRef;
-        type Name = Set<members::name>;
-        type Source = S::Source;
+        type HiddenRef = Unset;
+        type Branch = Unset;
+        type Name = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type Did = S::Did;
-        type Branch = S::Branch;
-        type HiddenRef = S::HiddenRef;
-        type Name = S::Name;
         type Source = Set<members::source>;
+        type HiddenRef = S::HiddenRef;
+        type Branch = S::Branch;
+        type Name = S::Name;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `hidden_ref` field to Set
+    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
+    impl<S: State> State for SetHiddenRef<S> {
+        type Source = S::Source;
+        type HiddenRef = Set<members::hidden_ref>;
+        type Branch = S::Branch;
+        type Name = S::Name;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Source = S::Source;
+        type HiddenRef = S::HiddenRef;
+        type Branch = Set<members::branch>;
+        type Name = S::Name;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Source = S::Source;
+        type HiddenRef = S::HiddenRef;
+        type Branch = S::Branch;
+        type Name = Set<members::name>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Source = S::Source;
+        type HiddenRef = S::HiddenRef;
+        type Branch = S::Branch;
+        type Name = S::Name;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `branch` field
-        pub struct branch(());
-        ///Marker type for the `hidden_ref` field
-        pub struct hidden_ref(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `hidden_ref` field
+        pub struct hidden_ref(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -249,11 +255,11 @@ where
 impl<'a, S> ForkStatusBuilder<'a, S>
 where
     S: fork_status_state::State,
-    S::Did: fork_status_state::IsSet,
-    S::Branch: fork_status_state::IsSet,
-    S::HiddenRef: fork_status_state::IsSet,
-    S::Name: fork_status_state::IsSet,
     S::Source: fork_status_state::IsSet,
+    S::HiddenRef: fork_status_state::IsSet,
+    S::Branch: fork_status_state::IsSet,
+    S::Name: fork_status_state::IsSet,
+    S::Did: fork_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ForkStatus<'a> {
@@ -287,11 +293,17 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ForkStatusOutput<'a> {
-    /// Fork status: 0=UpToDate, 1=FastForwardable, 2=Conflict, 3=MissingBranch
+    ///Fork status: 0=UpToDate, 1=FastForwardable, 2=Conflict, 3=MissingBranch
     pub status: i64,
 }
 
@@ -307,8 +319,9 @@ impl jacquard_common::xrpc::XrpcResp for ForkStatusResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ForkStatus<'a> {
     const NSID: &'static str = "sh.tangled.repo.forkStatus";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ForkStatusResponse;
 }
 
@@ -317,8 +330,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ForkStatus<'a> {
 pub struct ForkStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ForkStatusRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.forkStatus";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ForkStatus<'de>;
     type Response = ForkStatusResponse;
 }

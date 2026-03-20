@@ -8,58 +8,64 @@
 /// A measurement, fact, characteristic, or assertion about an occurrence. Multiple measurement records can reference the same occurrence, solving the Simple DwC one-measurement-per-record limitation.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Measurement<'a> {
-    /// Timestamp of record creation in the ATProto PDS.
+    ///Timestamp of record creation in the ATProto PDS.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The description of the potential error associated with the measurementValue (e.g., '0.5 cm', '5%').
+    ///The description of the potential error associated with the measurementValue (e.g., '0.5 cm', '5%').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_accuracy: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Person(s) who determined the measurement. Pipe-delimited for multiple.
+    ///Person(s) who determined the measurement. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_determined_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The date the measurement was made. ISO 8601 format.
+    ///The date the measurement was made. ISO 8601 format.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_determined_date: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// An identifier for the measurement. Should be unique within the dataset.
+    ///An identifier for the measurement. Should be unique within the dataset.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The description of or reference to the method used to determine the measurement (e.g., 'diameter tape at 1.3m height', 'laser rangefinder', 'Bitterlich method').
+    ///The description of or reference to the method used to determine the measurement (e.g., 'diameter tape at 1.3m height', 'laser rangefinder', 'Bitterlich method').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_method: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Comments or notes accompanying the measurement.
+    ///Comments or notes accompanying the measurement.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The nature of the measurement, fact, characteristic, or assertion (e.g., 'DBH', 'tree height', 'canopy cover', 'tail length', 'body mass', 'soil pH', 'water temperature').
+    ///The nature of the measurement, fact, characteristic, or assertion (e.g., 'DBH', 'tree height', 'canopy cover', 'tail length', 'body mass', 'soil pH', 'water temperature').
     #[serde(borrow)]
     pub measurement_type: jacquard_common::CowStr<'a>,
-    /// The units for the measurementValue (e.g., 'cm', 'm', 'kg', 'mm', '%', 'degrees Celsius').
+    ///The units for the measurementValue (e.g., 'cm', 'm', 'kg', 'mm', '%', 'degrees Celsius').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurement_unit: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The value of the measurement, fact, characteristic, or assertion (e.g., '45.2', 'present', 'blue').
+    ///The value of the measurement, fact, characteristic, or assertion (e.g., '45.2', 'present', 'blue').
     #[serde(borrow)]
     pub measurement_value: jacquard_common::CowStr<'a>,
-    /// The occurrenceID of the linked occurrence record (for cross-system interoperability).
+    ///The occurrenceID of the linked occurrence record (for cross-system interoperability).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub occurrence_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT-URI reference to the app.gainforest.dwc.occurrence record this measurement belongs to.
+    ///AT-URI reference to the app.gainforest.dwc.occurrence record this measurement belongs to.
     #[serde(borrow)]
     pub occurrence_ref: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod measurement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -68,8 +74,8 @@ pub mod measurement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type MeasurementValue;
-        type MeasurementType;
         type OccurrenceRef;
+        type MeasurementType;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -77,8 +83,8 @@ pub mod measurement_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type MeasurementValue = Unset;
-        type MeasurementType = Unset;
         type OccurrenceRef = Unset;
+        type MeasurementType = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `measurement_value` field to Set
@@ -86,17 +92,8 @@ pub mod measurement_state {
     impl<S: State> sealed::Sealed for SetMeasurementValue<S> {}
     impl<S: State> State for SetMeasurementValue<S> {
         type MeasurementValue = Set<members::measurement_value>;
+        type OccurrenceRef = S::OccurrenceRef;
         type MeasurementType = S::MeasurementType;
-        type OccurrenceRef = S::OccurrenceRef;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `measurement_type` field to Set
-    pub struct SetMeasurementType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeasurementType<S> {}
-    impl<S: State> State for SetMeasurementType<S> {
-        type MeasurementValue = S::MeasurementValue;
-        type MeasurementType = Set<members::measurement_type>;
-        type OccurrenceRef = S::OccurrenceRef;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `occurrence_ref` field to Set
@@ -104,8 +101,17 @@ pub mod measurement_state {
     impl<S: State> sealed::Sealed for SetOccurrenceRef<S> {}
     impl<S: State> State for SetOccurrenceRef<S> {
         type MeasurementValue = S::MeasurementValue;
-        type MeasurementType = S::MeasurementType;
         type OccurrenceRef = Set<members::occurrence_ref>;
+        type MeasurementType = S::MeasurementType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `measurement_type` field to Set
+    pub struct SetMeasurementType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeasurementType<S> {}
+    impl<S: State> State for SetMeasurementType<S> {
+        type MeasurementValue = S::MeasurementValue;
+        type OccurrenceRef = S::OccurrenceRef;
+        type MeasurementType = Set<members::measurement_type>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -113,8 +119,8 @@ pub mod measurement_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type MeasurementValue = S::MeasurementValue;
-        type MeasurementType = S::MeasurementType;
         type OccurrenceRef = S::OccurrenceRef;
+        type MeasurementType = S::MeasurementType;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -122,10 +128,10 @@ pub mod measurement_state {
     pub mod members {
         ///Marker type for the `measurement_value` field
         pub struct measurement_value(());
-        ///Marker type for the `measurement_type` field
-        pub struct measurement_type(());
         ///Marker type for the `occurrence_ref` field
         pub struct occurrence_ref(());
+        ///Marker type for the `measurement_type` field
+        pub struct measurement_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -164,7 +170,18 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
         MeasurementBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -249,12 +266,18 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `measurementID` field (optional)
-    pub fn measurement_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn measurement_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `measurementID` field to an Option value (optional)
-    pub fn maybe_measurement_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_measurement_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -270,7 +293,10 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
         self
     }
     /// Set the `measurementMethod` field to an Option value (optional)
-    pub fn maybe_measurement_method(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_measurement_method(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -286,7 +312,10 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
         self
     }
     /// Set the `measurementRemarks` field to an Option value (optional)
-    pub fn maybe_measurement_remarks(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_measurement_remarks(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -321,7 +350,10 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
         self
     }
     /// Set the `measurementUnit` field to an Option value (optional)
-    pub fn maybe_measurement_unit(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_measurement_unit(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -348,12 +380,18 @@ where
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `occurrenceID` field (optional)
-    pub fn occurrence_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn occurrence_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `occurrenceID` field to an Option value (optional)
-    pub fn maybe_occurrence_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -382,8 +420,8 @@ impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
     S::MeasurementValue: measurement_state::IsSet,
-    S::MeasurementType: measurement_state::IsSet,
     S::OccurrenceRef: measurement_state::IsSet,
+    S::MeasurementType: measurement_state::IsSet,
     S::CreatedAt: measurement_state::IsSet,
 {
     /// Build the final struct
@@ -445,7 +483,13 @@ impl<'a> Measurement<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasurementGetRecordOutput<'a> {
@@ -506,15 +550,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_accuracy",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_accuracy",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -526,15 +568,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_determined_by",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_determined_by",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -546,15 +586,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_determined_date",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_determined_date",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -566,15 +604,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -586,15 +622,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_method",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_method",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -606,15 +640,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 5000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_remarks",
-                            ),
-                            max: 5000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_remarks",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -627,15 +659,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_type",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_type",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -647,15 +677,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_unit",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_unit",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -668,15 +696,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "measurement_value",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_value",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -688,15 +714,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "occurrence_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "occurrence_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -704,8 +728,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_app_gainforest_dwc_measurement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.dwc.measurement"),

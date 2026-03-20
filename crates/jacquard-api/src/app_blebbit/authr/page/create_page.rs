@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePage<'a> {
@@ -34,7 +34,7 @@ pub struct CreatePage<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePageOutput<'a> {
@@ -63,8 +63,9 @@ impl jacquard_common::xrpc::XrpcResp for CreatePageResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePage<'a> {
     const NSID: &'static str = "app.blebbit.authr.page.createPage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreatePageResponse;
 }
 
@@ -73,8 +74,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePage<'a> {
 pub struct CreatePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreatePageRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.createPage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreatePage<'de>;
     type Response = CreatePageResponse;
 }

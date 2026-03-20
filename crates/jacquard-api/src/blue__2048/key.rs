@@ -11,19 +11,25 @@ pub mod player;
 /// A record that holds a did:key used to verify records. Use the collection to know the type of verification. Example blue.2048.key.game is for blue.2048.game records
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Key<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A did:key used to verify records came from an at://2048 authority
+    ///A did:key used to verify records came from an at://2048 authority
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
 }
 
 pub mod key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -31,37 +37,37 @@ pub mod key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Key;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Key = S::Key;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type CreatedAt = S::CreatedAt;
         type Key = Set<members::key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -134,8 +140,8 @@ where
 impl<'a, S> KeyBuilder<'a, S>
 where
     S: key_state::State,
-    S::CreatedAt: key_state::IsSet,
     S::Key: key_state::IsSet,
+    S::CreatedAt: key_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Key<'a> {
@@ -340,22 +346,28 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
 /// a signature for an at://2048 record meaning it has been verified by a service. Most likely @2048.blue
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SignatureRef<'a> {
-    /// The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
+    ///The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
     #[serde(borrow)]
     pub at_uri: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The public verifiable signature of the record. Serialization of the records value minus the signature field
+    ///The public verifiable signature of the record. Serialization of the records value minus the signature field
     #[serde(borrow)]
     pub signature: jacquard_common::CowStr<'a>,
 }
 
 pub mod signature_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -363,51 +375,51 @@ pub mod signature_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Signature;
         type CreatedAt;
         type AtUri;
-        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Signature = Unset;
         type CreatedAt = Unset;
         type AtUri = Unset;
-        type Signature = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type AtUri = S::AtUri;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `at_uri` field to Set
-    pub struct SetAtUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAtUri<S> {}
-    impl<S: State> State for SetAtUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type AtUri = Set<members::at_uri>;
-        type Signature = S::Signature;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
+        type Signature = Set<members::signature>;
         type CreatedAt = S::CreatedAt;
         type AtUri = S::AtUri;
-        type Signature = Set<members::signature>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Signature = S::Signature;
+        type CreatedAt = Set<members::created_at>;
+        type AtUri = S::AtUri;
+    }
+    ///State transition - sets the `at_uri` field to Set
+    pub struct SetAtUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAtUri<S> {}
+    impl<S: State> State for SetAtUri<S> {
+        type Signature = S::Signature;
+        type CreatedAt = S::CreatedAt;
+        type AtUri = Set<members::at_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `signature` field
+        pub struct signature(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `at_uri` field
         pub struct at_uri(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
     }
 }
 
@@ -500,9 +512,9 @@ where
 impl<'a, S> SignatureRefBuilder<'a, S>
 where
     S: signature_ref_state::State,
+    S::Signature: signature_ref_state::IsSet,
     S::CreatedAt: signature_ref_state::IsSet,
     S::AtUri: signature_ref_state::IsSet,
-    S::Signature: signature_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SignatureRef<'a> {

@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DismissMatch<'a> {
-    /// The subject's DID to dismiss the match with.
+    ///The subject's DID to dismiss the match with.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod dismiss_match_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,7 +57,9 @@ pub mod dismiss_match_state {
 /// Builder for constructing an instance of this type
 pub struct DismissMatchBuilder<'a, S: dismiss_match_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Did<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -128,7 +136,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DismissMatchOutput<'a> {}
@@ -142,7 +150,7 @@ pub struct DismissMatchOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -187,8 +195,9 @@ impl jacquard_common::xrpc::XrpcResp for DismissMatchResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DismissMatch<'a> {
     const NSID: &'static str = "app.bsky.contact.dismissMatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DismissMatchResponse;
 }
 
@@ -197,8 +206,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DismissMatch<'a> {
 pub struct DismissMatchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DismissMatchRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.dismissMatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DismissMatch<'de>;
     type Response = DismissMatchResponse;
 }

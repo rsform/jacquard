@@ -8,23 +8,29 @@
 /// Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream. NYI
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Syndication<'a> {
-    /// DID of the Streamplace broadcaster that will be replicating the livestream
+    ///DID of the Streamplace broadcaster that will be replicating the livestream
     #[serde(borrow)]
     pub broadcaster: jacquard_common::types::string::Did<'a>,
-    /// Client-declared timestamp when this syndication was created.
+    ///Client-declared timestamp when this syndication was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// DID of the streamer whose livestream is being replicated
+    ///DID of the streamer whose livestream is being replicated
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod syndication_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,51 +38,51 @@ pub mod syndication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Broadcaster;
         type Streamer;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Broadcaster = Unset;
         type Streamer = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `broadcaster` field to Set
-    pub struct SetBroadcaster<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBroadcaster<S> {}
-    impl<S: State> State for SetBroadcaster<S> {
-        type Broadcaster = Set<members::broadcaster>;
-        type Streamer = S::Streamer;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Broadcaster = S::Broadcaster;
-        type Streamer = Set<members::streamer>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Broadcaster = S::Broadcaster;
         type Streamer = S::Streamer;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `broadcaster` field to Set
+    pub struct SetBroadcaster<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBroadcaster<S> {}
+    impl<S: State> State for SetBroadcaster<S> {
+        type CreatedAt = S::CreatedAt;
+        type Broadcaster = Set<members::broadcaster>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type CreatedAt = S::CreatedAt;
+        type Broadcaster = S::Broadcaster;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `broadcaster` field
         pub struct broadcaster(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -169,9 +175,9 @@ where
 impl<'a, S> SyndicationBuilder<'a, S>
 where
     S: syndication_state::State,
+    S::CreatedAt: syndication_state::IsSet,
     S::Broadcaster: syndication_state::IsSet,
     S::Streamer: syndication_state::IsSet,
-    S::CreatedAt: syndication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Syndication<'a> {
@@ -214,7 +220,13 @@ impl<'a> Syndication<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyndicationGetRecordOutput<'a> {
@@ -271,8 +283,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Syndication<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_broadcast_syndication()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_broadcast_syndication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.broadcast.syndication"),

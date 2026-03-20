@@ -13,7 +13,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Acursed;
 impl std::fmt::Display for Acursed {
@@ -30,7 +30,7 @@ impl std::fmt::Display for Acursed {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Bind;
 impl std::fmt::Display for Bind {
@@ -47,7 +47,7 @@ impl std::fmt::Display for Bind {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Bond;
 impl std::fmt::Display for Bond {
@@ -64,7 +64,7 @@ impl std::fmt::Display for Bond {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Claw;
 impl std::fmt::Display for Claw {
@@ -81,7 +81,7 @@ impl std::fmt::Display for Claw {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Darksight;
 impl std::fmt::Display for Darksight {
@@ -98,7 +98,7 @@ impl std::fmt::Display for Darksight {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct EldritchAdaptability;
 impl std::fmt::Display for EldritchAdaptability {
@@ -115,7 +115,7 @@ impl std::fmt::Display for EldritchAdaptability {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct EldritchAssault;
 impl std::fmt::Display for EldritchAssault {
@@ -132,7 +132,7 @@ impl std::fmt::Display for EldritchAssault {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct EldritchEnchantment;
 impl std::fmt::Display for EldritchEnchantment {
@@ -149,7 +149,7 @@ impl std::fmt::Display for EldritchEnchantment {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct EldritchVisage;
 impl std::fmt::Display for EldritchVisage {
@@ -166,7 +166,7 @@ impl std::fmt::Display for EldritchVisage {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Faceless;
 impl std::fmt::Display for Faceless {
@@ -183,7 +183,7 @@ impl std::fmt::Display for Faceless {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct FateScriber;
 impl std::fmt::Display for FateScriber {
@@ -200,7 +200,7 @@ impl std::fmt::Display for FateScriber {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Instil;
 impl std::fmt::Display for Instil {
@@ -217,7 +217,7 @@ impl std::fmt::Display for Instil {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Invalid;
 impl std::fmt::Display for Invalid {
@@ -235,7 +235,7 @@ impl std::fmt::Display for Invalid {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Locked;
 impl std::fmt::Display for Locked {
@@ -252,7 +252,7 @@ impl std::fmt::Display for Locked {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Regenerate;
 impl std::fmt::Display for Regenerate {
@@ -269,7 +269,7 @@ impl std::fmt::Display for Regenerate {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct RuneSeeker;
 impl std::fmt::Display for RuneSeeker {
@@ -286,7 +286,7 @@ impl std::fmt::Display for RuneSeeker {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Spray;
 impl std::fmt::Display for Spray {
@@ -303,7 +303,7 @@ impl std::fmt::Display for Spray {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Whisper;
 impl std::fmt::Display for Whisper {

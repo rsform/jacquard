@@ -5,15 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///(default: 25, min: 1, max: 50)
+    ///Defaults to `25`. Min: 1. Max: 50.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -23,7 +34,7 @@ pub struct GetSuggestedUsersSkeleton<'a> {
 
 pub mod get_suggested_users_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,7 +52,10 @@ pub mod get_suggested_users_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetSuggestedUsersSkeletonBuilder<'a, S: get_suggested_users_skeleton_state::State> {
+pub struct GetSuggestedUsersSkeletonBuilder<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -53,13 +67,17 @@ pub struct GetSuggestedUsersSkeletonBuilder<'a, S: get_suggested_users_skeleton_
 
 impl<'a> GetSuggestedUsersSkeleton<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetSuggestedUsersSkeletonBuilder<'a, get_suggested_users_skeleton_state::Empty>
-    {
+    pub fn new() -> GetSuggestedUsersSkeletonBuilder<
+        'a,
+        get_suggested_users_skeleton_state::Empty,
+    > {
         GetSuggestedUsersSkeletonBuilder::new()
     }
 }
 
-impl<'a> GetSuggestedUsersSkeletonBuilder<'a, get_suggested_users_skeleton_state::Empty> {
+impl<
+    'a,
+> GetSuggestedUsersSkeletonBuilder<'a, get_suggested_users_skeleton_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedUsersSkeletonBuilder {
@@ -70,9 +88,15 @@ impl<'a> GetSuggestedUsersSkeletonBuilder<'a, get_suggested_users_skeleton_state
     }
 }
 
-impl<'a, S: get_suggested_users_skeleton_state::State> GetSuggestedUsersSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> GetSuggestedUsersSkeletonBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -83,7 +107,10 @@ impl<'a, S: get_suggested_users_skeleton_state::State> GetSuggestedUsersSkeleton
     }
 }
 
-impl<'a, S: get_suggested_users_skeleton_state::State> GetSuggestedUsersSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> GetSuggestedUsersSkeletonBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
@@ -96,7 +123,10 @@ impl<'a, S: get_suggested_users_skeleton_state::State> GetSuggestedUsersSkeleton
     }
 }
 
-impl<'a, S: get_suggested_users_skeleton_state::State> GetSuggestedUsersSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> GetSuggestedUsersSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
@@ -106,7 +136,10 @@ impl<'a, S: get_suggested_users_skeleton_state::State> GetSuggestedUsersSkeleton
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -128,17 +161,23 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeletonOutput<'a> {
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
-    /// DEPRECATED: use recIdStr instead.
+    ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Snowflake for this recommendation, use when submitting recommendation events.
+    ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,

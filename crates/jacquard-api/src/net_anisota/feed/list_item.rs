@@ -8,23 +8,29 @@
 /// Record representing a post's inclusion on a specific list. The AppView will ignore duplicate listitem records.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
-    /// Timestamp when the post was added to the list
+    ///Timestamp when the post was added to the list
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference (AT-URI) to the list record (net.anisota.feed.list).
+    ///Reference (AT-URI) to the list record (net.anisota.feed.list).
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
-    /// The post URI which is included on the list.
+    ///The post URI which is included on the list.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,49 +38,49 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Subject;
+        type List;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Subject = Unset;
+        type List = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type List = S::List;
         type Subject = Set<members::subject>;
+        type List = S::List;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Subject = S::Subject;
+        type List = Set<members::list>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type List = S::List;
         type Subject = S::Subject;
+        type List = S::List;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `list` field
+        pub struct list(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -169,8 +175,8 @@ where
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
-    S::List: list_item_state::IsSet,
     S::Subject: list_item_state::IsSet,
+    S::List: list_item_state::IsSet,
     S::CreatedAt: list_item_state::IsSet,
 {
     /// Build the final struct
@@ -214,7 +220,13 @@ impl<'a> ListItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItemGetRecordOutput<'a> {
@@ -271,7 +283,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_feed_listItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_net_anisota_feed_listItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.anisota.feed.listItem"),

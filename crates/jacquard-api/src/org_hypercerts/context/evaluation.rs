@@ -8,43 +8,57 @@
 /// An evaluation of a hypercert record (e.g. an activity and its impact).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Evaluation<'a> {
-    /// Evaluation data (URIs or blobs) containing detailed reports or methodology
+    ///Evaluation data (URIs or blobs) containing detailed reports or methodology
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<Vec<EvaluationContentItem<'a>>>,
-    /// Client-declared timestamp when this record was originally created
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// DIDs of the evaluators
+    ///DIDs of the evaluators
     #[serde(borrow)]
     pub evaluators: Vec<crate::app_certified::Did<'a>>,
-    /// An optional reference for georeferenced evaluations. The record referenced must conform with the lexicon app.certified.location.
+    ///An optional reference for georeferenced evaluations. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement
+    pub location: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub measurements: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    /// Optional overall score for this evaluation on a numeric scale.
+    pub measurements: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    ///Optional overall score for this evaluation on a numeric scale.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub score: std::option::Option<crate::org_hypercerts::context::evaluation::Score<'a>>,
-    /// A strong reference to what is being evaluated (e.g. activity, measurement, contribution, etc.)
+    pub score: std::option::Option<
+        crate::org_hypercerts::context::evaluation::Score<'a>,
+    >,
+    ///A strong reference to what is being evaluated (e.g. activity, measurement, contribution, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Brief evaluation summary
+    pub subject: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Brief evaluation summary
     #[serde(borrow)]
     pub summary: jacquard_common::CowStr<'a>,
 }
 
 pub mod evaluation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -52,51 +66,51 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Evaluators;
         type Summary;
         type CreatedAt;
+        type Evaluators;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Evaluators = Unset;
         type Summary = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluators` field to Set
-    pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluators<S> {}
-    impl<S: State> State for SetEvaluators<S> {
-        type Evaluators = Set<members::evaluators>;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
+        type Evaluators = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Evaluators = S::Evaluators;
         type Summary = Set<members::summary>;
         type CreatedAt = S::CreatedAt;
+        type Evaluators = S::Evaluators;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Evaluators = S::Evaluators;
         type Summary = S::Summary;
         type CreatedAt = Set<members::created_at>;
+        type Evaluators = S::Evaluators;
+    }
+    ///State transition - sets the `evaluators` field to Set
+    pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluators<S> {}
+    impl<S: State> State for SetEvaluators<S> {
+        type Summary = S::Summary;
+        type CreatedAt = S::CreatedAt;
+        type Evaluators = Set<members::evaluators>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluators` field
-        pub struct evaluators(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluators` field
+        pub struct evaluators(());
     }
 }
 
@@ -136,12 +150,18 @@ impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<Vec<EvaluationContentItem<'a>>>>) -> Self {
+    pub fn content(
+        mut self,
+        value: impl Into<Option<Vec<EvaluationContentItem<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<Vec<EvaluationContentItem<'a>>>) -> Self {
+    pub fn maybe_content(
+        mut self,
+        value: Option<Vec<EvaluationContentItem<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -208,7 +228,9 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `measurements` field (optional)
     pub fn measurements(
         mut self,
-        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -283,9 +305,9 @@ where
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::Evaluators: evaluation_state::IsSet,
     S::Summary: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::Evaluators: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
@@ -338,7 +360,13 @@ impl<'a> Evaluation<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -351,7 +379,13 @@ pub enum EvaluationContentItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationGetRecordOutput<'a> {
@@ -408,7 +442,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -419,7 +455,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("evaluators"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "evaluators",
+                    ),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -442,7 +480,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("summary"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "summary",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -457,15 +497,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "summary",
-                            ),
-                            max: 1000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "summary",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -473,8 +511,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_evaluation()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.context.evaluation"),
@@ -648,63 +687,65 @@ fn lexicon_doc_org_hypercerts_context_evaluation()
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("score"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Overall score for an evaluation on a numeric scale.",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("min"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("max"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("max"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("min"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "max",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "min",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -714,21 +755,27 @@ fn lexicon_doc_org_hypercerts_context_evaluation()
 /// Overall score for an evaluation on a numeric scale.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Score<'a> {
-    /// Maximum value of the scale, e.g. 5 or 10.
+    ///Maximum value of the scale, e.g. 5 or 10.
     pub max: i64,
-    /// Minimum value of the scale, e.g. 0 or 1.
+    ///Minimum value of the scale, e.g. 0 or 1.
     pub min: i64,
-    /// Score within the inclusive range [min, max].
+    ///Score within the inclusive range [min, max].
     pub value: i64,
 }
 
 pub mod score_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -736,51 +783,51 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Value;
         type Max;
         type Min;
-        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Value = Unset;
         type Max = Unset;
         type Min = Unset;
-        type Value = Unset;
-    }
-    ///State transition - sets the `max` field to Set
-    pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMax<S> {}
-    impl<S: State> State for SetMax<S> {
-        type Max = Set<members::max>;
-        type Min = S::Min;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `min` field to Set
-    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMin<S> {}
-    impl<S: State> State for SetMin<S> {
-        type Max = S::Max;
-        type Min = Set<members::min>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
         type Max = S::Max;
         type Min = S::Min;
-        type Value = Set<members::value>;
+    }
+    ///State transition - sets the `max` field to Set
+    pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMax<S> {}
+    impl<S: State> State for SetMax<S> {
+        type Value = S::Value;
+        type Max = Set<members::max>;
+        type Min = S::Min;
+    }
+    ///State transition - sets the `min` field to Set
+    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMin<S> {}
+    impl<S: State> State for SetMin<S> {
+        type Value = S::Value;
+        type Max = S::Max;
+        type Min = Set<members::min>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `max` field
         pub struct max(());
         ///Marker type for the `min` field
         pub struct min(());
-        ///Marker type for the `value` field
-        pub struct value(());
     }
 }
 
@@ -819,7 +866,10 @@ where
     S::Max: score_state::IsUnset,
 {
     /// Set the `max` field (required)
-    pub fn max(mut self, value: impl Into<i64>) -> ScoreBuilder<'a, score_state::SetMax<S>> {
+    pub fn max(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScoreBuilder<'a, score_state::SetMax<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ScoreBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -835,7 +885,10 @@ where
     S::Min: score_state::IsUnset,
 {
     /// Set the `min` field (required)
-    pub fn min(mut self, value: impl Into<i64>) -> ScoreBuilder<'a, score_state::SetMin<S>> {
+    pub fn min(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScoreBuilder<'a, score_state::SetMin<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ScoreBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -851,7 +904,10 @@ where
     S::Value: score_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(mut self, value: impl Into<i64>) -> ScoreBuilder<'a, score_state::SetValue<S>> {
+    pub fn value(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScoreBuilder<'a, score_state::SetValue<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         ScoreBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -864,9 +920,9 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
+    S::Value: score_state::IsSet,
     S::Max: score_state::IsSet,
     S::Min: score_state::IsSet,
-    S::Value: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {

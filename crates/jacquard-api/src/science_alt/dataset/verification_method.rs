@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct AutomatedTest;
 impl std::fmt::Display for AutomatedTest {
@@ -32,7 +32,7 @@ impl std::fmt::Display for AutomatedTest {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CodeReview;
 impl std::fmt::Display for CodeReview {
@@ -50,7 +50,7 @@ impl std::fmt::Display for CodeReview {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct FormalProof;
 impl std::fmt::Display for FormalProof {
@@ -161,7 +161,7 @@ impl jacquard_common::IntoStatic for VerificationMethod<'_> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct SignedHash;
 impl std::fmt::Display for SignedHash {

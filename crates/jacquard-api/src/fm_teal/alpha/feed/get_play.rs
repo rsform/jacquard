@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPlay<'a> {
@@ -18,7 +24,7 @@ pub struct GetPlay<'a> {
 
 pub mod get_play_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -26,37 +32,37 @@ pub mod get_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AuthorDid;
         type Rkey;
+        type AuthorDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AuthorDid = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `author_did` field to Set
-    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
-    impl<S: State> State for SetAuthorDid<S> {
-        type AuthorDid = Set<members::author_did>;
-        type Rkey = S::Rkey;
+        type AuthorDid = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type AuthorDid = S::AuthorDid;
         type Rkey = Set<members::rkey>;
+        type AuthorDid = S::AuthorDid;
+    }
+    ///State transition - sets the `author_did` field to Set
+    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
+    impl<S: State> State for SetAuthorDid<S> {
+        type Rkey = S::Rkey;
+        type AuthorDid = Set<members::author_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author_did` field
-        pub struct author_did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `author_did` field
+        pub struct author_did(());
     }
 }
 
@@ -129,8 +135,8 @@ where
 impl<'a, S> GetPlayBuilder<'a, S>
 where
     S: get_play_state::State,
-    S::AuthorDid: get_play_state::IsSet,
     S::Rkey: get_play_state::IsSet,
+    S::AuthorDid: get_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPlay<'a> {
@@ -143,7 +149,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPlayOutput<'a> {

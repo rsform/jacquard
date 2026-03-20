@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteCollection<'a> {
-    /// The AT-URI of the collection to delete
+    ///The AT-URI of the collection to delete
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod delete_collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,7 +57,9 @@ pub mod delete_collection_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteCollectionBuilder<'a, S: delete_collection_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -120,7 +128,13 @@ where
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteCollectionOutput {
@@ -139,8 +153,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteCollectionResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteCollection<'a> {
     const NSID: &'static str = "social.showcase.collection.deleteCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteCollectionResponse;
 }
 
@@ -149,8 +164,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteCollection<'a> {
 pub struct DeleteCollectionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteCollectionRequest {
     const PATH: &'static str = "/xrpc/social.showcase.collection.deleteCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteCollection<'de>;
     type Response = DeleteCollectionResponse;
 }

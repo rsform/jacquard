@@ -7,25 +7,31 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
-    /// DID of the service that implements the query.
+    ///DID of the service that implements the query.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// Parameters to pass to the query.
+    ///Parameters to pass to the query.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub input: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// XRPC query to call for pages of items.
+    ///XRPC query to call for pages of items.
     #[serde(borrow)]
     pub query: jacquard_common::types::string::Nsid<'a>,
 }
 
 pub mod list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,37 +39,37 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Query;
         type Did;
+        type Query;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Query = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `query` field to Set
-    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuery<S> {}
-    impl<S: State> State for SetQuery<S> {
-        type Query = Set<members::query>;
-        type Did = S::Did;
+        type Query = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Query = S::Query;
         type Did = Set<members::did>;
+        type Query = S::Query;
+    }
+    ///State transition - sets the `query` field to Set
+    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuery<S> {}
+    impl<S: State> State for SetQuery<S> {
+        type Did = S::Did;
+        type Query = Set<members::query>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `query` field
-        pub struct query(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `query` field
+        pub struct query(());
     }
 }
 
@@ -125,7 +131,10 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
         self
     }
     /// Set the `input` field to an Option value (optional)
-    pub fn maybe_input(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
+    pub fn maybe_input(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -153,8 +162,8 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Query: list_state::IsSet,
     S::Did: list_state::IsSet,
+    S::Query: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -184,7 +193,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListOutput<'a> {
@@ -205,8 +220,9 @@ impl jacquard_common::xrpc::XrpcResp for ListResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for List<'a> {
     const NSID: &'static str = "org.atsui.List";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ListResponse;
 }
 
@@ -215,8 +231,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for List<'a> {
 pub struct ListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
     const PATH: &'static str = "/xrpc/org.atsui.List";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = List<'de>;
     type Response = ListResponse;
 }
@@ -224,22 +241,28 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
 /// Response shape from a List data source query.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Page<'a> {
-    /// Opaque pagination token. Absent means no more items.
+    ///Opaque pagination token. Absent means no more items.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Elements to render as list rows.
+    ///Elements to render as list rows.
     #[serde(borrow)]
     pub items: Vec<crate::at_inlay::Element<'a>>,
 }
 
 pub mod page_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -299,7 +322,10 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
 
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -454,61 +480,65 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("page"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Response shape from a List data source query.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cursor"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Opaque pagination token. Absent means no more items.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(512usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cursor",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Opaque pagination token. Absent means no more items.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Elements to render as list rows.",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "at.inlay.defs#element",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(512usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "items",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Elements to render as list rows.",
+                                    ),
                                 ),
-                            );
-                            map
-                        },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "at.inlay.defs#element",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -532,7 +562,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("cursor"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cursor",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -14,17 +14,17 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSession<'a> {
-    /// When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
+    ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub allow_takendown: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub auth_factor_token: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Handle or other identifier supported by the server for the authenticating user.
+    ///Handle or other identifier supported by the server for the authenticating user.
     #[serde(borrow)]
     pub identifier: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -33,7 +33,13 @@ pub struct CreateSession<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSessionOutput<'a> {
@@ -57,7 +63,7 @@ pub struct CreateSessionOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
-    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<CreateSessionOutputStatus<'a>>,
@@ -151,7 +157,9 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
         match self {
             CreateSessionOutputStatus::Takendown => CreateSessionOutputStatus::Takendown,
             CreateSessionOutputStatus::Suspended => CreateSessionOutputStatus::Suspended,
-            CreateSessionOutputStatus::Deactivated => CreateSessionOutputStatus::Deactivated,
+            CreateSessionOutputStatus::Deactivated => {
+                CreateSessionOutputStatus::Deactivated
+            }
             CreateSessionOutputStatus::Other(v) => {
                 CreateSessionOutputStatus::Other(v.into_static())
             }
@@ -169,7 +177,7 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -214,8 +222,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
     const NSID: &'static str = "com.atproto.server.createSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateSessionResponse;
 }
 
@@ -224,8 +233,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
 pub struct CreateSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateSession<'de>;
     type Response = CreateSessionResponse;
 }

@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetStripeIntent<'a> {
@@ -22,7 +28,7 @@ pub struct GetStripeIntent<'a> {
 
 pub mod get_stripe_intent_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,7 +173,10 @@ where
 
 impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
     /// Set the `token` field (optional)
-    pub fn token(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn token(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -206,23 +215,23 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetStripeIntentOutput<'a> {
-    /// The customer ID for the payment intent
+    ///The customer ID for the payment intent
     #[serde(borrow)]
     pub customer: jacquard_common::CowStr<'a>,
-    /// The customer session ID for the payment intent
+    ///The customer session ID for the payment intent
     #[serde(borrow)]
     pub customer_session: jacquard_common::CowStr<'a>,
-    /// The ephemeral key for the payment intent
+    ///The ephemeral key for the payment intent
     #[serde(borrow)]
     pub ephemeral_key: jacquard_common::CowStr<'a>,
-    /// The payment intent ID
+    ///The payment intent ID
     #[serde(borrow)]
     pub payment_intent: jacquard_common::CowStr<'a>,
-    /// The publishable key for the payment intent
+    ///The publishable key for the payment intent
     #[serde(borrow)]
     pub publishable_key: jacquard_common::CowStr<'a>,
 }

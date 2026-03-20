@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveLabel<'a> {
@@ -22,7 +28,7 @@ pub struct ResolveLabel<'a> {
 
 pub mod resolve_label_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,37 +36,37 @@ pub mod resolve_label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Name;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Name = S::Name;
+        type Handle = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Handle = S::Handle;
         type Name = Set<members::name>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Name = S::Name;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -133,7 +139,10 @@ where
 
 impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -147,8 +156,8 @@ impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
 impl<'a, S> ResolveLabelBuilder<'a, S>
 where
     S: resolve_label_state::State,
-    S::Handle: resolve_label_state::IsSet,
     S::Name: resolve_label_state::IsSet,
+    S::Handle: resolve_label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveLabel<'a> {
@@ -162,17 +171,23 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveLabelOutput<'a> {
-    /// CID of the resolved dataset entry
+    ///CID of the resolved dataset entry
     #[serde(borrow)]
     pub cid: jacquard_common::CowStr<'a>,
-    /// The label record that was resolved
+    ///The label record that was resolved
     #[serde(borrow)]
     pub label: crate::science_alt::dataset::label::Label<'a>,
-    /// AT-URI of the resolved dataset entry
+    ///AT-URI of the resolved dataset entry
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -187,7 +202,7 @@ pub struct ResolveLabelOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

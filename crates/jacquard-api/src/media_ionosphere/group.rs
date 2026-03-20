@@ -8,7 +8,13 @@
 /// Represents a grouping of subgroups or programmes
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Group<'a> {
@@ -21,19 +27,19 @@ pub struct Group<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// Version identifier
+    ///Version identifier
     #[serde(borrow)]
     pub ionosphere: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Type of group, see Table 30 of DAB SPI for idea
+    ///Type of group, see Table 30 of DAB SPI for idea
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub kind: std::option::Option<GroupKind<'a>>,
-    /// The language of the string values in this record. NOT the language of the content
+    ///The language of the string values in this record. NOT the language of the content
     pub language: jacquard_common::types::string::Language,
-    /// A list of groups this record is a member of
+    ///A list of groups this record is a member of
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub member_of: std::option::Option<Vec<crate::media_ionosphere::Membership<'a>>>,
@@ -43,7 +49,7 @@ pub struct Group<'a> {
 
 pub mod group_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,49 +57,49 @@ pub mod group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ionosphere;
         type Language;
+        type Ionosphere;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ionosphere = Unset;
         type Language = Unset;
+        type Ionosphere = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Ionosphere = Set<members::ionosphere>;
-        type Language = S::Language;
-        type Name = S::Name;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
-        type Ionosphere = S::Ionosphere;
         type Language = Set<members::language>;
+        type Ionosphere = S::Ionosphere;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
+    impl<S: State> State for SetIonosphere<S> {
+        type Language = S::Language;
+        type Ionosphere = Set<members::ionosphere>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Ionosphere = S::Ionosphere;
         type Language = S::Language;
+        type Ionosphere = S::Ionosphere;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ionosphere` field
-        pub struct ionosphere(());
         ///Marker type for the `language` field
         pub struct language(());
+        ///Marker type for the `ionosphere` field
+        pub struct ionosphere(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -128,7 +134,17 @@ impl<'a> GroupBuilder<'a, group_state::Empty> {
     pub fn new() -> Self {
         GroupBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -136,12 +152,18 @@ impl<'a> GroupBuilder<'a, group_state::Empty> {
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -157,7 +179,10 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(mut self, value: Option<Vec<crate::media_ionosphere::Genre<'a>>>) -> Self {
+    pub fn maybe_genres(
+        mut self,
+        value: Option<Vec<crate::media_ionosphere::Genre<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -173,7 +198,10 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -200,12 +228,18 @@ where
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn keywords(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -284,8 +318,8 @@ where
 impl<'a, S> GroupBuilder<'a, S>
 where
     S: group_state::State,
-    S::Ionosphere: group_state::IsSet,
     S::Language: group_state::IsSet,
+    S::Ionosphere: group_state::IsSet,
     S::Name: group_state::IsSet,
 {
     /// Build the final struct
@@ -455,7 +489,13 @@ impl jacquard_common::IntoStatic for GroupKind<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GroupGetRecordOutput<'a> {
@@ -512,10 +552,40 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(ref value) = self.icon {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         {
@@ -523,7 +593,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ionosphere"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ionosphere",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -533,7 +605,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("kind"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "kind",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -548,15 +622,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -564,7 +636,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
     }
 }
 
-fn lexicon_doc_media_ionosphere_group() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_media_ionosphere_group() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("media.ionosphere.group"),

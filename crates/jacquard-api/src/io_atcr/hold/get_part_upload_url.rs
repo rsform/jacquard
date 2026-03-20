@@ -7,20 +7,26 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrl<'a> {
-    /// Part sequence number (1-indexed)
+    ///Part sequence number (1-indexed)
     pub part_number: i64,
-    /// Upload session ID from initiateUpload
+    ///Upload session ID from initiateUpload
     #[serde(borrow)]
     pub upload_id: jacquard_common::CowStr<'a>,
 }
 
 pub mod get_part_upload_url_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,21 +166,32 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrlOutput<'a> {
-    /// Additional headers required for the request (e.g., content-type)
+    ///Additional headers required for the request (e.g., content-type)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub headers: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// HTTP method to use (usually PUT)
+    ///HTTP method to use (usually PUT) Defaults to `"PUT"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_method")]
     #[serde(borrow)]
     pub method: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URL to PUT the part data to
+    ///URL to PUT the part data to
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+fn _default_method() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("PUT"))
 }
 
 #[jacquard_derive::open_union]
@@ -187,7 +204,7 @@ pub struct GetPartUploadUrlOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -232,8 +249,9 @@ impl jacquard_common::xrpc::XrpcResp for GetPartUploadUrlResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<'a> {
     const NSID: &'static str = "io.atcr.hold.getPartUploadUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GetPartUploadUrlResponse;
 }
 
@@ -242,8 +260,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<'a> {
 pub struct GetPartUploadUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPartUploadUrlRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.getPartUploadUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = GetPartUploadUrl<'de>;
     type Response = GetPartUploadUrlResponse;
 }

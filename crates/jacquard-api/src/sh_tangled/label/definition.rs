@@ -7,32 +7,38 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
-    /// The hex value for the background color for the label. Appviews may choose to respect this.
+    ///The hex value for the background color for the label. Appviews may choose to respect this.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub color: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]
+    ///Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub multiple: std::option::Option<bool>,
-    /// The display name of this label.
+    ///The display name of this label.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.
+    ///The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.
     #[serde(borrow)]
     pub scope: Vec<jacquard_common::types::string::Nsid<'a>>,
-    /// The type definition of this label. Appviews may allow sorting for certain types.
+    ///The type definition of this label. Appviews may allow sorting for certain types.
     #[serde(borrow)]
     pub value_type: crate::sh_tangled::label::definition::ValueType<'a>,
 }
 
 pub mod definition_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,7 +144,10 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
 
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn color(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -293,7 +302,13 @@ impl<'a> Definition<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<'a> {
@@ -355,15 +370,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count > 40usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 40usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 40usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -376,15 +389,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            min: 1usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        min: 1usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -392,7 +403,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
 }
 
-fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.label.definition"),
@@ -632,18 +645,18 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValueType<'a> {
-    /// Closed set of values that this label can take.
+    ///Closed set of values that this label can take.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#enum: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// An optional constraint that can be applied on string concrete types.
+    ///An optional constraint that can be applied on string concrete types.
     #[serde(borrow)]
     pub format: jacquard_common::CowStr<'a>,
-    /// The concrete type of this label's value.
+    ///The concrete type of this label's value.
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
 }

@@ -14,22 +14,28 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBlob<'a> {
-    /// DID of the broadcaster. If not provided, uses the server's default broadcaster.
+    ///DID of the broadcaster. If not provided, uses the server's default broadcaster.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// Branding asset key (mainLogo, favicon, siteTitle, etc.)
+    ///Branding asset key (mainLogo, favicon, siteTitle, etc.)
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBlobOutput<'a> {
@@ -46,7 +52,7 @@ pub struct DeleteBlobOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -93,8 +99,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteBlobResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBlob<'a> {
     const NSID: &'static str = "place.stream.branding.deleteBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteBlobResponse;
 }
 
@@ -103,8 +110,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBlob<'a> {
 pub struct DeleteBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.deleteBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteBlob<'de>;
     type Response = DeleteBlobResponse;
 }

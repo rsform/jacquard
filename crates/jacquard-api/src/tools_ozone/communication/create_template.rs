@@ -14,31 +14,37 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateTemplate<'a> {
-    /// Content of the template, markdown supported, can contain variable placeholders.
+    ///Content of the template, markdown supported, can contain variable placeholders.
     #[serde(borrow)]
     pub content_markdown: jacquard_common::CowStr<'a>,
-    /// DID of the user who is creating the template.
+    ///DID of the user who is creating the template.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// Message language.
+    ///Message language.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub lang: std::option::Option<jacquard_common::types::string::Language>,
-    /// Name of the template.
+    ///Name of the template.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Subject of the message, used in emails.
+    ///Subject of the message, used in emails.
     #[serde(borrow)]
     pub subject: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateTemplateOutput<'a> {
@@ -57,7 +63,7 @@ pub struct CreateTemplateOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -93,8 +99,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateTemplateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateTemplate<'a> {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateTemplateResponse;
 }
 
@@ -103,8 +110,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateTemplate<'a> {
 pub struct CreateTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateTemplateRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.createTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateTemplate<'de>;
     type Response = CreateTemplateResponse;
 }

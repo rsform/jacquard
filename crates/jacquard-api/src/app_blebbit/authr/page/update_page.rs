@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePageParams<'a> {
@@ -17,7 +23,7 @@ pub struct UpdatePageParams<'a> {
 
 pub mod update_page_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -93,7 +99,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePage<'a> {
@@ -113,7 +119,7 @@ pub struct UpdatePage<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePageOutput<'a> {
@@ -142,8 +148,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdatePageResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePage<'a> {
     const NSID: &'static str = "app.blebbit.authr.page.updatePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdatePageResponse;
 }
 
@@ -152,8 +159,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePage<'a> {
 pub struct UpdatePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdatePageRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.updatePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdatePage<'de>;
     type Response = UpdatePageResponse;
 }

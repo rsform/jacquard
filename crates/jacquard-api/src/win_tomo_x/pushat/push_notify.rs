@@ -7,20 +7,26 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PushNotify<'a> {
     #[serde(borrow)]
     pub body: crate::win_tomo_x::pushat::NotifyBody<'a>,
-    /// The DID of the target user to whom the notification will be sent.
+    ///The DID of the target user to whom the notification will be sent.
     #[serde(borrow)]
     pub target: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod push_notify_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -28,37 +34,37 @@ pub mod push_notify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type Body;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type Body = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type Body = S::Body;
+        type Target = Unset;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
-        type Target = S::Target;
         type Body = Set<members::body>;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type Body = S::Body;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
@@ -131,8 +137,8 @@ where
 impl<'a, S> PushNotifyBuilder<'a, S>
 where
     S: push_notify_state::State,
-    S::Target: push_notify_state::IsSet,
     S::Body: push_notify_state::IsSet,
+    S::Target: push_notify_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PushNotify<'a> {
@@ -167,7 +173,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PushNotifyOutput<'a> {}
@@ -181,7 +187,7 @@ pub struct PushNotifyOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -226,8 +232,9 @@ impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PushNotifyResponse;
 }
 
@@ -236,8 +243,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
 pub struct PushNotifyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
     const PATH: &'static str = "/xrpc/win.tomo-x.pushat.pushNotify";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = PushNotify<'de>;
     type Response = PushNotifyResponse;
 }

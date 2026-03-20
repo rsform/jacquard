@@ -8,25 +8,31 @@
 /// An application record.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct App<'a> {
-    /// An optional description of the application.
+    ///An optional description of the application.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A list of strong references to distribution records.
+    ///A list of strong references to distribution records.
     #[serde(borrow)]
     pub distributions: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// The name of the application.
+    ///The name of the application.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
 pub mod app_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,37 +40,37 @@ pub mod app_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Distributions;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Distributions = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Distributions = S::Distributions;
+        type Name = Unset;
     }
     ///State transition - sets the `distributions` field to Set
     pub struct SetDistributions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDistributions<S> {}
     impl<S: State> State for SetDistributions<S> {
-        type Name = S::Name;
         type Distributions = Set<members::distributions>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Distributions = S::Distributions;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `distributions` field
         pub struct distributions(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -99,12 +105,18 @@ impl<'a> AppBuilder<'a, app_state::Empty> {
 
 impl<'a, S: app_state::State> AppBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -151,8 +163,8 @@ where
 impl<'a, S> AppBuilder<'a, S>
 where
     S: app_state::State,
-    S::Name: app_state::IsSet,
     S::Distributions: app_state::IsSet,
+    S::Name: app_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> App<'a> {
@@ -195,7 +207,13 @@ impl<'a> App<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AppGetRecordOutput<'a> {
@@ -252,8 +270,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for App<'a> {
     }
 }
 
-fn lexicon_doc_garden_lexicon_exultant_zebra_app()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_garden_lexicon_exultant_zebra_app() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.lexicon.exultant-zebra.app"),

@@ -6,19 +6,27 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetNote<'a> {
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+    pub rkey: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
 }
 
 pub mod get_note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -26,37 +34,37 @@ pub mod get_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Rkey;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Rkey = S::Rkey;
+        type Repo = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Repo = S::Repo;
         type Rkey = Set<members::rkey>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rkey = S::Rkey;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -66,7 +74,9 @@ pub struct GetNoteBuilder<'a, S: get_note_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -118,7 +128,9 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
     ) -> GetNoteBuilder<'a, get_note_state::SetRkey<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
@@ -133,8 +145,8 @@ where
 impl<'a, S> GetNoteBuilder<'a, S>
 where
     S: get_note_state::State,
-    S::Repo: get_note_state::IsSet,
     S::Rkey: get_note_state::IsSet,
+    S::Repo: get_note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetNote<'a> {
@@ -147,7 +159,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetNoteOutput<'a> {

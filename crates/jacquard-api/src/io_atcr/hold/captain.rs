@@ -8,30 +8,36 @@
 /// Represents the hold's ownership and metadata. Stored as a singleton record at rkey 'self' in the hold's embedded PDS.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Captain<'a> {
-    /// Allow any authenticated user to register as crew
+    ///Allow any authenticated user to register as crew
     pub allow_all_crew: bool,
-    /// RFC3339 timestamp of when the hold was deployed
+    ///RFC3339 timestamp of when the hold was deployed
     pub deployed_at: jacquard_common::types::string::Datetime,
-    /// Enable Bluesky posts when manifests are pushed
+    ///Enable Bluesky posts when manifests are pushed
     pub enable_bluesky_posts: bool,
-    /// DID of the hold owner
+    ///DID of the hold owner
     #[serde(borrow)]
     pub owner: jacquard_common::types::string::Did<'a>,
-    /// Whether this hold allows public blob reads (pulls) without authentication
+    ///Whether this hold allows public blob reads (pulls) without authentication
     pub public: bool,
-    /// S3 region where blobs are stored
+    ///S3 region where blobs are stored
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub region: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// DID of successor hold for migration redirect
+    ///DID of successor hold for migration redirect
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub successor: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// Tier names that earn a supporter badge on user profiles
+    ///Tier names that earn a supporter badge on user profiles
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub supporter_badge_tiers: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -39,7 +45,7 @@ pub struct Captain<'a> {
 
 pub mod captain_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,85 +53,85 @@ pub mod captain_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AllowAllCrew;
         type Public;
-        type Owner;
-        type EnableBlueskyPosts;
+        type AllowAllCrew;
         type DeployedAt;
+        type EnableBlueskyPosts;
+        type Owner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AllowAllCrew = Unset;
         type Public = Unset;
-        type Owner = Unset;
-        type EnableBlueskyPosts = Unset;
+        type AllowAllCrew = Unset;
         type DeployedAt = Unset;
-    }
-    ///State transition - sets the `allow_all_crew` field to Set
-    pub struct SetAllowAllCrew<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowAllCrew<S> {}
-    impl<S: State> State for SetAllowAllCrew<S> {
-        type AllowAllCrew = Set<members::allow_all_crew>;
-        type Public = S::Public;
-        type Owner = S::Owner;
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
+        type EnableBlueskyPosts = Unset;
+        type Owner = Unset;
     }
     ///State transition - sets the `public` field to Set
     pub struct SetPublic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublic<S> {}
     impl<S: State> State for SetPublic<S> {
-        type AllowAllCrew = S::AllowAllCrew;
         type Public = Set<members::public>;
-        type Owner = S::Owner;
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
-    }
-    ///State transition - sets the `owner` field to Set
-    pub struct SetOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwner<S> {}
-    impl<S: State> State for SetOwner<S> {
         type AllowAllCrew = S::AllowAllCrew;
-        type Public = S::Public;
-        type Owner = Set<members::owner>;
+        type DeployedAt = S::DeployedAt;
         type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
-    }
-    ///State transition - sets the `enable_bluesky_posts` field to Set
-    pub struct SetEnableBlueskyPosts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnableBlueskyPosts<S> {}
-    impl<S: State> State for SetEnableBlueskyPosts<S> {
-        type AllowAllCrew = S::AllowAllCrew;
-        type Public = S::Public;
         type Owner = S::Owner;
-        type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
+    }
+    ///State transition - sets the `allow_all_crew` field to Set
+    pub struct SetAllowAllCrew<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAllowAllCrew<S> {}
+    impl<S: State> State for SetAllowAllCrew<S> {
+        type Public = S::Public;
+        type AllowAllCrew = Set<members::allow_all_crew>;
         type DeployedAt = S::DeployedAt;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type Owner = S::Owner;
     }
     ///State transition - sets the `deployed_at` field to Set
     pub struct SetDeployedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDeployedAt<S> {}
     impl<S: State> State for SetDeployedAt<S> {
-        type AllowAllCrew = S::AllowAllCrew;
         type Public = S::Public;
-        type Owner = S::Owner;
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type AllowAllCrew = S::AllowAllCrew;
         type DeployedAt = Set<members::deployed_at>;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type Owner = S::Owner;
+    }
+    ///State transition - sets the `enable_bluesky_posts` field to Set
+    pub struct SetEnableBlueskyPosts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnableBlueskyPosts<S> {}
+    impl<S: State> State for SetEnableBlueskyPosts<S> {
+        type Public = S::Public;
+        type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = S::DeployedAt;
+        type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
+        type Owner = S::Owner;
+    }
+    ///State transition - sets the `owner` field to Set
+    pub struct SetOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwner<S> {}
+    impl<S: State> State for SetOwner<S> {
+        type Public = S::Public;
+        type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = S::DeployedAt;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type Owner = Set<members::owner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `allow_all_crew` field
-        pub struct allow_all_crew(());
         ///Marker type for the `public` field
         pub struct public(());
-        ///Marker type for the `owner` field
-        pub struct owner(());
-        ///Marker type for the `enable_bluesky_posts` field
-        pub struct enable_bluesky_posts(());
+        ///Marker type for the `allow_all_crew` field
+        pub struct allow_all_crew(());
         ///Marker type for the `deployed_at` field
         pub struct deployed_at(());
+        ///Marker type for the `enable_bluesky_posts` field
+        pub struct enable_bluesky_posts(());
+        ///Marker type for the `owner` field
+        pub struct owner(());
     }
 }
 
@@ -260,7 +266,10 @@ where
 
 impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
     /// Set the `region` field (optional)
-    pub fn region(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn region(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -312,11 +321,11 @@ impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
 impl<'a, S> CaptainBuilder<'a, S>
 where
     S: captain_state::State,
-    S::AllowAllCrew: captain_state::IsSet,
     S::Public: captain_state::IsSet,
-    S::Owner: captain_state::IsSet,
-    S::EnableBlueskyPosts: captain_state::IsSet,
+    S::AllowAllCrew: captain_state::IsSet,
     S::DeployedAt: captain_state::IsSet,
+    S::EnableBlueskyPosts: captain_state::IsSet,
+    S::Owner: captain_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Captain<'a> {
@@ -369,7 +378,13 @@ impl<'a> Captain<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CaptainGetRecordOutput<'a> {
@@ -426,7 +441,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Captain<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("region"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "region",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -436,7 +453,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Captain<'a> {
     }
 }
 
-fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_atcr_hold_captain() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.hold.captain"),

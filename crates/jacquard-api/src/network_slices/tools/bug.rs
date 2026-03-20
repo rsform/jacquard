@@ -11,7 +11,13 @@ pub mod response;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bug<'a> {
@@ -24,30 +30,32 @@ pub struct Bug<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
-    /// Annotations of description (mentions and links)
+    ///Annotations of description (mentions and links)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets:
-        std::option::Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>,
-    /// Target namespace like 'social.grain' or 'app.bsky'
+    pub description_facets: std::option::Option<
+        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+    >,
+    ///Target namespace like 'social.grain' or 'app.bsky'
     #[serde(borrow)]
     pub namespace: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub severity: BugSeverity<'a>,
     #[serde(borrow)]
     pub steps_to_reproduce: jacquard_common::CowStr<'a>,
-    /// Annotations of steps to reproduce (mentions and links)
+    ///Annotations of steps to reproduce (mentions and links)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub steps_to_reproduce_facets:
-        std::option::Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>,
+    pub steps_to_reproduce_facets: std::option::Option<
+        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+    >,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
 pub mod bug_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -55,105 +63,105 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Description;
-        type Title;
+        type CreatedAt;
+        type Severity;
         type StepsToReproduce;
         type Namespace;
-        type Severity;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Description = Unset;
-        type Title = Unset;
+        type CreatedAt = Unset;
+        type Severity = Unset;
         type StepsToReproduce = Unset;
         type Namespace = Unset;
-        type Severity = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Title = S::Title;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = S::Namespace;
-        type Severity = S::Severity;
+        type Title = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
         type Description = Set<members::description>;
-        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
         type StepsToReproduce = S::StepsToReproduce;
         type Namespace = S::Namespace;
-        type Severity = S::Severity;
+        type Title = S::Title;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
         type Description = S::Description;
-        type Title = Set<members::title>;
+        type CreatedAt = Set<members::created_at>;
+        type Severity = S::Severity;
         type StepsToReproduce = S::StepsToReproduce;
         type Namespace = S::Namespace;
-        type Severity = S::Severity;
-    }
-    ///State transition - sets the `steps_to_reproduce` field to Set
-    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
-    impl<S: State> State for SetStepsToReproduce<S> {
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
         type Title = S::Title;
-        type StepsToReproduce = Set<members::steps_to_reproduce>;
-        type Namespace = S::Namespace;
-        type Severity = S::Severity;
-    }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNamespace<S> {}
-    impl<S: State> State for SetNamespace<S> {
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Title = S::Title;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = Set<members::namespace>;
-        type Severity = S::Severity;
     }
     ///State transition - sets the `severity` field to Set
     pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeverity<S> {}
     impl<S: State> State for SetSeverity<S> {
-        type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Severity = Set<members::severity>;
         type StepsToReproduce = S::StepsToReproduce;
         type Namespace = S::Namespace;
-        type Severity = Set<members::severity>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `steps_to_reproduce` field to Set
+    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
+    impl<S: State> State for SetStepsToReproduce<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = Set<members::steps_to_reproduce>;
+        type Namespace = S::Namespace;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNamespace<S> {}
+    impl<S: State> State for SetNamespace<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Namespace = Set<members::namespace>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Namespace = S::Namespace;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `severity` field
+        pub struct severity(());
         ///Marker type for the `steps_to_reproduce` field
         pub struct steps_to_reproduce(());
         ///Marker type for the `namespace` field
         pub struct namespace(());
-        ///Marker type for the `severity` field
-        pub struct severity(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -165,11 +173,15 @@ pub struct BugBuilder<'a, S: bug_state::State> {
         ::core::option::Option<crate::network_slices::tools::Images<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<
+            Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<BugSeverity<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<
+            Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -187,7 +199,18 @@ impl<'a> BugBuilder<'a, bug_state::Empty> {
     pub fn new() -> Self {
         BugBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -195,7 +218,10 @@ impl<'a> BugBuilder<'a, bug_state::Empty> {
 
 impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `appUsed` field (optional)
-    pub fn app_used(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn app_used(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -267,7 +293,9 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -343,7 +371,9 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `stepsToReproduceFacets` field (optional)
     pub fn steps_to_reproduce_facets(
         mut self,
-        value: impl Into<Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
@@ -380,12 +410,12 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::CreatedAt: bug_state::IsSet,
     S::Description: bug_state::IsSet,
-    S::Title: bug_state::IsSet,
+    S::CreatedAt: bug_state::IsSet,
+    S::Severity: bug_state::IsSet,
     S::StepsToReproduce: bug_state::IsSet,
     S::Namespace: bug_state::IsSet,
-    S::Severity: bug_state::IsSet,
+    S::Title: bug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bug<'a> {
@@ -540,7 +570,13 @@ impl jacquard_common::IntoStatic for BugSeverity<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BugGetRecordOutput<'a> {
@@ -597,7 +633,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("app_used"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "app_used",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -608,7 +646,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -623,15 +663,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 3000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 3000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -657,15 +695,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
                     )
                     .count();
                 if count > 1500usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "steps_to_reproduce",
-                            ),
-                            max: 1500usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "steps_to_reproduce",
+                        ),
+                        max: 1500usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -674,7 +710,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -689,15 +727,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "title",
-                            ),
-                            max: 100usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -705,7 +741,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
     }
 }
 
-fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_slices_tools_bug() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.tools.bug"),

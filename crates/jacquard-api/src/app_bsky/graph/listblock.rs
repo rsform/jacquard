@@ -8,19 +8,25 @@
 /// Record representing a block relationship against an entire an entire list of accounts (actors).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listblock<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference (AT-URI) to the mod list record.
+    ///Reference (AT-URI) to the mod list record.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod listblock_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -173,7 +179,13 @@ impl<'a> Listblock<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListblockGetRecordOutput<'a> {
@@ -230,7 +242,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listblock<'a> {
     }
 }
 
-fn lexicon_doc_app_bsky_graph_listblock() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_graph_listblock() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.graph.listblock"),

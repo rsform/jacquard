@@ -10,19 +10,25 @@ pub mod get_valid_badges;
 /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BadgeView<'a> {
     #[serde(borrow)]
     pub badge_type: BadgeViewBadgeType<'a>,
-    /// DID of the badge issuer.
+    ///DID of the badge issuer.
     #[serde(borrow)]
     pub issuer: jacquard_common::types::string::Did<'a>,
-    /// DID of the badge recipient.
+    ///DID of the badge recipient.
     #[serde(borrow)]
     pub recipient: jacquard_common::types::string::Did<'a>,
-    /// TODO: Cryptographic signature of the badge (of a place.stream.key).
+    ///TODO: Cryptographic signature of the badge (of a place.stream.key).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub signature: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -30,7 +36,7 @@ pub struct BadgeView<'a> {
 
 pub mod badge_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,49 +44,49 @@ pub mod badge_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Issuer;
         type Recipient;
+        type Issuer;
         type BadgeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Issuer = Unset;
         type Recipient = Unset;
+        type Issuer = Unset;
         type BadgeType = Unset;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type Issuer = Set<members::issuer>;
-        type Recipient = S::Recipient;
-        type BadgeType = S::BadgeType;
     }
     ///State transition - sets the `recipient` field to Set
     pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecipient<S> {}
     impl<S: State> State for SetRecipient<S> {
-        type Issuer = S::Issuer;
         type Recipient = Set<members::recipient>;
+        type Issuer = S::Issuer;
+        type BadgeType = S::BadgeType;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type Recipient = S::Recipient;
+        type Issuer = Set<members::issuer>;
         type BadgeType = S::BadgeType;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeType<S> {}
     impl<S: State> State for SetBadgeType<S> {
-        type Issuer = S::Issuer;
         type Recipient = S::Recipient;
+        type Issuer = S::Issuer;
         type BadgeType = Set<members::badge_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
         ///Marker type for the `recipient` field
         pub struct recipient(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
     }
@@ -175,12 +181,18 @@ where
 
 impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
     /// Set the `signature` field (optional)
-    pub fn signature(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn signature(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `signature` field to an Option value (optional)
-    pub fn maybe_signature(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_signature(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -189,8 +201,8 @@ impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
 impl<'a, S> BadgeViewBuilder<'a, S>
 where
     S: badge_view_state::State,
-    S::Issuer: badge_view_state::IsSet,
     S::Recipient: badge_view_state::IsSet,
+    S::Issuer: badge_view_state::IsSet,
     S::BadgeType: badge_view_state::IsSet,
 {
     /// Build the final struct
@@ -309,7 +321,9 @@ impl jacquard_common::IntoStatic for BadgeViewBadgeType<'_> {
     }
 }
 
-fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.badge.defs"),
@@ -426,21 +440,21 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("mod"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("streamer"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("vip"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map
         },
@@ -473,7 +487,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BadgeView<'a> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Mod;
 impl std::fmt::Display for Mod {
@@ -491,7 +505,7 @@ impl std::fmt::Display for Mod {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Streamer;
 impl std::fmt::Display for Streamer {
@@ -509,7 +523,7 @@ impl std::fmt::Display for Streamer {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Vip;
 impl std::fmt::Display for Vip {

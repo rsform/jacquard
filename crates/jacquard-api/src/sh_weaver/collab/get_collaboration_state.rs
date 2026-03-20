@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetCollaborationState<'a> {
@@ -16,7 +22,7 @@ pub struct GetCollaborationState<'a> {
 
 pub mod get_collaboration_state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,13 +55,18 @@ pub mod get_collaboration_state_state {
 /// Builder for constructing an instance of this type
 pub struct GetCollaborationStateBuilder<'a, S: get_collaboration_state_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
 impl<'a> GetCollaborationState<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetCollaborationStateBuilder<'a, get_collaboration_state_state::Empty> {
+    pub fn new() -> GetCollaborationStateBuilder<
+        'a,
+        get_collaboration_state_state::Empty,
+    > {
         GetCollaborationStateBuilder::new()
     }
 }
@@ -80,7 +91,10 @@ where
     pub fn resource(
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
-    ) -> GetCollaborationStateBuilder<'a, get_collaboration_state_state::SetResource<S>> {
+    ) -> GetCollaborationStateBuilder<
+        'a,
+        get_collaboration_state_state::SetResource<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         GetCollaborationStateBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -105,7 +119,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetCollaborationStateOutput<'a> {

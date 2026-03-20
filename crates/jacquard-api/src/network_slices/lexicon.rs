@@ -7,36 +7,47 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lexicon<'a> {
-    /// When the lexicon was created
+    ///When the lexicon was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The lexicon schema definitions as JSON
+    ///The lexicon schema definitions as JSON
     #[serde(borrow)]
     pub definitions: jacquard_common::CowStr<'a>,
-    /// Human-readable description of the lexicon
+    ///Human-readable description of the lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Whether this lexicon should be excluded from sync operations
+    ///Whether this lexicon should be excluded from sync operations Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_excluded_from_sync")]
     pub excluded_from_sync: std::option::Option<bool>,
-    /// Namespaced identifier for the lexicon
+    ///Namespaced identifier for the lexicon
     #[serde(borrow)]
     pub nsid: jacquard_common::CowStr<'a>,
-    /// AT-URI reference to the slice this lexicon belongs to
+    ///AT-URI reference to the slice this lexicon belongs to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
-    /// When the lexicon was last updated
+    ///When the lexicon was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+fn _default_excluded_from_sync() -> std::option::Option<bool> {
+    Some(false)
+}
+
 pub mod lexicon_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -44,67 +55,67 @@ pub mod lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Nsid;
         type Definitions;
-        type CreatedAt;
+        type Nsid;
         type Slice;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Nsid = Unset;
         type Definitions = Unset;
-        type CreatedAt = Unset;
+        type Nsid = Unset;
         type Slice = Unset;
-    }
-    ///State transition - sets the `nsid` field to Set
-    pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNsid<S> {}
-    impl<S: State> State for SetNsid<S> {
-        type Nsid = Set<members::nsid>;
-        type Definitions = S::Definitions;
-        type CreatedAt = S::CreatedAt;
-        type Slice = S::Slice;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `definitions` field to Set
     pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefinitions<S> {}
     impl<S: State> State for SetDefinitions<S> {
-        type Nsid = S::Nsid;
         type Definitions = Set<members::definitions>;
-        type CreatedAt = S::CreatedAt;
-        type Slice = S::Slice;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Nsid = S::Nsid;
-        type Definitions = S::Definitions;
-        type CreatedAt = Set<members::created_at>;
         type Slice = S::Slice;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `nsid` field to Set
+    pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNsid<S> {}
+    impl<S: State> State for SetNsid<S> {
+        type Definitions = S::Definitions;
+        type Nsid = Set<members::nsid>;
+        type Slice = S::Slice;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
-        type Nsid = S::Nsid;
         type Definitions = S::Definitions;
-        type CreatedAt = S::CreatedAt;
+        type Nsid = S::Nsid;
         type Slice = Set<members::slice>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Definitions = S::Definitions;
+        type Nsid = S::Nsid;
+        type Slice = S::Slice;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `nsid` field
-        pub struct nsid(());
         ///Marker type for the `definitions` field
         pub struct definitions(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `nsid` field
+        pub struct nsid(());
         ///Marker type for the `slice` field
         pub struct slice(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -181,12 +192,18 @@ where
 
 impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -265,10 +282,10 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
 impl<'a, S> LexiconBuilder<'a, S>
 where
     S: lexicon_state::State,
-    S::Nsid: lexicon_state::IsSet,
     S::Definitions: lexicon_state::IsSet,
-    S::CreatedAt: lexicon_state::IsSet,
+    S::Nsid: lexicon_state::IsSet,
     S::Slice: lexicon_state::IsSet,
+    S::CreatedAt: lexicon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lexicon<'a> {
@@ -276,7 +293,7 @@ where
             created_at: self.__unsafe_private_named.0.unwrap(),
             definitions: self.__unsafe_private_named.1.unwrap(),
             description: self.__unsafe_private_named.2,
-            excluded_from_sync: self.__unsafe_private_named.3,
+            excluded_from_sync: self.__unsafe_private_named.3.or_else(|| Some(false)),
             nsid: self.__unsafe_private_named.4.unwrap(),
             slice: self.__unsafe_private_named.5.unwrap(),
             updated_at: self.__unsafe_private_named.6,
@@ -295,7 +312,7 @@ where
             created_at: self.__unsafe_private_named.0.unwrap(),
             definitions: self.__unsafe_private_named.1.unwrap(),
             description: self.__unsafe_private_named.2,
-            excluded_from_sync: self.__unsafe_private_named.3,
+            excluded_from_sync: self.__unsafe_private_named.3.or_else(|| Some(false)),
             nsid: self.__unsafe_private_named.4.unwrap(),
             slice: self.__unsafe_private_named.5.unwrap(),
             updated_at: self.__unsafe_private_named.6,
@@ -319,7 +336,13 @@ impl<'a> Lexicon<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LexiconGetRecordOutput<'a> {
@@ -376,7 +399,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -387,7 +412,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("nsid"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nsid",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -397,7 +424,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
     }
 }
 
-fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.lexicon"),

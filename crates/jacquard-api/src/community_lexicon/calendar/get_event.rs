@@ -8,24 +8,30 @@
 /// An event record with RSVP counts and URL.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventView<'a> {
-    /// Number of users who have RSVP'd as going.
+    ///Number of users who have RSVP'd as going.
     pub count_going: i64,
-    /// Number of users who have RSVP'd as interested.
+    ///Number of users who have RSVP'd as interested.
     pub count_interested: i64,
-    /// Number of users who have RSVP'd as not going.
+    ///Number of users who have RSVP'd as not going.
     pub count_not_going: i64,
-    /// The canonical URL for this event on Smoke Signal.
+    ///The canonical URL for this event on Smoke Signal.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod event_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,65 +39,65 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CountInterested;
-        type Url;
         type CountGoing;
+        type Url;
+        type CountInterested;
         type CountNotGoing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CountInterested = Unset;
-        type Url = Unset;
         type CountGoing = Unset;
+        type Url = Unset;
+        type CountInterested = Unset;
         type CountNotGoing = Unset;
     }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
-    impl<S: State> State for SetCountInterested<S> {
-        type CountInterested = Set<members::count_interested>;
+    ///State transition - sets the `count_going` field to Set
+    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
+    impl<S: State> State for SetCountGoing<S> {
+        type CountGoing = Set<members::count_going>;
         type Url = S::Url;
-        type CountGoing = S::CountGoing;
+        type CountInterested = S::CountInterested;
         type CountNotGoing = S::CountNotGoing;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CountInterested = S::CountInterested;
-        type Url = Set<members::url>;
         type CountGoing = S::CountGoing;
+        type Url = Set<members::url>;
+        type CountInterested = S::CountInterested;
         type CountNotGoing = S::CountNotGoing;
     }
-    ///State transition - sets the `count_going` field to Set
-    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
-    impl<S: State> State for SetCountGoing<S> {
-        type CountInterested = S::CountInterested;
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
+    impl<S: State> State for SetCountInterested<S> {
+        type CountGoing = S::CountGoing;
         type Url = S::Url;
-        type CountGoing = Set<members::count_going>;
+        type CountInterested = Set<members::count_interested>;
         type CountNotGoing = S::CountNotGoing;
     }
     ///State transition - sets the `count_not_going` field to Set
     pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
     impl<S: State> State for SetCountNotGoing<S> {
-        type CountInterested = S::CountInterested;
-        type Url = S::Url;
         type CountGoing = S::CountGoing;
+        type Url = S::Url;
+        type CountInterested = S::CountInterested;
         type CountNotGoing = Set<members::count_not_going>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `count_going` field
         pub struct count_going(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
     }
@@ -206,9 +212,9 @@ where
 impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
-    S::CountInterested: event_view_state::IsSet,
-    S::Url: event_view_state::IsSet,
     S::CountGoing: event_view_state::IsSet,
+    S::Url: event_view_state::IsSet,
+    S::CountInterested: event_view_state::IsSet,
     S::CountNotGoing: event_view_state::IsSet,
 {
     /// Build the final struct
@@ -239,8 +245,9 @@ where
     }
 }
 
-fn lexicon_doc_community_lexicon_calendar_getEvent()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_community_lexicon_calendar_getEvent() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("community.lexicon.calendar.getEvent"),
@@ -250,93 +257,89 @@ fn lexicon_doc_community_lexicon_calendar_getEvent()
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("eventView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "An event record with RSVP counts and URL.",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("countGoing"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("countInterested"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("countNotGoing"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "countGoing",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "countInterested",
                             ),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("countNotGoing"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "countGoing",
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "countNotGoing",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "url",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The canonical URL for this event on Smoke Signal.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "countInterested",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "countNotGoing",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "The canonical URL for this event on Smoke Signal.",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -429,7 +432,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetEvent<'a> {
@@ -441,7 +450,7 @@ pub struct GetEvent<'a> {
 
 pub mod get_event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -566,7 +575,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetEventOutput<'a> {
@@ -585,7 +600,7 @@ pub struct GetEventOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

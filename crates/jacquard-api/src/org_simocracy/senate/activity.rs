@@ -8,31 +8,39 @@
 /// Senate simulation activity log entry.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
-    /// Type of senate activity
+    ///Type of senate activity
     #[serde(borrow)]
     pub activity_type: ActivityActivityType<'a>,
-    /// References to the sim records participating in this committee
+    ///References to the sim records participating in this committee
     #[serde(borrow)]
     pub committee_sims: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Timestamp when the activity was logged
+    ///Timestamp when the activity was logged
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Link to org.hypercerts.claim.evaluation record
+    ///Link to org.hypercerts.claim.evaluation record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub evaluation: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// The proposal text being evaluated
+    pub evaluation: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///The proposal text being evaluated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub proposal_text: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Summary of the simulation result
+    ///Summary of the simulation result
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub result_summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Current status of the activity
+    ///Current status of the activity
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<ActivityStatus<'a>>,
@@ -40,7 +48,7 @@ pub struct Activity<'a> {
 
 pub mod activity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,12 +215,18 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `proposalText` field (optional)
-    pub fn proposal_text(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn proposal_text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `proposalText` field to an Option value (optional)
-    pub fn maybe_proposal_text(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_proposal_text(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -220,12 +234,18 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `resultSummary` field (optional)
-    pub fn result_summary(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn result_summary(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `resultSummary` field to an Option value (optional)
-    pub fn maybe_result_summary(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_result_summary(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -384,10 +404,18 @@ impl jacquard_common::IntoStatic for ActivityActivityType<'_> {
     type Output = ActivityActivityType<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            ActivityActivityType::CommitteeEvaluation => ActivityActivityType::CommitteeEvaluation,
-            ActivityActivityType::SimulationStarted => ActivityActivityType::SimulationStarted,
-            ActivityActivityType::SimulationCompleted => ActivityActivityType::SimulationCompleted,
-            ActivityActivityType::Other(v) => ActivityActivityType::Other(v.into_static()),
+            ActivityActivityType::CommitteeEvaluation => {
+                ActivityActivityType::CommitteeEvaluation
+            }
+            ActivityActivityType::SimulationStarted => {
+                ActivityActivityType::SimulationStarted
+            }
+            ActivityActivityType::SimulationCompleted => {
+                ActivityActivityType::SimulationCompleted
+            }
+            ActivityActivityType::Other(v) => {
+                ActivityActivityType::Other(v.into_static())
+            }
         }
     }
 }
@@ -488,7 +516,13 @@ impl jacquard_common::IntoStatic for ActivityStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
@@ -582,7 +616,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     }
 }
 
-fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.senate.activity"),

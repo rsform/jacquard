@@ -17,20 +17,26 @@ pub mod verify_phone;
 /// Associates a profile with the positional index of the contact import input in the call to `app.bsky.contact.importContacts`, so clients can know which phone caused a particular match.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MatchAndContactIndex<'a> {
-    /// The index of this match in the import contact input.
+    ///The index of this match in the import contact input.
     pub contact_index: i64,
-    /// Profile of the matched user.
+    ///Profile of the matched user.
     #[serde(borrow)]
     pub r#match: crate::app_bsky::actor::ProfileView<'a>,
 }
 
 pub mod match_and_contact_index_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -84,7 +90,10 @@ pub struct MatchAndContactIndexBuilder<'a, S: match_and_contact_index_state::Sta
 
 impl<'a> MatchAndContactIndex<'a> {
     /// Create a new builder for this type
-    pub fn new() -> MatchAndContactIndexBuilder<'a, match_and_contact_index_state::Empty> {
+    pub fn new() -> MatchAndContactIndexBuilder<
+        'a,
+        match_and_contact_index_state::Empty,
+    > {
         MatchAndContactIndexBuilder::new()
     }
 }
@@ -109,7 +118,10 @@ where
     pub fn contact_index(
         mut self,
         value: impl Into<i64>,
-    ) -> MatchAndContactIndexBuilder<'a, match_and_contact_index_state::SetContactIndex<S>> {
+    ) -> MatchAndContactIndexBuilder<
+        'a,
+        match_and_contact_index_state::SetContactIndex<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         MatchAndContactIndexBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -168,7 +180,9 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.contact.defs"),
@@ -292,57 +306,57 @@ fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("syncStatus"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("syncedAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("matchesCount"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "matchesCount",
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("matchesCount")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "matchesCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "syncedAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Last date when contacts where imported.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("syncedAt"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Last date when contacts where imported.",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -393,21 +407,27 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MatchAndContactIndex<'a> 
 /// A stash object to be sent via bsync representing a notification to be created.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Notification<'a> {
-    /// The DID of who this notification comes from.
+    ///The DID of who this notification comes from.
     #[serde(borrow)]
     pub from: jacquard_common::types::string::Did<'a>,
-    /// The DID of who this notification should go to.
+    ///The DID of who this notification should go to.
     #[serde(borrow)]
     pub to: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -564,19 +584,25 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyncStatus<'a> {
-    /// Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
+    ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
     pub matches_count: i64,
-    /// Last date when contacts where imported.
+    ///Last date when contacts where imported.
     pub synced_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod sync_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

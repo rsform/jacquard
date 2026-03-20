@@ -14,11 +14,11 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateShout<'a> {
-    /// The content of the shout
+    ///The content of the shout
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -26,7 +26,13 @@ pub struct CreateShout<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateShoutOutput<'a> {
@@ -47,8 +53,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateShoutResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateShout<'a> {
     const NSID: &'static str = "app.rocksky.shout.createShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateShoutResponse;
 }
 
@@ -57,8 +64,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateShout<'a> {
 pub struct CreateShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.createShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateShout<'de>;
     type Response = CreateShoutResponse;
 }

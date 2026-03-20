@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertSet<'a> {
@@ -18,7 +24,13 @@ pub struct UpsertSet<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertSetOutput<'a> {
@@ -39,8 +51,9 @@ impl jacquard_common::xrpc::XrpcResp for UpsertSetResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertSet<'a> {
     const NSID: &'static str = "tools.ozone.set.upsertSet";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpsertSetResponse;
 }
 
@@ -49,8 +62,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertSet<'a> {
 pub struct UpsertSetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpsertSetRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.upsertSet";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpsertSet<'de>;
     type Response = UpsertSetResponse;
 }

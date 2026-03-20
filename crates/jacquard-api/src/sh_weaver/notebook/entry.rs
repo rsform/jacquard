@@ -8,22 +8,30 @@
 /// A notebook entry
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub authors: std::option::Option<Vec<crate::sh_weaver::actor::Author<'a>>>,
-    /// The content of the notebook entry. This should be some flavor of Markdown.
+    ///The content of the notebook entry. This should be some flavor of Markdown.
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: std::option::Option<crate::sh_weaver::notebook::ContentWarnings<'a>>,
-    /// Client-declared timestamp when this was originally created.
+    pub content_warnings: std::option::Option<
+        crate::sh_weaver::notebook::ContentWarnings<'a>,
+    >,
+    ///Client-declared timestamp when this was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The set of images and records, if any, embedded in the notebook entry.
+    ///The set of images and records, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embeds: std::option::Option<EntryEmbeds<'a>>,
@@ -37,14 +45,14 @@ pub struct Entry<'a> {
     pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(borrow)]
     pub title: crate::sh_weaver::notebook::Title<'a>,
-    /// Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.
+    ///Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -52,67 +60,67 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type CreatedAt;
         type Path;
+        type CreatedAt;
         type Title;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type CreatedAt = Unset;
         type Path = Unset;
+        type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type Path = S::Path;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
-        type Path = S::Path;
-        type Title = S::Title;
+        type Content = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type Path = Set<members::path>;
+        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Path = S::Path;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Content = S::Content;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type Path = S::Path;
+        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Path = S::Path;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -146,7 +154,18 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     pub fn new() -> Self {
         EntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -281,12 +300,18 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<crate::sh_weaver::notebook::Tags<'a>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -333,10 +358,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Content: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
     S::Path: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
     S::Title: entry_state::IsSet,
+    S::Content: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -401,7 +426,7 @@ impl<'a> Entry<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryEmbeds<'a> {
@@ -416,14 +441,17 @@ pub struct EntryEmbeds<'a> {
     pub records: std::option::Option<crate::sh_weaver::embed::records::Records<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub records_with_media:
-        std::option::Option<Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<'a>>>,
+    pub records_with_media: std::option::Option<
+        Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub videos: std::option::Option<crate::sh_weaver::embed::video::VideoRecord<'a>>,
 }
 
-fn lexicon_doc_sh_weaver_notebook_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_notebook_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.entry"),
@@ -698,7 +726,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryEmbeds<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {

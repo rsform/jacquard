@@ -15,23 +15,25 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CustomHeader<'a> {
-    /// HTTP header name (e.g., 'Cache-Control', 'X-Frame-Options')
+    ///HTTP header name (e.g., 'Cache-Control', 'X-Frame-Options')
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Optional glob pattern to apply this header to specific paths (e.g., '*.html', '/assets/*'). If not specified, applies to all paths.
+    ///Optional glob pattern to apply this header to specific paths (e.g., '*.html', '/assets/*'). If not specified, applies to all paths.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub path: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// HTTP header value
+    ///HTTP header value
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.wisp.settings"),
@@ -274,7 +276,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -284,7 +288,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("path"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "path",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -295,7 +301,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("value"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -308,37 +316,67 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
 /// Configuration settings for a static site hosted on wisp.place
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
-    /// Enable clean URL routing. When enabled, '/about' will attempt to serve '/about.html' or '/about/index.html' automatically.
+    ///Enable clean URL routing. When enabled, '/about' will attempt to serve '/about.html' or '/about/index.html' automatically. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_clean_urls")]
     pub clean_urls: std::option::Option<bool>,
-    /// Custom 404 error page file path. Incompatible with directoryListing and spaMode.
+    ///Custom 404 error page file path. Incompatible with directoryListing and spaMode.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub custom404: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Enable directory listing mode for paths that resolve to directories without an index file. Incompatible with spaMode.
+    ///Enable directory listing mode for paths that resolve to directories without an index file. Incompatible with spaMode. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_directory_listing")]
     pub directory_listing: std::option::Option<bool>,
-    /// Custom HTTP headers to set on responses
+    ///Custom HTTP headers to set on responses
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub headers: std::option::Option<Vec<crate::place_wisp::settings::CustomHeader<'a>>>,
-    /// Ordered list of files to try when serving a directory. Defaults to ['index.html'] if not specified.
+    ///Ordered list of files to try when serving a directory. Defaults to ['index.html'] if not specified.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub index_files: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// File to serve for all routes (e.g., 'index.html'). When set, enables SPA mode where all non-file requests are routed to this file. Incompatible with directoryListing and custom404.
+    ///File to serve for all routes (e.g., 'index.html'). When set, enables SPA mode where all non-file requests are routed to this file. Incompatible with directoryListing and custom404.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub spa_mode: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+fn _default_clean_urls() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_directory_listing() -> std::option::Option<bool> {
+    Some(false)
+}
+
+impl Default for Settings<'_> {
+    fn default() -> Self {
+        Self {
+            clean_urls: Some(false),
+            custom404: None,
+            directory_listing: Some(false),
+            headers: None,
+            index_files: None,
+            spa_mode: None,
+            extra_data: Default::default(),
+        }
+    }
+}
+
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -402,12 +440,18 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `custom404` field (optional)
-    pub fn custom404(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn custom404(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `custom404` field to an Option value (optional)
-    pub fn maybe_custom404(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_custom404(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -455,7 +499,10 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
         self
     }
     /// Set the `indexFiles` field to an Option value (optional)
-    pub fn maybe_index_files(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_index_files(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -463,7 +510,10 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `spaMode` field (optional)
-    pub fn spa_mode(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn spa_mode(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -481,9 +531,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
         Settings {
-            clean_urls: self.__unsafe_private_named.0,
+            clean_urls: self.__unsafe_private_named.0.or_else(|| Some(false)),
             custom404: self.__unsafe_private_named.1,
-            directory_listing: self.__unsafe_private_named.2,
+            directory_listing: self.__unsafe_private_named.2.or_else(|| Some(false)),
             headers: self.__unsafe_private_named.3,
             index_files: self.__unsafe_private_named.4,
             spa_mode: self.__unsafe_private_named.5,
@@ -499,9 +549,9 @@ where
         >,
     ) -> Settings<'a> {
         Settings {
-            clean_urls: self.__unsafe_private_named.0,
+            clean_urls: self.__unsafe_private_named.0.or_else(|| Some(false)),
             custom404: self.__unsafe_private_named.1,
-            directory_listing: self.__unsafe_private_named.2,
+            directory_listing: self.__unsafe_private_named.2.or_else(|| Some(false)),
             headers: self.__unsafe_private_named.3,
             index_files: self.__unsafe_private_named.4,
             spa_mode: self.__unsafe_private_named.5,
@@ -525,7 +575,13 @@ impl<'a> Settings<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
@@ -582,7 +638,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("custom404"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "custom404",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -592,7 +650,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("headers"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "headers",
+                    ),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -602,7 +662,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("index_files"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "index_files",
+                    ),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -612,7 +674,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("spa_mode"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "spa_mode",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -8,7 +8,13 @@
 /// A declaration of the existence of labeler service.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
@@ -18,23 +24,29 @@ pub struct Service<'a> {
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
     pub policies: crate::app_bsky::labeler::LabelerPolicies<'a>,
-    /// The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
+    ///The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason_types: std::option::Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
-    /// Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
+    pub reason_types: std::option::Option<
+        Vec<crate::com_atproto::moderation::ReasonType<'a>>,
+    >,
+    ///Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    /// The set of subject types (account, record, etc) this service accepts reports on.
+    pub subject_collections: std::option::Option<
+        Vec<jacquard_common::types::string::Nsid<'a>>,
+    >,
+    ///The set of subject types (account, record, etc) this service accepts reports on.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_types: std::option::Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+    pub subject_types: std::option::Option<
+        Vec<crate::com_atproto::moderation::SubjectType<'a>>,
+    >,
 }
 
 pub mod service_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,37 +54,37 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Policies;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Policies = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Policies = S::Policies;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `policies` field to Set
     pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPolicies<S> {}
     impl<S: State> State for SetPolicies<S> {
-        type CreatedAt = S::CreatedAt;
         type Policies = Set<members::policies>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Policies = S::Policies;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `policies` field
         pub struct policies(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -225,8 +237,8 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
-    S::CreatedAt: service_state::IsSet,
     S::Policies: service_state::IsSet,
+    S::CreatedAt: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
@@ -275,7 +287,13 @@ impl<'a> Service<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
@@ -332,7 +350,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     }
 }
 
-fn lexicon_doc_app_bsky_labeler_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_labeler_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.labeler.service"),

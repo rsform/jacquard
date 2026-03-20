@@ -8,312 +8,320 @@
 /// A biodiversity occurrence record following the Simple Darwin Core standard. Each record represents one occurrence of an organism at a location and time.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Occurrence<'a> {
-    /// Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
+    ///Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub associated_media: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
+    ///Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub associated_occurrences: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
+    ///Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub associated_references: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
+    ///Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub associated_sequences: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
+    ///Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub audio_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The specific nature of the data record. Must be one of the Darwin Core class names.
+    ///The specific nature of the data record. Must be one of the Darwin Core class names.
     #[serde(borrow)]
     pub basis_of_record: jacquard_common::CowStr<'a>,
-    /// The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
+    ///The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub behavior: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name of the class.
+    ///The full scientific name of the class.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub class: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The name, acronym, or code identifying the collection or dataset from which the record was derived.
+    ///The name, acronym, or code identifying the collection or dataset from which the record was derived.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub collection_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
+    ///Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub coordinate_uncertainty_in_meters: std::option::Option<i64>,
-    /// The name of the country or major administrative unit.
+    ///The name of the country or major administrative unit.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub country: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The standard code for the country (ISO 3166-1 alpha-2).
+    ///The standard code for the country (ISO 3166-1 alpha-2).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub country_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full, unabbreviated name of the next smaller administrative region than stateProvince.
+    ///The full, unabbreviated name of the next smaller administrative region than stateProvince.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub county: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Timestamp of record creation in the ATProto PDS.
+    ///Timestamp of record creation in the ATProto PDS.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
+    ///A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub data_generalizations: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The name identifying the dataset from which the record was derived.
+    ///The name identifying the dataset from which the record was derived.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dataset_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The date on which the identification was made. ISO 8601 format.
+    ///The date on which the identification was made. ISO 8601 format.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub date_identified: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Dublin Core type class that best describes the resource (dc:type).
+    ///The Dublin Core type class that best describes the resource (dc:type).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dc_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
+    ///Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub decimal_latitude: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
+    ///Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub decimal_longitude: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
+    ///Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dynamic_properties: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
+    ///The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
     #[serde(borrow)]
     pub event_date: jacquard_common::CowStr<'a>,
-    /// Identifier for the sampling event. Can be used to group occurrences from the same event.
+    ///Identifier for the sampling event. Can be used to group occurrences from the same event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub event_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
+    ///AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub event_ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
+    ///The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub event_time: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name of the family.
+    ///The full scientific name of the family.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub family: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Notes or reference to notes taken in the field about the event.
+    ///Notes or reference to notes taken in the field about the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub field_notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
+    ///GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub gbif_taxon_key: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name of the genus.
+    ///The full scientific name of the genus.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
+    ///The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
+    ///A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub habitat: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
+    ///A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub higher_classification: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
+    ///A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub identification_qualifier: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Comments or notes about the identification.
+    ///Comments or notes about the identification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub identification_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
+    ///Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub identified_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
+    ///Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub identified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
+    ///Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The number of individuals present at the time of the occurrence.
+    ///The number of individuals present at the time of the occurrence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub individual_count: std::option::Option<i64>,
-    /// A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
+    ///A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub information_withheld: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The name of the lowest or terminal infraspecific epithet.
+    ///The name of the lowest or terminal infraspecific epithet.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub infraspecific_epithet: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The name or acronym of the institution having custody of the object(s) or information in the record.
+    ///The name or acronym of the institution having custody of the object(s) or information in the record.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub institution_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
+    ///The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub kingdom: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
+    ///A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub license: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
+    ///The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub life_stage: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
+    ///The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifier for the location (e.g., a reference to a named site).
+    ///Identifier for the location (e.g., a reference to a named site).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub location_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Comments about the location.
+    ///Comments about the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub location_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The greater depth of a range of depth below the local surface (in meters).
+    ///The greater depth of a range of depth below the local surface (in meters).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub maximum_depth_in_meters: std::option::Option<i64>,
-    /// The upper limit of the range of elevation (in meters above sea level).
+    ///The upper limit of the range of elevation (in meters above sea level).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub maximum_elevation_in_meters: std::option::Option<i64>,
-    /// The lesser depth of a range of depth below the local surface (in meters).
+    ///The lesser depth of a range of depth below the local surface (in meters).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub minimum_depth_in_meters: std::option::Option<i64>,
-    /// The lower limit of the range of elevation (in meters above sea level).
+    ///The lower limit of the range of elevation (in meters above sea level).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub minimum_elevation_in_meters: std::option::Option<i64>,
-    /// The full, unabbreviated name of the next smaller administrative region than county.
+    ///The full, unabbreviated name of the next smaller administrative region than county.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub municipality: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The nomenclatural code under which the scientificName is constructed.
+    ///The nomenclatural code under which the scientificName is constructed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub nomenclatural_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
+    ///A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub occurrence_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Comments or notes about the occurrence.
+    ///Comments or notes about the occurrence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub occurrence_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Statement about the presence or absence of a taxon at a location.
+    ///Statement about the presence or absence of a taxon at a location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub occurrence_status: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name of the order.
+    ///The full scientific name of the order.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub order: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
+    ///A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub organism_quantity: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
+    ///The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub organism_quantity_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name of the phylum or division.
+    ///The full scientific name of the phylum or division.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub phylum: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Previous assignments of names to the occurrence. Pipe-delimited.
+    ///Previous assignments of names to the occurrence. Pipe-delimited.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub previous_identifications: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
+    ///Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub recorded_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
+    ///Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub recorded_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
+    ///A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub references: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
+    ///The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reproductive_condition: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Person or organization owning or managing rights over the resource.
+    ///Person or organization owning or managing rights over the resource.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rights_holder: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
+    ///The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sampling_effort: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
+    ///The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sampling_protocol: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
+    ///The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
     #[serde(borrow)]
     pub scientific_name: jacquard_common::CowStr<'a>,
-    /// The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
+    ///The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub scientific_name_authorship: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The sex of the biological individual(s).
+    ///The sex of the biological individual(s).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sex: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The name of the species epithet of the scientificName.
+    ///The name of the species epithet of the scientificName.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub specific_epithet: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Spectrogram image showing frequency analysis of audio recording.
+    ///Spectrogram image showing frequency analysis of audio recording.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub spectrogram_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The name of the next smaller administrative region than country.
+    pub spectrogram_evidence: std::option::Option<
+        jacquard_common::types::value::Data<'a>,
+    >,
+    ///The name of the next smaller administrative region than country.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub state_province: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The taxonomic rank of the most specific name in scientificName.
+    ///The taxonomic rank of the most specific name in scientificName.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub taxon_rank: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
+    ///The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub taxonomic_status: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The original textual description of the place as provided by the recorder.
+    ///The original textual description of the place as provided by the recorder.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub verbatim_locality: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A common or vernacular name for the taxon.
+    ///A common or vernacular name for the taxon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub vernacular_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
+    ///Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub video_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
@@ -321,7 +329,7 @@ pub struct Occurrence<'a> {
 
 pub mod occurrence_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -329,8 +337,8 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BasisOfRecord;
         type ScientificName;
+        type BasisOfRecord;
         type EventDate;
         type CreatedAt;
     }
@@ -338,26 +346,26 @@ pub mod occurrence_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BasisOfRecord = Unset;
         type ScientificName = Unset;
+        type BasisOfRecord = Unset;
         type EventDate = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `basis_of_record` field to Set
-    pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
-    impl<S: State> State for SetBasisOfRecord<S> {
-        type BasisOfRecord = Set<members::basis_of_record>;
-        type ScientificName = S::ScientificName;
-        type EventDate = S::EventDate;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `scientific_name` field to Set
     pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScientificName<S> {}
     impl<S: State> State for SetScientificName<S> {
-        type BasisOfRecord = S::BasisOfRecord;
         type ScientificName = Set<members::scientific_name>;
+        type BasisOfRecord = S::BasisOfRecord;
+        type EventDate = S::EventDate;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `basis_of_record` field to Set
+    pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
+    impl<S: State> State for SetBasisOfRecord<S> {
+        type ScientificName = S::ScientificName;
+        type BasisOfRecord = Set<members::basis_of_record>;
         type EventDate = S::EventDate;
         type CreatedAt = S::CreatedAt;
     }
@@ -365,8 +373,8 @@ pub mod occurrence_state {
     pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventDate<S> {}
     impl<S: State> State for SetEventDate<S> {
-        type BasisOfRecord = S::BasisOfRecord;
         type ScientificName = S::ScientificName;
+        type BasisOfRecord = S::BasisOfRecord;
         type EventDate = Set<members::event_date>;
         type CreatedAt = S::CreatedAt;
     }
@@ -374,18 +382,18 @@ pub mod occurrence_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BasisOfRecord = S::BasisOfRecord;
         type ScientificName = S::ScientificName;
+        type BasisOfRecord = S::BasisOfRecord;
         type EventDate = S::EventDate;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `basis_of_record` field
-        pub struct basis_of_record(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
+        ///Marker type for the `basis_of_record` field
+        pub struct basis_of_record(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
         ///Marker type for the `created_at` field
@@ -493,12 +501,85 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
         OccurrenceBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -515,7 +596,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -618,7 +702,10 @@ where
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `behavior` field (optional)
-    pub fn behavior(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn behavior(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -631,7 +718,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `class` field (optional)
-    pub fn class(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn class(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -652,7 +742,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `collectionCode` field to an Option value (optional)
-    pub fn maybe_collection_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_collection_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -660,7 +753,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `coordinateUncertaintyInMeters` field (optional)
-    pub fn coordinate_uncertainty_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
+    pub fn coordinate_uncertainty_in_meters(
+        mut self,
+        value: impl Into<Option<i64>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -673,7 +769,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `country` field (optional)
-    pub fn country(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn country(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -686,12 +785,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
-    pub fn country_code(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn country_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
-    pub fn maybe_country_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_country_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -699,7 +804,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `county` field (optional)
-    pub fn county(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn county(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
@@ -750,12 +858,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `datasetName` field (optional)
-    pub fn dataset_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn dataset_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `datasetName` field to an Option value (optional)
-    pub fn maybe_dataset_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_dataset_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.15 = value;
         self
     }
@@ -771,7 +885,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `dateIdentified` field to an Option value (optional)
-    pub fn maybe_date_identified(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_date_identified(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.16 = value;
         self
     }
@@ -779,7 +896,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dcType` field (optional)
-    pub fn dc_type(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn dc_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.17 = value.into();
         self
     }
@@ -800,7 +920,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
-    pub fn maybe_decimal_latitude(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_latitude(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.18 = value;
         self
     }
@@ -816,7 +939,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
-    pub fn maybe_decimal_longitude(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_longitude(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.19 = value;
         self
     }
@@ -832,7 +958,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `dynamicProperties` field to an Option value (optional)
-    pub fn maybe_dynamic_properties(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_dynamic_properties(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.20 = value;
         self
     }
@@ -859,7 +988,10 @@ where
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventID` field (optional)
-    pub fn event_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn event_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.22 = value.into();
         self
     }
@@ -891,12 +1023,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
-    pub fn event_time(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn event_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.24 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
-    pub fn maybe_event_time(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_event_time(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.24 = value;
         self
     }
@@ -904,7 +1042,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn family(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.25 = value.into();
         self
     }
@@ -917,12 +1058,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
-    pub fn field_notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn field_notes(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.26 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
-    pub fn maybe_field_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_field_notes(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.26 = value;
         self
     }
@@ -930,12 +1077,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `gbifTaxonKey` field (optional)
-    pub fn gbif_taxon_key(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn gbif_taxon_key(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.27 = value.into();
         self
     }
     /// Set the `gbifTaxonKey` field to an Option value (optional)
-    pub fn maybe_gbif_taxon_key(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_gbif_taxon_key(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.27 = value;
         self
     }
@@ -943,7 +1096,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `genus` field (optional)
-    pub fn genus(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn genus(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.28 = value.into();
         self
     }
@@ -956,12 +1112,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
-    pub fn geodetic_datum(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn geodetic_datum(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.29 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
-    pub fn maybe_geodetic_datum(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_geodetic_datum(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.29 = value;
         self
     }
@@ -969,7 +1131,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `habitat` field (optional)
-    pub fn habitat(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn habitat(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.30 = value.into();
         self
     }
@@ -1039,12 +1204,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedBy` field (optional)
-    pub fn identified_by(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn identified_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.34 = value.into();
         self
     }
     /// Set the `identifiedBy` field to an Option value (optional)
-    pub fn maybe_identified_by(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_identified_by(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.34 = value;
         self
     }
@@ -1060,7 +1231,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `identifiedByID` field to an Option value (optional)
-    pub fn maybe_identified_by_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_identified_by_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.35 = value;
         self
     }
@@ -1146,7 +1320,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `institutionCode` field to an Option value (optional)
-    pub fn maybe_institution_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_institution_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.40 = value;
         self
     }
@@ -1154,7 +1331,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `kingdom` field (optional)
-    pub fn kingdom(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn kingdom(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.41 = value.into();
         self
     }
@@ -1167,7 +1347,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn license(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.42 = value.into();
         self
     }
@@ -1180,12 +1363,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `lifeStage` field (optional)
-    pub fn life_stage(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn life_stage(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.43 = value.into();
         self
     }
     /// Set the `lifeStage` field to an Option value (optional)
-    pub fn maybe_life_stage(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_life_stage(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.43 = value;
         self
     }
@@ -1193,7 +1382,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locality` field (optional)
-    pub fn locality(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn locality(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.44 = value.into();
         self
     }
@@ -1206,12 +1398,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationID` field (optional)
-    pub fn location_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn location_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.45 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
-    pub fn maybe_location_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_location_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.45 = value;
         self
     }
@@ -1227,7 +1425,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
-    pub fn maybe_location_remarks(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_location_remarks(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.46 = value;
         self
     }
@@ -1287,12 +1488,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `municipality` field (optional)
-    pub fn municipality(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn municipality(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.51 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
-    pub fn maybe_municipality(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_municipality(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.51 = value;
         self
     }
@@ -1308,7 +1515,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `nomenclaturalCode` field to an Option value (optional)
-    pub fn maybe_nomenclatural_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_nomenclatural_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.52 = value;
         self
     }
@@ -1316,12 +1526,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceID` field (optional)
-    pub fn occurrence_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn occurrence_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.53 = value.into();
         self
     }
     /// Set the `occurrenceID` field to an Option value (optional)
-    pub fn maybe_occurrence_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.53 = value;
         self
     }
@@ -1337,7 +1553,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `occurrenceRemarks` field to an Option value (optional)
-    pub fn maybe_occurrence_remarks(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_remarks(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.54 = value;
         self
     }
@@ -1353,7 +1572,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `occurrenceStatus` field to an Option value (optional)
-    pub fn maybe_occurrence_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_status(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.55 = value;
         self
     }
@@ -1361,7 +1583,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `order` field (optional)
-    pub fn order(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn order(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.56 = value.into();
         self
     }
@@ -1382,7 +1607,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `organismQuantity` field to an Option value (optional)
-    pub fn maybe_organism_quantity(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_organism_quantity(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.57 = value;
         self
     }
@@ -1409,7 +1637,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `phylum` field (optional)
-    pub fn phylum(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn phylum(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.59 = value.into();
         self
     }
@@ -1441,12 +1672,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedBy` field (optional)
-    pub fn recorded_by(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn recorded_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.61 = value.into();
         self
     }
     /// Set the `recordedBy` field to an Option value (optional)
-    pub fn maybe_recorded_by(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_recorded_by(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.61 = value;
         self
     }
@@ -1454,12 +1691,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedByID` field (optional)
-    pub fn recorded_by_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn recorded_by_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.62 = value.into();
         self
     }
     /// Set the `recordedByID` field to an Option value (optional)
-    pub fn maybe_recorded_by_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_recorded_by_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.62 = value;
         self
     }
@@ -1505,12 +1748,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `rightsHolder` field (optional)
-    pub fn rights_holder(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn rights_holder(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.65 = value.into();
         self
     }
     /// Set the `rightsHolder` field to an Option value (optional)
-    pub fn maybe_rights_holder(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_rights_holder(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.65 = value;
         self
     }
@@ -1526,7 +1775,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
-    pub fn maybe_sampling_effort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_effort(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.66 = value;
         self
     }
@@ -1542,7 +1794,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
-    pub fn maybe_sampling_protocol(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_protocol(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.67 = value;
         self
     }
@@ -1609,7 +1864,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `specificEpithet` field to an Option value (optional)
-    pub fn maybe_specific_epithet(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_specific_epithet(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.71 = value;
         self
     }
@@ -1636,12 +1894,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
-    pub fn state_province(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn state_province(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.73 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
-    pub fn maybe_state_province(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_state_province(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.73 = value;
         self
     }
@@ -1649,12 +1913,18 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonRank` field (optional)
-    pub fn taxon_rank(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn taxon_rank(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.74 = value.into();
         self
     }
     /// Set the `taxonRank` field to an Option value (optional)
-    pub fn maybe_taxon_rank(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_taxon_rank(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.74 = value;
         self
     }
@@ -1670,7 +1940,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `taxonomicStatus` field to an Option value (optional)
-    pub fn maybe_taxonomic_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_taxonomic_status(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.75 = value;
         self
     }
@@ -1686,7 +1959,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `verbatimLocality` field to an Option value (optional)
-    pub fn maybe_verbatim_locality(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_verbatim_locality(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.76 = value;
         self
     }
@@ -1702,7 +1978,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         self
     }
     /// Set the `vernacularName` field to an Option value (optional)
-    pub fn maybe_vernacular_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_vernacular_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.77 = value;
         self
     }
@@ -1730,8 +2009,8 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S> OccurrenceBuilder<'a, S>
 where
     S: occurrence_state::State,
-    S::BasisOfRecord: occurrence_state::IsSet,
     S::ScientificName: occurrence_state::IsSet,
+    S::BasisOfRecord: occurrence_state::IsSet,
     S::EventDate: occurrence_state::IsSet,
     S::CreatedAt: occurrence_state::IsSet,
 {
@@ -1928,7 +2207,13 @@ impl<'a> Occurrence<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OccurrenceGetRecordOutput<'a> {
@@ -1989,15 +2274,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "associated_media",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "associated_media",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2009,15 +2292,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "associated_occurrences",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "associated_occurrences",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2029,15 +2310,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "associated_references",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "associated_references",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2049,15 +2328,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "associated_sequences",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "associated_sequences",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2070,15 +2347,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "basis_of_record",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "basis_of_record",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2090,15 +2365,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "behavior",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "behavior",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2110,15 +2383,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "class",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "class",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2130,15 +2401,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "collection_code",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "collection_code",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2161,15 +2430,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "country",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "country",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2205,15 +2472,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "county",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "county",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2225,15 +2490,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "data_generalizations",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "data_generalizations",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2245,15 +2508,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "dataset_name",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "dataset_name",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2265,15 +2526,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "date_identified",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "date_identified",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2285,15 +2544,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "dc_type",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "dc_type",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2305,15 +2562,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "decimal_latitude",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "decimal_latitude",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2325,15 +2580,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "decimal_longitude",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "decimal_longitude",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2345,15 +2598,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "dynamic_properties",
-                            ),
-                            max: 10000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "dynamic_properties",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2366,15 +2617,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_date",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_date",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2386,15 +2635,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2406,15 +2653,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_time",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_time",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2426,15 +2671,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "family",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "family",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2446,15 +2689,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "field_notes",
-                            ),
-                            max: 10000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "field_notes",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2466,15 +2707,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "gbif_taxon_key",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "gbif_taxon_key",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2486,15 +2725,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "genus",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "genus",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2506,15 +2743,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "geodetic_datum",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "geodetic_datum",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2526,15 +2761,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "habitat",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "habitat",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2546,15 +2779,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "higher_classification",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "higher_classification",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2566,15 +2797,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "identification_qualifier",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identification_qualifier",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2586,15 +2815,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "identification_remarks",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identification_remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2606,15 +2833,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "identified_by",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identified_by",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2626,15 +2851,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "identified_by_id",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identified_by_id",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2657,15 +2880,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "information_withheld",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "information_withheld",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2677,15 +2898,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "infraspecific_epithet",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "infraspecific_epithet",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2697,15 +2916,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "institution_code",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "institution_code",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2717,15 +2934,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "kingdom",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "kingdom",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2737,15 +2952,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "license",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "license",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2757,15 +2970,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "life_stage",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "life_stage",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2777,15 +2988,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "locality",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "locality",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2797,15 +3006,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "location_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "location_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2817,15 +3024,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "location_remarks",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "location_remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2859,15 +3064,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "municipality",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "municipality",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2879,15 +3082,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "nomenclatural_code",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "nomenclatural_code",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2899,15 +3100,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "occurrence_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "occurrence_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2919,15 +3118,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 5000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "occurrence_remarks",
-                            ),
-                            max: 5000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "occurrence_remarks",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2939,15 +3136,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "occurrence_status",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "occurrence_status",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2959,15 +3154,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "order",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "order",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2979,15 +3172,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "organism_quantity",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "organism_quantity",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2999,15 +3190,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "organism_quantity_type",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "organism_quantity_type",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3019,15 +3208,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "phylum",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "phylum",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3039,15 +3226,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "previous_identifications",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "previous_identifications",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3059,15 +3244,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "recorded_by",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "recorded_by",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3079,15 +3262,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "recorded_by_id",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "recorded_by_id",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3099,15 +3280,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "reproductive_condition",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "reproductive_condition",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3119,15 +3298,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "rights_holder",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "rights_holder",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3139,15 +3316,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "sampling_effort",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sampling_effort",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3159,15 +3334,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "sampling_protocol",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sampling_protocol",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3180,15 +3353,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "scientific_name",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "scientific_name",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3200,15 +3371,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "scientific_name_authorship",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "scientific_name_authorship",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3220,13 +3389,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("sex"),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sex",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3238,15 +3407,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "specific_epithet",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "specific_epithet",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3258,15 +3425,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "state_province",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "state_province",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3278,15 +3443,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "taxon_rank",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "taxon_rank",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3298,15 +3461,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "taxonomic_status",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "taxonomic_status",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3318,15 +3479,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "verbatim_locality",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "verbatim_locality",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3338,15 +3497,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "vernacular_name",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "vernacular_name",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -3354,7 +3511,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.dwc.occurrence"),

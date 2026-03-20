@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActor<'a> {
@@ -16,7 +22,7 @@ pub struct GetSuggestedFollowsByActor<'a> {
 
 pub mod get_suggested_follows_by_actor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,22 +53,30 @@ pub mod get_suggested_follows_by_actor_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetSuggestedFollowsByActorBuilder<'a, S: get_suggested_follows_by_actor_state::State> {
+pub struct GetSuggestedFollowsByActorBuilder<
+    'a,
+    S: get_suggested_follows_by_actor_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
 impl<'a> GetSuggestedFollowsByActor<'a> {
     /// Create a new builder for this type
-    pub fn new()
-    -> GetSuggestedFollowsByActorBuilder<'a, get_suggested_follows_by_actor_state::Empty> {
+    pub fn new() -> GetSuggestedFollowsByActorBuilder<
+        'a,
+        get_suggested_follows_by_actor_state::Empty,
+    > {
         GetSuggestedFollowsByActorBuilder::new()
     }
 }
 
-impl<'a> GetSuggestedFollowsByActorBuilder<'a, get_suggested_follows_by_actor_state::Empty> {
+impl<
+    'a,
+> GetSuggestedFollowsByActorBuilder<'a, get_suggested_follows_by_actor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedFollowsByActorBuilder {
@@ -82,8 +96,10 @@ where
     pub fn actor(
         mut self,
         value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> GetSuggestedFollowsByActorBuilder<'a, get_suggested_follows_by_actor_state::SetActor<S>>
-    {
+    ) -> GetSuggestedFollowsByActorBuilder<
+        'a,
+        get_suggested_follows_by_actor_state::SetActor<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         GetSuggestedFollowsByActorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -108,22 +124,33 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActorOutput<'a> {
-    /// If true, response has fallen-back to generic results, and is not scoped using relativeToDid
+    ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_is_fallback")]
     pub is_fallback: std::option::Option<bool>,
-    /// DEPRECATED: use recIdStr instead.
+    ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rec_id: std::option::Option<i64>,
-    /// Snowflake for this recommendation, use when submitting recommendation events.
+    ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
+}
+
+fn _default_is_fallback() -> std::option::Option<bool> {
+    Some(false)
 }
 
 /// Response type for

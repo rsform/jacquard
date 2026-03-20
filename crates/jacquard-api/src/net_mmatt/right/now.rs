@@ -8,24 +8,30 @@
 /// A personal lexicon for mmatt's statuslog.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Now<'a> {
-    /// The unix timestamp of when the status was recorded
+    ///The unix timestamp of when the status was recorded
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The emoji of the status update
+    ///The emoji of the status update
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub emoji: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The text of the status update
+    ///The text of the status update
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
 pub mod now_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,7 +123,10 @@ where
 
 impl<'a, S: now_state::State> NowBuilder<'a, S> {
     /// Set the `emoji` field (optional)
-    pub fn emoji(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn emoji(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -194,7 +203,13 @@ impl<'a> Now<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NowGetRecordOutput<'a> {
@@ -251,7 +266,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Now<'a> {
     }
 }
 
-fn lexicon_doc_net_mmatt_right_now() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_net_mmatt_right_now() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.mmatt.right.now"),

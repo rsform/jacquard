@@ -8,50 +8,62 @@
 /// An attachment providing commentary, context, evidence, or documentary material related to a hypercert record (e.g. an activity, project, claim, or evaluation).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Attachment<'a> {
-    /// The files, documents, or external references included in this attachment record.
+    ///The files, documents, or external references included in this attachment record.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<Vec<AttachmentContentItem<'a>>>,
-    /// The type of attachment, e.g. report, audit, evidence, testimonial, methodology, etc.
+    ///The type of attachment, e.g. report, audit, evidence, testimonial, methodology, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Client-declared timestamp when this record was originally created.
+    ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Rich-text description, represented as a Leaflet linear document.
+    ///Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description:
-        std::option::Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
-    /// A strong reference to the location where this attachment's subject matter occurred. The record referenced must conform with the lexicon app.certified.location.
+    pub description: std::option::Option<
+        crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
+    >,
+    ///A strong reference to the location where this attachment's subject matter occurred. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Short summary of this attachment, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.
+    pub location: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Short summary of this attachment, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub short_description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
+    ///Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_description_facets:
-        std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// References to the subject(s) the attachment is connected to—this may be an activity claim, outcome claim, measurement, evaluation, or even another attachment. This is optional as the attachment can exist before the claim is recorded.
+    pub short_description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
+    ///References to the subject(s) the attachment is connected to—this may be an activity claim, outcome claim, measurement, evaluation, or even another attachment. This is optional as the attachment can exist before the claim is recorded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    /// Display title for this attachment (e.g. 'Impact Assessment Report', 'Audit Findings')
+    pub subjects: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    ///Display title for this attachment (e.g. 'Impact Assessment Report', 'Audit Findings')
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,7 +112,9 @@ pub struct AttachmentBuilder<'a, S: attachment_state::State> {
         ::core::option::Option<Vec<AttachmentContentItem<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
+        ::core::option::Option<
+            crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
+        >,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
@@ -122,7 +136,17 @@ impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
     pub fn new() -> Self {
         AttachmentBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -130,12 +154,18 @@ impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<Vec<AttachmentContentItem<'a>>>>) -> Self {
+    pub fn content(
+        mut self,
+        value: impl Into<Option<Vec<AttachmentContentItem<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<Vec<AttachmentContentItem<'a>>>) -> Self {
+    pub fn maybe_content(
+        mut self,
+        value: Option<Vec<AttachmentContentItem<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -143,12 +173,18 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `contentType` field (optional)
-    pub fn content_type(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn content_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `contentType` field to an Option value (optional)
-    pub fn maybe_content_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_content_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -177,7 +213,9 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>>,
+        value: impl Into<
+            Option<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -221,7 +259,10 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
         self
     }
     /// Set the `shortDescription` field to an Option value (optional)
-    pub fn maybe_short_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_short_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -250,7 +291,9 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(
         mut self,
-        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
@@ -343,7 +386,13 @@ impl<'a> Attachment<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -356,7 +405,13 @@ pub enum AttachmentContentItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AttachmentGetRecordOutput<'a> {
@@ -413,7 +468,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -451,15 +508,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "short_description",
-                            ),
-                            max: 300usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "short_description",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -467,7 +522,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subjects"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subjects",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -478,7 +535,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -488,8 +547,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_attachment()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_context_attachment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.context.attachment"),

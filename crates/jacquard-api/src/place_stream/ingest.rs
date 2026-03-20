@@ -10,21 +10,27 @@ pub mod get_ingest_urls;
 /// An ingest URL for a Streamplace station.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ingest<'a> {
-    /// The type of ingest endpoint, currently 'rtmp' and 'whip' are supported.
+    ///The type of ingest endpoint, currently 'rtmp' and 'whip' are supported.
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
-    /// The URL of the ingest endpoint.
+    ///The URL of the ingest endpoint.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod ingest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,37 +38,37 @@ pub mod ingest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Type;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Type = S::Type;
+        type Url = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Url = S::Url;
         type Type = Set<members::r#type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Type = S::Type;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -135,8 +141,8 @@ where
 impl<'a, S> IngestBuilder<'a, S>
 where
     S: ingest_state::State,
-    S::Url: ingest_state::IsSet,
     S::Type: ingest_state::IsSet,
+    S::Url: ingest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ingest<'a> {
@@ -162,7 +168,9 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_ingest_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_ingest_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.ingest.defs"),

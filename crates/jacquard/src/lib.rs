@@ -36,6 +36,7 @@
 //! use jacquard::client::{Agent, FileAuthStore};
 //! use jacquard::oauth::client::OAuthClient;
 //! use jacquard::xrpc::XrpcClient;
+//! use jacquard::oauth::types::AuthorizeOptions;
 //! # #[cfg(feature = "loopback")]
 //! use jacquard::oauth::loopback::LoopbackConfig;
 //! # use miette::IntoDiagnostic;
@@ -99,7 +100,7 @@
 //! - [`jacquard-repo`](https://docs.rs/jacquard-repo/latest/jacquard_repo/index.html) - Repository primitives (MST, commits, CAR I/O, block storage)
 //! - [`jacquard-lexicon`](https://docs.rs/jacquard-lexicon/latest/jacquard_lexicon/index.html) - Lexicon resolution, fetching, parsing and Rust code generation from schemas
 //! - [`jacquard-lexgen`](https://docs.rs/jacquard-lexicon/latest/jacquard_lexicon/index.html) - Code generation binaries
-//! - [`jacquard-derive`](https://docs.rs/jacquard-derive/latest/jacquard_derive/index.html) - Macros (`#[lexicon]`, `#[open_union]`, `#[derive(IntoStatic)]`)
+//! - [`jacquard-derive`](https://docs.rs/jacquard-derive/latest/jacquard_derive/index.html) - Macros (`#[lexicon]`, `#[open_union]`, `#[derive(IntoStatic)]`, `#[derive(LexiconSchema)]`, `#[derive(XrpcRequest)]`)
 //!
 //!
 //! ### A note on lifetimes

@@ -8,31 +8,41 @@
 /// Per-contributor presentation defaults, reusable across boards.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Contributor<'a> {
-    /// Whether to render the contributor image as circular (default true)
+    ///Whether to render the contributor image as circular (default true)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub circular_image: std::option::Option<bool>,
-    /// StrongRef to the contributorInformation record
+    ///StrongRef to the contributorInformation record
     #[serde(borrow)]
     pub contributor_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Timestamp when the contributor record was created
+    ///Timestamp when the contributor record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Iframe shown on hover
+    ///Iframe shown on hover
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Image overlay shown on hover
+    pub hover_iframe_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///Image overlay shown on hover
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Link URL for this contributor
+    pub hover_image_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///Link URL for this contributor
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Direct video or Instagram URL
+    ///Direct video or Instagram URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub video_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
@@ -40,7 +50,7 @@ pub struct Contributor<'a> {
 
 pub mod contributor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -297,7 +307,13 @@ impl<'a> Contributor<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorGetRecordOutput<'a> {
@@ -354,7 +370,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
     }
 }
 
-fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hyperboards.contributor"),

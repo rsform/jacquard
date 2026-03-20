@@ -14,14 +14,14 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Throw<'a> {
-    /// Human-readable error message
+    ///Human-readable error message
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
-    /// Stack trace, if available
+    ///Stack trace, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub stack: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -29,7 +29,13 @@ pub struct Throw<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThrowOutput<'a> {
@@ -50,8 +56,9 @@ impl jacquard_common::xrpc::XrpcResp for ThrowResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Throw<'a> {
     const NSID: &'static str = "at.inlay.Throw";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ThrowResponse;
 }
 
@@ -60,8 +67,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Throw<'a> {
 pub struct ThrowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ThrowRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Throw";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Throw<'de>;
     type Response = ThrowResponse;
 }

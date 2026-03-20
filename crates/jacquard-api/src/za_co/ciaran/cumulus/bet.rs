@@ -8,12 +8,18 @@
 /// The record containing a Bet placed on a Cumulus Market
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bet<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The record containing the Cumulus Market for this Bet
+    ///The record containing the Cumulus Market for this Bet
     #[serde(borrow)]
     pub market: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
@@ -22,7 +28,7 @@ pub struct Bet<'a> {
 
 pub mod bet_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,49 +36,49 @@ pub mod bet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Position;
+        type CreatedAt;
         type Market;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Position = Unset;
+        type CreatedAt = Unset;
         type Market = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Position = S::Position;
-        type Market = S::Market;
     }
     ///State transition - sets the `position` field to Set
     pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPosition<S> {}
     impl<S: State> State for SetPosition<S> {
-        type CreatedAt = S::CreatedAt;
         type Position = Set<members::position>;
+        type CreatedAt = S::CreatedAt;
+        type Market = S::Market;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Position = S::Position;
+        type CreatedAt = Set<members::created_at>;
         type Market = S::Market;
     }
     ///State transition - sets the `market` field to Set
     pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMarket<S> {}
     impl<S: State> State for SetMarket<S> {
-        type CreatedAt = S::CreatedAt;
         type Position = S::Position;
+        type CreatedAt = S::CreatedAt;
         type Market = Set<members::market>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `position` field
         pub struct position(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `market` field
         pub struct market(());
     }
@@ -167,8 +173,8 @@ where
 impl<'a, S> BetBuilder<'a, S>
 where
     S: bet_state::State,
-    S::CreatedAt: bet_state::IsSet,
     S::Position: bet_state::IsSet,
+    S::CreatedAt: bet_state::IsSet,
     S::Market: bet_state::IsSet,
 {
     /// Build the final struct
@@ -212,7 +218,13 @@ impl<'a> Bet<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BetGetRecordOutput<'a> {
@@ -270,7 +282,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bet<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("position"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
                     max: 3usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -281,7 +295,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bet<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 2usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("position"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
                     min: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -291,7 +307,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bet<'a> {
     }
 }
 
-fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_za_co_ciaran_cumulus_bet() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("za.co.ciaran.cumulus.bet"),

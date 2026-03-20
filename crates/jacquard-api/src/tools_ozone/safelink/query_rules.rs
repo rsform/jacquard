@@ -14,41 +14,46 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRules<'a> {
-    /// Filter by action types
+    ///Filter by action types
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub actions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Filter by rule creator
+    ///Filter by rule creator
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// Cursor for pagination
+    ///Cursor for pagination
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Maximum number of results to return
+    ///Maximum number of results to return Defaults to `50`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_limit")]
     pub limit: std::option::Option<i64>,
-    /// Filter by pattern type
+    ///Filter by pattern type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pattern_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Filter by reason type
+    ///Filter by reason type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Sort direction
+    ///Sort direction
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_direction: std::option::Option<QueryRulesSortDirection<'a>>,
-    /// Filter by specific URLs or domains
+    ///Filter by specific URLs or domains
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 /// Sort direction
@@ -135,18 +140,26 @@ impl jacquard_common::IntoStatic for QueryRulesSortDirection<'_> {
         match self {
             QueryRulesSortDirection::Asc => QueryRulesSortDirection::Asc,
             QueryRulesSortDirection::Desc => QueryRulesSortDirection::Desc,
-            QueryRulesSortDirection::Other(v) => QueryRulesSortDirection::Other(v.into_static()),
+            QueryRulesSortDirection::Other(v) => {
+                QueryRulesSortDirection::Other(v.into_static())
+            }
         }
     }
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRulesOutput<'a> {
-    /// Next cursor for pagination. Only present if there are more results.
+    ///Next cursor for pagination. Only present if there are more results.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -166,8 +179,9 @@ impl jacquard_common::xrpc::XrpcResp for QueryRulesResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for QueryRules<'a> {
     const NSID: &'static str = "tools.ozone.safelink.queryRules";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = QueryRulesResponse;
 }
 
@@ -176,8 +190,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryRules<'a> {
 pub struct QueryRulesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryRules";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = QueryRules<'de>;
     type Response = QueryRulesResponse;
 }

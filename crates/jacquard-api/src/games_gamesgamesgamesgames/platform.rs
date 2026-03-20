@@ -8,7 +8,13 @@
 /// A platform for playing video games.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Platform<'a> {
@@ -20,7 +26,9 @@ pub struct Platform<'a> {
     pub alternative_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<crate::games_gamesgamesgamesgames::PlatformCategory<'a>>,
+    pub category: std::option::Option<
+        crate::games_gamesgamesgamesgames::PlatformCategory<'a>,
+    >,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -32,20 +40,26 @@ pub struct Platform<'a> {
     pub generation: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub versions: std::option::Option<Vec<crate::games_gamesgamesgamesgames::PlatformVersion<'a>>>,
+    pub versions: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::PlatformVersion<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
+    >,
 }
 
 pub mod platform_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,37 +67,37 @@ pub mod platform_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -100,7 +114,9 @@ pub struct PlatformBuilder<'a, S: platform_state::State> {
         ::core::option::Option<i64>,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::PlatformVersion<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::PlatformVersion<'a>>,
+        >,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -119,7 +135,17 @@ impl<'a> PlatformBuilder<'a, platform_state::Empty> {
         PlatformBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -128,12 +154,18 @@ impl<'a> PlatformBuilder<'a, platform_state::Empty> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `abbreviation` field (optional)
-    pub fn abbreviation(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn abbreviation(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `abbreviation` field to an Option value (optional)
-    pub fn maybe_abbreviation(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_abbreviation(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -149,7 +181,10 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
         self
     }
     /// Set the `alternativeName` field to an Option value (optional)
-    pub fn maybe_alternative_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_alternative_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -195,12 +230,18 @@ where
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -280,7 +321,9 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `versions` field (optional)
     pub fn versions(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::PlatformVersion<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::PlatformVersion<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
@@ -317,8 +360,8 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S> PlatformBuilder<'a, S>
 where
     S: platform_state::State,
-    S::Name: platform_state::IsSet,
     S::CreatedAt: platform_state::IsSet,
+    S::Name: platform_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Platform<'a> {
@@ -377,7 +420,13 @@ impl<'a> Platform<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlatformGetRecordOutput<'a> {
@@ -434,8 +483,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_platform()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_games_gamesgamesgamesgames_platform() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("games.gamesgamesgamesgames.platform"),

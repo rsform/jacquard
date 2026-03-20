@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteActor<'a> {
@@ -17,7 +23,7 @@ pub struct UnmuteActor<'a> {
 
 pub mod unmute_actor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,8 +56,9 @@ pub mod unmute_actor_state {
 /// Builder for constructing an instance of this type
 pub struct UnmuteActorBuilder<'a, S: unmute_actor_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -131,8 +138,9 @@ impl jacquard_common::xrpc::XrpcResp for UnmuteActorResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteActor<'a> {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnmuteActorResponse;
 }
 
@@ -141,8 +149,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteActor<'a> {
 pub struct UnmuteActorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UnmuteActor<'de>;
     type Response = UnmuteActorResponse;
 }

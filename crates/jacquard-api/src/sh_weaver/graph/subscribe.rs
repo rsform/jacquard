@@ -8,19 +8,25 @@
 /// Request to subscribe to a notebook. Requires acceptance to be active.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Subscribe<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// URI of the notebook to subscribe to.
+    ///URI of the notebook to subscribe to.
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod subscribe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -28,37 +34,37 @@ pub mod subscribe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Notebook;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Notebook = S::Notebook;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type CreatedAt = S::CreatedAt;
         type Notebook = Set<members::notebook>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Notebook = S::Notebook;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -131,8 +137,8 @@ where
 impl<'a, S> SubscribeBuilder<'a, S>
 where
     S: subscribe_state::State,
-    S::CreatedAt: subscribe_state::IsSet,
     S::Notebook: subscribe_state::IsSet,
+    S::CreatedAt: subscribe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscribe<'a> {
@@ -173,7 +179,13 @@ impl<'a> Subscribe<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeGetRecordOutput<'a> {
@@ -230,7 +242,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscribe<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_graph_subscribe() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_graph_subscribe() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.graph.subscribe"),

@@ -7,20 +7,26 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccountSigningKey<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// Did-key formatted public key
+    ///Did-key formatted public key
     #[serde(borrow)]
     pub signing_key: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod update_account_signing_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -63,7 +69,10 @@ pub mod update_account_signing_key_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct UpdateAccountSigningKeyBuilder<'a, S: update_account_signing_key_state::State> {
+pub struct UpdateAccountSigningKeyBuilder<
+    'a,
+    S: update_account_signing_key_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -74,7 +83,10 @@ pub struct UpdateAccountSigningKeyBuilder<'a, S: update_account_signing_key_stat
 
 impl<'a> UpdateAccountSigningKey<'a> {
     /// Create a new builder for this type
-    pub fn new() -> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::Empty> {
+    pub fn new() -> UpdateAccountSigningKeyBuilder<
+        'a,
+        update_account_signing_key_state::Empty,
+    > {
         UpdateAccountSigningKeyBuilder::new()
     }
 }
@@ -99,7 +111,10 @@ where
     pub fn did(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::SetDid<S>> {
+    ) -> UpdateAccountSigningKeyBuilder<
+        'a,
+        update_account_signing_key_state::SetDid<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -118,8 +133,10 @@ where
     pub fn signing_key(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::SetSigningKey<S>>
-    {
+    ) -> UpdateAccountSigningKeyBuilder<
+        'a,
+        update_account_signing_key_state::SetSigningKey<S>,
+    > {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -171,8 +188,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountSigningKeyResponse;
 }
 
@@ -181,8 +199,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
 pub struct UpdateAccountSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateAccountSigningKey<'de>;
     type Response = UpdateAccountSigningKeyResponse;
 }

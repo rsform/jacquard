@@ -15,16 +15,18 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Domain<'a> {
-    /// Domain identifier for boundary. Must be a valid domain name.
+    ///Domain identifier for boundary. Must be a valid domain name.
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_zone_stratos_boundary_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_zone_stratos_boundary_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("zone.stratos.boundary.defs"),
@@ -136,7 +138,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domain<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 253usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("value"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
                     max: 253usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -149,18 +153,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domain<'a> {
 /// A collection of domains that define the exposure boundary for a record.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Domains<'a> {
-    /// List of domains that can access this record.
+    ///List of domains that can access this record.
     #[serde(borrow)]
     pub values: Vec<crate::zone_stratos::boundary::Domain<'a>>,
 }
 
 pub mod domains_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,8 +203,9 @@ pub mod domains_state {
 /// Builder for constructing an instance of this type
 pub struct DomainsBuilder<'a, S: domains_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<Vec<crate::zone_stratos::boundary::Domain<'a>>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::zone_stratos::boundary::Domain<'a>>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -280,7 +291,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domains<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("values"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "values",
+                    ),
                     max: 10usize,
                     actual: value.len(),
                 });

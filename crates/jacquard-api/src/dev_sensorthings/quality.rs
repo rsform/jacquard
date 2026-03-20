@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Good;
 impl std::fmt::Display for Good {
@@ -32,7 +32,7 @@ impl std::fmt::Display for Good {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Missing;
 impl std::fmt::Display for Missing {
@@ -50,7 +50,7 @@ impl std::fmt::Display for Missing {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Suspect;
 impl std::fmt::Display for Suspect {

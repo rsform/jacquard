@@ -8,46 +8,58 @@
 /// Definition of a transaction
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Flag to indicate if this is an Easy Exchange (random partner).
+    ///Flag to indicate if this is an Easy Exchange (random partner).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub is_easy_exchange: std::option::Option<bool>,
-    /// Optional message attached to the exchange offer or completion.
+    ///Optional message attached to the exchange offer or completion.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The DID of the exchange partner.
+    ///The DID of the exchange partner.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub partner: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// URI of the partner's profile, used for Constellation backlinking during the offer stage.
+    ///URI of the partner's profile, used for Constellation backlinking during the offer stage.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ref_partner: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// URI of the referencing transaction (e.g., the original Offer) when completing or rejecting.
+    ///URI of the referencing transaction (e.g., the original Offer) when completing or rejecting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ref_transaction: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The current status of the transaction.
+    pub ref_transaction: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The current status of the transaction.
     #[serde(borrow)]
     pub status: TransactionStatus<'a>,
-    /// URIs of the stickers received in this exchange (if completed).
+    ///URIs of the stickers received in this exchange (if completed).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sticker_in: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
-    /// URIs of the stickers given in this exchange.
+    pub sticker_in: std::option::Option<
+        Vec<jacquard_common::types::string::UriValue<'a>>,
+    >,
+    ///URIs of the stickers given in this exchange.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sticker_out: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+    pub sticker_out: std::option::Option<
+        Vec<jacquard_common::types::string::UriValue<'a>>,
+    >,
 }
 
 pub mod transaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,7 +130,17 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
     pub fn new() -> Self {
         TransactionBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -158,7 +180,10 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -179,7 +204,10 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
         self
     }
     /// Set the `partner` field to an Option value (optional)
-    pub fn maybe_partner(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
+    pub fn maybe_partner(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -433,7 +461,13 @@ impl jacquard_common::IntoStatic for TransactionStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionGetRecordOutput<'a> {
@@ -490,7 +524,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 6400usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
                     max: 6400usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -504,15 +540,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
                     )
                     .count();
                 if count > 640usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "message",
-                            ),
-                            max: 640usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "message",
+                        ),
+                        max: 640usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -521,7 +555,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("status"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "status",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -531,8 +567,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
     }
 }
 
-fn lexicon_doc_com_suibari_atsumeat_transaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_com_suibari_atsumeat_transaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.suibari.atsumeat.transaction"),

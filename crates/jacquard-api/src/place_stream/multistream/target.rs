@@ -8,26 +8,32 @@
 /// An external server for rebroadcasting a Streamplace stream
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Target<'a> {
-    /// Whether this target is currently active.
+    ///Whether this target is currently active.
     pub active: bool,
-    /// When this target was created.
+    ///When this target was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A user-friendly name for this target.
+    ///A user-friendly name for this target.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The rtmp:// or rtmps:// url of the target server.
+    ///The rtmp:// or rtmps:// url of the target server.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,49 +41,49 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Active;
+        type CreatedAt;
         type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Active = Unset;
+        type CreatedAt = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Active = S::Active;
-        type Url = S::Url;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type CreatedAt = S::CreatedAt;
         type Active = Set<members::active>;
+        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Active = S::Active;
+        type CreatedAt = Set<members::created_at>;
         type Url = S::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CreatedAt = S::CreatedAt;
         type Active = S::Active;
+        type CreatedAt = S::CreatedAt;
         type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `active` field
         pub struct active(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `url` field
         pub struct url(());
     }
@@ -153,7 +159,10 @@ where
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -186,8 +195,8 @@ where
 impl<'a, S> TargetBuilder<'a, S>
 where
     S: target_state::State,
-    S::CreatedAt: target_state::IsSet,
     S::Active: target_state::IsSet,
+    S::CreatedAt: target_state::IsSet,
     S::Url: target_state::IsSet,
 {
     /// Build the final struct
@@ -233,7 +242,13 @@ impl<'a> Target<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TargetGetRecordOutput<'a> {
@@ -290,7 +305,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -300,8 +317,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_multistream_target() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_place_stream_multistream_target() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.multistream.target"),

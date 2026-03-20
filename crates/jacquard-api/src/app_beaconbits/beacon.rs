@@ -10,77 +10,88 @@ pub mod like;
 /// A location-based check-in record
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Beacon<'a> {
-    /// Structured address using community lexicon
+    ///Structured address using community lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub address_details:
-        std::option::Option<crate::community_lexicon::location::address::Address<'a>>,
-    /// Chain emoji (root beacon only)
+    pub address_details: std::option::Option<
+        crate::community_lexicon::location::address::Address<'a>,
+    >,
+    ///Chain emoji (root beacon only)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub chain_emoji: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Custom chain name (root beacon only)
+    ///Custom chain name (root beacon only)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub chain_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Timestamp when the beacon was created
+    ///Timestamp when the beacon was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Structured location using community lexicon
+    ///Structured location using community lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub location: std::option::Option<crate::community_lexicon::location::geo::Geo<'a>>,
-    /// DIDs of users mentioned in the beacon
+    ///DIDs of users mentioned in the beacon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    /// Reference to parent beacon for chaining
+    ///Reference to parent beacon for chaining
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_beacon: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Reference to associated Bluesky post
+    pub parent_beacon: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Reference to associated Bluesky post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Star rating (1-5)
+    ///Star rating (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rating: std::option::Option<i64>,
-    /// ISO timestamp when beacon becomes visible (delayed reveal)
+    ///ISO timestamp when beacon becomes visible (delayed reveal)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub reveal_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// User comment or caption
+    ///User comment or caption
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub shout: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Reference to root post for threading
+    ///Reference to root post for threading
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thread_root: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Human-readable address
+    pub thread_root: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Human-readable address
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub venue_address: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Category classification (bar, cafe, restaurant, etc.)
+    ///Category classification (bar, cafe, restaurant, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub venue_category: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Display name of the venue
+    ///Display name of the venue
     #[serde(borrow)]
     pub venue_name: jacquard_common::CowStr<'a>,
-    /// OSM URI identifier (osm://node/123 or osm://way/456)
+    ///OSM URI identifier (osm://node/123 or osm://way/456)
     #[serde(borrow)]
     pub venue_uri: jacquard_common::CowStr<'a>,
-    /// Visibility setting for the beacon
+    ///Visibility setting for the beacon
     #[serde(borrow)]
     pub visibility: BeaconVisibility<'a>,
 }
 
 pub mod beacon_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -190,8 +201,23 @@ impl<'a> BeaconBuilder<'a, beacon_state::Empty> {
         BeaconBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -202,7 +228,9 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(
         mut self,
-        value: impl Into<Option<crate::community_lexicon::location::address::Address<'a>>>,
+        value: impl Into<
+            Option<crate::community_lexicon::location::address::Address<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -219,12 +247,18 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainEmoji` field (optional)
-    pub fn chain_emoji(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn chain_emoji(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `chainEmoji` field to an Option value (optional)
-    pub fn maybe_chain_emoji(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_chain_emoji(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -232,12 +266,18 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainName` field (optional)
-    pub fn chain_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn chain_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `chainName` field to an Option value (optional)
-    pub fn maybe_chain_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_chain_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -372,7 +412,10 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `shout` field (optional)
-    pub fn shout(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn shout(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
@@ -404,12 +447,18 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
-    pub fn venue_address(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn venue_address(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
-    pub fn maybe_venue_address(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_venue_address(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -417,12 +466,18 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
-    pub fn venue_category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn venue_category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
-    pub fn maybe_venue_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_venue_category(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.13 = value;
         self
     }
@@ -661,7 +716,13 @@ impl jacquard_common::IntoStatic for BeaconVisibility<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BeaconGetRecordOutput<'a> {
@@ -722,15 +783,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 8usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "chain_emoji",
-                            ),
-                            max: 8usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "chain_emoji",
+                        ),
+                        max: 8usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -742,22 +801,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "chain_name",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "chain_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
         if let Some(ref value) = self.rating {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -766,7 +825,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
         if let Some(ref value) = self.rating {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -780,15 +841,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 280usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "shout",
-                            ),
-                            max: 280usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "shout",
+                        ),
+                        max: 280usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -800,15 +859,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "venue_address",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "venue_address",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -820,15 +877,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "venue_category",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "venue_category",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -841,15 +896,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "venue_name",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "venue_name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -862,15 +915,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "venue_uri",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "venue_uri",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -883,15 +934,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "visibility",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "visibility",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -899,7 +948,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.beacon"),

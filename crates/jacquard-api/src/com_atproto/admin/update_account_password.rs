@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccountPassword<'a> {
@@ -19,7 +25,7 @@ pub struct UpdateAccountPassword<'a> {
 
 pub mod update_account_password_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -73,7 +79,10 @@ pub struct UpdateAccountPasswordBuilder<'a, S: update_account_password_state::St
 
 impl<'a> UpdateAccountPassword<'a> {
     /// Create a new builder for this type
-    pub fn new() -> UpdateAccountPasswordBuilder<'a, update_account_password_state::Empty> {
+    pub fn new() -> UpdateAccountPasswordBuilder<
+        'a,
+        update_account_password_state::Empty,
+    > {
         UpdateAccountPasswordBuilder::new()
     }
 }
@@ -117,7 +126,10 @@ where
     pub fn password(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> UpdateAccountPasswordBuilder<'a, update_account_password_state::SetPassword<S>> {
+    ) -> UpdateAccountPasswordBuilder<
+        'a,
+        update_account_password_state::SetPassword<S>,
+    > {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         UpdateAccountPasswordBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -169,8 +181,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
     const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountPasswordResponse;
 }
 
@@ -179,8 +192,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
 pub struct UpdateAccountPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateAccountPassword<'de>;
     type Response = UpdateAccountPasswordResponse;
 }

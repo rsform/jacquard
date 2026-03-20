@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateItem<'a> {
@@ -32,7 +38,7 @@ pub struct UpdateItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The AT-URI of the item
+    ///The AT-URI of the item
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -42,7 +48,7 @@ pub struct UpdateItem<'a> {
 
 pub mod update_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +107,17 @@ impl<'a> UpdateItemBuilder<'a, update_item_state::Empty> {
     pub fn new() -> Self {
         UpdateItemBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -109,7 +125,10 @@ impl<'a> UpdateItemBuilder<'a, update_item_state::Empty> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -122,12 +141,18 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -192,12 +217,18 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -205,7 +236,10 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -237,7 +271,10 @@ where
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<UpdateItemVisibility<'a>>>) -> Self {
+    pub fn visibility(
+        mut self,
+        value: impl Into<Option<UpdateItemVisibility<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -379,14 +416,22 @@ impl jacquard_common::IntoStatic for UpdateItemVisibility<'_> {
             UpdateItemVisibility::Public => UpdateItemVisibility::Public,
             UpdateItemVisibility::Unlisted => UpdateItemVisibility::Unlisted,
             UpdateItemVisibility::Private => UpdateItemVisibility::Private,
-            UpdateItemVisibility::Other(v) => UpdateItemVisibility::Other(v.into_static()),
+            UpdateItemVisibility::Other(v) => {
+                UpdateItemVisibility::Other(v.into_static())
+            }
         }
     }
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateItemOutput<'a> {
@@ -407,8 +452,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateItemResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateItem<'a> {
     const NSID: &'static str = "social.showcase.library.updateItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateItemResponse;
 }
 
@@ -417,8 +463,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateItem<'a> {
 pub struct UpdateItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.updateItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateItem<'de>;
     type Response = UpdateItemResponse;
 }

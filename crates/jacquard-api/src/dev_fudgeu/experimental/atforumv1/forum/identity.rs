@@ -8,7 +8,13 @@
 /// Defines what the forum is - name, description, etc.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
@@ -24,7 +30,7 @@ pub struct Identity<'a> {
 
 pub mod identity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -85,7 +91,10 @@ impl<'a> IdentityBuilder<'a, identity_state::Empty> {
 
 impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
     /// Set the `accent` field (optional)
-    pub fn accent(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn accent(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -98,12 +107,18 @@ impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
 
 impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -174,7 +189,13 @@ impl<'a> Identity<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityGetRecordOutput<'a> {
@@ -231,7 +252,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("accent"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "accent",
+                    ),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -241,7 +264,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 7usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("accent"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "accent",
+                    ),
                     min: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -251,7 +276,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -262,7 +289,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -272,8 +301,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_identity()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_identity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static(
@@ -285,85 +315,79 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_identity()
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(
-                    ::jacquard_lexicon::lexicon::LexRecord {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Defines what the forum is - name, description, etc.",
-                        )),
-                        key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
-                            ::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
-                                required: Some(vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ]),
-                                nullable: None,
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
-                                    map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "accent",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                            ::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: None,
-                                                default: None,
-                                                min_length: Some(7usize),
-                                                max_length: Some(7usize),
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
-                                            },
-                                        ),
-                                    );
-                                    map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "description",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                            ::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: Some(300usize),
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
-                                            },
-                                        ),
-                                    );
-                                    map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "name",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                            ::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: Some(100usize),
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
-                                            },
-                                        ),
-                                    );
-                                    map
-                                },
-                            },
                         ),
-                    },
-                ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "accent",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: Some(7usize),
+                                    max_length: Some(7usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(300usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "name",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(100usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
             );
             map
         },

@@ -860,6 +860,44 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                         });
                     }
                 },
+                ConstraintCheck::BlobMaxSize { max } => quote! {
+                    {
+                        let size = value.blob().size;
+                        if size > #max {
+                            return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                                path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                                max: #max,
+                                actual: size,
+                            });
+                        }
+                    }
+                },
+                ConstraintCheck::BlobAccept { accept } => {
+                    let accept_strs: Vec<_> = accept.iter().map(|s| s.as_str()).collect();
+                    quote! {
+                        {
+                            let mime = value.blob().mime_type.as_str();
+                            let accepted: &[&str] = &[#(#accept_strs),*];
+                            let matched = accepted.iter().any(|pattern| {
+                                if *pattern == "*/*" {
+                                    true
+                                } else if pattern.ends_with("/*") {
+                                    let prefix = &pattern[..pattern.len() - 2];
+                                    mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                                } else {
+                                    mime == *pattern
+                                }
+                            });
+                            if !matched {
+                                return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                                    accepted: vec![#(#accept_strs.to_string()),*],
+                                    actual: mime.to_string(),
+                                });
+                            }
+                        }
+                    }
+                },
             };
 
             // Wrap in Option check if field is optional

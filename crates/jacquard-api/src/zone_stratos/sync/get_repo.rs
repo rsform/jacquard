@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepo<'a> {
@@ -18,7 +24,7 @@ pub struct GetRepo<'a> {
 
 pub mod get_repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,12 +103,18 @@ where
 
 impl<'a, S: get_repo_state::State> GetRepoBuilder<'a, S> {
     /// Set the `since` field (optional)
-    pub fn since(mut self, value: impl Into<Option<jacquard_common::types::string::Tid>>) -> Self {
+    pub fn since(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Tid>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(mut self, value: Option<jacquard_common::types::string::Tid>) -> Self {
+    pub fn maybe_since(
+        mut self,
+        value: Option<jacquard_common::types::string::Tid>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -123,7 +135,13 @@ where
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoOutput {
@@ -140,7 +158,7 @@ pub struct GetRepoOutput {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

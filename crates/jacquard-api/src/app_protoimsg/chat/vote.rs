@@ -8,22 +8,28 @@
 /// A vote on a poll. Lives in the voter's repo.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
-    /// Timestamp of vote.
+    ///Timestamp of vote.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// AT-URI of the poll being voted on.
+    ///AT-URI of the poll being voted on.
     #[serde(borrow)]
     pub poll: jacquard_common::types::string::AtUri<'a>,
-    /// Indices of selected options (0-based).
+    ///Indices of selected options (0-based).
     pub selected_options: Vec<i64>,
 }
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -31,51 +37,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Poll;
         type SelectedOptions;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Poll = Unset;
         type SelectedOptions = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type Poll = Set<members::poll>;
-        type SelectedOptions = S::SelectedOptions;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `selected_options` field to Set
-    pub struct SetSelectedOptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSelectedOptions<S> {}
-    impl<S: State> State for SetSelectedOptions<S> {
-        type Poll = S::Poll;
-        type SelectedOptions = Set<members::selected_options>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Poll = S::Poll;
         type SelectedOptions = S::SelectedOptions;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type CreatedAt = S::CreatedAt;
+        type Poll = Set<members::poll>;
+        type SelectedOptions = S::SelectedOptions;
+    }
+    ///State transition - sets the `selected_options` field to Set
+    pub struct SetSelectedOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSelectedOptions<S> {}
+    impl<S: State> State for SetSelectedOptions<S> {
+        type CreatedAt = S::CreatedAt;
+        type Poll = S::Poll;
+        type SelectedOptions = Set<members::selected_options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `poll` field
         pub struct poll(());
         ///Marker type for the `selected_options` field
         pub struct selected_options(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -168,9 +174,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
+    S::CreatedAt: vote_state::IsSet,
     S::Poll: vote_state::IsSet,
     S::SelectedOptions: vote_state::IsSet,
-    S::CreatedAt: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -213,7 +219,13 @@ impl<'a> Vote<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<'a> {
@@ -283,7 +295,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_protoimsg_chat_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.vote"),

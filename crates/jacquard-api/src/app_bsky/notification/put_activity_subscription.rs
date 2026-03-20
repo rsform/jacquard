@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutActivitySubscription<'a> {
@@ -19,7 +25,7 @@ pub struct PutActivitySubscription<'a> {
 
 pub mod put_activity_subscription_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -27,42 +33,45 @@ pub mod put_activity_subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActivitySubscription;
         type Subject;
+        type ActivitySubscription;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActivitySubscription = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `activity_subscription` field to Set
-    pub struct SetActivitySubscription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivitySubscription<S> {}
-    impl<S: State> State for SetActivitySubscription<S> {
-        type ActivitySubscription = Set<members::activity_subscription>;
-        type Subject = S::Subject;
+        type ActivitySubscription = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type ActivitySubscription = S::ActivitySubscription;
         type Subject = Set<members::subject>;
+        type ActivitySubscription = S::ActivitySubscription;
+    }
+    ///State transition - sets the `activity_subscription` field to Set
+    pub struct SetActivitySubscription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivitySubscription<S> {}
+    impl<S: State> State for SetActivitySubscription<S> {
+        type Subject = S::Subject;
+        type ActivitySubscription = Set<members::activity_subscription>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activity_subscription` field
-        pub struct activity_subscription(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `activity_subscription` field
+        pub struct activity_subscription(());
     }
 }
 
 /// Builder for constructing an instance of this type
-pub struct PutActivitySubscriptionBuilder<'a, S: put_activity_subscription_state::State> {
+pub struct PutActivitySubscriptionBuilder<
+    'a,
+    S: put_activity_subscription_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<crate::app_bsky::notification::ActivitySubscription<'a>>,
@@ -73,7 +82,10 @@ pub struct PutActivitySubscriptionBuilder<'a, S: put_activity_subscription_state
 
 impl<'a> PutActivitySubscription<'a> {
     /// Create a new builder for this type
-    pub fn new() -> PutActivitySubscriptionBuilder<'a, put_activity_subscription_state::Empty> {
+    pub fn new() -> PutActivitySubscriptionBuilder<
+        'a,
+        put_activity_subscription_state::Empty,
+    > {
         PutActivitySubscriptionBuilder::new()
     }
 }
@@ -120,7 +132,10 @@ where
     pub fn subject(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> PutActivitySubscriptionBuilder<'a, put_activity_subscription_state::SetSubject<S>> {
+    ) -> PutActivitySubscriptionBuilder<
+        'a,
+        put_activity_subscription_state::SetSubject<S>,
+    > {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         PutActivitySubscriptionBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -133,8 +148,8 @@ where
 impl<'a, S> PutActivitySubscriptionBuilder<'a, S>
 where
     S: put_activity_subscription_state::State,
-    S::ActivitySubscription: put_activity_subscription_state::IsSet,
     S::Subject: put_activity_subscription_state::IsSet,
+    S::ActivitySubscription: put_activity_subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutActivitySubscription<'a> {
@@ -162,14 +177,21 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutActivitySubscriptionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity_subscription:
-        std::option::Option<crate::app_bsky::notification::ActivitySubscription<'a>>,
+    pub activity_subscription: std::option::Option<
+        crate::app_bsky::notification::ActivitySubscription<'a>,
+    >,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
@@ -186,8 +208,9 @@ impl jacquard_common::xrpc::XrpcResp for PutActivitySubscriptionResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
     const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutActivitySubscriptionResponse;
 }
 
@@ -196,8 +219,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
 pub struct PutActivitySubscriptionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutActivitySubscriptionRequest {
     const PATH: &'static str = "/xrpc/app.bsky.notification.putActivitySubscription";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = PutActivitySubscription<'de>;
     type Response = PutActivitySubscriptionResponse;
 }

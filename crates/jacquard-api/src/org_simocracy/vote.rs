@@ -8,22 +8,28 @@
 /// A quadratic vote allocation targeting a sim.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
-    /// Timestamp when the vote was cast
+    ///Timestamp when the vote was cast
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference to the sim record being voted for
+    ///Reference to the sim record being voted for
     #[serde(borrow)]
     pub sim: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Number of quadratic votes allocated
+    ///Number of quadratic votes allocated
     pub votes: i64,
 }
 
 pub mod vote_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -31,51 +37,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Sim;
         type CreatedAt;
         type Votes;
-        type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Sim = Unset;
         type CreatedAt = Unset;
         type Votes = Unset;
-        type Sim = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Votes = S::Votes;
-        type Sim = S::Sim;
-    }
-    ///State transition - sets the `votes` field to Set
-    pub struct SetVotes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVotes<S> {}
-    impl<S: State> State for SetVotes<S> {
-        type CreatedAt = S::CreatedAt;
-        type Votes = Set<members::votes>;
-        type Sim = S::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
+        type Sim = Set<members::sim>;
         type CreatedAt = S::CreatedAt;
         type Votes = S::Votes;
-        type Sim = Set<members::sim>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Sim = S::Sim;
+        type CreatedAt = Set<members::created_at>;
+        type Votes = S::Votes;
+    }
+    ///State transition - sets the `votes` field to Set
+    pub struct SetVotes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVotes<S> {}
+    impl<S: State> State for SetVotes<S> {
+        type Sim = S::Sim;
+        type CreatedAt = S::CreatedAt;
+        type Votes = Set<members::votes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `sim` field
+        pub struct sim(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `votes` field
         pub struct votes(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
     }
 }
 
@@ -152,7 +158,10 @@ where
     S::Votes: vote_state::IsUnset,
 {
     /// Set the `votes` field (required)
-    pub fn votes(mut self, value: impl Into<i64>) -> VoteBuilder<'a, vote_state::SetVotes<S>> {
+    pub fn votes(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VoteBuilder<'a, vote_state::SetVotes<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         VoteBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -165,9 +174,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
+    S::Sim: vote_state::IsSet,
     S::CreatedAt: vote_state::IsSet,
     S::Votes: vote_state::IsSet,
-    S::Sim: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -210,7 +219,13 @@ impl<'a> Vote<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<'a> {

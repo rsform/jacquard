@@ -8,28 +8,34 @@
 /// A folder for organizing bookmarks
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Folder<'a> {
-    /// Hex color code for the folder (e.g., #ff0000)
+    ///Hex color code for the folder (e.g., #ff0000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub color: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Timestamp when the folder was created
+    ///Timestamp when the folder was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Description of the folder
+    ///Description of the folder
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Lucide icon name
+    ///Lucide icon name
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub icon: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Display name of the folder
+    ///Display name of the folder
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Visibility setting for the folder
+    ///Visibility setting for the folder
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub visibility: std::option::Option<FolderVisibility<'a>>,
@@ -37,7 +43,7 @@ pub struct Folder<'a> {
 
 pub mod folder_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,7 +119,10 @@ impl<'a> FolderBuilder<'a, folder_state::Empty> {
 
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn color(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -145,12 +154,18 @@ where
 
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -158,7 +173,10 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
 
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn icon(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -348,7 +366,13 @@ impl jacquard_common::IntoStatic for FolderVisibility<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FolderGetRecordOutput<'a> {
@@ -409,15 +433,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
                     )
                     .count();
                 if count > 7usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "color",
-                            ),
-                            max: 7usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "color",
+                        ),
+                        max: 7usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -429,15 +451,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
                     )
                     .count();
                 if count > 280usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 280usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 280usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -449,15 +469,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "icon",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -470,15 +488,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -490,15 +506,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "visibility",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "visibility",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -506,8 +520,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_bookmark_folder() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_app_beaconbits_bookmark_folder() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.bookmark.folder"),

@@ -8,28 +8,34 @@
 /// Agent acknowledgment record for a processed job.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ack<'a> {
-    /// Timestamp when the acknowledgment was created.
+    ///Timestamp when the acknowledgment was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Additional context or details for the acknowledgment.
+    ///Additional context or details for the acknowledgment.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URI of the content being processed by the agent.
+    ///URI of the content being processed by the agent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Job type identifier being acknowledged by the agent.
+    ///Job type identifier being acknowledged by the agent.
     #[serde(borrow)]
     pub work_type: jacquard_common::CowStr<'a>,
 }
 
 pub mod ack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,7 +128,10 @@ where
 
 impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -220,7 +229,13 @@ impl<'a> Ack<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AckGetRecordOutput<'a> {
@@ -277,7 +292,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ack<'a> {
     }
 }
 
-fn lexicon_doc_top_launchpadx_agent_ack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_top_launchpadx_agent_ack() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("top.launchpadx.agent.ack"),

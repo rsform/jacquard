@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Previous;
 /// Response type for
@@ -29,8 +29,9 @@ impl jacquard_common::xrpc::XrpcResp for PreviousResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Previous {
     const NSID: &'static str = "app.rocksky.spotify.previous";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PreviousResponse;
 }
 
@@ -39,8 +40,9 @@ impl jacquard_common::xrpc::XrpcRequest for Previous {
 pub struct PreviousRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PreviousRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.previous";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Previous;
     type Response = PreviousResponse;
 }

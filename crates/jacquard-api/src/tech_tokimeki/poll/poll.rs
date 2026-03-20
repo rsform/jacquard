@@ -8,25 +8,33 @@
 /// A poll record that can be attached to a post via embed.external
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Poll<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// When the poll closes for voting
+    ///When the poll closes for voting
     pub ends_at: jacquard_common::types::string::Datetime,
-    /// Poll options (2-4 choices)
+    ///Poll options (2-4 choices)
     #[serde(borrow)]
     pub options: Vec<jacquard_common::CowStr<'a>>,
-    /// Reference to the post this poll is attached to
+    ///Reference to the post this poll is attached to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub subject: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
 }
 
 pub mod poll_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,49 +42,49 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Options;
         type EndsAt;
+        type Options;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Options = Unset;
         type EndsAt = Unset;
+        type Options = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `options` field to Set
-    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOptions<S> {}
-    impl<S: State> State for SetOptions<S> {
-        type Options = Set<members::options>;
-        type EndsAt = S::EndsAt;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndsAt<S> {}
     impl<S: State> State for SetEndsAt<S> {
-        type Options = S::Options;
         type EndsAt = Set<members::ends_at>;
+        type Options = S::Options;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `options` field to Set
+    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOptions<S> {}
+    impl<S: State> State for SetOptions<S> {
+        type EndsAt = S::EndsAt;
+        type Options = Set<members::options>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Options = S::Options;
         type EndsAt = S::EndsAt;
+        type Options = S::Options;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `options` field
-        pub struct options(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `options` field
+        pub struct options(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -191,8 +199,8 @@ impl<'a, S: poll_state::State> PollBuilder<'a, S> {
 impl<'a, S> PollBuilder<'a, S>
 where
     S: poll_state::State,
-    S::Options: poll_state::IsSet,
     S::EndsAt: poll_state::IsSet,
+    S::Options: poll_state::IsSet,
     S::CreatedAt: poll_state::IsSet,
 {
     /// Build the final struct
@@ -238,7 +246,13 @@ impl<'a> Poll<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PollGetRecordOutput<'a> {
@@ -296,7 +310,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 4usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("options"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "options",
+                    ),
                     max: 4usize,
                     actual: value.len(),
                 });
@@ -307,7 +323,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 2usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("options"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "options",
+                    ),
                     min: 2usize,
                     actual: value.len(),
                 });
@@ -317,7 +335,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_poll_poll() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_tech_tokimeki_poll_poll() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.poll.poll"),

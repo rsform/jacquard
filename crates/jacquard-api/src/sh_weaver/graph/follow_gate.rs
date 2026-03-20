@@ -8,22 +8,38 @@
 /// Settings controlling follow approval behavior. Absence means auto-accept.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowGate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid.
+    ///If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_invalidate_prior")]
     pub invalidate_prior: std::option::Option<bool>,
-    /// If true, follows require manual acceptance.
+    ///If true, follows require manual acceptance. Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_require_approval")]
     pub require_approval: std::option::Option<bool>,
+}
+
+fn _default_invalidate_prior() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_require_approval() -> std::option::Option<bool> {
+    Some(false)
 }
 
 pub mod follow_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -136,8 +152,8 @@ where
     pub fn build(self) -> FollowGate<'a> {
         FollowGate {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            invalidate_prior: self.__unsafe_private_named.1,
-            require_approval: self.__unsafe_private_named.2,
+            invalidate_prior: self.__unsafe_private_named.1.or_else(|| Some(false)),
+            require_approval: self.__unsafe_private_named.2.or_else(|| Some(false)),
             extra_data: Default::default(),
         }
     }
@@ -151,8 +167,8 @@ where
     ) -> FollowGate<'a> {
         FollowGate {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            invalidate_prior: self.__unsafe_private_named.1,
-            require_approval: self.__unsafe_private_named.2,
+            invalidate_prior: self.__unsafe_private_named.1.or_else(|| Some(false)),
+            require_approval: self.__unsafe_private_named.2.or_else(|| Some(false)),
             extra_data: Some(extra_data),
         }
     }
@@ -173,7 +189,13 @@ impl<'a> FollowGate<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowGateGetRecordOutput<'a> {
@@ -230,7 +252,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowGate<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_graph_followGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_graph_followGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.graph.followGate"),

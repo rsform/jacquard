@@ -8,14 +8,20 @@
 /// A podcast episode belonging to a show.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Episode<'a> {
-    /// URL to the audio file. Can be any host the creator controls.
+    ///URL to the audio file. Can be any host the creator controls.
     #[serde(borrow)]
     pub audio_url: jacquard_common::types::string::UriValue<'a>,
-    /// Optional per-episode cover art, overrides show art.
+    ///Optional per-episode cover art, overrides show art.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cover_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
@@ -23,12 +29,12 @@ pub struct Episode<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Episode duration in seconds.
+    ///Episode duration in seconds.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub duration_seconds: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub episode_number: std::option::Option<i64>,
-    /// Follows podcast RSS spec episode types.
+    ///Follows podcast RSS spec episode types.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub episode_type: std::option::Option<EpisodeEpisodeType<'a>>,
@@ -36,7 +42,7 @@ pub struct Episode<'a> {
     pub explicit: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub season_number: std::option::Option<i64>,
-    /// The show this episode belongs to.
+    ///The show this episode belongs to.
     #[serde(borrow)]
     pub show: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
@@ -45,7 +51,7 @@ pub struct Episode<'a> {
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,67 +59,67 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type AudioUrl;
-        type CreatedAt;
         type Show;
+        type Title;
+        type CreatedAt;
+        type AudioUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type AudioUrl = Unset;
-        type CreatedAt = Unset;
         type Show = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type AudioUrl = S::AudioUrl;
-        type CreatedAt = S::CreatedAt;
-        type Show = S::Show;
-    }
-    ///State transition - sets the `audio_url` field to Set
-    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
-    impl<S: State> State for SetAudioUrl<S> {
-        type Title = S::Title;
-        type AudioUrl = Set<members::audio_url>;
-        type CreatedAt = S::CreatedAt;
-        type Show = S::Show;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type AudioUrl = S::AudioUrl;
-        type CreatedAt = Set<members::created_at>;
-        type Show = S::Show;
+        type Title = Unset;
+        type CreatedAt = Unset;
+        type AudioUrl = Unset;
     }
     ///State transition - sets the `show` field to Set
     pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShow<S> {}
     impl<S: State> State for SetShow<S> {
-        type Title = S::Title;
-        type AudioUrl = S::AudioUrl;
-        type CreatedAt = S::CreatedAt;
         type Show = Set<members::show>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type AudioUrl = S::AudioUrl;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Show = S::Show;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type AudioUrl = S::AudioUrl;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Show = S::Show;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+        type AudioUrl = S::AudioUrl;
+    }
+    ///State transition - sets the `audio_url` field to Set
+    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
+    impl<S: State> State for SetAudioUrl<S> {
+        type Show = S::Show;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type AudioUrl = Set<members::audio_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `audio_url` field
-        pub struct audio_url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `show` field
         pub struct show(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `audio_url` field
+        pub struct audio_url(());
     }
 }
 
@@ -149,7 +155,17 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
         EpisodeBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -215,12 +231,18 @@ where
 
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -254,7 +276,10 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `episodeType` field (optional)
-    pub fn episode_type(mut self, value: impl Into<Option<EpisodeEpisodeType<'a>>>) -> Self {
+    pub fn episode_type(
+        mut self,
+        value: impl Into<Option<EpisodeEpisodeType<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -332,10 +357,10 @@ where
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::Title: episode_state::IsSet,
-    S::AudioUrl: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
     S::Show: episode_state::IsSet,
+    S::Title: episode_state::IsSet,
+    S::CreatedAt: episode_state::IsSet,
+    S::AudioUrl: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
@@ -488,7 +513,13 @@ impl jacquard_common::IntoStatic for EpisodeEpisodeType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeGetRecordOutput<'a> {
@@ -541,11 +572,58 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cover_art {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover_art",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.cover_art {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover_art",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -556,7 +634,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -566,7 +646,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     }
 }
 
-fn lexicon_doc_pink_vase_pod_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_pink_vase_pod_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pink.vase.pod.episode"),

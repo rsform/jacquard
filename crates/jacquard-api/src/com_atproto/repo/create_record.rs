@@ -7,37 +7,45 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateRecord<'a> {
-    /// The NSID of the record collection.
+    ///The NSID of the record collection.
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    /// The record itself. Must contain a $type field.
+    ///The record itself. Must contain a $type field.
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    /// The handle or DID of the repo (aka, current account).
+    ///The handle or DID of the repo (aka, current account).
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
-    /// The Record Key.
+    ///The Record Key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rkey: std::option::Option<
-        jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+        jacquard_common::types::string::RecordKey<
+            jacquard_common::types::string::Rkey<'a>,
+        >,
     >,
-    /// Compare and swap with the previous commit by CID.
+    ///Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    /// Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
+    ///Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub validate: std::option::Option<bool>,
 }
 
 pub mod create_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +109,9 @@ pub struct CreateRecordBuilder<'a, S: create_record_state::State> {
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<bool>,
@@ -190,7 +200,9 @@ impl<'a, S: create_record_state::State> CreateRecordBuilder<'a, S> {
         mut self,
         value: impl Into<
             Option<
-                jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+                jacquard_common::types::string::RecordKey<
+                    jacquard_common::types::string::Rkey<'a>,
+                >,
             >,
         >,
     ) -> Self {
@@ -201,7 +213,9 @@ impl<'a, S: create_record_state::State> CreateRecordBuilder<'a, S> {
     pub fn maybe_rkey(
         mut self,
         value: Option<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
@@ -282,7 +296,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateRecordOutput<'a> {
@@ -379,7 +399,9 @@ impl jacquard_common::IntoStatic for CreateRecordOutputValidationStatus<'_> {
     type Output = CreateRecordOutputValidationStatus<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            CreateRecordOutputValidationStatus::Valid => CreateRecordOutputValidationStatus::Valid,
+            CreateRecordOutputValidationStatus::Valid => {
+                CreateRecordOutputValidationStatus::Valid
+            }
             CreateRecordOutputValidationStatus::Unknown => {
                 CreateRecordOutputValidationStatus::Unknown
             }
@@ -400,7 +422,7 @@ impl jacquard_common::IntoStatic for CreateRecordOutputValidationStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -437,8 +459,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateRecordResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateRecord<'a> {
     const NSID: &'static str = "com.atproto.repo.createRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateRecordResponse;
 }
 
@@ -447,8 +470,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateRecord<'a> {
 pub struct CreateRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRecordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.createRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateRecord<'de>;
     type Response = CreateRecordResponse;
 }

@@ -14,18 +14,24 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutHostingUrl<'a> {
-    /// The expo push token
+    ///The expo push token
     #[serde(borrow)]
     pub url: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutHostingUrlOutput<'a> {
@@ -44,8 +50,9 @@ impl jacquard_common::xrpc::XrpcResp for PutHostingUrlResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PutHostingUrl<'a> {
     const NSID: &'static str = "app.ocho.plugin.putHostingUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutHostingUrlResponse;
 }
 
@@ -54,8 +61,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutHostingUrl<'a> {
 pub struct PutHostingUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutHostingUrlRequest {
     const PATH: &'static str = "/xrpc/app.ocho.plugin.putHostingUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = PutHostingUrl<'de>;
     type Response = PutHostingUrlResponse;
 }

@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyOfNewEntry<'a> {
@@ -17,7 +23,7 @@ pub struct NotifyOfNewEntry<'a> {
 
 pub mod notify_of_new_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,7 +56,9 @@ pub mod notify_of_new_entry_state {
 /// Builder for constructing an instance of this type
 pub struct NotifyOfNewEntryBuilder<'a, S: notify_of_new_entry_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -127,7 +135,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyOfNewEntryOutput<'a> {}
@@ -141,7 +149,7 @@ pub struct NotifyOfNewEntryOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -166,8 +174,9 @@ impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
     const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = NotifyOfNewEntryResponse;
 }
 
@@ -176,8 +185,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
 pub struct NotifyOfNewEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.notifyOfNewEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = NotifyOfNewEntry<'de>;
     type Response = NotifyOfNewEntryResponse;
 }

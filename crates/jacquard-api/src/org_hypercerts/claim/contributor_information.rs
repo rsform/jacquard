@@ -8,21 +8,27 @@
 /// Contributor information including identifier, display name, and image.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorInformation<'a> {
-    /// Client-declared timestamp when this record was originally created.
+    ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Human-readable name for the contributor as it should appear in UI.
+    ///Human-readable name for the contributor as it should appear in UI.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// DID (did:plc:...) or URI to a social profile of the contributor.
+    ///DID (did:plc:...) or URI to a social profile of the contributor.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub identifier: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The contributor visual representation as a URI or image blob.
+    ///The contributor visual representation as a URI or image blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image: std::option::Option<ContributorInformationImage<'a>>,
@@ -30,7 +36,7 @@ pub struct ContributorInformation<'a> {
 
 pub mod contributor_information_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -74,7 +80,10 @@ pub struct ContributorInformationBuilder<'a, S: contributor_information_state::S
 
 impl<'a> ContributorInformation<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ContributorInformationBuilder<'a, contributor_information_state::Empty> {
+    pub fn new() -> ContributorInformationBuilder<
+        'a,
+        contributor_information_state::Empty,
+    > {
         ContributorInformationBuilder::new()
     }
 }
@@ -99,7 +108,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> ContributorInformationBuilder<'a, contributor_information_state::SetCreatedAt<S>> {
+    ) -> ContributorInformationBuilder<
+        'a,
+        contributor_information_state::SetCreatedAt<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ContributorInformationBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -111,12 +123,18 @@ where
 
 impl<'a, S: contributor_information_state::State> ContributorInformationBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn display_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -124,12 +142,18 @@ impl<'a, S: contributor_information_state::State> ContributorInformationBuilder<
 
 impl<'a, S: contributor_information_state::State> ContributorInformationBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_identifier(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -137,12 +161,18 @@ impl<'a, S: contributor_information_state::State> ContributorInformationBuilder<
 
 impl<'a, S: contributor_information_state::State> ContributorInformationBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<ContributorInformationImage<'a>>>) -> Self {
+    pub fn image(
+        mut self,
+        value: impl Into<Option<ContributorInformationImage<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<ContributorInformationImage<'a>>) -> Self {
+    pub fn maybe_image(
+        mut self,
+        value: Option<ContributorInformationImage<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -196,7 +226,13 @@ impl<'a> ContributorInformation<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -209,7 +245,13 @@ pub enum ContributorInformationImage<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorInformationGetRecordOutput<'a> {
@@ -278,7 +320,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorInformation<'a
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("identifier"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "identifier",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -288,11 +332,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorInformation<'a
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_contributorInformation()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_claim_contributorInformation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.hypercerts.claim.contributorInformation"),
+        id: ::jacquard_common::CowStr::new_static(
+            "org.hypercerts.claim.contributorInformation",
+        ),
         revision: None,
         description: None,
         defs: {

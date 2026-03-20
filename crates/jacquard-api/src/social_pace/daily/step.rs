@@ -8,21 +8,27 @@
 /// A daily recording of your steps for that day. This record is expected to be update throughout the day and represent's 12am-12pm in your timezone, or what you count as a "day". The key is also traditionally the date of your "day" yyy-mm-dd.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Step<'a> {
-    /// The first time this record was created
+    ///The first time this record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The number of steps taken during the day
+    ///The number of steps taken during the day
     pub steps: i64,
-    /// The last time this record was updated
+    ///The last time this record was updated
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod step_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,51 +36,51 @@ pub mod step_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type UpdatedAt;
         type Steps;
+        type UpdatedAt;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type UpdatedAt = Unset;
         type Steps = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type Steps = S::Steps;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Steps = S::Steps;
+        type UpdatedAt = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSteps<S> {}
     impl<S: State> State for SetSteps<S> {
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
         type Steps = Set<members::steps>;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Steps = S::Steps;
+        type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Steps = S::Steps;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `steps` field
         pub struct steps(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -132,7 +138,10 @@ where
     S::Steps: step_state::IsUnset,
 {
     /// Set the `steps` field (required)
-    pub fn steps(mut self, value: impl Into<i64>) -> StepBuilder<'a, step_state::SetSteps<S>> {
+    pub fn steps(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StepBuilder<'a, step_state::SetSteps<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         StepBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -164,9 +173,9 @@ where
 impl<'a, S> StepBuilder<'a, S>
 where
     S: step_state::State,
-    S::CreatedAt: step_state::IsSet,
-    S::UpdatedAt: step_state::IsSet,
     S::Steps: step_state::IsSet,
+    S::UpdatedAt: step_state::IsSet,
+    S::CreatedAt: step_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Step<'a> {
@@ -209,7 +218,13 @@ impl<'a> Step<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StepGetRecordOutput<'a> {
@@ -266,7 +281,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Step<'a> {
     }
 }
 
-fn lexicon_doc_social_pace_daily_step() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_pace_daily_step() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.pace.daily.step"),

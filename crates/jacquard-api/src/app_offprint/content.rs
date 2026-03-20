@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
-    /// Array of content blocks
+    ///Array of content blocks
     #[serde(borrow)]
     pub items: Vec<ContentItemsItem<'a>>,
 }
 
 pub mod content_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,7 +127,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -152,7 +164,9 @@ pub enum ContentItemsItem<'a> {
     ImageDiff(Box<crate::app_offprint::block::image_diff::ImageDiff<'a>>),
 }
 
-fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.offprint.content"),
@@ -162,79 +176,53 @@ fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Array of content blocks",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(
-                                            ::jacquard_lexicon::lexicon::LexRefUnion {
-                                                description: None,
-                                                refs: vec![
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.text",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.heading",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.blockquote",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.callout",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.bulletList",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.orderedList",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.taskList",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.codeBlock",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.horizontalRule",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.image",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.imageGrid",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.imageCarousel",
-                                                    ),
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "app.offprint.block.imageDiff",
-                                                    ),
-                                                ],
-                                                closed: None,
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "items",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Array of content blocks",
+                                    ),
                                 ),
-                            );
-                            map
-                        },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.text"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.heading"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.blockquote"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.callout"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.bulletList"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.orderedList"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.taskList"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.codeBlock"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.horizontalRule"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.image"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageGrid"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageCarousel"),
+                                        ::jacquard_common::CowStr::new_static("app.offprint.block.imageDiff")
+                                    ],
+                                    closed: None,
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },

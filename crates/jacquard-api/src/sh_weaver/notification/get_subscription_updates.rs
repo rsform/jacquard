@@ -5,15 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubscriptionUpdates<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///(default: 20, min: 1, max: 50)
+    ///Defaults to `20`. Min: 1. Max: 50.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -22,7 +33,7 @@ pub struct GetSubscriptionUpdates<'a> {
 
 pub mod get_subscription_updates_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -52,7 +63,10 @@ pub struct GetSubscriptionUpdatesBuilder<'a, S: get_subscription_updates_state::
 
 impl<'a> GetSubscriptionUpdates<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetSubscriptionUpdatesBuilder<'a, get_subscription_updates_state::Empty> {
+    pub fn new() -> GetSubscriptionUpdatesBuilder<
+        'a,
+        get_subscription_updates_state::Empty,
+    > {
         GetSubscriptionUpdatesBuilder::new()
     }
 }
@@ -70,7 +84,10 @@ impl<'a> GetSubscriptionUpdatesBuilder<'a, get_subscription_updates_state::Empty
 
 impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -104,7 +121,10 @@ impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
+    pub fn maybe_since(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -126,7 +146,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubscriptionUpdatesOutput<'a> {

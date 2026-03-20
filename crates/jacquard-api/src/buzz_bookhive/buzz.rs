@@ -8,16 +8,22 @@
 /// Record containing a Bookhive comment.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Buzz<'a> {
     #[serde(borrow)]
     pub book: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// The content of the comment.
+    ///The content of the comment.
     #[serde(borrow)]
     pub comment: jacquard_common::CowStr<'a>,
-    /// Client-declared timestamp when this comment was originally created.
+    ///Client-declared timestamp when this comment was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -25,7 +31,7 @@ pub struct Buzz<'a> {
 
 pub mod buzz_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,67 +39,67 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
-        type Comment;
         type Parent;
         type CreatedAt;
+        type Book;
+        type Comment;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
-        type Comment = Unset;
         type Parent = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `comment` field to Set
-    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComment<S> {}
-    impl<S: State> State for SetComment<S> {
-        type Book = S::Book;
-        type Comment = Set<members::comment>;
-        type Parent = S::Parent;
-        type CreatedAt = S::CreatedAt;
+        type Book = Unset;
+        type Comment = Unset;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type Book = S::Book;
-        type Comment = S::Comment;
         type Parent = Set<members::parent>;
         type CreatedAt = S::CreatedAt;
+        type Book = S::Book;
+        type Comment = S::Comment;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Book = S::Book;
-        type Comment = S::Comment;
         type Parent = S::Parent;
         type CreatedAt = Set<members::created_at>;
+        type Book = S::Book;
+        type Comment = S::Comment;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Book = Set<members::book>;
+        type Comment = S::Comment;
+    }
+    ///State transition - sets the `comment` field to Set
+    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComment<S> {}
+    impl<S: State> State for SetComment<S> {
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Book = S::Book;
+        type Comment = Set<members::comment>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
-        ///Marker type for the `comment` field
-        pub struct comment(());
         ///Marker type for the `parent` field
         pub struct parent(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `book` field
+        pub struct book(());
+        ///Marker type for the `comment` field
+        pub struct comment(());
     }
 }
 
@@ -206,10 +212,10 @@ where
 impl<'a, S> BuzzBuilder<'a, S>
 where
     S: buzz_state::State,
-    S::Book: buzz_state::IsSet,
-    S::Comment: buzz_state::IsSet,
     S::Parent: buzz_state::IsSet,
     S::CreatedAt: buzz_state::IsSet,
+    S::Book: buzz_state::IsSet,
+    S::Comment: buzz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Buzz<'a> {
@@ -254,7 +260,13 @@ impl<'a> Buzz<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BuzzGetRecordOutput<'a> {
@@ -312,7 +324,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("comment"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "comment",
+                    ),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -327,15 +341,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "comment",
-                            ),
-                            max: 10000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "comment",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
                 }
             }
         }

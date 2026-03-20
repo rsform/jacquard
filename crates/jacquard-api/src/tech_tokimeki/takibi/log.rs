@@ -8,20 +8,28 @@
 /// A log record - adding wood to the fire. Implicitly records visible sparks as a form of 'silent appreciation'.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Sparks visible at the moment of adding wood, with elapsed time for decay scoring
+    ///Sparks visible at the moment of adding wood, with elapsed time for decay scoring
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub visible_sparks: std::option::Option<Vec<crate::tech_tokimeki::takibi::log::SparkRef<'a>>>,
+    pub visible_sparks: std::option::Option<
+        Vec<crate::tech_tokimeki::takibi::log::SparkRef<'a>>,
+    >,
 }
 
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -161,7 +169,13 @@ impl<'a> Log<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<'a> {
@@ -230,7 +244,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.takibi.log"),
@@ -302,47 +318,49 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("sparkRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Reference to a visible spark with timing information",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("spark"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("elapsed"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("elapsed"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: Some(10000i64),
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("elapsed")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "elapsed",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: Some(10000i64),
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "spark",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("spark"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -352,20 +370,26 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::Lexico
 /// Reference to a visible spark with timing information
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SparkRef<'a> {
-    /// Milliseconds since the spark appeared on screen (0-10000)
+    ///Milliseconds since the spark appeared on screen (0-10000)
     pub elapsed: i64,
-    /// Strong reference to the spark record
+    ///Strong reference to the spark record
     #[serde(borrow)]
     pub spark: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod spark_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -520,7 +544,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparkRef<'a> {
             let value = &self.elapsed;
             if *value > 10000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("elapsed"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "elapsed",
+                    ),
                     max: 10000i64,
                     actual: *value,
                 });
@@ -530,7 +556,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparkRef<'a> {
             let value = &self.elapsed;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("elapsed"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "elapsed",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

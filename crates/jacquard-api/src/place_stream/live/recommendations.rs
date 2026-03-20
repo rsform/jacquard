@@ -8,20 +8,26 @@
 /// A list of recommended streamers, in order of preference
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Recommendations<'a> {
-    /// Client-declared timestamp when this list was created.
+    ///Client-declared timestamp when this list was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Ordered list of recommended streamer DIDs
+    ///Ordered list of recommended streamer DIDs
     #[serde(borrow)]
     pub streamers: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
 pub mod recommendations_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,7 +180,13 @@ impl<'a> Recommendations<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecommendationsGetRecordOutput<'a> {
@@ -232,7 +244,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recommendations<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 8usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("streamers"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "streamers",
+                    ),
                     max: 8usize,
                     actual: value.len(),
                 });
@@ -243,7 +257,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recommendations<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 0usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("streamers"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "streamers",
+                    ),
                     min: 0usize,
                     actual: value.len(),
                 });
@@ -253,8 +269,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recommendations<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_live_recommendations()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_live_recommendations() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.live.recommendations"),

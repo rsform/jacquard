@@ -18,13 +18,19 @@ pub mod report_shout;
 /// A declaration of a shout.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Shout<'a> {
-    /// The date when the shout was created.
+    ///The date when the shout was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The message of the shout.
+    ///The message of the shout.
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -36,7 +42,7 @@ pub struct Shout<'a> {
 
 pub mod shout_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -248,7 +254,13 @@ impl<'a> Shout<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShoutGetRecordOutput<'a> {
@@ -306,7 +318,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Shout<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -317,7 +331,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Shout<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -442,33 +458,35 @@ fn lexicon_doc_app_rocksky_shout() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Author<'a> {
-    /// The URL of the author's avatar image.
+    ///The URL of the author's avatar image.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The decentralized identifier (DID) of the author.
+    ///The decentralized identifier (DID) of the author.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    /// The display name of the author.
+    ///The display name of the author.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The handle of the author.
+    ///The handle of the author.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub handle: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    /// The unique identifier of the author.
+    ///The unique identifier of the author.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn lexicon_doc_app_rocksky_shout_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_rocksky_shout_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.rocksky.shout.defs"),
@@ -737,26 +755,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShoutView<'a> {
-    /// The author of the shout.
+    ///The author of the shout.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub author: std::option::Option<crate::app_rocksky::shout::Author<'a>>,
-    /// The date and time when the shout was created.
+    ///The date and time when the shout was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The unique identifier of the shout.
+    ///The unique identifier of the shout.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The content of the shout.
+    ///The content of the shout.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The ID of the parent shout if this is a reply, otherwise null.
+    ///The ID of the parent shout if this is a reply, otherwise null.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<jacquard_common::CowStr<'a>>,

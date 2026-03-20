@@ -8,29 +8,35 @@
 /// S3 or S3-compatible storage for WebDataset tar archives. Supports custom endpoints for MinIO, Cloudflare R2, and other S3-compatible services.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StorageS3<'a> {
-    /// S3 bucket name
+    ///S3 bucket name
     #[serde(borrow)]
     pub bucket: jacquard_common::CowStr<'a>,
-    /// Custom S3-compatible endpoint URL (e.g., for MinIO, Cloudflare R2). Omit for standard AWS S3.
+    ///Custom S3-compatible endpoint URL (e.g., for MinIO, Cloudflare R2). Omit for standard AWS S3.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub endpoint: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// AWS region (e.g., 'us-east-1'). Optional for S3-compatible services.
+    ///AWS region (e.g., 'us-east-1'). Optional for S3-compatible services.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub region: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Array of shard entries with object key and integrity checksum
+    ///Array of shard entries with object key and integrity checksum
     #[serde(borrow)]
     pub shards: Vec<crate::science_alt::dataset::storage_s3::ShardEntry<'a>>,
 }
 
 pub mod storage_s3_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,37 +44,37 @@ pub mod storage_s3_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bucket;
         type Shards;
+        type Bucket;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bucket = Unset;
         type Shards = Unset;
-    }
-    ///State transition - sets the `bucket` field to Set
-    pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBucket<S> {}
-    impl<S: State> State for SetBucket<S> {
-        type Bucket = Set<members::bucket>;
-        type Shards = S::Shards;
+        type Bucket = Unset;
     }
     ///State transition - sets the `shards` field to Set
     pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShards<S> {}
     impl<S: State> State for SetShards<S> {
-        type Bucket = S::Bucket;
         type Shards = Set<members::shards>;
+        type Bucket = S::Bucket;
+    }
+    ///State transition - sets the `bucket` field to Set
+    pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBucket<S> {}
+    impl<S: State> State for SetBucket<S> {
+        type Shards = S::Shards;
+        type Bucket = Set<members::bucket>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bucket` field
-        pub struct bucket(());
         ///Marker type for the `shards` field
         pub struct shards(());
+        ///Marker type for the `bucket` field
+        pub struct bucket(());
     }
 }
 
@@ -79,7 +85,9 @@ pub struct StorageS3Builder<'a, S: storage_s3_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::science_alt::dataset::storage_s3::ShardEntry<'a>>>,
+        ::core::option::Option<
+            Vec<crate::science_alt::dataset::storage_s3::ShardEntry<'a>>,
+        >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -142,7 +150,10 @@ impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
 
 impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     /// Set the `region` field (optional)
-    pub fn region(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn region(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -175,8 +186,8 @@ where
 impl<'a, S> StorageS3Builder<'a, S>
 where
     S: storage_s3_state::State,
-    S::Bucket: storage_s3_state::IsSet,
     S::Shards: storage_s3_state::IsSet,
+    S::Bucket: storage_s3_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StorageS3<'a> {
@@ -206,7 +217,9 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("science.alt.dataset.storageS3"),
@@ -319,53 +332,57 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::L
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("shardEntry"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "A single S3 object shard with integrity checksum",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "science.alt.dataset.entry#shardChecksum",
-                                        ),
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "checksum",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "science.alt.dataset.entry#shardChecksum",
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "S3 object key for this WebDataset tar shard",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(1024usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "key",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "S3 object key for this WebDataset tar shard",
+                                    ),
                                 ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(1024usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -390,7 +407,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("bucket"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "bucket",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -400,7 +419,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("endpoint"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "endpoint",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -410,7 +431,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("region"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "region",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -421,7 +444,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("shards"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shards",
+                    ),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -434,21 +459,27 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
 /// A single S3 object shard with integrity checksum
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShardEntry<'a> {
-    /// Content hash for integrity verification
+    ///Content hash for integrity verification
     #[serde(borrow)]
     pub checksum: crate::science_alt::dataset::entry::ShardChecksum<'a>,
-    /// S3 object key for this WebDataset tar shard
+    ///S3 object key for this WebDataset tar shard
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
 }
 
 pub mod shard_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -604,7 +635,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardEntry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });

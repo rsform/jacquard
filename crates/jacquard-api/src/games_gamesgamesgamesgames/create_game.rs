@@ -14,21 +14,25 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGame<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: std::option::Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
+    pub age_ratings: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternative_names:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
+    pub alternative_names: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub application_type:
-        std::option::Option<crate::games_gamesgamesgamesgames::ApplicationType<'a>>,
+    pub application_type: std::option::Option<
+        crate::games_gamesgamesgamesgames::ApplicationType<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub engines: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
@@ -40,18 +44,22 @@ pub struct CreateGame<'a> {
     pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub language_supports:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
+    pub language_supports: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub modes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub multiplayer_modes:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
+    pub multiplayer_modes: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
+    >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -59,14 +67,17 @@ pub struct CreateGame<'a> {
     pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
+    pub player_perspectives: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub releases: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>,
+    pub releases: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub should_publish: std::option::Option<bool>,
-    /// URL-friendly identifier for the game.
+    ///URL-friendly identifier for the game.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -81,18 +92,30 @@ pub struct CreateGame<'a> {
     pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub time_to_beat: std::option::Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>,
+    pub time_to_beat: std::option::Option<
+        crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub videos: std::option::Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
+    pub videos: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
+    >,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGameOutput<'a> {
@@ -114,8 +137,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateGameResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGame<'a> {
     const NSID: &'static str = "games.gamesgamesgamesgames.createGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateGameResponse;
 }
 
@@ -124,8 +148,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGame<'a> {
 pub struct CreateGameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateGameRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateGame<'de>;
     type Response = CreateGameResponse;
 }

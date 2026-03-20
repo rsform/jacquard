@@ -15,84 +15,93 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CodeHash<'a> {
-    /// Hash algorithm identifier (e.g., 'sha256', 'blake3')
+    ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
     #[serde(borrow)]
     pub algorithm: jacquard_common::CowStr<'a>,
-    /// Hex-encoded hash digest
+    ///Hex-encoded hash digest
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_science_alt_dataset_lensVerification()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("science.alt.dataset.lensVerification"),
+        id: ::jacquard_common::CowStr::new_static(
+            "science.alt.dataset.lensVerification",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("codeHash"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Content hash for code integrity verification",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("algorithm"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("digest"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("algorithm"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Hash algorithm identifier (e.g., 'sha256', 'blake3')",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(20usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("digest")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "algorithm",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Hash algorithm identifier (e.g., 'sha256', 'blake3')",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("digest"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Hex-encoded hash digest",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(128usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(20usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "digest",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Hex-encoded hash digest",
+                                    ),
                                 ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -264,7 +273,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeHash<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("algorithm"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "algorithm",
+                    ),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -275,7 +286,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeHash<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("digest"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -288,40 +301,50 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeHash<'a> {
 /// Verification record for a lens transformation. The verifier's identity is implicit — the DID of the repo owner who writes this record. Follows the ATProto pattern where verification records live in the verifier's own PDS.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LensVerification<'a> {
-    /// Hash of the code at the referenced commit. Required for signedHash method.
+    ///Hash of the code at the referenced commit. Required for signedHash method.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub code_hash:
-        std::option::Option<crate::science_alt::dataset::lens_verification::CodeHash<'a>>,
-    /// Timestamp when this verification was issued
+    pub code_hash: std::option::Option<
+        crate::science_alt::dataset::lens_verification::CodeHash<'a>,
+    >,
+    ///Timestamp when this verification was issued
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Human-readable description of what was verified
+    ///Human-readable description of what was verified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT-URI of the lens record being verified
+    ///AT-URI of the lens record being verified
     #[serde(borrow)]
     pub lens: jacquard_common::types::string::AtUri<'a>,
-    /// CID of the specific lens record version. Ensures immutability — if the lens is updated, old verifications do not carry over.
+    ///CID of the specific lens record version. Ensures immutability — if the lens is updated, old verifications do not carry over.
     #[serde(borrow)]
     pub lens_commit: jacquard_common::CowStr<'a>,
-    /// Link to proof artifact (Coq/Lean proof, test suite, etc.). Used with formalProof or automatedTest methods.
+    ///Link to proof artifact (Coq/Lean proof, test suite, etc.). Used with formalProof or automatedTest methods.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub proof_ref: std::option::Option<crate::science_alt::dataset::lens::CodeReference<'a>>,
-    /// What kind of verification was performed
+    pub proof_ref: std::option::Option<
+        crate::science_alt::dataset::lens::CodeReference<'a>,
+    >,
+    ///What kind of verification was performed
     #[serde(borrow)]
-    pub verification_method:
-        crate::science_alt::dataset::verification_method::VerificationMethod<'a>,
+    pub verification_method: crate::science_alt::dataset::verification_method::VerificationMethod<
+        'a,
+    >,
 }
 
 pub mod lens_verification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -329,67 +352,67 @@ pub mod lens_verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type VerificationMethod;
         type CreatedAt;
         type Lens;
         type LensCommit;
-        type VerificationMethod;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type VerificationMethod = Unset;
         type CreatedAt = Unset;
         type Lens = Unset;
         type LensCommit = Unset;
-        type VerificationMethod = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Lens = S::Lens;
-        type LensCommit = S::LensCommit;
-        type VerificationMethod = S::VerificationMethod;
-    }
-    ///State transition - sets the `lens` field to Set
-    pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLens<S> {}
-    impl<S: State> State for SetLens<S> {
-        type CreatedAt = S::CreatedAt;
-        type Lens = Set<members::lens>;
-        type LensCommit = S::LensCommit;
-        type VerificationMethod = S::VerificationMethod;
-    }
-    ///State transition - sets the `lens_commit` field to Set
-    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
-    impl<S: State> State for SetLensCommit<S> {
-        type CreatedAt = S::CreatedAt;
-        type Lens = S::Lens;
-        type LensCommit = Set<members::lens_commit>;
-        type VerificationMethod = S::VerificationMethod;
     }
     ///State transition - sets the `verification_method` field to Set
     pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
     impl<S: State> State for SetVerificationMethod<S> {
+        type VerificationMethod = Set<members::verification_method>;
         type CreatedAt = S::CreatedAt;
         type Lens = S::Lens;
         type LensCommit = S::LensCommit;
-        type VerificationMethod = Set<members::verification_method>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = Set<members::created_at>;
+        type Lens = S::Lens;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `lens` field to Set
+    pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLens<S> {}
+    impl<S: State> State for SetLens<S> {
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = S::CreatedAt;
+        type Lens = Set<members::lens>;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `lens_commit` field to Set
+    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
+    impl<S: State> State for SetLensCommit<S> {
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = S::CreatedAt;
+        type Lens = S::Lens;
+        type LensCommit = Set<members::lens_commit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `verification_method` field
+        pub struct verification_method(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `lens` field
         pub struct lens(());
         ///Marker type for the `lens_commit` field
         pub struct lens_commit(());
-        ///Marker type for the `verification_method` field
-        pub struct verification_method(());
     }
 }
 
@@ -397,7 +420,9 @@ pub mod lens_verification_state {
 pub struct LensVerificationBuilder<'a, S: lens_verification_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::science_alt::dataset::lens_verification::CodeHash<'a>>,
+        ::core::option::Option<
+            crate::science_alt::dataset::lens_verification::CodeHash<'a>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -432,7 +457,9 @@ impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     /// Set the `codeHash` field (optional)
     pub fn code_hash(
         mut self,
-        value: impl Into<Option<crate::science_alt::dataset::lens_verification::CodeHash<'a>>>,
+        value: impl Into<
+            Option<crate::science_alt::dataset::lens_verification::CodeHash<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -468,12 +495,18 @@ where
 
 impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -544,7 +577,9 @@ where
     /// Set the `verificationMethod` field (required)
     pub fn verification_method(
         mut self,
-        value: impl Into<crate::science_alt::dataset::verification_method::VerificationMethod<'a>>,
+        value: impl Into<
+            crate::science_alt::dataset::verification_method::VerificationMethod<'a>,
+        >,
     ) -> LensVerificationBuilder<'a, lens_verification_state::SetVerificationMethod<S>> {
         self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         LensVerificationBuilder {
@@ -558,10 +593,10 @@ where
 impl<'a, S> LensVerificationBuilder<'a, S>
 where
     S: lens_verification_state::State,
+    S::VerificationMethod: lens_verification_state::IsSet,
     S::CreatedAt: lens_verification_state::IsSet,
     S::Lens: lens_verification_state::IsSet,
     S::LensCommit: lens_verification_state::IsSet,
-    S::VerificationMethod: lens_verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LensVerification<'a> {
@@ -612,7 +647,13 @@ impl<'a> LensVerification<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LensVerificationGetRecordOutput<'a> {
@@ -669,7 +710,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensVerification<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -680,7 +723,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensVerification<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("lens"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lens",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -691,7 +736,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensVerification<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("lens_commit"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lens_commit",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

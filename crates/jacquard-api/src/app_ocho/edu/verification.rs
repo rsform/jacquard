@@ -8,23 +8,29 @@
 /// Record declaring a verification relationship between an account and a .edu domain. Verifications are only considered valid by an app if issued by an account the app considers trusted.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Verification<'a> {
-    /// Date of when the verification was created.
+    ///Date of when the verification was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The domain the subject is verified under.
+    ///The domain the subject is verified under.
     #[serde(borrow)]
     pub domain: jacquard_common::CowStr<'a>,
-    /// DID of the subject the verification applies to.
+    ///DID of the subject the verification applies to.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod verification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,49 +38,49 @@ pub mod verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Domain;
+        type CreatedAt;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Domain = Unset;
+        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Domain = S::Domain;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
-        type CreatedAt = S::CreatedAt;
         type Domain = Set<members::domain>;
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Domain = S::Domain;
+        type CreatedAt = Set<members::created_at>;
         type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `domain` field
         pub struct domain(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -169,8 +175,8 @@ where
 impl<'a, S> VerificationBuilder<'a, S>
 where
     S: verification_state::State,
-    S::CreatedAt: verification_state::IsSet,
     S::Domain: verification_state::IsSet,
+    S::CreatedAt: verification_state::IsSet,
     S::Subject: verification_state::IsSet,
 {
     /// Build the final struct
@@ -214,7 +220,13 @@ impl<'a> Verification<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationGetRecordOutput<'a> {
@@ -271,7 +283,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Verification<'a> {
     }
 }
 
-fn lexicon_doc_app_ocho_edu_verification() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_ocho_edu_verification() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.ocho.edu.verification"),

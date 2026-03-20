@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableInviteCodes<'a> {
@@ -38,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for DisableInviteCodesResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DisableInviteCodes<'a> {
     const NSID: &'static str = "com.atproto.admin.disableInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DisableInviteCodesResponse;
 }
 
@@ -48,8 +49,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DisableInviteCodes<'a> {
 pub struct DisableInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.disableInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DisableInviteCodes<'de>;
     type Response = DisableInviteCodesResponse;
 }

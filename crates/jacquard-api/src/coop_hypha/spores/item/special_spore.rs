@@ -8,20 +8,26 @@
 /// A special spore capture record. Each steal creates a new record with a TID key. Current holder is determined by the most recent createdAt timestamp across all backlinked records for a given origin (subject).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpecialSpore<'a> {
-    /// When this capture occurred.
+    ///When this capture occurred.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Origin garden DID. Used for backlink indexing to find all captures of this spore.
+    ///Origin garden DID. Used for backlink indexing to find all captures of this spore.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod special_spore_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,37 +35,37 @@ pub mod special_spore_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -132,8 +138,8 @@ where
 impl<'a, S> SpecialSporeBuilder<'a, S>
 where
     S: special_spore_state::State,
-    S::CreatedAt: special_spore_state::IsSet,
     S::Subject: special_spore_state::IsSet,
+    S::CreatedAt: special_spore_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SpecialSpore<'a> {
@@ -174,7 +180,13 @@ impl<'a> SpecialSpore<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpecialSporeGetRecordOutput<'a> {
@@ -231,8 +243,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpecialSpore<'a> {
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_item_specialSpore()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_coop_hypha_spores_item_specialSpore() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("coop.hypha.spores.item.specialSpore"),

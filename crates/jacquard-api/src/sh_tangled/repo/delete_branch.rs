@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBranch<'a> {
@@ -19,7 +25,7 @@ pub struct DeleteBranch<'a> {
 
 pub mod delete_branch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -27,37 +33,37 @@ pub mod delete_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
         type Repo;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Repo = S::Repo;
+        type Branch = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Branch = S::Branch;
         type Repo = Set<members::repo>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Repo = S::Repo;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -130,8 +136,8 @@ where
 impl<'a, S> DeleteBranchBuilder<'a, S>
 where
     S: delete_branch_state::State,
-    S::Branch: delete_branch_state::IsSet,
     S::Repo: delete_branch_state::IsSet,
+    S::Branch: delete_branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteBranch<'a> {
@@ -169,8 +175,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteBranchResponse;
 }
 
@@ -179,8 +186,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
 pub struct DeleteBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.deleteBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteBranch<'de>;
     type Response = DeleteBranchResponse;
 }

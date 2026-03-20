@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Cancelled;
 impl std::fmt::Display for Cancelled {
@@ -32,7 +32,7 @@ impl std::fmt::Display for Cancelled {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Hybrid;
 impl std::fmt::Display for Hybrid {
@@ -50,7 +50,7 @@ impl std::fmt::Display for Hybrid {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Inperson;
 impl std::fmt::Display for Inperson {
@@ -62,46 +62,56 @@ impl std::fmt::Display for Inperson {
 /// A calendar event.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
-    /// Client-declared timestamp when the event was created.
+    ///Client-declared timestamp when the event was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The description of the event.
+    ///The description of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Client-declared timestamp when the event ends.
+    ///Client-declared timestamp when the event ends.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub ends_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The locations where the event takes place.
+    ///The locations where the event takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub locations: std::option::Option<Vec<EventLocationsItem<'a>>>,
-    /// The attendance mode of the event.
+    ///The attendance mode of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mode: std::option::Option<crate::community_lexicon::calendar::event::Mode<'a>>,
-    /// The name of the event.
+    ///The name of the event.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Client-declared timestamp when the event starts.
+    ///Client-declared timestamp when the event starts.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub starts_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The status of the event.
+    ///The status of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::community_lexicon::calendar::event::Status<'a>>,
-    /// URIs associated with the event.
+    pub status: std::option::Option<
+        crate::community_lexicon::calendar::event::Status<'a>,
+    >,
+    ///URIs associated with the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub uris: std::option::Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>,
+    pub uris: std::option::Option<
+        Vec<crate::community_lexicon::calendar::event::Uri<'a>>,
+    >,
 }
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -172,7 +182,17 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     pub fn new() -> Self {
         EventBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -199,12 +219,18 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -231,12 +257,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locations` field (optional)
-    pub fn locations(mut self, value: impl Into<Option<Vec<EventLocationsItem<'a>>>>) -> Self {
+    pub fn locations(
+        mut self,
+        value: impl Into<Option<Vec<EventLocationsItem<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
-    pub fn maybe_locations(mut self, value: Option<Vec<EventLocationsItem<'a>>>) -> Self {
+    pub fn maybe_locations(
+        mut self,
+        value: Option<Vec<EventLocationsItem<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -396,7 +428,13 @@ impl<'a> Event<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -415,7 +453,13 @@ pub enum EventLocationsItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<'a> {
@@ -472,8 +516,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     }
 }
 
-fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("community.lexicon.calendar.event"),
@@ -483,21 +528,21 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("cancelled"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("hybrid"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("inperson"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -703,128 +748,128 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("mode"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(
-                    ::jacquard_lexicon::lexicon::LexString {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "The mode of the event.",
-                        )),
-                        format: None,
-                        default: None,
-                        min_length: None,
-                        max_length: None,
-                        min_graphemes: None,
-                        max_graphemes: None,
-                        r#enum: None,
-                        r#const: None,
-                        known_values: None,
-                    },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("The mode of the event."),
+                    ),
+                    format: None,
+                    default: None,
+                    min_length: None,
+                    max_length: None,
+                    min_graphemes: None,
+                    max_graphemes: None,
+                    r#enum: None,
+                    r#const: None,
+                    known_values: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("planned"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("postponed"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("rescheduled"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduled"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(
-                    ::jacquard_lexicon::lexicon::LexString {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "The status of the event.",
-                        )),
-                        format: None,
-                        default: None,
-                        min_length: None,
-                        max_length: None,
-                        min_graphemes: None,
-                        max_graphemes: None,
-                        r#enum: None,
-                        r#const: None,
-                        known_values: None,
-                    },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("The status of the event."),
+                    ),
+                    format: None,
+                    default: None,
+                    min_length: None,
+                    max_length: None,
+                    min_graphemes: None,
+                    max_graphemes: None,
+                    r#enum: None,
+                    r#const: None,
+                    known_values: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "A URI associated with the event.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "The display name of the URI.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The display name of the URI.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("virtual"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map
         },
@@ -843,7 +888,9 @@ pub enum Mode<'a> {
 impl<'a> Mode<'a> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CommunityLexiconCalendarEventHybrid => "community.lexicon.calendar.event#hybrid",
+            Self::CommunityLexiconCalendarEventHybrid => {
+                "community.lexicon.calendar.event#hybrid"
+            }
             Self::CommunityLexiconCalendarEventInperson => {
                 "community.lexicon.calendar.event#inperson"
             }
@@ -858,7 +905,9 @@ impl<'a> Mode<'a> {
 impl<'a> From<&'a str> for Mode<'a> {
     fn from(s: &'a str) -> Self {
         match s {
-            "community.lexicon.calendar.event#hybrid" => Self::CommunityLexiconCalendarEventHybrid,
+            "community.lexicon.calendar.event#hybrid" => {
+                Self::CommunityLexiconCalendarEventHybrid
+            }
             "community.lexicon.calendar.event#inperson" => {
                 Self::CommunityLexiconCalendarEventInperson
             }
@@ -873,7 +922,9 @@ impl<'a> From<&'a str> for Mode<'a> {
 impl<'a> From<String> for Mode<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
-            "community.lexicon.calendar.event#hybrid" => Self::CommunityLexiconCalendarEventHybrid,
+            "community.lexicon.calendar.event#hybrid" => {
+                Self::CommunityLexiconCalendarEventHybrid
+            }
             "community.lexicon.calendar.event#inperson" => {
                 Self::CommunityLexiconCalendarEventInperson
             }
@@ -923,7 +974,9 @@ impl jacquard_common::IntoStatic for Mode<'_> {
     type Output = Mode<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            Mode::CommunityLexiconCalendarEventHybrid => Mode::CommunityLexiconCalendarEventHybrid,
+            Mode::CommunityLexiconCalendarEventHybrid => {
+                Mode::CommunityLexiconCalendarEventHybrid
+            }
             Mode::CommunityLexiconCalendarEventInperson => {
                 Mode::CommunityLexiconCalendarEventInperson
             }
@@ -944,7 +997,7 @@ impl jacquard_common::IntoStatic for Mode<'_> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Planned;
 impl std::fmt::Display for Planned {
@@ -962,7 +1015,7 @@ impl std::fmt::Display for Planned {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Postponed;
 impl std::fmt::Display for Postponed {
@@ -980,7 +1033,7 @@ impl std::fmt::Display for Postponed {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Rescheduled;
 impl std::fmt::Display for Rescheduled {
@@ -998,7 +1051,7 @@ impl std::fmt::Display for Rescheduled {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Scheduled;
 impl std::fmt::Display for Scheduled {
@@ -1148,11 +1201,17 @@ impl jacquard_common::IntoStatic for Status<'_> {
 /// A URI associated with the event.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Uri<'a> {
-    /// The display name of the URI.
+    ///The display name of the URI.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -1162,7 +1221,7 @@ pub struct Uri<'a> {
 
 pub mod uri_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1222,7 +1281,10 @@ impl<'a> UriBuilder<'a, uri_state::Empty> {
 
 impl<'a, S: uri_state::State> UriBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -1307,7 +1369,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Virtual;
 impl std::fmt::Display for Virtual {

@@ -8,21 +8,32 @@
 /// A declaration of a at://2048 player's profile
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Does not want to show up anywhere. Keep stats to your PDS.
+    ///Does not want to show up anywhere. Keep stats to your PDS. Defaults to `false`.
+    #[serde(default = "_default_solo_play")]
     pub solo_play: bool,
-    /// The sync status of this record with the users AT Protocol repo.
+    ///The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
     pub sync_status: crate::blue__2048::SyncStatus<'a>,
 }
 
+fn _default_solo_play() -> bool {
+    false
+}
+
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,49 +41,49 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SyncStatus;
         type SoloPlay;
+        type SyncStatus;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SyncStatus = Unset;
         type SoloPlay = Unset;
+        type SyncStatus = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
-    impl<S: State> State for SetSyncStatus<S> {
-        type SyncStatus = Set<members::sync_status>;
-        type SoloPlay = S::SoloPlay;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `solo_play` field to Set
     pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
     impl<S: State> State for SetSoloPlay<S> {
-        type SyncStatus = S::SyncStatus;
         type SoloPlay = Set<members::solo_play>;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type SoloPlay = S::SoloPlay;
+        type SyncStatus = Set<members::sync_status>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SyncStatus = S::SyncStatus;
         type SoloPlay = S::SoloPlay;
+        type SyncStatus = S::SyncStatus;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sync_status` field
-        pub struct sync_status(());
         ///Marker type for the `solo_play` field
         pub struct solo_play(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -167,8 +178,8 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::SyncStatus: profile_state::IsSet,
     S::SoloPlay: profile_state::IsSet,
+    S::SyncStatus: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
@@ -212,7 +223,13 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -269,7 +286,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.2048.player.profile"),

@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookIdentifiers<'a> {
@@ -26,7 +32,7 @@ pub struct GetBookIdentifiers<'a> {
 
 pub mod get_book_identifiers_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -75,12 +81,18 @@ impl<'a> GetBookIdentifiersBuilder<'a, get_book_identifiers_state::Empty> {
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `goodreadsId` field (optional)
-    pub fn goodreads_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn goodreads_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `goodreadsId` field to an Option value (optional)
-    pub fn maybe_goodreads_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_goodreads_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -88,7 +100,10 @@ impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> 
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `hiveId` field (optional)
-    pub fn hive_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn hive_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -101,7 +116,10 @@ impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> 
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `isbn` field (optional)
-    pub fn isbn(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn isbn(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -114,7 +132,10 @@ impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> 
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `isbn13` field (optional)
-    pub fn isbn13(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn isbn13(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -142,7 +163,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookIdentifiersOutput<'a> {

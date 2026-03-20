@@ -8,7 +8,13 @@
 /// A reusable workout plan template
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkoutPlan<'a> {
@@ -17,7 +23,7 @@ pub struct WorkoutPlan<'a> {
     pub exercises: Vec<crate::app_fitsky::workout_plan::PlanExercise<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Open Graph preview image for social sharing
+    ///Open Graph preview image for social sharing
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub og_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
@@ -27,7 +33,7 @@ pub struct WorkoutPlan<'a> {
 
 pub mod workout_plan_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,66 +42,66 @@ pub mod workout_plan_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Exercises;
-        type Name;
-        type Type;
         type CreatedAt;
+        type Type;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Exercises = Unset;
-        type Name = Unset;
-        type Type = Unset;
         type CreatedAt = Unset;
+        type Type = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `exercises` field to Set
     pub struct SetExercises<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExercises<S> {}
     impl<S: State> State for SetExercises<S> {
         type Exercises = Set<members::exercises>;
-        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Exercises = S::Exercises;
-        type Name = Set<members::name>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Exercises = S::Exercises;
         type Name = S::Name;
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Exercises = S::Exercises;
-        type Name = S::Name;
-        type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Exercises = S::Exercises;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Exercises = S::Exercises;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `exercises` field
         pub struct exercises(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -229,9 +235,9 @@ impl<'a, S> WorkoutPlanBuilder<'a, S>
 where
     S: workout_plan_state::State,
     S::Exercises: workout_plan_state::IsSet,
-    S::Name: workout_plan_state::IsSet,
-    S::Type: workout_plan_state::IsSet,
     S::CreatedAt: workout_plan_state::IsSet,
+    S::Type: workout_plan_state::IsSet,
+    S::Name: workout_plan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkoutPlan<'a> {
@@ -376,7 +382,13 @@ impl jacquard_common::IntoStatic for WorkoutPlanType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkoutPlanGetRecordOutput<'a> {
@@ -434,10 +446,57 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkoutPlan<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(ref value) = self.og_image {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "og_image",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.og_image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "og_image",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         {
@@ -445,7 +504,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkoutPlan<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -455,7 +516,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkoutPlan<'a> {
     }
 }
 
-fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.fitsky.workoutPlan"),
@@ -572,86 +635,82 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("planExercise"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("targetSets"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("targetReps"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(128usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("notes"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(512usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "targetReps",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(1i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "targetSets",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(1i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("targetReps")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notes",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(512usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "targetReps",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(1i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "targetSets",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(1i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -660,7 +719,13 @@ fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconD
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlanExercise<'a> {
@@ -675,7 +740,7 @@ pub struct PlanExercise<'a> {
 
 pub mod plan_exercise_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -683,51 +748,51 @@ pub mod plan_exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TargetReps;
-        type TargetSets;
         type Name;
+        type TargetSets;
+        type TargetReps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TargetReps = Unset;
-        type TargetSets = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `target_reps` field to Set
-    pub struct SetTargetReps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetReps<S> {}
-    impl<S: State> State for SetTargetReps<S> {
-        type TargetReps = Set<members::target_reps>;
-        type TargetSets = S::TargetSets;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `target_sets` field to Set
-    pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSets<S> {}
-    impl<S: State> State for SetTargetSets<S> {
-        type TargetReps = S::TargetReps;
-        type TargetSets = Set<members::target_sets>;
-        type Name = S::Name;
+        type TargetSets = Unset;
+        type TargetReps = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type TargetReps = S::TargetReps;
-        type TargetSets = S::TargetSets;
         type Name = Set<members::name>;
+        type TargetSets = S::TargetSets;
+        type TargetReps = S::TargetReps;
+    }
+    ///State transition - sets the `target_sets` field to Set
+    pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetSets<S> {}
+    impl<S: State> State for SetTargetSets<S> {
+        type Name = S::Name;
+        type TargetSets = Set<members::target_sets>;
+        type TargetReps = S::TargetReps;
+    }
+    ///State transition - sets the `target_reps` field to Set
+    pub struct SetTargetReps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetReps<S> {}
+    impl<S: State> State for SetTargetReps<S> {
+        type Name = S::Name;
+        type TargetSets = S::TargetSets;
+        type TargetReps = Set<members::target_reps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target_reps` field
-        pub struct target_reps(());
-        ///Marker type for the `target_sets` field
-        pub struct target_sets(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `target_sets` field
+        pub struct target_sets(());
+        ///Marker type for the `target_reps` field
+        pub struct target_reps(());
     }
 }
 
@@ -782,7 +847,10 @@ where
 
 impl<'a, S: plan_exercise_state::State> PlanExerciseBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn notes(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -834,9 +902,9 @@ where
 impl<'a, S> PlanExerciseBuilder<'a, S>
 where
     S: plan_exercise_state::State,
-    S::TargetReps: plan_exercise_state::IsSet,
-    S::TargetSets: plan_exercise_state::IsSet,
     S::Name: plan_exercise_state::IsSet,
+    S::TargetSets: plan_exercise_state::IsSet,
+    S::TargetReps: plan_exercise_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanExercise<'a> {
@@ -884,7 +952,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanExercise<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -894,7 +964,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanExercise<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("notes"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -904,7 +976,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanExercise<'a> {
             let value = &self.target_reps;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("target_reps"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "target_reps",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -914,7 +988,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanExercise<'a> {
             let value = &self.target_sets;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("target_sets"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "target_sets",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });

@@ -8,14 +8,20 @@
 /// A Picosky message containing at most 2048 graphemes.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Message<'a> {
-    /// Text content.
+    ///Text content.
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
-    /// Annotations of text (mentions, URLs, hashtags, etc)
+    ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::social_psky::richtext::facet::Facet<'a>>>,
@@ -28,7 +34,7 @@ pub struct Message<'a> {
 
 pub mod message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -225,7 +231,13 @@ impl<'a> Message<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageGetRecordOutput<'a> {
@@ -283,7 +295,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20480usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 20480usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -298,15 +312,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "content",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -314,7 +326,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     }
 }
 
-fn lexicon_doc_social_psky_chat_message() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_psky_chat_message() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.psky.chat.message"),

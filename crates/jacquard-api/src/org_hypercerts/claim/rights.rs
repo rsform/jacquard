@@ -8,30 +8,36 @@
 /// Describes the rights that a contributor and/or an owner has, such as whether the hypercert can be sold, transferred, and under what conditions.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rights<'a> {
-    /// An attachment to define the rights further, e.g. a legal document.
+    ///An attachment to define the rights further, e.g. a legal document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub attachment: std::option::Option<RightsAttachment<'a>>,
-    /// Client-declared timestamp when this record was originally created
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Detailed explanation of the rights holders' permissions, restrictions, and conditions
+    ///Detailed explanation of the rights holders' permissions, restrictions, and conditions
     #[serde(borrow)]
     pub rights_description: jacquard_common::CowStr<'a>,
-    /// Human-readable name for these rights (e.g. 'All Rights Reserved', 'CC BY-SA 4.0')
+    ///Human-readable name for these rights (e.g. 'All Rights Reserved', 'CC BY-SA 4.0')
     #[serde(borrow)]
     pub rights_name: jacquard_common::CowStr<'a>,
-    /// Short identifier code for this rights type (e.g. 'ARR', 'CC-BY-SA') to facilitate filtering and search
+    ///Short identifier code for this rights type (e.g. 'ARR', 'CC-BY-SA') to facilitate filtering and search
     #[serde(borrow)]
     pub rights_type: jacquard_common::CowStr<'a>,
 }
 
 pub mod rights_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -39,65 +45,65 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RightsName;
-        type RightsDescription;
         type RightsType;
+        type RightsDescription;
+        type RightsName;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RightsName = Unset;
-        type RightsDescription = Unset;
         type RightsType = Unset;
+        type RightsDescription = Unset;
+        type RightsName = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `rights_name` field to Set
-    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsName<S> {}
-    impl<S: State> State for SetRightsName<S> {
-        type RightsName = Set<members::rights_name>;
+    ///State transition - sets the `rights_type` field to Set
+    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsType<S> {}
+    impl<S: State> State for SetRightsType<S> {
+        type RightsType = Set<members::rights_type>;
         type RightsDescription = S::RightsDescription;
-        type RightsType = S::RightsType;
+        type RightsName = S::RightsName;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rights_description` field to Set
     pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
     impl<S: State> State for SetRightsDescription<S> {
-        type RightsName = S::RightsName;
-        type RightsDescription = Set<members::rights_description>;
         type RightsType = S::RightsType;
+        type RightsDescription = Set<members::rights_description>;
+        type RightsName = S::RightsName;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `rights_type` field to Set
-    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsType<S> {}
-    impl<S: State> State for SetRightsType<S> {
-        type RightsName = S::RightsName;
+    ///State transition - sets the `rights_name` field to Set
+    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsName<S> {}
+    impl<S: State> State for SetRightsName<S> {
+        type RightsType = S::RightsType;
         type RightsDescription = S::RightsDescription;
-        type RightsType = Set<members::rights_type>;
+        type RightsName = Set<members::rights_name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type RightsName = S::RightsName;
-        type RightsDescription = S::RightsDescription;
         type RightsType = S::RightsType;
+        type RightsDescription = S::RightsDescription;
+        type RightsName = S::RightsName;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rights_name` field
-        pub struct rights_name(());
-        ///Marker type for the `rights_description` field
-        pub struct rights_description(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
+        ///Marker type for the `rights_description` field
+        pub struct rights_description(());
+        ///Marker type for the `rights_name` field
+        pub struct rights_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -226,9 +232,9 @@ where
 impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
-    S::RightsName: rights_state::IsSet,
-    S::RightsDescription: rights_state::IsSet,
     S::RightsType: rights_state::IsSet,
+    S::RightsDescription: rights_state::IsSet,
+    S::RightsName: rights_state::IsSet,
     S::CreatedAt: rights_state::IsSet,
 {
     /// Build the final struct
@@ -276,7 +282,13 @@ impl<'a> Rights<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -289,7 +301,13 @@ pub enum RightsAttachment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RightsGetRecordOutput<'a> {
@@ -364,15 +382,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "rights_description",
-                            ),
-                            max: 1000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "rights_description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -381,7 +397,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rights_name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rights_name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -392,7 +410,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rights_type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rights_type",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -402,7 +422,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.claim.rights"),

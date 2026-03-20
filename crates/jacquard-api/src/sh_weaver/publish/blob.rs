@@ -8,21 +8,27 @@
 /// A simple record referencing a file hosted on a PDS
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
-    /// relative path to the blob
+    ///relative path to the blob
     #[serde(borrow)]
     pub path: jacquard_common::CowStr<'a>,
-    /// Reference to the uploaded file
+    ///Reference to the uploaded file
     #[serde(borrow)]
     pub upload: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 pub mod blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -175,7 +181,13 @@ impl<'a> Blob<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobGetRecordOutput<'a> {
@@ -233,17 +245,65 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blob<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("path"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "path",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        {
+            let value = &self.upload;
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "upload",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.upload;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "upload",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         Ok(())
     }
 }
 
-fn lexicon_doc_sh_weaver_publish_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_publish_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.publish.blob"),
@@ -253,66 +313,60 @@ fn lexicon_doc_sh_weaver_publish_blob() -> ::jacquard_lexicon::lexicon::LexiconD
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(
-                    ::jacquard_lexicon::lexicon::LexRecord {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "A simple record referencing a file hosted on a PDS",
-                        )),
-                        key: Some(::jacquard_common::CowStr::new_static("tid")),
-                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(
-                            ::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
-                                required: Some(vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "upload",
-                                    ),
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("path"),
-                                ]),
-                                nullable: None,
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
-                                    map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "path",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                            ::jacquard_lexicon::lexicon::LexString {
-                                                description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "relative path to the blob",
-                                                    ),
-                                                ),
-                                                format: None,
-                                                default: None,
-                                                min_length: Some(1usize),
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
-                                            },
-                                        ),
-                                    );
-                                    map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "upload",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(
-                                            ::jacquard_lexicon::lexicon::LexBlob {
-                                                description: None,
-                                                accept: None,
-                                                max_size: None,
-                                            },
-                                        ),
-                                    );
-                                    map
-                                },
-                            },
                         ),
-                    },
-                ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("upload"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("path")
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "path",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "relative path to the blob",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: Some(1usize),
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "upload",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                    description: None,
+                                    accept: None,
+                                    max_size: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
             );
             map
         },

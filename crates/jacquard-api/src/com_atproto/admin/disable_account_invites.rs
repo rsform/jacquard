@@ -7,13 +7,19 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableAccountInvites<'a> {
     #[serde(borrow)]
     pub account: jacquard_common::types::string::Did<'a>,
-    /// Optional reason for disabled invites.
+    ///Optional reason for disabled invites.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -21,7 +27,7 @@ pub struct DisableAccountInvites<'a> {
 
 pub mod disable_account_invites_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -63,7 +69,10 @@ pub struct DisableAccountInvitesBuilder<'a, S: disable_account_invites_state::St
 
 impl<'a> DisableAccountInvites<'a> {
     /// Create a new builder for this type
-    pub fn new() -> DisableAccountInvitesBuilder<'a, disable_account_invites_state::Empty> {
+    pub fn new() -> DisableAccountInvitesBuilder<
+        'a,
+        disable_account_invites_state::Empty,
+    > {
         DisableAccountInvitesBuilder::new()
     }
 }
@@ -100,7 +109,10 @@ where
 
 impl<'a, S: disable_account_invites_state::State> DisableAccountInvitesBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -152,8 +164,9 @@ impl jacquard_common::xrpc::XrpcResp for DisableAccountInvitesResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<'a> {
     const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DisableAccountInvitesResponse;
 }
 
@@ -162,8 +175,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<'a> {
 pub struct DisableAccountInvitesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableAccountInvitesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.disableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DisableAccountInvites<'de>;
     type Response = DisableAccountInvitesResponse;
 }

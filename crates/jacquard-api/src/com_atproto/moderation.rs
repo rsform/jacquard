@@ -16,7 +16,7 @@ pub mod create_report;
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonAppeal;
 impl std::fmt::Display for ReasonAppeal {
@@ -34,7 +34,7 @@ impl std::fmt::Display for ReasonAppeal {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleading;
 impl std::fmt::Display for ReasonMisleading {
@@ -52,7 +52,7 @@ impl std::fmt::Display for ReasonMisleading {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonOther;
 impl std::fmt::Display for ReasonOther {
@@ -70,7 +70,7 @@ impl std::fmt::Display for ReasonOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonRude;
 impl std::fmt::Display for ReasonRude {
@@ -88,7 +88,7 @@ impl std::fmt::Display for ReasonRude {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexual;
 impl std::fmt::Display for ReasonSexual {
@@ -106,7 +106,7 @@ impl std::fmt::Display for ReasonSexual {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSpam;
 impl std::fmt::Display for ReasonSpam {
@@ -170,7 +170,9 @@ pub enum ReasonType<'a> {
 impl<'a> ReasonType<'a> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::ComAtprotoModerationDefsReasonSpam => "com.atproto.moderation.defs#reasonSpam",
+            Self::ComAtprotoModerationDefsReasonSpam => {
+                "com.atproto.moderation.defs#reasonSpam"
+            }
             Self::ComAtprotoModerationDefsReasonViolation => {
                 "com.atproto.moderation.defs#reasonViolation"
             }
@@ -180,13 +182,21 @@ impl<'a> ReasonType<'a> {
             Self::ComAtprotoModerationDefsReasonSexual => {
                 "com.atproto.moderation.defs#reasonSexual"
             }
-            Self::ComAtprotoModerationDefsReasonRude => "com.atproto.moderation.defs#reasonRude",
-            Self::ComAtprotoModerationDefsReasonOther => "com.atproto.moderation.defs#reasonOther",
+            Self::ComAtprotoModerationDefsReasonRude => {
+                "com.atproto.moderation.defs#reasonRude"
+            }
+            Self::ComAtprotoModerationDefsReasonOther => {
+                "com.atproto.moderation.defs#reasonOther"
+            }
             Self::ComAtprotoModerationDefsReasonAppeal => {
                 "com.atproto.moderation.defs#reasonAppeal"
             }
-            Self::ToolsOzoneReportDefsReasonAppeal => "tools.ozone.report.defs#reasonAppeal",
-            Self::ToolsOzoneReportDefsReasonOther => "tools.ozone.report.defs#reasonOther",
+            Self::ToolsOzoneReportDefsReasonAppeal => {
+                "tools.ozone.report.defs#reasonAppeal"
+            }
+            Self::ToolsOzoneReportDefsReasonOther => {
+                "tools.ozone.report.defs#reasonOther"
+            }
             Self::ToolsOzoneReportDefsReasonViolenceAnimal => {
                 "tools.ozone.report.defs#reasonViolenceAnimal"
             }
@@ -283,7 +293,9 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonRuleBanEvasion => {
                 "tools.ozone.report.defs#reasonRuleBanEvasion"
             }
-            Self::ToolsOzoneReportDefsReasonRuleOther => "tools.ozone.report.defs#reasonRuleOther",
+            Self::ToolsOzoneReportDefsReasonRuleOther => {
+                "tools.ozone.report.defs#reasonRuleOther"
+            }
             Self::ToolsOzoneReportDefsReasonSelfHarmContent => {
                 "tools.ozone.report.defs#reasonSelfHarmContent"
             }
@@ -307,7 +319,9 @@ impl<'a> ReasonType<'a> {
 impl<'a> From<&'a str> for ReasonType<'a> {
     fn from(s: &'a str) -> Self {
         match s {
-            "com.atproto.moderation.defs#reasonSpam" => Self::ComAtprotoModerationDefsReasonSpam,
+            "com.atproto.moderation.defs#reasonSpam" => {
+                Self::ComAtprotoModerationDefsReasonSpam
+            }
             "com.atproto.moderation.defs#reasonViolation" => {
                 Self::ComAtprotoModerationDefsReasonViolation
             }
@@ -317,13 +331,21 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "com.atproto.moderation.defs#reasonSexual" => {
                 Self::ComAtprotoModerationDefsReasonSexual
             }
-            "com.atproto.moderation.defs#reasonRude" => Self::ComAtprotoModerationDefsReasonRude,
-            "com.atproto.moderation.defs#reasonOther" => Self::ComAtprotoModerationDefsReasonOther,
+            "com.atproto.moderation.defs#reasonRude" => {
+                Self::ComAtprotoModerationDefsReasonRude
+            }
+            "com.atproto.moderation.defs#reasonOther" => {
+                Self::ComAtprotoModerationDefsReasonOther
+            }
             "com.atproto.moderation.defs#reasonAppeal" => {
                 Self::ComAtprotoModerationDefsReasonAppeal
             }
-            "tools.ozone.report.defs#reasonAppeal" => Self::ToolsOzoneReportDefsReasonAppeal,
-            "tools.ozone.report.defs#reasonOther" => Self::ToolsOzoneReportDefsReasonOther,
+            "tools.ozone.report.defs#reasonAppeal" => {
+                Self::ToolsOzoneReportDefsReasonAppeal
+            }
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
             "tools.ozone.report.defs#reasonViolenceAnimal" => {
                 Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
@@ -420,7 +442,9 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonRuleBanEvasion" => {
                 Self::ToolsOzoneReportDefsReasonRuleBanEvasion
             }
-            "tools.ozone.report.defs#reasonRuleOther" => Self::ToolsOzoneReportDefsReasonRuleOther,
+            "tools.ozone.report.defs#reasonRuleOther" => {
+                Self::ToolsOzoneReportDefsReasonRuleOther
+            }
             "tools.ozone.report.defs#reasonSelfHarmContent" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
@@ -444,7 +468,9 @@ impl<'a> From<&'a str> for ReasonType<'a> {
 impl<'a> From<String> for ReasonType<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
-            "com.atproto.moderation.defs#reasonSpam" => Self::ComAtprotoModerationDefsReasonSpam,
+            "com.atproto.moderation.defs#reasonSpam" => {
+                Self::ComAtprotoModerationDefsReasonSpam
+            }
             "com.atproto.moderation.defs#reasonViolation" => {
                 Self::ComAtprotoModerationDefsReasonViolation
             }
@@ -454,13 +480,21 @@ impl<'a> From<String> for ReasonType<'a> {
             "com.atproto.moderation.defs#reasonSexual" => {
                 Self::ComAtprotoModerationDefsReasonSexual
             }
-            "com.atproto.moderation.defs#reasonRude" => Self::ComAtprotoModerationDefsReasonRude,
-            "com.atproto.moderation.defs#reasonOther" => Self::ComAtprotoModerationDefsReasonOther,
+            "com.atproto.moderation.defs#reasonRude" => {
+                Self::ComAtprotoModerationDefsReasonRude
+            }
+            "com.atproto.moderation.defs#reasonOther" => {
+                Self::ComAtprotoModerationDefsReasonOther
+            }
             "com.atproto.moderation.defs#reasonAppeal" => {
                 Self::ComAtprotoModerationDefsReasonAppeal
             }
-            "tools.ozone.report.defs#reasonAppeal" => Self::ToolsOzoneReportDefsReasonAppeal,
-            "tools.ozone.report.defs#reasonOther" => Self::ToolsOzoneReportDefsReasonOther,
+            "tools.ozone.report.defs#reasonAppeal" => {
+                Self::ToolsOzoneReportDefsReasonAppeal
+            }
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
             "tools.ozone.report.defs#reasonViolenceAnimal" => {
                 Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
@@ -557,7 +591,9 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonRuleBanEvasion" => {
                 Self::ToolsOzoneReportDefsReasonRuleBanEvasion
             }
-            "tools.ozone.report.defs#reasonRuleOther" => Self::ToolsOzoneReportDefsReasonRuleOther,
+            "tools.ozone.report.defs#reasonRuleOther" => {
+                Self::ToolsOzoneReportDefsReasonRuleOther
+            }
             "tools.ozone.report.defs#reasonSelfHarmContent" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
@@ -771,7 +807,7 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolation;
 impl std::fmt::Display for ReasonViolation {

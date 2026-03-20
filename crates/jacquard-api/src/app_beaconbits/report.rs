@@ -8,27 +8,33 @@
 /// A report of inappropriate content on a beacon
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Report<'a> {
-    /// AT URI of the beacon being reported
+    ///AT URI of the beacon being reported
     #[serde(borrow)]
     pub beacon_uri: jacquard_common::types::string::AtUri<'a>,
-    /// Timestamp when the report was created
+    ///Timestamp when the report was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Additional context for the report
+    ///Additional context for the report
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub details: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Reason for the report
+    ///Reason for the report
     #[serde(borrow)]
     pub reason: ReportReason<'a>,
 }
 
 pub mod report_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,51 +42,51 @@ pub mod report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BeaconUri;
-        type Reason;
         type CreatedAt;
+        type Reason;
+        type BeaconUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BeaconUri = Unset;
-        type Reason = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `beacon_uri` field to Set
-    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
-    impl<S: State> State for SetBeaconUri<S> {
-        type BeaconUri = Set<members::beacon_uri>;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type BeaconUri = S::BeaconUri;
-        type Reason = Set<members::reason>;
-        type CreatedAt = S::CreatedAt;
+        type Reason = Unset;
+        type BeaconUri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BeaconUri = S::BeaconUri;
-        type Reason = S::Reason;
         type CreatedAt = Set<members::created_at>;
+        type Reason = S::Reason;
+        type BeaconUri = S::BeaconUri;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type CreatedAt = S::CreatedAt;
+        type Reason = Set<members::reason>;
+        type BeaconUri = S::BeaconUri;
+    }
+    ///State transition - sets the `beacon_uri` field to Set
+    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
+    impl<S: State> State for SetBeaconUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type Reason = S::Reason;
+        type BeaconUri = Set<members::beacon_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `beacon_uri` field
-        pub struct beacon_uri(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
+        ///Marker type for the `beacon_uri` field
+        pub struct beacon_uri(());
     }
 }
 
@@ -154,7 +160,10 @@ where
 
 impl<'a, S: report_state::State> ReportBuilder<'a, S> {
     /// Set the `details` field (optional)
-    pub fn details(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn details(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -187,9 +196,9 @@ where
 impl<'a, S> ReportBuilder<'a, S>
 where
     S: report_state::State,
-    S::BeaconUri: report_state::IsSet,
-    S::Reason: report_state::IsSet,
     S::CreatedAt: report_state::IsSet,
+    S::Reason: report_state::IsSet,
+    S::BeaconUri: report_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Report<'a> {
@@ -343,7 +352,13 @@ impl jacquard_common::IntoStatic for ReportReason<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReportGetRecordOutput<'a> {
@@ -404,15 +419,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "details",
-                            ),
-                            max: 500usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "details",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -425,15 +438,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "reason",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "reason",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -441,7 +452,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
     }
 }
 
-fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.beaconbits.report"),

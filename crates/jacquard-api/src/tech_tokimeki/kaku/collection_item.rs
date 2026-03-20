@@ -8,25 +8,31 @@
 /// An item in a collection linking to a post
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItem<'a> {
-    /// Reference to the collection
+    ///Reference to the collection
     #[serde(borrow)]
     pub collection: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Order within the collection
+    ///Order within the collection
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub order: std::option::Option<i64>,
-    /// Reference to the post
+    ///Reference to the post
     #[serde(borrow)]
     pub post: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod collection_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,51 +40,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Post;
         type CreatedAt;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Post = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Post = S::Post;
-        type CreatedAt = S::CreatedAt;
+        type Collection = Unset;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
-        type Collection = S::Collection;
         type Post = Set<members::post>;
         type CreatedAt = S::CreatedAt;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
         type Post = S::Post;
         type CreatedAt = Set<members::created_at>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Post = S::Post;
+        type CreatedAt = S::CreatedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `post` field
         pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -185,9 +191,9 @@ where
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::Collection: collection_item_state::IsSet,
     S::Post: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
+    S::Collection: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -232,7 +238,13 @@ impl<'a> CollectionItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<'a> {
@@ -288,7 +300,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
         if let Some(ref value) = self.order {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("order"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "order",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -298,8 +312,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_collectionItem()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_tech_tokimeki_kaku_collectionItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.kaku.collectionItem"),

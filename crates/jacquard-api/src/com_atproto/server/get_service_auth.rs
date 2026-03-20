@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuth<'a> {
@@ -21,7 +27,7 @@ pub struct GetServiceAuth<'a> {
 
 pub mod get_service_auth_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,7 +128,10 @@ impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
         self
     }
     /// Set the `lxm` field to an Option value (optional)
-    pub fn maybe_lxm(mut self, value: Option<jacquard_common::types::string::Nsid<'a>>) -> Self {
+    pub fn maybe_lxm(
+        mut self,
+        value: Option<jacquard_common::types::string::Nsid<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -152,7 +161,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuthOutput<'a> {
@@ -170,7 +179,7 @@ pub struct GetServiceAuthOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

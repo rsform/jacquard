@@ -5,19 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacks {
-    ///(default: 10, min: 1, max: 25)
+    ///Defaults to `10`. Min: 1. Max: 25.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
 pub mod get_onboarding_suggested_starter_packs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,9 +62,9 @@ impl GetOnboardingSuggestedStarterPacks {
     }
 }
 
-impl
-    GetOnboardingSuggestedStarterPacksBuilder<get_onboarding_suggested_starter_packs_state::Empty>
-{
+impl GetOnboardingSuggestedStarterPacksBuilder<
+    get_onboarding_suggested_starter_packs_state::Empty,
+> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetOnboardingSuggestedStarterPacksBuilder {
@@ -63,9 +74,9 @@ impl
     }
 }
 
-impl<S: get_onboarding_suggested_starter_packs_state::State>
-    GetOnboardingSuggestedStarterPacksBuilder<S>
-{
+impl<
+    S: get_onboarding_suggested_starter_packs_state::State,
+> GetOnboardingSuggestedStarterPacksBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
@@ -92,7 +103,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacksOutput<'a> {

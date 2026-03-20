@@ -22,19 +22,21 @@ pub mod update_webhook;
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RewriteRule<'a> {
-    /// Text to search for and replace.
+    ///Text to search for and replace.
     #[serde(borrow)]
     pub from: jacquard_common::CowStr<'a>,
-    /// Text to replace with.
+    ///Text to replace with.
     #[serde(borrow)]
     pub to: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.server.defs"),
@@ -44,59 +46,61 @@ fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::Lexico
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("rewriteRule"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("from"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("to")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "from",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Text to search for and replace.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: Some(1usize),
+                                max_length: Some(100usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("to"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("from"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Text to search for and replace.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: Some(1usize),
-                                        max_length: Some(100usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Text to replace with.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("to"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Text to replace with.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(100usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(100usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("webhook"),
@@ -434,7 +438,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("from"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "from",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -445,7 +451,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("from"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "from",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -456,7 +464,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("to"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "to",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -469,61 +479,67 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
 /// A webhook configuration for receiving Streamplace events.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Webhook<'a> {
-    /// Whether this webhook is currently active.
+    ///Whether this webhook is currently active.
     pub active: bool,
-    /// When this webhook was created.
+    ///When this webhook was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A description of what this webhook is used for.
+    ///A description of what this webhook is used for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Number of consecutive errors for this webhook.
+    ///Number of consecutive errors for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub error_count: std::option::Option<i64>,
-    /// The types of events this webhook should receive.
+    ///The types of events this webhook should receive.
     #[serde(borrow)]
     pub events: Vec<jacquard_common::CowStr<'a>>,
-    /// Unique identifier for this webhook.
+    ///Unique identifier for this webhook.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// When this webhook was last triggered.
+    ///When this webhook was last triggered.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_triggered: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// A user-friendly name for this webhook.
+    ///A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Text to prepend to webhook messages.
+    ///Text to prepend to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Text replacement rules for webhook messages.
+    ///Text replacement rules for webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rewrite: std::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
-    /// Text to append to webhook messages.
+    ///Text to append to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// When this webhook was last updated.
+    ///When this webhook was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The webhook URL where events will be sent.
+    ///The webhook URL where events will be sent.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod webhook_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -531,83 +547,83 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Url;
         type Active;
+        type Id;
         type Events;
+        type Url;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Url = Unset;
         type Active = Unset;
+        type Id = Unset;
         type Events = Unset;
+        type Url = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Url = S::Url;
-        type Active = S::Active;
-        type Events = S::Events;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Id = S::Id;
-        type Url = Set<members::url>;
-        type Active = S::Active;
-        type Events = S::Events;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type Id = S::Id;
-        type Url = S::Url;
         type Active = Set<members::active>;
+        type Id = S::Id;
         type Events = S::Events;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Active = S::Active;
+        type Id = Set<members::id>;
+        type Events = S::Events;
+        type Url = S::Url;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `events` field to Set
     pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvents<S> {}
     impl<S: State> State for SetEvents<S> {
-        type Id = S::Id;
-        type Url = S::Url;
         type Active = S::Active;
+        type Id = S::Id;
         type Events = Set<members::events>;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Active = S::Active;
+        type Id = S::Id;
+        type Events = S::Events;
+        type Url = Set<members::url>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Id = S::Id;
-        type Url = S::Url;
         type Active = S::Active;
+        type Id = S::Id;
         type Events = S::Events;
+        type Url = S::Url;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `active` field
         pub struct active(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `events` field
         pub struct events(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -648,7 +664,20 @@ impl<'a> WebhookBuilder<'a, webhook_state::Empty> {
         WebhookBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -695,12 +724,18 @@ where
 
 impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -786,7 +821,10 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
         self
     }
     /// Set the `muteWords` field to an Option value (optional)
-    pub fn maybe_mute_words(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_mute_words(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -794,7 +832,10 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
 
 impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -807,7 +848,10 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
 
 impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
     /// Set the `prefix` field (optional)
-    pub fn prefix(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn prefix(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -839,7 +883,10 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
 
 impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
     /// Set the `suffix` field (optional)
-    pub fn suffix(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn suffix(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
@@ -891,10 +938,10 @@ where
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
-    S::Id: webhook_state::IsSet,
-    S::Url: webhook_state::IsSet,
     S::Active: webhook_state::IsSet,
+    S::Id: webhook_state::IsSet,
     S::Events: webhook_state::IsSet,
+    S::Url: webhook_state::IsSet,
     S::CreatedAt: webhook_state::IsSet,
 {
     /// Build the final struct
@@ -962,7 +1009,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -972,7 +1021,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -982,7 +1033,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("prefix"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "prefix",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -992,7 +1045,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("suffix"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "suffix",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });

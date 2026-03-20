@@ -8,27 +8,33 @@
 /// A warrant where one ATProto identity vouches for the trustworthiness of another identity
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Warrant<'a> {
-    /// When the warrant was created
+    ///When the warrant was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional description explaining the basis for this warrant
+    ///Optional description explaining the basis for this warrant
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Optional expiration date for this warrant
+    ///Optional expiration date for this warrant
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// DID of the identity being warranted for
+    ///DID of the identity being warranted for
     #[serde(borrow)]
     pub subject: jacquard_common::CowStr<'a>,
-    /// Level of trust being warranted
+    ///Level of trust being warranted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub trust_level: std::option::Option<WarrantTrustLevel<'a>>,
-    /// Type of warrant being provided
+    ///Type of warrant being provided
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub warrant_type: std::option::Option<WarrantWarrantType<'a>>,
@@ -36,7 +42,7 @@ pub struct Warrant<'a> {
 
 pub mod warrant_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,12 +137,18 @@ where
 
 impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -182,7 +194,10 @@ where
 
 impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `trustLevel` field (optional)
-    pub fn trust_level(mut self, value: impl Into<Option<WarrantTrustLevel<'a>>>) -> Self {
+    pub fn trust_level(
+        mut self,
+        value: impl Into<Option<WarrantTrustLevel<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -195,7 +210,10 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
 
 impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `warrantType` field (optional)
-    pub fn warrant_type(mut self, value: impl Into<Option<WarrantWarrantType<'a>>>) -> Self {
+    pub fn warrant_type(
+        mut self,
+        value: impl Into<Option<WarrantWarrantType<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -462,7 +480,13 @@ impl jacquard_common::IntoStatic for WarrantWarrantType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WarrantGetRecordOutput<'a> {
@@ -519,7 +543,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -529,8 +555,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_warrant()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("beauty.cybernetic.trustcow.warrant"),

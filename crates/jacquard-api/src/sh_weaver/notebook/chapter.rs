@@ -8,7 +8,13 @@
 /// A grouping of entries in a notebook.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Chapter<'a> {
@@ -16,13 +22,15 @@ pub struct Chapter<'a> {
     pub authors: Vec<crate::sh_weaver::actor::Author<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: std::option::Option<crate::sh_weaver::notebook::ContentWarnings<'a>>,
-    /// Client-declared timestamp when this was originally created.
+    pub content_warnings: std::option::Option<
+        crate::sh_weaver::notebook::ContentWarnings<'a>,
+    >,
+    ///Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub entry_list: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// The notebook this chapter belongs to.
+    ///The notebook this chapter belongs to.
     #[serde(borrow)]
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -38,7 +46,7 @@ pub struct Chapter<'a> {
 
 pub mod chapter_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,49 +54,49 @@ pub mod chapter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EntryList;
         type Authors;
+        type EntryList;
         type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EntryList = Unset;
         type Authors = Unset;
+        type EntryList = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `entry_list` field to Set
-    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryList<S> {}
-    impl<S: State> State for SetEntryList<S> {
-        type EntryList = Set<members::entry_list>;
-        type Authors = S::Authors;
-        type Notebook = S::Notebook;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type EntryList = S::EntryList;
         type Authors = Set<members::authors>;
+        type EntryList = S::EntryList;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `entry_list` field to Set
+    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryList<S> {}
+    impl<S: State> State for SetEntryList<S> {
+        type Authors = S::Authors;
+        type EntryList = Set<members::entry_list>;
         type Notebook = S::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type EntryList = S::EntryList;
         type Authors = S::Authors;
+        type EntryList = S::EntryList;
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry_list` field
-        pub struct entry_list(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `entry_list` field
+        pub struct entry_list(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
     }
@@ -244,12 +252,18 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<crate::sh_weaver::notebook::Tags<'a>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -265,7 +279,10 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<crate::sh_weaver::notebook::Title<'a>>) -> Self {
+    pub fn maybe_title(
+        mut self,
+        value: Option<crate::sh_weaver::notebook::Title<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -274,8 +291,8 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S> ChapterBuilder<'a, S>
 where
     S: chapter_state::State,
-    S::EntryList: chapter_state::IsSet,
     S::Authors: chapter_state::IsSet,
+    S::EntryList: chapter_state::IsSet,
     S::Notebook: chapter_state::IsSet,
 {
     /// Build the final struct
@@ -329,7 +346,13 @@ impl<'a> Chapter<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChapterGetRecordOutput<'a> {
@@ -386,7 +409,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chapter<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.chapter"),

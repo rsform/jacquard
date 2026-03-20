@@ -8,19 +8,25 @@
 /// Recipient response to a badge award.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Response<'a> {
-    /// Reference to the badge award.
+    ///Reference to the badge award.
     #[serde(borrow)]
     pub badge_award: crate::app_certified::badge::award::Award<'a>,
-    /// Client-declared timestamp when this record was originally created
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The recipient’s response for the badge (accepted or rejected).
+    ///The recipient’s response for the badge (accepted or rejected).
     #[serde(borrow)]
     pub response: ResponseResponse<'a>,
-    /// Optional relative weight for accepted badges, assigned by the recipient.
+    ///Optional relative weight for accepted badges, assigned by the recipient.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub weight: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -28,7 +34,7 @@ pub struct Response<'a> {
 
 pub mod response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -173,7 +179,10 @@ where
 
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `weight` field (optional)
-    pub fn weight(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn weight(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -323,7 +332,13 @@ impl jacquard_common::IntoStatic for ResponseResponse<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseGetRecordOutput<'a> {
@@ -380,7 +395,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("weight"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "weight",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -390,7 +407,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
     }
 }
 
-fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.certified.badge.response"),

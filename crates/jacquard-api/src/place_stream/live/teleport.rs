@@ -8,23 +8,29 @@
 /// Record defining a 'teleport', that is active during a certain time.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Teleport<'a> {
-    /// The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
+    ///The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub duration_seconds: std::option::Option<i64>,
-    /// The time the teleport becomes active.
+    ///The time the teleport becomes active.
     pub starts_at: jacquard_common::types::string::Datetime,
-    /// The DID of the streamer to teleport to.
+    ///The DID of the streamer to teleport to.
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod teleport_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,7 +199,13 @@ impl<'a> Teleport<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TeleportGetRecordOutput<'a> {
@@ -272,7 +284,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Teleport<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_live_teleport() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_live_teleport() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.live.teleport"),

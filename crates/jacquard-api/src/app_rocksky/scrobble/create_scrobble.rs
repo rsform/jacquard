@@ -14,88 +14,92 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateScrobble<'a> {
-    /// The album of the track being scrobbled
+    ///The album of the track being scrobbled
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub album: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The URL of the album art for the track
+    ///The URL of the album art for the track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub album_art: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The Apple Music link for the track, if available
+    ///The Apple Music link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub apple_music_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The artist of the track being scrobbled
+    pub apple_music_link: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The artist of the track being scrobbled
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
-    /// The URL of the artist's picture, if available
+    ///The URL of the artist's picture, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_picture: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The composer of the track, if available
+    pub artist_picture: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The composer of the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub composer: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The copyright message for the track, if available
+    ///The copyright message for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub copyright_message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Deezer link for the track, if available
+    ///The Deezer link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub deezer_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The disc number of the track in the album, if applicable
+    ///The disc number of the track in the album, if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disc_number: std::option::Option<i64>,
-    /// The duration of the track in seconds
+    ///The duration of the track in seconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub duration: std::option::Option<i64>,
-    /// The record label of the track, if available
+    ///The record label of the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub label: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Last.fm link for the track, if available
+    ///The Last.fm link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub lastfm_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The lyrics of the track, if available
+    ///The lyrics of the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub lyrics: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The MusicBrainz ID of the track, if available
+    ///The MusicBrainz ID of the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The release date of the track, formatted as YYYY-MM-DD
+    ///The release date of the track, formatted as YYYY-MM-DD
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub release_date: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Spotify link for the track, if available
+    ///The Spotify link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub spotify_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The Tidal link for the track, if available
+    ///The Tidal link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tidal_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The timestamp of the scrobble in milliseconds since epoch
+    ///The timestamp of the scrobble in milliseconds since epoch
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub timestamp: std::option::Option<i64>,
-    /// The title of the track being scrobbled
+    ///The title of the track being scrobbled
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    /// The track number of the track in the album
+    ///The track number of the track in the album
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub track_number: std::option::Option<i64>,
-    /// The year the track was released
+    ///The year the track was released
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub year: std::option::Option<i64>,
-    /// The Youtube link for the track, if available
+    ///The Youtube link for the track, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub youtube_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
@@ -103,7 +107,13 @@ pub struct CreateScrobble<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateScrobbleOutput<'a> {
@@ -124,8 +134,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateScrobble<'a> {
     const NSID: &'static str = "app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateScrobbleResponse;
 }
 
@@ -134,8 +145,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateScrobble<'a> {
 pub struct CreateScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateScrobbleRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateScrobble<'de>;
     type Response = CreateScrobbleResponse;
 }

@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
@@ -20,7 +26,7 @@ pub struct GetProfile<'a> {
 
 pub mod get_profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -80,7 +86,10 @@ impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
 
 impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
     /// Set the `handle` field (optional)
-    pub fn handle(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn handle(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -106,20 +115,26 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
-    /// The user's activity
+    ///The user's activity
     #[serde(borrow)]
     pub activity: Vec<crate::buzz_bookhive::Activity<'a>>,
-    /// All books in the user's library
+    ///All books in the user's library
     #[serde(borrow)]
     pub books: Vec<crate::buzz_bookhive::UserBook<'a>>,
-    /// The user's friend activity
+    ///The user's friend activity
     #[serde(borrow)]
     pub friend_activity: Vec<crate::buzz_bookhive::UserBook<'a>>,
-    /// The user's profile
+    ///The user's profile
     #[serde(borrow)]
     pub profile: crate::buzz_bookhive::Profile<'a>,
 }

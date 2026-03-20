@@ -15,24 +15,30 @@ pub mod sync;
 /// Indicates this record requires hydration from an external service. The stub record on the PDS contains minimal data; full content is fetched from the service endpoint.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Source<'a> {
-    /// DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
+    ///DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
     #[serde(borrow)]
     pub service: jacquard_common::types::string::Did<'a>,
-    /// Reference to the full record at the hydration service.
+    ///Reference to the full record at the hydration service.
     #[serde(borrow)]
     pub subject: crate::zone_stratos::SubjectRef<'a>,
-    /// Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
+    ///Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
     #[serde(borrow)]
     pub vary: SourceVary<'a>,
 }
 
 pub mod source_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,51 +46,51 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Vary;
         type Service;
         type Subject;
-        type Vary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Vary = Unset;
         type Service = Unset;
         type Subject = Unset;
-        type Vary = Unset;
-    }
-    ///State transition - sets the `service` field to Set
-    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetService<S> {}
-    impl<S: State> State for SetService<S> {
-        type Service = Set<members::service>;
-        type Subject = S::Subject;
-        type Vary = S::Vary;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Service = S::Service;
-        type Subject = Set<members::subject>;
-        type Vary = S::Vary;
     }
     ///State transition - sets the `vary` field to Set
     pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVary<S> {}
     impl<S: State> State for SetVary<S> {
+        type Vary = Set<members::vary>;
         type Service = S::Service;
         type Subject = S::Subject;
-        type Vary = Set<members::vary>;
+    }
+    ///State transition - sets the `service` field to Set
+    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetService<S> {}
+    impl<S: State> State for SetService<S> {
+        type Vary = S::Vary;
+        type Service = Set<members::service>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Vary = S::Vary;
+        type Service = S::Service;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `vary` field
+        pub struct vary(());
         ///Marker type for the `service` field
         pub struct service(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `vary` field
-        pub struct vary(());
     }
 }
 
@@ -177,9 +183,9 @@ where
 impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
+    S::Vary: source_state::IsSet,
     S::Service: source_state::IsSet,
     S::Subject: source_state::IsSet,
-    S::Vary: source_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Source<'a> {
@@ -471,7 +477,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("vary"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "vary",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -484,21 +492,27 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
 /// A strong reference to a record, including its content hash for verification.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectRef<'a> {
-    /// CID of the full record content for integrity verification.
+    ///CID of the full record content for integrity verification.
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    /// AT-URI of the record at the hydration service.
+    ///AT-URI of the record at the hydration service.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod subject_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -506,37 +520,37 @@ pub mod subject_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -609,8 +623,8 @@ where
 impl<'a, S> SubjectRefBuilder<'a, S>
 where
     S: subject_ref_state::State,
-    S::Cid: subject_ref_state::IsSet,
     S::Uri: subject_ref_state::IsSet,
+    S::Cid: subject_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {

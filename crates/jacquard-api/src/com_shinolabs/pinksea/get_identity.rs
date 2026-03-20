@@ -6,20 +6,32 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetIdentity;
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetIdentityOutput<'a> {
-    /// The DID of the user.
+    ///The DID of the user.
     #[serde(borrow)]
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
-    /// The handle of the author.
+    ///The handle of the author.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }

@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MuteActorList<'a> {
@@ -17,7 +23,7 @@ pub struct MuteActorList<'a> {
 
 pub mod mute_actor_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,7 +56,9 @@ pub mod mute_actor_list_state {
 /// Builder for constructing an instance of this type
 pub struct MuteActorListBuilder<'a, S: mute_actor_list_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -130,8 +138,9 @@ impl jacquard_common::xrpc::XrpcResp for MuteActorListResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for MuteActorList<'a> {
     const NSID: &'static str = "app.bsky.graph.muteActorList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MuteActorListResponse;
 }
 
@@ -140,8 +149,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MuteActorList<'a> {
 pub struct MuteActorListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MuteActorListRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.muteActorList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = MuteActorList<'de>;
     type Response = MuteActorListResponse;
 }

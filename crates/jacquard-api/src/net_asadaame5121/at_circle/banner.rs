@@ -8,7 +8,13 @@
 /// A banner image for a ring
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Banner<'a> {
@@ -21,7 +27,7 @@ pub struct Banner<'a> {
 
 pub mod banner_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,51 +35,51 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Ring;
         type Banner;
         type CreatedAt;
-        type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Ring = Unset;
         type Banner = Unset;
         type CreatedAt = Unset;
-        type Ring = Unset;
-    }
-    ///State transition - sets the `banner` field to Set
-    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBanner<S> {}
-    impl<S: State> State for SetBanner<S> {
-        type Banner = Set<members::banner>;
-        type CreatedAt = S::CreatedAt;
-        type Ring = S::Ring;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Banner = S::Banner;
-        type CreatedAt = Set<members::created_at>;
-        type Ring = S::Ring;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
+        type Ring = Set<members::ring>;
         type Banner = S::Banner;
         type CreatedAt = S::CreatedAt;
-        type Ring = Set<members::ring>;
+    }
+    ///State transition - sets the `banner` field to Set
+    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBanner<S> {}
+    impl<S: State> State for SetBanner<S> {
+        type Ring = S::Ring;
+        type Banner = Set<members::banner>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ring = S::Ring;
+        type Banner = S::Banner;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ring` field
+        pub struct ring(());
         ///Marker type for the `banner` field
         pub struct banner(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `ring` field
-        pub struct ring(());
     }
 }
 
@@ -166,9 +172,9 @@ where
 impl<'a, S> BannerBuilder<'a, S>
 where
     S: banner_state::State,
+    S::Ring: banner_state::IsSet,
     S::Banner: banner_state::IsSet,
     S::CreatedAt: banner_state::IsSet,
-    S::Ring: banner_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Banner<'a> {
@@ -211,7 +217,13 @@ impl<'a> Banner<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BannerGetRecordOutput<'a> {
@@ -264,12 +276,57 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Banner<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.banner;
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.banner;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
 
-fn lexicon_doc_net_asadaame5121_at_circle_banner()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.asadaame5121.at-circle.banner"),

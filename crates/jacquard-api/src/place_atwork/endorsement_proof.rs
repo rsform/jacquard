@@ -8,18 +8,24 @@
 /// A cryptographic proof record that validates an endorsement by containing the CID of the endorsement content.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EndorsementProof<'a> {
-    /// The CID (Content Identifier) of the endorsement content that this proof validates. The endorsement's signatures array references this proof record.
+    ///The CID (Content Identifier) of the endorsement content that this proof validates. The endorsement's signatures array references this proof record.
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
 }
 
 pub mod endorsement_proof_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -52,7 +58,9 @@ pub mod endorsement_proof_state {
 /// Builder for constructing an instance of this type
 pub struct EndorsementProofBuilder<'a, S: endorsement_proof_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Cid<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -135,7 +143,13 @@ impl<'a> EndorsementProof<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EndorsementProofGetRecordOutput<'a> {
@@ -192,7 +206,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EndorsementProof<'a> {
     }
 }
 
-fn lexicon_doc_place_atwork_endorsementProof() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_atwork_endorsementProof() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.endorsementProof"),

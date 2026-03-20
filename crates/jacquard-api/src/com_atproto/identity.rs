@@ -17,23 +17,29 @@ pub mod update_handle;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityInfo<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// The complete DID document for the identity.
+    ///The complete DID document for the identity.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
-    /// The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
+    ///The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
 pub mod identity_info_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,51 +47,51 @@ pub mod identity_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Handle;
         type DidDoc;
         type Did;
-        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Handle = Unset;
         type DidDoc = Unset;
         type Did = Unset;
-        type Handle = Unset;
-    }
-    ///State transition - sets the `did_doc` field to Set
-    pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDidDoc<S> {}
-    impl<S: State> State for SetDidDoc<S> {
-        type DidDoc = Set<members::did_doc>;
-        type Did = S::Did;
-        type Handle = S::Handle;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type DidDoc = S::DidDoc;
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
+        type Handle = Set<members::handle>;
         type DidDoc = S::DidDoc;
         type Did = S::Did;
-        type Handle = Set<members::handle>;
+    }
+    ///State transition - sets the `did_doc` field to Set
+    pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDidDoc<S> {}
+    impl<S: State> State for SetDidDoc<S> {
+        type Handle = S::Handle;
+        type DidDoc = Set<members::did_doc>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type DidDoc = S::DidDoc;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `handle` field
+        pub struct handle(());
         ///Marker type for the `did_doc` field
         pub struct did_doc(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
     }
 }
 
@@ -178,9 +184,9 @@ where
 impl<'a, S> IdentityInfoBuilder<'a, S>
 where
     S: identity_info_state::State,
+    S::Handle: identity_info_state::IsSet,
     S::DidDoc: identity_info_state::IsSet,
     S::Did: identity_info_state::IsSet,
-    S::Handle: identity_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IdentityInfo<'a> {
@@ -208,7 +214,9 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.atproto.identity.defs"),

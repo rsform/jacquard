@@ -7,29 +7,35 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact<'a> {
-    /// the artifact
+    ///the artifact
     #[serde(borrow)]
     pub artifact: jacquard_common::types::blob::BlobRef<'a>,
-    /// time of creation of this artifact
+    ///time of creation of this artifact
     pub created_at: jacquard_common::types::string::Datetime,
-    /// name of the artifact
+    ///name of the artifact
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// repo that this artifact is being uploaded to
+    ///repo that this artifact is being uploaded to
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
-    /// hash of the tag object that this artifact is attached to (only annotated tags are supported)
+    ///hash of the tag object that this artifact is attached to (only annotated tags are supported)
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub tag: jacquard_common::deps::bytes::Bytes,
 }
 
 pub mod artifact_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,84 +44,84 @@ pub mod artifact_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Artifact;
-        type Repo;
         type CreatedAt;
         type Name;
         type Tag;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Artifact = Unset;
-        type Repo = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
         type Tag = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `artifact` field to Set
     pub struct SetArtifact<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtifact<S> {}
     impl<S: State> State for SetArtifact<S> {
         type Artifact = Set<members::artifact>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Tag = S::Tag;
         type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Tag = S::Tag;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Artifact = S::Artifact;
-        type Repo = Set<members::repo>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Tag = S::Tag;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Artifact = S::Artifact;
-        type Repo = S::Repo;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type Tag = S::Tag;
+        type Repo = S::Repo;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Artifact = S::Artifact;
-        type Repo = S::Repo;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type Tag = S::Tag;
+        type Repo = S::Repo;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
         type Artifact = S::Artifact;
-        type Repo = S::Repo;
         type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Tag = Set<members::tag>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Artifact = S::Artifact;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Tag = S::Tag;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `artifact` field
         pub struct artifact(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -249,10 +255,10 @@ impl<'a, S> ArtifactBuilder<'a, S>
 where
     S: artifact_state::State,
     S::Artifact: artifact_state::IsSet,
-    S::Repo: artifact_state::IsSet,
     S::CreatedAt: artifact_state::IsSet,
     S::Name: artifact_state::IsSet,
     S::Tag: artifact_state::IsSet,
+    S::Repo: artifact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Artifact<'a> {
@@ -299,7 +305,13 @@ impl<'a> Artifact<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArtifactGetRecordOutput<'a> {
@@ -352,11 +364,57 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.artifact;
+            {
+                let size = value.blob().size;
+                if size > 52428800usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artifact",
+                        ),
+                        max: 52428800usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.artifact;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artifact",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.artifact"),

@@ -8,7 +8,13 @@
 /// A fitness goal to track progress against
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Goal<'a> {
@@ -20,13 +26,13 @@ pub struct Goal<'a> {
     #[serde(borrow)]
     pub period: GoalPeriod<'a>,
     pub start_date: jacquard_common::types::string::Datetime,
-    /// Target value in base units (meters for distance, seconds for duration, seconds-per-km for pace, count for workouts)
+    ///Target value in base units (meters for distance, seconds for duration, seconds-per-km for pace, count for workouts)
     pub target_value: i64,
 }
 
 pub mod goal_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,85 +40,85 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Period;
-        type StartDate;
-        type TargetValue;
         type Metric;
+        type Period;
+        type TargetValue;
+        type StartDate;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Period = Unset;
-        type StartDate = Unset;
-        type TargetValue = Unset;
         type Metric = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Period = S::Period;
-        type StartDate = S::StartDate;
-        type TargetValue = S::TargetValue;
-        type Metric = S::Metric;
-    }
-    ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeriod<S> {}
-    impl<S: State> State for SetPeriod<S> {
-        type CreatedAt = S::CreatedAt;
-        type Period = Set<members::period>;
-        type StartDate = S::StartDate;
-        type TargetValue = S::TargetValue;
-        type Metric = S::Metric;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type CreatedAt = S::CreatedAt;
-        type Period = S::Period;
-        type StartDate = Set<members::start_date>;
-        type TargetValue = S::TargetValue;
-        type Metric = S::Metric;
-    }
-    ///State transition - sets the `target_value` field to Set
-    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
-    impl<S: State> State for SetTargetValue<S> {
-        type CreatedAt = S::CreatedAt;
-        type Period = S::Period;
-        type StartDate = S::StartDate;
-        type TargetValue = Set<members::target_value>;
-        type Metric = S::Metric;
+        type Period = Unset;
+        type TargetValue = Unset;
+        type StartDate = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
-        type CreatedAt = S::CreatedAt;
-        type Period = S::Period;
-        type StartDate = S::StartDate;
-        type TargetValue = S::TargetValue;
         type Metric = Set<members::metric>;
+        type Period = S::Period;
+        type TargetValue = S::TargetValue;
+        type StartDate = S::StartDate;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `period` field to Set
+    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeriod<S> {}
+    impl<S: State> State for SetPeriod<S> {
+        type Metric = S::Metric;
+        type Period = Set<members::period>;
+        type TargetValue = S::TargetValue;
+        type StartDate = S::StartDate;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `target_value` field to Set
+    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
+    impl<S: State> State for SetTargetValue<S> {
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type TargetValue = Set<members::target_value>;
+        type StartDate = S::StartDate;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartDate<S> {}
+    impl<S: State> State for SetStartDate<S> {
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type TargetValue = S::TargetValue;
+        type StartDate = Set<members::start_date>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type TargetValue = S::TargetValue;
+        type StartDate = S::StartDate;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `period` field
-        pub struct period(());
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
-        ///Marker type for the `target_value` field
-        pub struct target_value(());
         ///Marker type for the `metric` field
         pub struct metric(());
+        ///Marker type for the `period` field
+        pub struct period(());
+        ///Marker type for the `target_value` field
+        pub struct target_value(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -265,11 +271,11 @@ where
 impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
-    S::CreatedAt: goal_state::IsSet,
-    S::Period: goal_state::IsSet,
-    S::StartDate: goal_state::IsSet,
-    S::TargetValue: goal_state::IsSet,
     S::Metric: goal_state::IsSet,
+    S::Period: goal_state::IsSet,
+    S::TargetValue: goal_state::IsSet,
+    S::StartDate: goal_state::IsSet,
+    S::CreatedAt: goal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Goal<'a> {
@@ -509,7 +515,13 @@ impl jacquard_common::IntoStatic for GoalPeriod<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GoalGetRecordOutput<'a> {
@@ -567,7 +579,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("metric"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "metric",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -578,7 +592,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("period"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "period",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });

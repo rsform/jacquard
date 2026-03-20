@@ -8,26 +8,32 @@
 /// Record granting moderation permissions to a user for this streamer's content.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Permission<'a> {
-    /// Client-declared timestamp when this moderator was added.
+    ///Client-declared timestamp when this moderator was added.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional expiration time for this delegation. If set, the delegation is invalid after this time.
+    ///Optional expiration time for this delegation. If set, the delegation is invalid after this time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expiration_time: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The DID of the user granted moderator permissions.
+    ///The DID of the user granted moderator permissions.
     #[serde(borrow)]
     pub moderator: jacquard_common::types::string::Did<'a>,
-    /// Array of permissions granted to this moderator. 'ban' covers blocks/bans (with optional expiration), 'hide' covers message gates, 'livestream.manage' allows updating livestream metadata.
+    ///Array of permissions granted to this moderator. 'ban' covers blocks/bans (with optional expiration), 'hide' covers message gates, 'livestream.manage' allows updating livestream metadata.
     #[serde(borrow)]
     pub permissions: Vec<jacquard_common::CowStr<'a>>,
 }
 
 pub mod permission_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,50 +42,50 @@ pub mod permission_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Moderator;
-        type CreatedAt;
         type Permissions;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Moderator = Unset;
-        type CreatedAt = Unset;
         type Permissions = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `moderator` field to Set
     pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModerator<S> {}
     impl<S: State> State for SetModerator<S> {
         type Moderator = Set<members::moderator>;
+        type Permissions = S::Permissions;
         type CreatedAt = S::CreatedAt;
-        type Permissions = S::Permissions;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Moderator = S::Moderator;
-        type CreatedAt = Set<members::created_at>;
-        type Permissions = S::Permissions;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
         type Moderator = S::Moderator;
-        type CreatedAt = S::CreatedAt;
         type Permissions = Set<members::permissions>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Moderator = S::Moderator;
+        type Permissions = S::Permissions;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `moderator` field
         pub struct moderator(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -193,8 +199,8 @@ impl<'a, S> PermissionBuilder<'a, S>
 where
     S: permission_state::State,
     S::Moderator: permission_state::IsSet,
-    S::CreatedAt: permission_state::IsSet,
     S::Permissions: permission_state::IsSet,
+    S::CreatedAt: permission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Permission<'a> {
@@ -239,7 +245,13 @@ impl<'a> Permission<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PermissionGetRecordOutput<'a> {
@@ -296,8 +308,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Permission<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_moderation_permission()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.moderation.permission"),

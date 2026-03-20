@@ -7,23 +7,29 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Accomplishment<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional free-form metadata for extra accomplishment context.
+    ///Optional free-form metadata for extra accomplishment context.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// Accomplishment type key (e.g. first_made, first_recipe)
+    ///Accomplishment type key (e.g. first_made, first_recipe)
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
 }
 
 pub mod accomplishment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,7 +204,13 @@ impl<'a> Accomplishment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccomplishmentGetRecordOutput<'a> {
@@ -255,7 +267,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Accomplishment<'a> {
     }
 }
 
-fn lexicon_doc_io_kich_accomplishment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_kich_accomplishment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.kich.accomplishment"),

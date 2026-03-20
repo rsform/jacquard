@@ -8,23 +8,29 @@
 /// A colour palette for notebook theming
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ColourScheme<'a> {
     #[serde(borrow)]
     pub colours: ColourSchemeColours<'a>,
-    /// Human-readable name for the colour scheme
+    ///Human-readable name for the colour scheme
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Whether this is a dark or light colour scheme
+    ///Whether this is a dark or light colour scheme
     #[serde(borrow)]
     pub variant: jacquard_common::CowStr<'a>,
 }
 
 pub mod colour_scheme_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,49 +38,49 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Variant;
+        type Name;
         type Colours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Variant = Unset;
+        type Name = Unset;
         type Colours = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Variant = S::Variant;
-        type Colours = S::Colours;
     }
     ///State transition - sets the `variant` field to Set
     pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVariant<S> {}
     impl<S: State> State for SetVariant<S> {
-        type Name = S::Name;
         type Variant = Set<members::variant>;
+        type Name = S::Name;
+        type Colours = S::Colours;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Variant = S::Variant;
+        type Name = Set<members::name>;
         type Colours = S::Colours;
     }
     ///State transition - sets the `colours` field to Set
     pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetColours<S> {}
     impl<S: State> State for SetColours<S> {
-        type Name = S::Name;
         type Variant = S::Variant;
+        type Name = S::Name;
         type Colours = Set<members::colours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `variant` field
         pub struct variant(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `colours` field
         pub struct colours(());
     }
@@ -169,8 +175,8 @@ where
 impl<'a, S> ColourSchemeBuilder<'a, S>
 where
     S: colour_scheme_state::State,
-    S::Name: colour_scheme_state::IsSet,
     S::Variant: colour_scheme_state::IsSet,
+    S::Name: colour_scheme_state::IsSet,
     S::Colours: colour_scheme_state::IsSet,
 {
     /// Build the final struct
@@ -221,62 +227,63 @@ impl<'a> ColourScheme<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ColourSchemeColours<'a> {
-    /// Primary background for page/frame
+    ///Primary background for page/frame
     #[serde(borrow)]
     pub base: jacquard_common::CowStr<'a>,
-    /// Border/divider colour
+    ///Border/divider colour
     #[serde(borrow)]
     pub border: jacquard_common::CowStr<'a>,
-    /// Emphasized text (bold, important)
+    ///Emphasized text (bold, important)
     #[serde(borrow)]
     pub emphasis: jacquard_common::CowStr<'a>,
-    /// Error state colour
+    ///Error state colour
     #[serde(borrow)]
     pub error: jacquard_common::CowStr<'a>,
-    /// Selection/highlight colour
+    ///Selection/highlight colour
     #[serde(borrow)]
     pub highlight: jacquard_common::CowStr<'a>,
-    /// Hyperlink colour
+    ///Hyperlink colour
     #[serde(borrow)]
     pub link: jacquard_common::CowStr<'a>,
-    /// De-emphasized text (disabled, metadata)
+    ///De-emphasized text (disabled, metadata)
     #[serde(borrow)]
     pub muted: jacquard_common::CowStr<'a>,
-    /// Tertiary background for popovers/dialogs
+    ///Tertiary background for popovers/dialogs
     #[serde(borrow)]
     pub overlay: jacquard_common::CowStr<'a>,
-    /// Primary brand/accent colour
+    ///Primary brand/accent colour
     #[serde(borrow)]
     pub primary: jacquard_common::CowStr<'a>,
-    /// Secondary accent colour
+    ///Secondary accent colour
     #[serde(borrow)]
     pub secondary: jacquard_common::CowStr<'a>,
-    /// Medium emphasis text (comments, labels)
+    ///Medium emphasis text (comments, labels)
     #[serde(borrow)]
     pub subtle: jacquard_common::CowStr<'a>,
-    /// Success state colour
+    ///Success state colour
     #[serde(borrow)]
     pub success: jacquard_common::CowStr<'a>,
-    /// Secondary background for panels/cards
+    ///Secondary background for panels/cards
     #[serde(borrow)]
     pub surface: jacquard_common::CowStr<'a>,
-    /// Tertiary accent colour
+    ///Tertiary accent colour
     #[serde(borrow)]
     pub tertiary: jacquard_common::CowStr<'a>,
-    /// Primary readable text colour
+    ///Primary readable text colour
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-    /// Warning state colour
+    ///Warning state colour
     #[serde(borrow)]
     pub warning: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.colourScheme"),
@@ -743,7 +750,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ColourSchemeGetRecordOutput<'a> {

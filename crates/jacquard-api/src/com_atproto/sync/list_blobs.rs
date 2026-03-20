@@ -5,8 +5,18 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(500i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListBlobs<'a> {
@@ -15,7 +25,8 @@ pub struct ListBlobs<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///(default: 500, min: 1, max: 1000)
+    ///Defaults to `500`. Min: 1. Max: 1000.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -24,7 +35,7 @@ pub struct ListBlobs<'a> {
 
 pub mod list_blobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -86,7 +97,10 @@ impl<'a> ListBlobsBuilder<'a, list_blobs_state::Empty> {
 
 impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -131,12 +145,18 @@ impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
 
 impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     /// Set the `since` field (optional)
-    pub fn since(mut self, value: impl Into<Option<jacquard_common::types::string::Tid>>) -> Self {
+    pub fn since(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Tid>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(mut self, value: Option<jacquard_common::types::string::Tid>) -> Self {
+    pub fn maybe_since(
+        mut self,
+        value: Option<jacquard_common::types::string::Tid>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -160,7 +180,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListBlobsOutput<'a> {
@@ -181,7 +207,7 @@ pub struct ListBlobsOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

@@ -8,22 +8,28 @@
 /// Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listitem<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference (AT-URI) to the list record (app.bsky.graph.list).
+    ///Reference (AT-URI) to the list record (app.bsky.graph.list).
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
-    /// The account which is included on the list.
+    ///The account which is included on the list.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod listitem_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -213,7 +219,13 @@ impl<'a> Listitem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListitemGetRecordOutput<'a> {
@@ -270,7 +282,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listitem<'a> {
     }
 }
 
-fn lexicon_doc_app_bsky_graph_listitem() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_graph_listitem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.graph.listitem"),

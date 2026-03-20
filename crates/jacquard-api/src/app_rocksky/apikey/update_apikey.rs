@@ -14,25 +14,31 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateApikey<'a> {
-    /// A new description for the API key.
+    ///A new description for the API key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The ID of the API key to update.
+    ///The ID of the API key to update.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// The new name of the API key.
+    ///The new name of the API key.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateApikeyOutput<'a> {
@@ -53,8 +59,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateApikeyResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateApikey<'a> {
     const NSID: &'static str = "app.rocksky.apikey.updateApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateApikeyResponse;
 }
 
@@ -63,8 +70,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateApikey<'a> {
 pub struct UpdateApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateApikeyRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.updateApikey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateApikey<'de>;
     type Response = UpdateApikeyResponse;
 }

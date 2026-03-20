@@ -7,28 +7,44 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageCarousel<'a> {
-    /// Auto-advance slides
+    ///Auto-advance slides Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_autoplay")]
     pub autoplay: std::option::Option<bool>,
-    /// Carousel caption
+    ///Carousel caption
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Array of images in the carousel (2-6)
+    ///Array of images in the carousel (2-6)
     #[serde(borrow)]
     pub images: Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
-    /// Milliseconds between slides
+    ///Milliseconds between slides Defaults to `3000`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_interval")]
     pub interval: std::option::Option<i64>,
+}
+
+fn _default_autoplay() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_interval() -> std::option::Option<i64> {
+    Some(3000i64)
 }
 
 pub mod image_carousel_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -64,7 +80,9 @@ pub struct ImageCarouselBuilder<'a, S: image_carousel_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::app_offprint::block::image_grid::GridImage<'a>>>,
+        ::core::option::Option<
+            Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
+        >,
         ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -103,7 +121,10 @@ impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
 
 impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn caption(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -154,10 +175,10 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageCarousel<'a> {
         ImageCarousel {
-            autoplay: self.__unsafe_private_named.0,
+            autoplay: self.__unsafe_private_named.0.or_else(|| Some(false)),
             caption: self.__unsafe_private_named.1,
             images: self.__unsafe_private_named.2.unwrap(),
-            interval: self.__unsafe_private_named.3,
+            interval: self.__unsafe_private_named.3.or_else(|| Some(3000i64)),
             extra_data: Default::default(),
         }
     }
@@ -170,17 +191,18 @@ where
         >,
     ) -> ImageCarousel<'a> {
         ImageCarousel {
-            autoplay: self.__unsafe_private_named.0,
+            autoplay: self.__unsafe_private_named.0.or_else(|| Some(false)),
             caption: self.__unsafe_private_named.1,
             images: self.__unsafe_private_named.2.unwrap(),
-            interval: self.__unsafe_private_named.3,
+            interval: self.__unsafe_private_named.3.or_else(|| Some(3000i64)),
             extra_data: Some(extra_data),
         }
     }
 }
 
-fn lexicon_doc_app_offprint_block_imageCarousel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_app_offprint_block_imageCarousel() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.offprint.block.imageCarousel"),
@@ -190,82 +212,82 @@ fn lexicon_doc_app_offprint_block_imageCarousel() -> ::jacquard_lexicon::lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("images"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("autoplay"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("images")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "autoplay",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "caption",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Carousel caption"),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("caption"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Carousel caption",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "images",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Array of images in the carousel (2-6)",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("images"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Array of images in the carousel (2-6)",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "app.offprint.block.imageGrid#gridImage",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: Some(2usize),
-                                        max_length: Some(6usize),
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("interval"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.offprint.block.imageGrid#gridImage",
+                                    ),
+                                }),
+                                min_length: Some(2usize),
+                                max_length: Some(6usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "interval",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -290,7 +312,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 6usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
                     max: 6usize,
                     actual: value.len(),
                 });
@@ -301,7 +325,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 2usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
                     min: 2usize,
                     actual: value.len(),
                 });

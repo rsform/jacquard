@@ -8,23 +8,29 @@
 /// Records a badge award to a user, project, or activity claim.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Award<'a> {
-    /// Reference to the badge definition for this award.
+    ///Reference to the badge definition for this award.
     #[serde(borrow)]
     pub badge: crate::app_certified::badge::definition::Definition<'a>,
-    /// Client-declared timestamp when this record was originally created
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional statement explaining the reason for this badge award.
+    ///Optional statement explaining the reason for this badge award.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Entity the badge award is for (either an account DID or any specific AT Protocol record), e.g. a user, a project, or a specific activity claim.
+    ///Entity the badge award is for (either an account DID or any specific AT Protocol record), e.g. a user, a project, or a specific activity claim.
     #[serde(borrow)]
     pub subject: AwardSubject<'a>,
-    /// Optional URL the badge award links to.
+    ///Optional URL the badge award links to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
@@ -32,7 +38,7 @@ pub struct Award<'a> {
 
 pub mod award_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -159,7 +165,10 @@ where
 
 impl<'a, S: award_state::State> AwardBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -260,7 +269,13 @@ impl<'a> Award<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -273,7 +288,13 @@ pub enum AwardSubject<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AwardGetRecordOutput<'a> {
@@ -330,7 +351,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Award<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("note"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "note",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -340,7 +363,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Award<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -350,7 +375,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Award<'a> {
     }
 }
 
-fn lexicon_doc_app_certified_badge_award() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_certified_badge_award() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.certified.badge.award"),

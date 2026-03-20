@@ -107,8 +107,34 @@ fn extract_property_validations(
                 });
             }
         }
+        LexObjectProperty::Blob(b) => {
+            if let Some(max) = b.max_size {
+                checks.push(ValidationCheck {
+                    field_name: field_name.to_string(),
+                    schema_name: schema_name.to_string(),
+                    field_type: "BlobRef".to_string(),
+                    is_required,
+                    is_array: false,
+                    check: ConstraintCheck::BlobMaxSize { max },
+                });
+            }
+            if let Some(accept) = &b.accept {
+                if !accept.is_empty() {
+                    checks.push(ValidationCheck {
+                        field_name: field_name.to_string(),
+                        schema_name: schema_name.to_string(),
+                        field_type: "BlobRef".to_string(),
+                        is_required,
+                        is_array: false,
+                        check: ConstraintCheck::BlobAccept {
+                            accept: accept.iter().map(|m| m.as_str().to_string()).collect(),
+                        },
+                    });
+                }
+            }
+        }
         _ => {
-            // Other types don't have runtime validations in the current impl
+            // Other types don't have runtime validations in the current impl.
         }
     }
 

@@ -8,41 +8,49 @@
 /// A job listing
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listing<'a> {
-    /// URL where applicants can apply for the job.
+    ///URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub apply_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Larger horizontal image to display behind job listing view.
+    ///Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// The description of the job listing.
+    ///The description of the job listing.
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
-    /// Annotations of text (mentions, URLs, hashtags, etc).
+    ///Annotations of text (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// Locations that are relevant to the job listing.
+    ///Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
-    /// Client-declared timestamp when the job listing expires.
+    pub locations: std::option::Option<
+        Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
+    >,
+    ///Client-declared timestamp when the job listing expires.
     pub not_after: jacquard_common::types::string::Datetime,
-    /// Client-declared timestamp when the job listing becomes visible.
+    ///Client-declared timestamp when the job listing becomes visible.
     pub not_before: jacquard_common::types::string::Datetime,
-    /// The title of the job listing.
+    ///The title of the job listing.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
 pub mod listing_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,66 +59,66 @@ pub mod listing_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type NotAfter;
-        type NotBefore;
-        type Title;
         type Description;
+        type Title;
+        type NotBefore;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type NotAfter = Unset;
-        type NotBefore = Unset;
-        type Title = Unset;
         type Description = Unset;
+        type Title = Unset;
+        type NotBefore = Unset;
     }
     ///State transition - sets the `not_after` field to Set
     pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotAfter<S> {}
     impl<S: State> State for SetNotAfter<S> {
         type NotAfter = Set<members::not_after>;
-        type NotBefore = S::NotBefore;
+        type Description = S::Description;
         type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `not_before` field to Set
-    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
-    impl<S: State> State for SetNotBefore<S> {
-        type NotAfter = S::NotAfter;
-        type NotBefore = Set<members::not_before>;
-        type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type NotAfter = S::NotAfter;
         type NotBefore = S::NotBefore;
-        type Title = Set<members::title>;
-        type Description = S::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type NotAfter = S::NotAfter;
-        type NotBefore = S::NotBefore;
-        type Title = S::Title;
         type Description = Set<members::description>;
+        type Title = S::Title;
+        type NotBefore = S::NotBefore;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type NotAfter = S::NotAfter;
+        type Description = S::Description;
+        type Title = Set<members::title>;
+        type NotBefore = S::NotBefore;
+    }
+    ///State transition - sets the `not_before` field to Set
+    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
+    impl<S: State> State for SetNotBefore<S> {
+        type NotAfter = S::NotAfter;
+        type Description = S::Description;
+        type Title = S::Title;
+        type NotBefore = Set<members::not_before>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `not_after` field
         pub struct not_after(());
-        ///Marker type for the `not_before` field
-        pub struct not_before(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `not_before` field
+        pub struct not_before(());
     }
 }
 
@@ -122,7 +130,9 @@ pub struct ListingBuilder<'a, S: listing_state::State> {
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-        ::core::option::Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
+        ::core::option::Option<
+            Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -228,7 +238,9 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(
         mut self,
-        value: impl Into<Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -304,9 +316,9 @@ impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
     S::NotAfter: listing_state::IsSet,
-    S::NotBefore: listing_state::IsSet,
-    S::Title: listing_state::IsSet,
     S::Description: listing_state::IsSet,
+    S::Title: listing_state::IsSet,
+    S::NotBefore: listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listing<'a> {
@@ -359,7 +371,13 @@ impl<'a> Listing<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingGetRecordOutput<'a> {
@@ -412,12 +430,58 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.banner {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.banner {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         {
             let value = &self.description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -432,15 +496,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 10000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -449,7 +511,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -459,7 +523,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
     }
 }
 
-fn lexicon_doc_place_atwork_listing() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_atwork_listing() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.listing"),

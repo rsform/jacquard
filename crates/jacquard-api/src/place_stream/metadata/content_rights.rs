@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct AllRightsReserved;
 impl std::fmt::Display for AllRightsReserved {
@@ -32,7 +32,7 @@ impl std::fmt::Display for AllRightsReserved {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CcByNcNd40;
 impl std::fmt::Display for CcByNcNd40 {
@@ -50,7 +50,7 @@ impl std::fmt::Display for CcByNcNd40 {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CcByNcSa40;
 impl std::fmt::Display for CcByNcSa40 {
@@ -68,7 +68,7 @@ impl std::fmt::Display for CcByNcSa40 {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CcByNc40;
 impl std::fmt::Display for CcByNc40 {
@@ -86,7 +86,7 @@ impl std::fmt::Display for CcByNc40 {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CcByNd40;
 impl std::fmt::Display for CcByNd40 {
@@ -104,7 +104,7 @@ impl std::fmt::Display for CcByNd40 {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CcBySa40;
 impl std::fmt::Display for CcBySa40 {
@@ -122,7 +122,7 @@ impl std::fmt::Display for CcBySa40 {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct CcBy40;
 impl std::fmt::Display for CcBy40 {
@@ -140,7 +140,7 @@ impl std::fmt::Display for CcBy40 {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Cc010;
 impl std::fmt::Display for Cc010 {
@@ -159,26 +159,26 @@ impl std::fmt::Display for Cc010 {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContentRights<'a> {
-    /// Copyright notice for the work.
+    ///Copyright notice for the work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub copyright_notice: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Year of creation or publication.
+    ///Year of creation or publication.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub copyright_year: std::option::Option<i64>,
-    /// Name of the creator of the work.
+    ///Name of the creator of the work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub creator: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Credit line for the work.
+    ///Credit line for the work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub credit_line: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// License URL or identifier.
+    ///License URL or identifier.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub license: std::option::Option<ContentRightsLicense<'a>>,
@@ -201,7 +201,9 @@ pub enum ContentRightsLicense<'a> {
 impl<'a> ContentRightsLicense<'a> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::AllRightsReserved => "place.stream.metadata.contentRights#all-rights-reserved",
+            Self::AllRightsReserved => {
+                "place.stream.metadata.contentRights#all-rights-reserved"
+            }
             Self::Cc010 => "place.stream.metadata.contentRights#cc0_1__0",
             Self::CcBy40 => "place.stream.metadata.contentRights#cc-by_4__0",
             Self::CcBySa40 => "place.stream.metadata.contentRights#cc-by-sa_4__0",
@@ -217,7 +219,9 @@ impl<'a> ContentRightsLicense<'a> {
 impl<'a> From<&'a str> for ContentRightsLicense<'a> {
     fn from(s: &'a str) -> Self {
         match s {
-            "place.stream.metadata.contentRights#all-rights-reserved" => Self::AllRightsReserved,
+            "place.stream.metadata.contentRights#all-rights-reserved" => {
+                Self::AllRightsReserved
+            }
             "place.stream.metadata.contentRights#cc0_1__0" => Self::Cc010,
             "place.stream.metadata.contentRights#cc-by_4__0" => Self::CcBy40,
             "place.stream.metadata.contentRights#cc-by-sa_4__0" => Self::CcBySa40,
@@ -233,7 +237,9 @@ impl<'a> From<&'a str> for ContentRightsLicense<'a> {
 impl<'a> From<String> for ContentRightsLicense<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
-            "place.stream.metadata.contentRights#all-rights-reserved" => Self::AllRightsReserved,
+            "place.stream.metadata.contentRights#all-rights-reserved" => {
+                Self::AllRightsReserved
+            }
             "place.stream.metadata.contentRights#cc0_1__0" => Self::Cc010,
             "place.stream.metadata.contentRights#cc-by_4__0" => Self::CcBy40,
             "place.stream.metadata.contentRights#cc-by-sa_4__0" => Self::CcBySa40,
@@ -290,7 +296,9 @@ impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
     type Output = ContentRightsLicense<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            ContentRightsLicense::AllRightsReserved => ContentRightsLicense::AllRightsReserved,
+            ContentRightsLicense::AllRightsReserved => {
+                ContentRightsLicense::AllRightsReserved
+            }
             ContentRightsLicense::Cc010 => ContentRightsLicense::Cc010,
             ContentRightsLicense::CcBy40 => ContentRightsLicense::CcBy40,
             ContentRightsLicense::CcBySa40 => ContentRightsLicense::CcBySa40,
@@ -298,13 +306,16 @@ impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
             ContentRightsLicense::CcByNcSa40 => ContentRightsLicense::CcByNcSa40,
             ContentRightsLicense::CcByNd40 => ContentRightsLicense::CcByNd40,
             ContentRightsLicense::CcByNcNd40 => ContentRightsLicense::CcByNcNd40,
-            ContentRightsLicense::Other(v) => ContentRightsLicense::Other(v.into_static()),
+            ContentRightsLicense::Other(v) => {
+                ContentRightsLicense::Other(v.into_static())
+            }
         }
     }
 }
 
-fn lexicon_doc_place_stream_metadata_contentRights()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.metadata.contentRights"),
@@ -313,164 +324,172 @@ fn lexicon_doc_place_stream_metadata_contentRights()
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("all-rights-reserved"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "all-rights-reserved",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-nc-nd_4__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "cc-by-nc-nd_4__0",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-nc-sa_4__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "cc-by-nc-sa_4__0",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-nc_4__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-nd_4__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by-sa_4__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("cc-by_4__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("cc0_1__0"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(
-                    ::jacquard_lexicon::lexicon::LexToken { description: None },
-                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Content rights and attribution information.",
-                        )),
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "copyrightNotice",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "copyrightNotice",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Copyright notice for the work.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Copyright notice for the work.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "copyrightYear",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "creator",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Name of the creator of the work.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "copyrightYear",
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "creditLine",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Credit line for the work.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "license",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "License URL or identifier.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("creator"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Name of the creator of the work.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "creditLine",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Credit line for the work.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("license"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "License URL or identifier.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },

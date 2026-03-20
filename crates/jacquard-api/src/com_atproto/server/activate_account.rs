@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ActivateAccount;
 /// Response type for
@@ -29,8 +29,9 @@ impl jacquard_common::xrpc::XrpcResp for ActivateAccountResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for ActivateAccount {
     const NSID: &'static str = "com.atproto.server.activateAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ActivateAccountResponse;
 }
 
@@ -39,8 +40,9 @@ impl jacquard_common::xrpc::XrpcRequest for ActivateAccount {
 pub struct ActivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ActivateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.activateAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ActivateAccount;
     type Response = ActivateAccountResponse;
 }

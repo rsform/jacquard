@@ -14,25 +14,31 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Send<'a> {
-    /// The user to send the message to.
+    ///The user to send the message to.
     #[serde(borrow)]
     pub did: jacquard_common::CowStr<'a>,
-    /// The message to send to the user.
+    ///The message to send to the user.
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendOutput<'a> {
-    /// Whether the token was successfully registered.
+    ///Whether the token was successfully registered.
     pub success: bool,
 }
 
@@ -48,8 +54,9 @@ impl jacquard_common::xrpc::XrpcResp for SendResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Send<'a> {
     const NSID: &'static str = "app.ocho.message.send";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SendResponse;
 }
 
@@ -58,8 +65,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Send<'a> {
 pub struct SendRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendRequest {
     const PATH: &'static str = "/xrpc/app.ocho.message.send";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Send<'de>;
     type Response = SendResponse;
 }

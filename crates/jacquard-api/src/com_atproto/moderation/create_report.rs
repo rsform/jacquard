@@ -7,18 +7,26 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
-    /// Additional context about the content and violation.
+    pub mod_tool: std::option::Option<
+        crate::com_atproto::moderation::create_report::ModTool<'a>,
+    >,
+    ///Additional context about the content and violation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Indicates the broad category of violation the report is for.
+    ///Indicates the broad category of violation the report is for.
     #[serde(borrow)]
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
     #[serde(borrow)]
@@ -27,7 +35,7 @@ pub struct CreateReport<'a> {
 
 pub mod create_report_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,37 +43,37 @@ pub mod create_report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ReasonType;
         type Subject;
+        type ReasonType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ReasonType = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `reason_type` field to Set
-    pub struct SetReasonType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReasonType<S> {}
-    impl<S: State> State for SetReasonType<S> {
-        type ReasonType = Set<members::reason_type>;
-        type Subject = S::Subject;
+        type ReasonType = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type ReasonType = S::ReasonType;
         type Subject = Set<members::subject>;
+        type ReasonType = S::ReasonType;
+    }
+    ///State transition - sets the `reason_type` field to Set
+    pub struct SetReasonType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReasonType<S> {}
+    impl<S: State> State for SetReasonType<S> {
+        type Subject = S::Subject;
+        type ReasonType = Set<members::reason_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason_type` field
-        pub struct reason_type(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `reason_type` field
+        pub struct reason_type(());
     }
 }
 
@@ -73,7 +81,9 @@ pub mod create_report_state {
 pub struct CreateReportBuilder<'a, S: create_report_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
+        ::core::option::Option<
+            crate::com_atproto::moderation::create_report::ModTool<'a>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::com_atproto::moderation::ReasonType<'a>>,
         ::core::option::Option<CreateReportSubject<'a>>,
@@ -103,7 +113,9 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(
         mut self,
-        value: impl Into<Option<crate::com_atproto::moderation::create_report::ModTool<'a>>>,
+        value: impl Into<
+            Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -120,7 +132,10 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
 
 impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -172,8 +187,8 @@ where
 impl<'a, S> CreateReportBuilder<'a, S>
 where
     S: create_report_state::State,
-    S::ReasonType: create_report_state::IsSet,
     S::Subject: create_report_state::IsSet,
+    S::ReasonType: create_report_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateReport<'a> {
@@ -205,7 +220,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -218,7 +239,13 @@ pub enum CreateReportSubject<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateReportOutput<'a> {
@@ -237,7 +264,13 @@ pub struct CreateReportOutput<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -260,8 +293,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateReportResponse;
 }
 
@@ -270,8 +304,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
 pub struct CreateReportRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     const PATH: &'static str = "/xrpc/com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateReport<'de>;
     type Response = CreateReportResponse;
 }
@@ -286,21 +321,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
-    /// Additional arbitrary metadata about the source
+    ///Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
+    ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_com_atproto_moderation_createReport()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.atproto.moderation.createReport"),

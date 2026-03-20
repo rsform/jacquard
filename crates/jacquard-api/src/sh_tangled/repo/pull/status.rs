@@ -11,20 +11,26 @@ pub mod open;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
     #[serde(borrow)]
     pub pull: jacquard_common::types::string::AtUri<'a>,
-    /// status of the pull request
+    ///status of the pull request
     #[serde(borrow)]
     pub status: StatusStatus<'a>,
 }
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -261,7 +267,9 @@ impl jacquard_common::IntoStatic for StatusStatus<'_> {
     type Output = StatusStatus<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            StatusStatus::ShTangledRepoPullStatusOpen => StatusStatus::ShTangledRepoPullStatusOpen,
+            StatusStatus::ShTangledRepoPullStatusOpen => {
+                StatusStatus::ShTangledRepoPullStatusOpen
+            }
             StatusStatus::ShTangledRepoPullStatusClosed => {
                 StatusStatus::ShTangledRepoPullStatusClosed
             }
@@ -275,7 +283,13 @@ impl jacquard_common::IntoStatic for StatusStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusGetRecordOutput<'a> {
@@ -332,7 +346,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_pull_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_tangled_repo_pull_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.pull.status"),

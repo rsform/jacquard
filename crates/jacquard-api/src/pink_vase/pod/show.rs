@@ -8,15 +8,21 @@
 /// A podcast show. A single user can have multiple shows.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Show<'a> {
-    /// Podcast categories e.g. 'Technology', 'Comedy'.
+    ///Podcast categories e.g. 'Technology', 'Comedy'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub categories: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Cover art image. Stored as a blob in the user's PDS.
+    ///Cover art image. Stored as a blob in the user's PDS.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cover_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
@@ -24,13 +30,13 @@ pub struct Show<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Whether the show contains explicit content.
+    ///Whether the show contains explicit content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub explicit: std::option::Option<bool>,
-    /// Primary language of the show, BCP-47 format e.g. 'en', 'es'.
+    ///Primary language of the show, BCP-47 format e.g. 'en', 'es'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub language: std::option::Option<jacquard_common::types::string::Language>,
-    /// The display name of the show.
+    ///The display name of the show.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -40,7 +46,7 @@ pub struct Show<'a> {
 
 pub mod show_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,7 +132,10 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
         self
     }
     /// Set the `categories` field to an Option value (optional)
-    pub fn maybe_categories(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_categories(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -172,12 +181,18 @@ where
 
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -310,7 +325,13 @@ impl<'a> Show<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShowGetRecordOutput<'a> {
@@ -367,17 +388,66 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("categories"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "categories",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
+            }
+        }
+        if let Some(ref value) = self.cover_art {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover_art",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.cover_art {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover_art",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -388,7 +458,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });

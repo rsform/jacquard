@@ -8,24 +8,30 @@
 /// A flower taken from another user's garden, representing a bookmark or collection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TakenFlower<'a> {
-    /// Client-declared timestamp when the flower was taken.
+    ///Client-declared timestamp when the flower was taken.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional note or reason for taking this flower
+    ///Optional note or reason for taking this flower
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// DID of the garden the flower was taken from.
+    ///DID of the garden the flower was taken from.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod taken_flower_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -117,7 +123,10 @@ where
 
 impl<'a, S: taken_flower_state::State> TakenFlowerBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -194,7 +203,13 @@ impl<'a> TakenFlower<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TakenFlowerGetRecordOutput<'a> {
@@ -251,7 +266,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TakenFlower<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("note"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "note",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -265,15 +282,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TakenFlower<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "note",
-                            ),
-                            max: 500usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "note",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -281,11 +296,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TakenFlower<'a> {
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_social_takenFlower()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_coop_hypha_spores_social_takenFlower() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("coop.hypha.spores.social.takenFlower"),
+        id: ::jacquard_common::CowStr::new_static(
+            "coop.hypha.spores.social.takenFlower",
+        ),
         revision: None,
         description: None,
         defs: {

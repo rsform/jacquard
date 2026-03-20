@@ -8,48 +8,54 @@
 /// A podcast feed/show. Record key is the podcast's Podcasting 2.0 UUIDv5 GUID, enabling direct lookup from RSS feed metadata.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Podcast<'a> {
-    /// Cover artwork for the podcast. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
+    ///Cover artwork for the podcast. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
     #[serde(borrow)]
     pub artwork: jacquard_common::types::blob::BlobRef<'a>,
-    /// Podcast categories (max 3).
+    ///Podcast categories (max 3).
     #[serde(borrow)]
     pub categories: Vec<crate::org_atpodcasting::AppleCategory<'a>>,
-    /// When the podcast record was created.
+    ///When the podcast record was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A description of the podcast.
+    ///A description of the podcast.
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
-    /// Whether the podcast contains explicit content. Defaults to false.
+    ///Whether the podcast contains explicit content. Defaults to false.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub explicit: std::option::Option<bool>,
-    /// URL of the podcast's RSS feed.
+    ///URL of the podcast's RSS feed.
     #[serde(borrow)]
     pub feed_url: jacquard_common::types::string::UriValue<'a>,
-    /// Podcasting 2.0 UUIDv5 GUID of the podcast. Must match the record key.
+    ///Podcasting 2.0 UUIDv5 GUID of the podcast. Must match the record key.
     #[serde(borrow)]
     pub guid: jacquard_common::CowStr<'a>,
-    /// Primary language of the podcast (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
+    ///Primary language of the podcast (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
     pub language: jacquard_common::types::string::Language,
-    /// URL of the podcast's homepage or companion website.
+    ///URL of the podcast's homepage or companion website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// AT URI of the new canonical podcast record after an ownership transfer. When set, consumers should follow this reference to the current record.
+    ///AT URI of the new canonical podcast record after an ownership transfer. When set, consumers should follow this reference to the current record.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub moved_to: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// The name of the podcast.
+    ///The name of the podcast.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
 pub mod podcast_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -57,151 +63,151 @@ pub mod podcast_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Language;
         type Title;
         type Description;
         type FeedUrl;
-        type Artwork;
-        type Guid;
+        type CreatedAt;
         type Categories;
+        type Guid;
+        type Artwork;
+        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Language = Unset;
         type Title = Unset;
         type Description = Unset;
         type FeedUrl = Unset;
-        type Artwork = Unset;
-        type Guid = Unset;
+        type CreatedAt = Unset;
         type Categories = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Language = S::Language;
-        type Title = S::Title;
-        type Description = S::Description;
-        type FeedUrl = S::FeedUrl;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-        type Categories = S::Categories;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type CreatedAt = S::CreatedAt;
-        type Language = Set<members::language>;
-        type Title = S::Title;
-        type Description = S::Description;
-        type FeedUrl = S::FeedUrl;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-        type Categories = S::Categories;
+        type Guid = Unset;
+        type Artwork = Unset;
+        type Language = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Title = Set<members::title>;
         type Description = S::Description;
         type FeedUrl = S::FeedUrl;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
+        type CreatedAt = S::CreatedAt;
         type Categories = S::Categories;
+        type Guid = S::Guid;
+        type Artwork = S::Artwork;
+        type Language = S::Language;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Title = S::Title;
         type Description = Set<members::description>;
         type FeedUrl = S::FeedUrl;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
+        type CreatedAt = S::CreatedAt;
         type Categories = S::Categories;
+        type Guid = S::Guid;
+        type Artwork = S::Artwork;
+        type Language = S::Language;
     }
     ///State transition - sets the `feed_url` field to Set
     pub struct SetFeedUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeedUrl<S> {}
     impl<S: State> State for SetFeedUrl<S> {
-        type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Title = S::Title;
         type Description = S::Description;
         type FeedUrl = Set<members::feed_url>;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-        type Categories = S::Categories;
-    }
-    ///State transition - sets the `artwork` field to Set
-    pub struct SetArtwork<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtwork<S> {}
-    impl<S: State> State for SetArtwork<S> {
         type CreatedAt = S::CreatedAt;
+        type Categories = S::Categories;
+        type Guid = S::Guid;
+        type Artwork = S::Artwork;
         type Language = S::Language;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
         type Description = S::Description;
         type FeedUrl = S::FeedUrl;
-        type Artwork = Set<members::artwork>;
+        type CreatedAt = Set<members::created_at>;
+        type Categories = S::Categories;
         type Guid = S::Guid;
-        type Categories = S::Categories;
-    }
-    ///State transition - sets the `guid` field to Set
-    pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGuid<S> {}
-    impl<S: State> State for SetGuid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
-        type Title = S::Title;
-        type Description = S::Description;
-        type FeedUrl = S::FeedUrl;
         type Artwork = S::Artwork;
-        type Guid = Set<members::guid>;
-        type Categories = S::Categories;
+        type Language = S::Language;
     }
     ///State transition - sets the `categories` field to Set
     pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCategories<S> {}
     impl<S: State> State for SetCategories<S> {
-        type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Title = S::Title;
         type Description = S::Description;
         type FeedUrl = S::FeedUrl;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
+        type CreatedAt = S::CreatedAt;
         type Categories = Set<members::categories>;
+        type Guid = S::Guid;
+        type Artwork = S::Artwork;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `guid` field to Set
+    pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGuid<S> {}
+    impl<S: State> State for SetGuid<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type FeedUrl = S::FeedUrl;
+        type CreatedAt = S::CreatedAt;
+        type Categories = S::Categories;
+        type Guid = Set<members::guid>;
+        type Artwork = S::Artwork;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `artwork` field to Set
+    pub struct SetArtwork<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtwork<S> {}
+    impl<S: State> State for SetArtwork<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type FeedUrl = S::FeedUrl;
+        type CreatedAt = S::CreatedAt;
+        type Categories = S::Categories;
+        type Guid = S::Guid;
+        type Artwork = Set<members::artwork>;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLanguage<S> {}
+    impl<S: State> State for SetLanguage<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type FeedUrl = S::FeedUrl;
+        type CreatedAt = S::CreatedAt;
+        type Categories = S::Categories;
+        type Guid = S::Guid;
+        type Artwork = S::Artwork;
+        type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `feed_url` field
         pub struct feed_url(());
-        ///Marker type for the `artwork` field
-        pub struct artwork(());
-        ///Marker type for the `guid` field
-        pub struct guid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `categories` field
         pub struct categories(());
+        ///Marker type for the `guid` field
+        pub struct guid(());
+        ///Marker type for the `artwork` field
+        pub struct artwork(());
+        ///Marker type for the `language` field
+        pub struct language(());
     }
 }
 
@@ -237,7 +243,17 @@ impl<'a> PodcastBuilder<'a, podcast_state::Empty> {
         PodcastBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -450,14 +466,14 @@ where
 impl<'a, S> PodcastBuilder<'a, S>
 where
     S: podcast_state::State,
-    S::CreatedAt: podcast_state::IsSet,
-    S::Language: podcast_state::IsSet,
     S::Title: podcast_state::IsSet,
     S::Description: podcast_state::IsSet,
     S::FeedUrl: podcast_state::IsSet,
-    S::Artwork: podcast_state::IsSet,
-    S::Guid: podcast_state::IsSet,
+    S::CreatedAt: podcast_state::IsSet,
     S::Categories: podcast_state::IsSet,
+    S::Guid: podcast_state::IsSet,
+    S::Artwork: podcast_state::IsSet,
+    S::Language: podcast_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podcast<'a> {
@@ -516,7 +532,13 @@ impl<'a> Podcast<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PodcastGetRecordOutput<'a> {
@@ -570,11 +592,59 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
+            let value = &self.artwork;
+            {
+                let size = value.blob().size;
+                if size > 5000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artwork",
+                        ),
+                        max: 5000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.artwork;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artwork",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
             let value = &self.categories;
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("categories"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "categories",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -585,7 +655,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 4000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -596,7 +668,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 36usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("guid"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "guid",
+                    ),
                     max: 36usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -607,7 +681,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -617,7 +693,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
     }
 }
 
-fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.atpodcasting.podcast"),

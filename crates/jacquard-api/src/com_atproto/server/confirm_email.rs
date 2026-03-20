@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfirmEmail<'a> {
@@ -34,7 +34,7 @@ pub struct ConfirmEmail<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -97,8 +97,9 @@ impl jacquard_common::xrpc::XrpcResp for ConfirmEmailResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ConfirmEmail<'a> {
     const NSID: &'static str = "com.atproto.server.confirmEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ConfirmEmailResponse;
 }
 
@@ -107,8 +108,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ConfirmEmail<'a> {
 pub struct ConfirmEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ConfirmEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.confirmEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ConfirmEmail<'de>;
     type Response = ConfirmEmailResponse;
 }

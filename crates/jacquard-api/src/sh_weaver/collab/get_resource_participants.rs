@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceParticipants<'a> {
@@ -16,7 +22,7 @@ pub struct GetResourceParticipants<'a> {
 
 pub mod get_resource_participants_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,15 +53,23 @@ pub mod get_resource_participants_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetResourceParticipantsBuilder<'a, S: get_resource_participants_state::State> {
+pub struct GetResourceParticipantsBuilder<
+    'a,
+    S: get_resource_participants_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
 impl<'a> GetResourceParticipants<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetResourceParticipantsBuilder<'a, get_resource_participants_state::Empty> {
+    pub fn new() -> GetResourceParticipantsBuilder<
+        'a,
+        get_resource_participants_state::Empty,
+    > {
         GetResourceParticipantsBuilder::new()
     }
 }
@@ -80,7 +94,10 @@ where
     pub fn resource(
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
-    ) -> GetResourceParticipantsBuilder<'a, get_resource_participants_state::SetResource<S>> {
+    ) -> GetResourceParticipantsBuilder<
+        'a,
+        get_resource_participants_state::SetResource<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         GetResourceParticipantsBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -105,7 +122,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceParticipantsOutput<'a> {

@@ -8,28 +8,34 @@
 /// Agent thought record.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Thought<'a> {
-    /// Timestamp when the thought was recorded.
+    ///Timestamp when the thought was recorded.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Additional context or details for the thought.
+    ///Additional context or details for the thought.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URI of the content being processed by the agent.
+    ///URI of the content being processed by the agent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Job type identifier the agent is thinking about.
+    ///Job type identifier the agent is thinking about.
     #[serde(borrow)]
     pub work_type: jacquard_common::CowStr<'a>,
 }
 
 pub mod thought_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,37 +43,37 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type CreatedAt;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkType<S> {}
-    impl<S: State> State for SetWorkType<S> {
-        type WorkType = Set<members::work_type>;
-        type CreatedAt = S::CreatedAt;
+        type WorkType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type WorkType = S::WorkType;
         type CreatedAt = Set<members::created_at>;
+        type WorkType = S::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkType<S> {}
+    impl<S: State> State for SetWorkType<S> {
+        type CreatedAt = S::CreatedAt;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
@@ -122,7 +128,10 @@ where
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -174,8 +183,8 @@ where
 impl<'a, S> ThoughtBuilder<'a, S>
 where
     S: thought_state::State,
-    S::WorkType: thought_state::IsSet,
     S::CreatedAt: thought_state::IsSet,
+    S::WorkType: thought_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thought<'a> {
@@ -220,7 +229,13 @@ impl<'a> Thought<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThoughtGetRecordOutput<'a> {
@@ -277,7 +292,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
     }
 }
 
-fn lexicon_doc_top_launchpadx_agent_thought() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_top_launchpadx_agent_thought() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("top.launchpadx.agent.thought"),

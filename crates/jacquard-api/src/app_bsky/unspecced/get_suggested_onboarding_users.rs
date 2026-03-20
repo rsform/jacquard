@@ -5,22 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedOnboardingUsers<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///(default: 25, min: 1, max: 50)
+    ///Defaults to `25`. Min: 1. Max: 50.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
 pub mod get_suggested_onboarding_users_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,7 +49,10 @@ pub mod get_suggested_onboarding_users_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetSuggestedOnboardingUsersBuilder<'a, S: get_suggested_onboarding_users_state::State> {
+pub struct GetSuggestedOnboardingUsersBuilder<
+    'a,
+    S: get_suggested_onboarding_users_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -49,13 +63,17 @@ pub struct GetSuggestedOnboardingUsersBuilder<'a, S: get_suggested_onboarding_us
 
 impl<'a> GetSuggestedOnboardingUsers<'a> {
     /// Create a new builder for this type
-    pub fn new()
-    -> GetSuggestedOnboardingUsersBuilder<'a, get_suggested_onboarding_users_state::Empty> {
+    pub fn new() -> GetSuggestedOnboardingUsersBuilder<
+        'a,
+        get_suggested_onboarding_users_state::Empty,
+    > {
         GetSuggestedOnboardingUsersBuilder::new()
     }
 }
 
-impl<'a> GetSuggestedOnboardingUsersBuilder<'a, get_suggested_onboarding_users_state::Empty> {
+impl<
+    'a,
+> GetSuggestedOnboardingUsersBuilder<'a, get_suggested_onboarding_users_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedOnboardingUsersBuilder {
@@ -66,9 +84,15 @@ impl<'a> GetSuggestedOnboardingUsersBuilder<'a, get_suggested_onboarding_users_s
     }
 }
 
-impl<'a, S: get_suggested_onboarding_users_state::State> GetSuggestedOnboardingUsersBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_onboarding_users_state::State,
+> GetSuggestedOnboardingUsersBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -79,7 +103,10 @@ impl<'a, S: get_suggested_onboarding_users_state::State> GetSuggestedOnboardingU
     }
 }
 
-impl<'a, S: get_suggested_onboarding_users_state::State> GetSuggestedOnboardingUsersBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_onboarding_users_state::State,
+> GetSuggestedOnboardingUsersBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
@@ -107,17 +134,23 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedOnboardingUsersOutput<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
-    /// DEPRECATED: use recIdStr instead.
+    ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Snowflake for this recommendation, use when submitting recommendation events.
+    ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,

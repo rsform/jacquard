@@ -7,21 +7,27 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddValues<'a> {
-    /// Name of the set to add values to
+    ///Name of the set to add values to
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Array of string values to add to the set
+    ///Array of string values to add to the set
     #[serde(borrow)]
     pub values: Vec<jacquard_common::CowStr<'a>>,
 }
 
 pub mod add_values_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,37 +35,37 @@ pub mod add_values_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Values;
         type Name;
+        type Values;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Values = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `values` field to Set
-    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValues<S> {}
-    impl<S: State> State for SetValues<S> {
-        type Values = Set<members::values>;
-        type Name = S::Name;
+        type Values = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Values = S::Values;
         type Name = Set<members::name>;
+        type Values = S::Values;
+    }
+    ///State transition - sets the `values` field to Set
+    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValues<S> {}
+    impl<S: State> State for SetValues<S> {
+        type Name = S::Name;
+        type Values = Set<members::values>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `values` field
-        pub struct values(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `values` field
+        pub struct values(());
     }
 }
 
@@ -132,8 +138,8 @@ where
 impl<'a, S> AddValuesBuilder<'a, S>
 where
     S: add_values_state::State,
-    S::Values: add_values_state::IsSet,
     S::Name: add_values_state::IsSet,
+    S::Values: add_values_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddValues<'a> {
@@ -171,8 +177,9 @@ impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
     const NSID: &'static str = "tools.ozone.set.addValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AddValuesResponse;
 }
 
@@ -181,8 +188,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
 pub struct AddValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.addValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = AddValues<'de>;
     type Response = AddValuesResponse;
 }

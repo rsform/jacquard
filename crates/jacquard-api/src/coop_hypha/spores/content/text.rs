@@ -8,20 +8,26 @@
 /// Custom content block for spores.garden sites
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
-    /// Block content
+    ///Block content
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
-    /// Creation timestamp
+    ///Creation timestamp
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Content format
+    ///Content format
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub format: std::option::Option<TextFormat<'a>>,
-    /// Block title
+    ///Block title
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -29,7 +35,7 @@ pub struct Text<'a> {
 
 pub mod text_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,7 +160,10 @@ impl<'a, S: text_state::State> TextBuilder<'a, S> {
 
 impl<'a, S: text_state::State> TextBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -308,7 +317,13 @@ impl jacquard_common::IntoStatic for TextFormat<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TextGetRecordOutput<'a> {
@@ -366,7 +381,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 500000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -381,15 +398,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
                     )
                     .count();
                 if count > 50000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "content",
-                            ),
-                            max: 50000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        max: 50000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -397,7 +412,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -411,15 +428,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "title",
-                            ),
-                            max: 200usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 200usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -427,8 +442,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_content_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_coop_hypha_spores_content_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("coop.hypha.spores.content.text"),

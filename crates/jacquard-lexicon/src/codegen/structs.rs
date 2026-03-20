@@ -106,8 +106,10 @@ impl<'c> CodeGenerator<'c> {
                     !super::builder_heuristics::conflicts_with_builder_macro(&type_name);
 
                 // Generate main struct fields
-                let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
+                let (fields, default_fns) =
+                    self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
                 let doc = self.generate_doc_comment(record.description.as_ref());
+                let manual_default = self.generate_manual_default(&type_name, obj);
 
                 let struct_def = quote! {
                     #doc
@@ -117,6 +119,8 @@ impl<'c> CodeGenerator<'c> {
                     pub struct #ident<'a> {
                         #fields
                     }
+                    #(#default_fns)*
+                    #manual_default
                 };
 
                 // Generate custom builder if needed
@@ -241,12 +245,19 @@ impl<'c> CodeGenerator<'c> {
         // - 1+ required fields (not all strings): custom builder (but not if name conflicts)
         let decision = super::builder_heuristics::should_generate_builder(&type_name, obj);
         let has_builder = decision.has_builder;
-        let has_default = decision.has_default;
 
-        let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
+        let (fields, default_fns) =
+            self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());
 
-        let struct_def = if has_default {
+        // Determine Default strategy:
+        // 1. Manual impl if schema defaults cover all required fields
+        // 2. derive(Default) if heuristic says so (0 required, or all-string required)
+        // 3. No Default otherwise
+        let manual_default = self.generate_manual_default(&type_name, obj);
+        let use_derive_default = manual_default.is_none() && decision.has_default;
+
+        let struct_def = if use_derive_default {
             quote! {
                 #doc
                 #[jacquard_derive::lexicon]
@@ -255,6 +266,7 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
+                #(#default_fns)*
             }
         } else {
             quote! {
@@ -265,6 +277,7 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
+                #(#default_fns)*
             }
         };
 
@@ -287,6 +300,7 @@ impl<'c> CodeGenerator<'c> {
 
         Ok(quote! {
             #struct_def
+            #manual_default
             #builder
             #(#unions)*
             #shared_fn
@@ -294,22 +308,24 @@ impl<'c> CodeGenerator<'c> {
         })
     }
 
-    /// Generate fields for an object
+    /// Generate fields for an object.
+    /// Returns (field tokens, companion default functions).
     pub(super) fn generate_object_fields(
         &self,
         nsid: &str,
         parent_type_name: &str,
         obj: &LexObject<'static>,
         _is_builder: bool,
-    ) -> Result<TokenStream> {
+    ) -> Result<(TokenStream, Vec<TokenStream>)> {
         let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let nullable = obj.nullable.as_ref().map(|n| n.as_slice()).unwrap_or(&[]);
 
         let mut fields = Vec::new();
+        let mut default_fns = Vec::new();
         for (field_name, field_type) in &obj.properties {
             let is_required = required.contains(field_name);
             let is_nullable = nullable.contains(field_name);
-            let field_tokens = self.generate_field(
+            let (field_tokens, default_fn) = self.generate_field(
                 nsid,
                 parent_type_name,
                 field_name,
@@ -318,12 +334,16 @@ impl<'c> CodeGenerator<'c> {
                 is_nullable,
             )?;
             fields.push(field_tokens);
+            if let Some(f) = default_fn {
+                default_fns.push(f);
+            }
         }
 
-        Ok(quote! { #(#fields)* })
+        Ok((quote! { #(#fields)* }, default_fns))
     }
 
-    /// Generate a single field
+    /// Generate a single field.
+    /// Returns (field tokens, optional companion default function).
     pub(super) fn generate_field(
         &self,
         nsid: &str,
@@ -332,7 +352,7 @@ impl<'c> CodeGenerator<'c> {
         field_type: &LexObjectProperty<'static>,
         is_required: bool,
         is_nullable: bool,
-    ) -> Result<TokenStream> {
+    ) -> Result<(TokenStream, Option<TokenStream>)> {
         if field_name.is_empty() {
             eprintln!(
                 "Warning: Empty field name in lexicon '{}' type '{}', using 'unknown' as fallback",
@@ -345,13 +365,14 @@ impl<'c> CodeGenerator<'c> {
             self.property_to_rust_type(nsid, parent_type_name, field_name, field_type)?;
         let needs_lifetime = self.property_needs_lifetime(field_type);
 
-        let rust_type = if is_required && !is_nullable {
+        let is_optional = !is_required || is_nullable;
+        let rust_type = if !is_optional {
             rust_type
         } else {
             quote! { std::option::Option<#rust_type> }
         };
 
-        // Extract description from field type
+        // Extract description from field type.
         let description = match field_type {
             LexObjectProperty::Ref(r) => r.description.as_ref(),
             LexObjectProperty::Union(u) => u.description.as_ref(),
@@ -365,21 +386,45 @@ impl<'c> CodeGenerator<'c> {
             LexObjectProperty::String(s) => s.description.as_ref(),
             LexObjectProperty::Unknown(u) => u.description.as_ref(),
         };
-        let doc = self.generate_doc_comment(description);
+
+        // Extract schema default and generate companion function + serde attr.
+        let (default_doc, serde_default_attr, default_fn) =
+            self.extract_field_default(field_name, field_type, is_optional);
+
+        // Combine description with default doc suffix.
+        let combined_desc = match (description, &default_doc) {
+            (Some(desc), Some(def_doc)) => {
+                Some(format!("{} {}", desc.as_ref(), def_doc))
+            }
+            (Some(desc), None) => Some(desc.as_ref().to_string()),
+            (None, Some(def_doc)) => Some(def_doc.clone()),
+            (None, None) => None,
+        };
+        let doc = combined_desc
+            .as_ref()
+            .map(|d| {
+                let d = d.as_str();
+                quote! { #[doc = #d] }
+            })
+            .unwrap_or_default();
 
         let mut attrs = Vec::new();
 
-        if !is_required {
+        if is_optional {
             attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
         }
 
-        // Add serde(borrow) to all fields with lifetimes
+        if let Some(serde_attr) = serde_default_attr {
+            attrs.push(serde_attr);
+        }
+
+        // Add serde(borrow) to all fields with lifetimes.
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
         }
 
         if matches!(field_type, LexObjectProperty::Bytes(_)) {
-            if is_required {
+            if !is_optional {
                 attrs.push(quote! { #[serde(with = "jacquard_common::serde_bytes_helper")] });
             } else {
                 attrs.push(
@@ -388,11 +433,180 @@ impl<'c> CodeGenerator<'c> {
             }
         }
 
-        Ok(quote! {
-            #doc
-            #(#attrs)*
-            pub #field_ident: #rust_type,
+        Ok((
+            quote! {
+                #doc
+                #(#attrs)*
+                pub #field_ident: #rust_type,
+            },
+            default_fn,
+        ))
+    }
+
+    /// Extract schema default value from a field type and generate the companion
+    /// default function and serde attribute.
+    ///
+    /// Returns (doc_suffix, serde_attr, companion_fn).
+    fn extract_field_default(
+        &self,
+        field_name: &str,
+        field_type: &LexObjectProperty<'static>,
+        is_optional: bool,
+    ) -> (Option<String>, Option<TokenStream>, Option<TokenStream>) {
+        let fn_name = format!("_default_{}", field_name.to_snake_case());
+        let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+        let serde_attr = quote! { #[serde(default = #fn_name)] };
+
+        match field_type {
+            LexObjectProperty::Boolean(b) if b.default.is_some() => {
+                let v = b.default.unwrap();
+                let doc = format!("Defaults to `{}`.", v);
+                if is_optional {
+                    (
+                        Some(doc),
+                        Some(serde_attr),
+                        Some(quote! {
+                            fn #fn_ident() -> std::option::Option<bool> { Some(#v) }
+                        }),
+                    )
+                } else {
+                    (
+                        Some(doc),
+                        Some(serde_attr),
+                        Some(quote! {
+                            fn #fn_ident() -> bool { #v }
+                        }),
+                    )
+                }
+            }
+            LexObjectProperty::Integer(i) if i.default.is_some() => {
+                let v = i.default.unwrap();
+                let doc = format!("Defaults to `{}`.", v);
+                if is_optional {
+                    (
+                        Some(doc),
+                        Some(serde_attr),
+                        Some(quote! {
+                            fn #fn_ident() -> std::option::Option<i64> { Some(#v) }
+                        }),
+                    )
+                } else {
+                    (
+                        Some(doc),
+                        Some(serde_attr),
+                        Some(quote! {
+                            fn #fn_ident() -> i64 { #v }
+                        }),
+                    )
+                }
+            }
+            LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
+                let v = s.default.as_ref().unwrap().as_ref();
+                let doc = format!("Defaults to `\"{}\"`.", v);
+                if is_optional {
+                    (
+                        Some(doc),
+                        Some(serde_attr),
+                        Some(quote! {
+                            fn #fn_ident() -> std::option::Option<jacquard_common::CowStr<'static>> {
+                                Some(jacquard_common::CowStr::from(#v))
+                            }
+                        }),
+                    )
+                } else {
+                    (
+                        Some(doc),
+                        Some(serde_attr),
+                        Some(quote! {
+                            fn #fn_ident() -> jacquard_common::CowStr<'static> {
+                                jacquard_common::CowStr::from(#v)
+                            }
+                        }),
+                    )
+                }
+            }
+            _ => (None, None, None),
+        }
+    }
+
+    /// Generate a manual `impl Default` for a struct when all required fields have
+    /// schema defaults. Optional fields default to `None` or `Some(schema_default)`.
+    pub(super) fn generate_manual_default(
+        &self,
+        type_name: &str,
+        obj: &LexObject<'static>,
+    ) -> Option<TokenStream> {
+        if !super::builder_heuristics::eligible_for_schema_default(obj) {
+            return None;
+        }
+
+        // Check if any field actually has a schema default. If none do,
+        // the existing derive(Default) is sufficient.
+        let any_schema_default = obj.properties.values().any(|p| {
+            super::builder_heuristics::has_schema_default(p)
+        });
+        if !any_schema_default {
+            return None;
+        }
+
+        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+        let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
+        let nullable = obj.nullable.as_ref().map(|n| n.as_slice()).unwrap_or(&[]);
+
+        let field_defaults: Vec<_> = obj
+            .properties
+            .iter()
+            .map(|(field_name, field_type)| {
+                let field_ident = make_ident(&field_name.to_snake_case());
+                let is_required = required.contains(field_name);
+                let is_nullable = nullable.contains(field_name);
+                let is_optional = !is_required || is_nullable;
+
+                let value = self.schema_default_value(field_type, is_optional);
+                quote! { #field_ident: #value }
+            })
+            .collect();
+
+        Some(quote! {
+            impl Default for #ident<'_> {
+                fn default() -> Self {
+                    Self {
+                        #(#field_defaults,)*
+                        extra_data: Default::default(),
+                    }
+                }
+            }
         })
+    }
+
+    /// Generate the default value expression for a field.
+    fn schema_default_value(
+        &self,
+        field_type: &LexObjectProperty<'static>,
+        is_optional: bool,
+    ) -> TokenStream {
+        let inner = match field_type {
+            LexObjectProperty::Boolean(b) if b.default.is_some() => {
+                let v = b.default.unwrap();
+                Some(quote! { #v })
+            }
+            LexObjectProperty::Integer(i) if i.default.is_some() => {
+                let v = i.default.unwrap();
+                Some(quote! { #v })
+            }
+            LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
+                let v = s.default.as_ref().unwrap().as_ref();
+                Some(quote! { jacquard_common::CowStr::from(#v) })
+            }
+            _ => None,
+        };
+
+        match (inner, is_optional) {
+            (Some(val), true) => quote! { Some(#val) },
+            (Some(val), false) => val,
+            (None, true) => quote! { None },
+            (None, false) => quote! { Default::default() },
+        }
     }
 
     /// Generate a union enum for refs

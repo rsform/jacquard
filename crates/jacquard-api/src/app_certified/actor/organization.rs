@@ -8,32 +8,42 @@
 /// Extended metadata for an organization actor. Complements the base actor profile with organization-specific fields like legal structure and reference links.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Organization<'a> {
-    /// Client-declared timestamp when this record was originally created.
+    ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
+    ///When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub founded_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
+    ///A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
+    pub location: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub organization_type: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
+    ///Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub urls: std::option::Option<Vec<crate::app_certified::actor::organization::UrlItem<'a>>>,
+    pub urls: std::option::Option<
+        Vec<crate::app_certified::actor::organization::UrlItem<'a>>,
+    >,
 }
 
 pub mod organization_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -71,7 +81,9 @@ pub struct OrganizationBuilder<'a, S: organization_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<crate::app_certified::actor::organization::UrlItem<'a>>>,
+        ::core::option::Option<
+            Vec<crate::app_certified::actor::organization::UrlItem<'a>>,
+        >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -174,7 +186,9 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `urls` field (optional)
     pub fn urls(
         mut self,
-        value: impl Into<Option<Vec<crate::app_certified::actor::organization::UrlItem<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::app_certified::actor::organization::UrlItem<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -239,7 +253,13 @@ impl<'a> Organization<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OrganizationGetRecordOutput<'a> {
@@ -308,8 +328,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Organization<'a> {
     }
 }
 
-fn lexicon_doc_app_certified_actor_organization() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_app_certified_actor_organization() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.certified.actor.organization"),
@@ -512,22 +533,28 @@ fn lexicon_doc_app_certified_actor_organization() -> ::jacquard_lexicon::lexicon
 /// A labeled URL reference.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UrlItem<'a> {
-    /// Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
+    ///Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub label: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The URL.
+    ///The URL.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod url_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -587,7 +614,10 @@ impl<'a> UrlItemBuilder<'a, url_item_state::Empty> {
 
 impl<'a, S: url_item_state::State> UrlItemBuilder<'a, S> {
     /// Set the `label` field (optional)
-    pub fn label(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn label(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -663,7 +693,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("label"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label",
+                    ),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -677,15 +709,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "label",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "label",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -694,7 +724,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -709,13 +741,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "url",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }

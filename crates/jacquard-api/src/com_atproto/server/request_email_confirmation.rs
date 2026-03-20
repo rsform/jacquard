@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct RequestEmailConfirmation;
 /// Response type for
@@ -29,8 +29,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestEmailConfirmation {
     const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestEmailConfirmationResponse;
 }
 
@@ -39,8 +40,9 @@ impl jacquard_common::xrpc::XrpcRequest for RequestEmailConfirmation {
 pub struct RequestEmailConfirmationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailConfirmationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestEmailConfirmation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RequestEmailConfirmation;
     type Response = RequestEmailConfirmationResponse;
 }

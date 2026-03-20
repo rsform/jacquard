@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sign {
@@ -14,7 +20,13 @@ pub struct Sign {
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SignOutput {
@@ -48,19 +60,24 @@ impl jacquard_common::xrpc::XrpcResp for SignResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Sign {
     const NSID: &'static str = "garden.lexicon.ngerakines.semeion.Sign";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Response = SignResponse;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
         Self: serde::Deserialize<'de>,
     {
-        Ok(Box::new(Self {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        }))
+        Ok(
+            Box::new(Self {
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+            }),
+        )
     }
 }
 
@@ -69,8 +86,9 @@ impl jacquard_common::xrpc::XrpcRequest for Sign {
 pub struct SignRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SignRequest {
     const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.semeion.Sign";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Request<'de> = Sign;
     type Response = SignResponse;
 }

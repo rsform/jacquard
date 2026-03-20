@@ -14,31 +14,31 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTemplate<'a> {
-    /// Content of the template, markdown supported, can contain variable placeholders.
+    ///Content of the template, markdown supported, can contain variable placeholders.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content_markdown: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disabled: std::option::Option<bool>,
-    /// ID of the template to be updated.
+    ///ID of the template to be updated.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// Message language.
+    ///Message language.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub lang: std::option::Option<jacquard_common::types::string::Language>,
-    /// Name of the template.
+    ///Name of the template.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Subject of the message, used in emails.
+    ///Subject of the message, used in emails.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// DID of the user who is updating the template.
+    ///DID of the user who is updating the template.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub updated_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -46,7 +46,13 @@ pub struct UpdateTemplate<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTemplateOutput<'a> {
@@ -65,7 +71,7 @@ pub struct UpdateTemplateOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -101,8 +107,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateTemplateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateTemplate<'a> {
     const NSID: &'static str = "tools.ozone.communication.updateTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateTemplateResponse;
 }
 
@@ -111,8 +118,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateTemplate<'a> {
 pub struct UpdateTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateTemplateRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.updateTemplate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateTemplate<'de>;
     type Response = UpdateTemplateResponse;
 }

@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WhepParams<'a> {
@@ -18,7 +24,7 @@ pub struct WhepParams<'a> {
 
 pub mod whep_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -26,37 +32,37 @@ pub mod whep_params_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rendition;
         type Streamer;
+        type Rendition;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rendition = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `rendition` field to Set
-    pub struct SetRendition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRendition<S> {}
-    impl<S: State> State for SetRendition<S> {
-        type Rendition = Set<members::rendition>;
-        type Streamer = S::Streamer;
+        type Rendition = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type Rendition = S::Rendition;
         type Streamer = Set<members::streamer>;
+        type Rendition = S::Rendition;
+    }
+    ///State transition - sets the `rendition` field to Set
+    pub struct SetRendition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRendition<S> {}
+    impl<S: State> State for SetRendition<S> {
+        type Streamer = S::Streamer;
+        type Rendition = Set<members::rendition>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rendition` field
-        pub struct rendition(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `rendition` field
+        pub struct rendition(());
     }
 }
 
@@ -129,8 +135,8 @@ where
 impl<'a, S> WhepParamsBuilder<'a, S>
 where
     S: whep_params_state::State,
-    S::Rendition: whep_params_state::IsSet,
     S::Streamer: whep_params_state::IsSet,
+    S::Rendition: whep_params_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WhepParams<'a> {
@@ -142,7 +148,13 @@ where
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Whep {
@@ -150,7 +162,13 @@ pub struct Whep {
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WhepOutput {
@@ -167,7 +185,7 @@ pub struct WhepOutput {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -219,19 +237,24 @@ impl jacquard_common::xrpc::XrpcResp for WhepResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Whep {
     const NSID: &'static str = "place.stream.playback.whep";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Response = WhepResponse;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
         Self: serde::Deserialize<'de>,
     {
-        Ok(Box::new(Self {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        }))
+        Ok(
+            Box::new(Self {
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+            }),
+        )
     }
 }
 
@@ -240,8 +263,9 @@ impl jacquard_common::xrpc::XrpcRequest for Whep {
 pub struct WhepRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhepRequest {
     const PATH: &'static str = "/xrpc/place.stream.playback.whep";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Request<'de> = Whep;
     type Response = WhepResponse;
 }

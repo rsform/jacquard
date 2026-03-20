@@ -7,41 +7,47 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stack<'a> {
-    /// Cross-axis alignment of children.
+    ///Cross-axis alignment of children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub align: std::option::Option<StackAlign<'a>>,
     #[serde(borrow)]
     pub children: jacquard_common::types::value::Data<'a>,
-    /// Space between children.
+    ///Space between children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub gap: std::option::Option<StackGap<'a>>,
-    /// Whether this container has inset padding. The theme controls the amount.
+    ///Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub inset: std::option::Option<bool>,
-    /// Main-axis distribution of children.
+    ///Main-axis distribution of children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub justify: std::option::Option<StackJustify<'a>>,
-    /// Whether the container has an opaque background.
+    ///Whether the container has an opaque background.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub opaque: std::option::Option<bool>,
-    /// Whether to show a visual separator between children.
+    ///Whether to show a visual separator between children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub separator: std::option::Option<bool>,
-    /// Whether the container sticks to the top of the scroll area.
+    ///Whether the container sticks to the top of the scroll area.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub sticky: std::option::Option<bool>,
 }
 
 pub mod stack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -555,7 +561,13 @@ impl jacquard_common::IntoStatic for StackJustify<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StackOutput<'a> {
@@ -576,8 +588,9 @@ impl jacquard_common::xrpc::XrpcResp for StackResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Stack<'a> {
     const NSID: &'static str = "org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StackResponse;
 }
 
@@ -586,8 +599,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Stack<'a> {
 pub struct StackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Stack<'de>;
     type Response = StackResponse;
 }

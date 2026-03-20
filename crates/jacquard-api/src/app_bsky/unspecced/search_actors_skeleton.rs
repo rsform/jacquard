@@ -5,15 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///(default: 25, min: 1, max: 100)
+    ///Defaults to `25`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
@@ -27,7 +38,7 @@ pub struct SearchActorsSkeleton<'a> {
 
 pub mod search_actors_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -72,7 +83,10 @@ pub struct SearchActorsSkeletonBuilder<'a, S: search_actors_skeleton_state::Stat
 
 impl<'a> SearchActorsSkeleton<'a> {
     /// Create a new builder for this type
-    pub fn new() -> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::Empty> {
+    pub fn new() -> SearchActorsSkeletonBuilder<
+        'a,
+        search_actors_skeleton_state::Empty,
+    > {
         SearchActorsSkeletonBuilder::new()
     }
 }
@@ -90,7 +104,10 @@ impl<'a> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::Empty> {
 
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -156,7 +173,10 @@ impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a,
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -181,7 +201,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsSkeletonOutput<'a> {
@@ -190,7 +216,7 @@ pub struct SearchActorsSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
+    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub hits_total: std::option::Option<i64>,
 }
@@ -205,7 +231,7 @@ pub struct SearchActorsSkeletonOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

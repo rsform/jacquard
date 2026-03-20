@@ -8,13 +8,19 @@
 /// Marks an answer as answering a given question
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelectedAnswer<'a> {
     #[serde(borrow)]
     pub answer_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Client-declared timestamp when this vote was originally created.
+    ///Client-declared timestamp when this vote was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub question_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -22,7 +28,7 @@ pub struct SelectedAnswer<'a> {
 
 pub mod selected_answer_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,51 +36,51 @@ pub mod selected_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AnswerRef;
         type CreatedAt;
         type QuestionRef;
+        type AnswerRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AnswerRef = Unset;
         type CreatedAt = Unset;
         type QuestionRef = Unset;
-    }
-    ///State transition - sets the `answer_ref` field to Set
-    pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
-    impl<S: State> State for SetAnswerRef<S> {
-        type AnswerRef = Set<members::answer_ref>;
-        type CreatedAt = S::CreatedAt;
-        type QuestionRef = S::QuestionRef;
+        type AnswerRef = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AnswerRef = S::AnswerRef;
         type CreatedAt = Set<members::created_at>;
         type QuestionRef = S::QuestionRef;
+        type AnswerRef = S::AnswerRef;
     }
     ///State transition - sets the `question_ref` field to Set
     pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
     impl<S: State> State for SetQuestionRef<S> {
-        type AnswerRef = S::AnswerRef;
         type CreatedAt = S::CreatedAt;
         type QuestionRef = Set<members::question_ref>;
+        type AnswerRef = S::AnswerRef;
+    }
+    ///State transition - sets the `answer_ref` field to Set
+    pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
+    impl<S: State> State for SetAnswerRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type QuestionRef = S::QuestionRef;
+        type AnswerRef = Set<members::answer_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answer_ref` field
-        pub struct answer_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `question_ref` field
         pub struct question_ref(());
+        ///Marker type for the `answer_ref` field
+        pub struct answer_ref(());
     }
 }
 
@@ -167,9 +173,9 @@ where
 impl<'a, S> SelectedAnswerBuilder<'a, S>
 where
     S: selected_answer_state::State,
-    S::AnswerRef: selected_answer_state::IsSet,
     S::CreatedAt: selected_answer_state::IsSet,
     S::QuestionRef: selected_answer_state::IsSet,
+    S::AnswerRef: selected_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SelectedAnswer<'a> {
@@ -212,7 +218,13 @@ impl<'a> SelectedAnswer<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelectedAnswerGetRecordOutput<'a> {
@@ -269,8 +281,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelectedAnswer<'a> {
     }
 }
 
-fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_fyi_questionable_selectedAnswer() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fyi.questionable.selectedAnswer"),

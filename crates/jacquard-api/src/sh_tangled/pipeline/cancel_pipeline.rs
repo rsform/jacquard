@@ -7,24 +7,30 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancelPipeline<'a> {
-    /// pipeline at-uri
+    ///pipeline at-uri
     #[serde(borrow)]
     pub pipeline: jacquard_common::types::string::AtUri<'a>,
-    /// repo at-uri, spindle can't resolve repo from pipeline at-uri yet
+    ///repo at-uri, spindle can't resolve repo from pipeline at-uri yet
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
-    /// workflow name
+    ///workflow name
     #[serde(borrow)]
     pub workflow: jacquard_common::CowStr<'a>,
 }
 
 pub mod cancel_pipeline_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -211,8 +217,9 @@ impl jacquard_common::xrpc::XrpcResp for CancelPipelineResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CancelPipeline<'a> {
     const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CancelPipelineResponse;
 }
 
@@ -221,8 +228,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CancelPipeline<'a> {
 pub struct CancelPipelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CancelPipelineRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.pipeline.cancelPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CancelPipeline<'de>;
     type Response = CancelPipelineResponse;
 }

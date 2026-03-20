@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProfile<'a> {
@@ -29,10 +29,12 @@ pub struct CreateProfile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Annotations of text (mentions, URLs, hashtags, etc)
+    ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -40,7 +42,9 @@ pub struct CreateProfile<'a> {
     pub founded_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -49,7 +53,9 @@ pub struct CreateProfile<'a> {
     pub status: std::option::Option<CreateProfileStatus<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
+    >,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -157,7 +163,13 @@ impl jacquard_common::IntoStatic for CreateProfileStatus<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProfileOutput<'a> {
@@ -179,8 +191,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateProfileResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateProfile<'a> {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.createProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateProfileResponse;
 }
 
@@ -189,8 +202,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateProfile<'a> {
 pub struct CreateProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.org.createProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateProfile<'de>;
     type Response = CreateProfileResponse;
 }

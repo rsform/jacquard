@@ -8,41 +8,47 @@
 /// A collection of flashcards and sources.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Deck<'a> {
-    /// Ordered list of references to cards in this deck.
+    ///Ordered list of references to cards in this deck.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub card_refs: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Description of the deck context.
+    ///Description of the deck context.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Language code for the deck content (e.g., 'en', 'es', 'fr').
+    ///Language code for the deck content (e.g., 'en', 'es', 'fr').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub language: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// License for the deck content.
+    ///License for the deck content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub license: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// References to source materials (articles, lectures) used in this deck.
+    ///References to source materials (articles, lectures) used in this deck.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source_refs: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Title of the deck.
+    ///Title of the deck.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    /// Timestamp of last update.
+    ///Timestamp of last update.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Visibility setting for the deck.
+    ///Visibility setting for the deck.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub visibility: std::option::Option<DeckVisibility<'a>>,
@@ -50,7 +56,7 @@ pub struct Deck<'a> {
 
 pub mod deck_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -122,7 +128,18 @@ impl<'a> DeckBuilder<'a, deck_state::Empty> {
     pub fn new() -> Self {
         DeckBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -168,12 +185,18 @@ where
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -181,7 +204,10 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn language(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -194,7 +220,10 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn license(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -226,12 +255,18 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -443,7 +478,13 @@ impl jacquard_common::IntoStatic for DeckVisibility<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeckGetRecordOutput<'a> {
@@ -500,7 +541,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -510,7 +553,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("language"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "language",
+                    ),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -520,7 +565,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("license"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "license",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -530,7 +577,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 64usize,
                     actual: value.len(),
                 });
@@ -541,7 +590,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -551,7 +602,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("visibility"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "visibility",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -561,8 +614,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
     }
 }
 
-fn lexicon_doc_org_stormlightlabs_malfestio_deck()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_stormlightlabs_malfestio_deck() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.stormlightlabs.malfestio.deck"),

@@ -8,7 +8,13 @@
 /// allow service to push. key must be did
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Allow<'a> {
@@ -20,7 +26,7 @@ pub struct Allow<'a> {
 
 pub mod allow_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,7 +94,10 @@ impl<'a, S: allow_state::State> AllowBuilder<'a, S> {
         self
     }
     /// Set the `config` field to an Option value (optional)
-    pub fn maybe_config(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
+    pub fn maybe_config(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -157,7 +166,13 @@ impl<'a> Allow<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AllowGetRecordOutput<'a> {
@@ -214,7 +229,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Allow<'a> {
     }
 }
 
-fn lexicon_doc_win_tomo_x_pushat_allow() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_win_tomo_x_pushat_allow() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("win.tomo-x.pushat.allow"),

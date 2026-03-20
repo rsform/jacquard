@@ -106,13 +106,9 @@ If you have `just` installed, you can run the [examples](https://tangled.org/non
 - Initial work toward allowing jacquard to function on platforms without access to the standard library.
 - `std` usage is now feature-gated. the library currently *does not compile* without `std` due to some remaining dependencies.
 
-### Testimonials
-
-- ["the most straightforward interface to atproto I've encountered so far."](https://bsky.app/profile/offline.mountainherder.xyz/post/3m3xwewzs3k2v) - @offline.mountainherder.xyz
-- "It has saved me a lot of time already! Well worth a few beers and or microcontrollers" - [@baileytownsend.dev](https://bsky.app/profile/baileytownsend.dev)
-
 ### Projects using Jacquard
 
+- [Tranquil PDS](https://tangled.org/tranquil.farm/tranquil-pds)
 - [skywatch-phash-rs](https://tangled.org/skywatch.blue/skywatch-phash-rs)
 - [Weaver](https://weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
 - [wisp.place CLI tool](https://docs.wisp.place/cli/) - formerly
@@ -134,6 +130,14 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 | `jacquard-lexicon` | Lexicon parsing and code generation | [![Crates.io](https://img.shields.io/crates/v/jacquard-lexicon.svg)](https://crates.io/crates/jacquard-lexicon) [![Documentation](https://docs.rs/jacquard-lexicon/badge.svg)](https://docs.rs/jacquard-lexicon) |
 | `jacquard-lexgen` | Code generation binaries | [![Crates.io](https://img.shields.io/crates/v/jacquard-lexgen.svg)](https://crates.io/crates/jacquard-lexgen) [![Documentation](https://docs.rs/jacquard-lexgen/badge.svg)](https://docs.rs/jacquard-lexgen) |
 | `jacquard-derive` | Macros for lexicon types | [![Crates.io](https://img.shields.io/crates/v/jacquard-derive.svg)](https://crates.io/crates/jacquard-derive) [![Documentation](https://docs.rs/jacquard-derive/badge.svg)](https://docs.rs/jacquard-derive) |
+
+### Testimonials
+
+- ["the most straightforward interface to atproto I've encountered so far."](https://bsky.app/profile/offline.mountainherder.xyz/post/3m3xwewzs3k2v) - @offline.mountainherder.xyz
+- "It has saved me a lot of time already! Well worth a few beers and or microcontrollers" - [@baileytownsend.dev](https://bsky.app/profile/baileytownsend.dev)
+- ["This is what your library allowed me to do in an hour!!! Thank you!!!"](https://bsky.app/profile/desertthunder.dev/post/3mhhbcula6224)
+ - @desertthunder.dev
+
 
 ## Development
 

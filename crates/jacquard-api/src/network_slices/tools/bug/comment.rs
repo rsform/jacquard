@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
@@ -16,15 +22,17 @@ pub struct Comment<'a> {
     pub attachments: std::option::Option<crate::network_slices::tools::Images<'a>>,
     #[serde(borrow)]
     pub body: jacquard_common::CowStr<'a>,
-    /// Annotations of body text (mentions and links)
+    ///Annotations of body text (mentions and links)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub body_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// Reference to the bug report
+    pub body_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
+    ///Reference to the bug report
     #[serde(borrow)]
     pub bug: jacquard_common::types::string::AtUri<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional reference to parent comment for threading
+    ///Optional reference to parent comment for threading
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -32,7 +40,7 @@ pub struct Comment<'a> {
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,49 +48,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bug;
         type CreatedAt;
+        type Bug;
         type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bug = Unset;
         type CreatedAt = Unset;
+        type Bug = Unset;
         type Body = Unset;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type Bug = Set<members::bug>;
-        type CreatedAt = S::CreatedAt;
-        type Body = S::Body;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Bug = S::Bug;
         type CreatedAt = Set<members::created_at>;
+        type Bug = S::Bug;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBug<S> {}
+    impl<S: State> State for SetBug<S> {
+        type CreatedAt = S::CreatedAt;
+        type Bug = Set<members::bug>;
         type Body = S::Body;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
-        type Bug = S::Bug;
         type CreatedAt = S::CreatedAt;
+        type Bug = S::Bug;
         type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bug` field
-        pub struct bug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `bug` field
+        pub struct bug(());
         ///Marker type for the `body` field
         pub struct body(());
     }
@@ -237,8 +245,8 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Bug: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Bug: comment_state::IsSet,
     S::Body: comment_state::IsSet,
 {
     /// Build the final struct
@@ -288,7 +296,13 @@ impl<'a> Comment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
@@ -346,7 +360,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("body"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "body",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -361,15 +377,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
                     )
                     .count();
                 if count > 3000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "body",
-                            ),
-                            max: 3000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "body",
+                        ),
+                        max: 3000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -377,8 +391,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-fn lexicon_doc_network_slices_tools_bug_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_network_slices_tools_bug_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.tools.bug.comment"),

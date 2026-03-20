@@ -8,23 +8,29 @@
 /// Named label pointing to a dataset entry. Multiple labels with the same name but different versions can coexist, enabling versioned references to immutable dataset entries.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Label<'a> {
-    /// Timestamp when this label was created
+    ///Timestamp when this label was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// AT-URI pointing to the dataset entry this label refers to
+    ///AT-URI pointing to the dataset entry this label refers to
     #[serde(borrow)]
     pub dataset_uri: jacquard_common::types::string::AtUri<'a>,
-    /// Optional description of this labeled version
+    ///Optional description of this labeled version
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// User-facing label name, e.g. 'mnist'
+    ///User-facing label name, e.g. 'mnist'
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Semver or free-form version string, e.g. '1.0.1'. When omitted, the label is unversioned.
+    ///Semver or free-form version string, e.g. '1.0.1'. When omitted, the label is unversioned.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub version: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -32,7 +38,7 @@ pub struct Label<'a> {
 
 pub mod label_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -159,12 +165,18 @@ where
 
 impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -191,7 +203,10 @@ where
 
 impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -254,7 +269,13 @@ impl<'a> Label<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelGetRecordOutput<'a> {
@@ -312,7 +333,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("dataset_uri"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "dataset_uri",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -322,7 +345,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -333,7 +358,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -343,7 +370,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -353,7 +382,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
     }
 }
 
-fn lexicon_doc_science_alt_dataset_label() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_science_alt_dataset_label() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("science.alt.dataset.label"),

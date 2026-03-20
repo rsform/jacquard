@@ -8,20 +8,26 @@
 /// Ephemeral challenge-response auth record. Client writes this to prove PDS write access during login, server verifies the nonce, then client deletes it immediately.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthVerify<'a> {
-    /// When this verification record was created.
+    ///When this verification record was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Server-issued challenge nonce to prove write access.
+    ///Server-issued challenge nonce to prove write access.
     #[serde(borrow)]
     pub nonce: jacquard_common::CowStr<'a>,
 }
 
 pub mod auth_verify_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,37 +35,37 @@ pub mod auth_verify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Nonce;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Nonce = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Nonce = S::Nonce;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `nonce` field to Set
     pub struct SetNonce<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNonce<S> {}
     impl<S: State> State for SetNonce<S> {
-        type CreatedAt = S::CreatedAt;
         type Nonce = Set<members::nonce>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Nonce = S::Nonce;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `nonce` field
         pub struct nonce(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -132,8 +138,8 @@ where
 impl<'a, S> AuthVerifyBuilder<'a, S>
 where
     S: auth_verify_state::State,
-    S::CreatedAt: auth_verify_state::IsSet,
     S::Nonce: auth_verify_state::IsSet,
+    S::CreatedAt: auth_verify_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthVerify<'a> {
@@ -174,7 +180,13 @@ impl<'a> AuthVerify<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthVerifyGetRecordOutput<'a> {
@@ -231,7 +243,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthVerify<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_authVerify() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_protoimsg_chat_authVerify() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.authVerify"),

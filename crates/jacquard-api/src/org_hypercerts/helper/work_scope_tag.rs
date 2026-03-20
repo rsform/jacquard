@@ -8,35 +8,41 @@
 /// A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkScopeTag<'a> {
-    /// Optional array of alternative names or identifiers for this scope.
+    ///Optional array of alternative names or identifiers for this scope.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub aliases: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Client-declared timestamp when this record was originally created
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Optional longer description of this scope.
+    ///Optional longer description of this scope.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Optional external reference for this scope as a URI or blob.
+    ///Optional external reference for this scope as a URI or blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub external_reference: std::option::Option<WorkScopeTagExternalReference<'a>>,
-    /// Lowercase, hyphenated machine-readable key for this scope (e.g., 'ipfs', 'go-lang', 'filecoin').
+    ///Lowercase, hyphenated machine-readable key for this scope (e.g., 'ipfs', 'go-lang', 'filecoin').
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
-    /// Category type of this scope. Recommended values: topic, language, domain, method, tag.
+    ///Category type of this scope. Recommended values: topic, language, domain, method, tag.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub kind: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Human-readable label for this scope.
+    ///Human-readable label for this scope.
     #[serde(borrow)]
     pub label: jacquard_common::CowStr<'a>,
-    /// Optional strong reference to a parent scope record for taxonomy/hierarchy support.
+    ///Optional strong reference to a parent scope record for taxonomy/hierarchy support.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
@@ -44,7 +50,7 @@ pub struct WorkScopeTag<'a> {
 
 pub mod work_scope_tag_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -52,49 +58,49 @@ pub mod work_scope_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
         type CreatedAt;
+        type Label;
         type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
         type CreatedAt = Unset;
+        type Label = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type Label = Set<members::label>;
-        type CreatedAt = S::CreatedAt;
-        type Key = S::Key;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Label = S::Label;
         type CreatedAt = Set<members::created_at>;
+        type Label = S::Label;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabel<S> {}
+    impl<S: State> State for SetLabel<S> {
+        type CreatedAt = S::CreatedAt;
+        type Label = Set<members::label>;
         type Key = S::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Label = S::Label;
         type CreatedAt = S::CreatedAt;
+        type Label = S::Label;
         type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `label` field
+        pub struct label(());
         ///Marker type for the `key` field
         pub struct key(());
     }
@@ -136,12 +142,18 @@ impl<'a> WorkScopeTagBuilder<'a, work_scope_tag_state::Empty> {
 
 impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     /// Set the `aliases` field (optional)
-    pub fn aliases(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn aliases(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `aliases` field to an Option value (optional)
-    pub fn maybe_aliases(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_aliases(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -168,12 +180,18 @@ where
 
 impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -219,7 +237,10 @@ where
 
 impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     /// Set the `kind` field (optional)
-    pub fn kind(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn kind(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -271,8 +292,8 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
 impl<'a, S> WorkScopeTagBuilder<'a, S>
 where
     S: work_scope_tag_state::State,
-    S::Label: work_scope_tag_state::IsSet,
     S::CreatedAt: work_scope_tag_state::IsSet,
+    S::Label: work_scope_tag_state::IsSet,
     S::Key: work_scope_tag_state::IsSet,
 {
     /// Build the final struct
@@ -326,7 +347,13 @@ impl<'a> WorkScopeTag<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -339,7 +366,13 @@ pub enum WorkScopeTagExternalReference<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkScopeTagGetRecordOutput<'a> {
@@ -396,7 +429,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("aliases"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "aliases",
+                    ),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -406,7 +441,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -420,15 +457,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 1000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -437,7 +472,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 120usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     max: 120usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -447,7 +484,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("kind"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "kind",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -458,7 +497,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("label"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -468,8 +509,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_helper_workScopeTag()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.helper.workScopeTag"),

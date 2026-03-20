@@ -8,44 +8,50 @@
 /// Records a funding receipt for a payment from one user to another user. It may be recorded by the recipient, by the sender, or by a third party. The sender may remain anonymous.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Receipt<'a> {
-    /// Amount of funding received as a numeric string (e.g. '1000.50').
+    ///Amount of funding received as a numeric string (e.g. '1000.50').
     #[serde(borrow)]
     pub amount: jacquard_common::CowStr<'a>,
-    /// Client-declared timestamp when this receipt record was created.
+    ///Client-declared timestamp when this receipt record was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Currency of the payment (e.g. EUR, USD, ETH).
+    ///Currency of the payment (e.g. EUR, USD, ETH).
     #[serde(borrow)]
     pub currency: jacquard_common::CowStr<'a>,
-    /// Optional reference to the activity, project, or organization this funding relates to.
+    ///Optional reference to the activity, project, or organization this funding relates to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#for: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// DID of the sender who transferred the funds. Leave empty if sender wants to stay anonymous.
+    ///DID of the sender who transferred the funds. Leave empty if sender wants to stay anonymous.
     #[serde(borrow)]
     pub from: crate::app_certified::Did<'a>,
-    /// Optional notes or additional context for this funding receipt.
+    ///Optional notes or additional context for this funding receipt.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Timestamp when the payment occurred.
+    ///Timestamp when the payment occurred.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub occurred_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Optional network within the payment rail (e.g. arbitrum, ethereum, sepa, visa, paypal).
+    ///Optional network within the payment rail (e.g. arbitrum, ethereum, sepa, visa, paypal).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub payment_network: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// How the funds were transferred (e.g. bank_transfer, credit_card, onchain, cash, check, payment_processor).
+    ///How the funds were transferred (e.g. bank_transfer, credit_card, onchain, cash, check, payment_processor).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub payment_rail: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The recipient of the funds. Can be identified by DID or a clear-text name.
+    ///The recipient of the funds. Can be identified by DID or a clear-text name.
     #[serde(borrow)]
     pub to: jacquard_common::CowStr<'a>,
-    /// Identifier of the underlying payment transaction (e.g. bank reference, onchain transaction hash, or processor-specific ID). Use paymentNetwork to specify the network where applicable.
+    ///Identifier of the underlying payment transaction (e.g. bank reference, onchain transaction hash, or processor-specific ID). Use paymentNetwork to specify the network where applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub transaction_id: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -53,7 +59,7 @@ pub struct Receipt<'a> {
 
 pub mod receipt_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -61,85 +67,85 @@ pub mod receipt_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type From;
-        type Currency;
-        type CreatedAt;
-        type Amount;
         type To;
+        type Amount;
+        type CreatedAt;
+        type Currency;
+        type From;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type From = Unset;
-        type Currency = Unset;
-        type CreatedAt = Unset;
-        type Amount = Unset;
         type To = Unset;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
-        type From = Set<members::from>;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-        type Amount = S::Amount;
-        type To = S::To;
-    }
-    ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrency<S> {}
-    impl<S: State> State for SetCurrency<S> {
-        type From = S::From;
-        type Currency = Set<members::currency>;
-        type CreatedAt = S::CreatedAt;
-        type Amount = S::Amount;
-        type To = S::To;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type From = S::From;
-        type Currency = S::Currency;
-        type CreatedAt = Set<members::created_at>;
-        type Amount = S::Amount;
-        type To = S::To;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type From = S::From;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-        type Amount = Set<members::amount>;
-        type To = S::To;
+        type Amount = Unset;
+        type CreatedAt = Unset;
+        type Currency = Unset;
+        type From = Unset;
     }
     ///State transition - sets the `to` field to Set
     pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTo<S> {}
     impl<S: State> State for SetTo<S> {
-        type From = S::From;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-        type Amount = S::Amount;
         type To = Set<members::to>;
+        type Amount = S::Amount;
+        type CreatedAt = S::CreatedAt;
+        type Currency = S::Currency;
+        type From = S::From;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmount<S> {}
+    impl<S: State> State for SetAmount<S> {
+        type To = S::To;
+        type Amount = Set<members::amount>;
+        type CreatedAt = S::CreatedAt;
+        type Currency = S::Currency;
+        type From = S::From;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type To = S::To;
+        type Amount = S::Amount;
+        type CreatedAt = Set<members::created_at>;
+        type Currency = S::Currency;
+        type From = S::From;
+    }
+    ///State transition - sets the `currency` field to Set
+    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrency<S> {}
+    impl<S: State> State for SetCurrency<S> {
+        type To = S::To;
+        type Amount = S::Amount;
+        type CreatedAt = S::CreatedAt;
+        type Currency = Set<members::currency>;
+        type From = S::From;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFrom<S> {}
+    impl<S: State> State for SetFrom<S> {
+        type To = S::To;
+        type Amount = S::Amount;
+        type CreatedAt = S::CreatedAt;
+        type Currency = S::Currency;
+        type From = Set<members::from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `from` field
-        pub struct from(());
-        ///Marker type for the `currency` field
-        pub struct currency(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `amount` field
-        pub struct amount(());
         ///Marker type for the `to` field
         pub struct to(());
+        ///Marker type for the `amount` field
+        pub struct amount(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `currency` field
+        pub struct currency(());
+        ///Marker type for the `from` field
+        pub struct from(());
     }
 }
 
@@ -175,7 +181,17 @@ impl<'a> ReceiptBuilder<'a, receipt_state::Empty> {
         ReceiptBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -249,7 +265,10 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
         self
     }
     /// Set the `for` field to an Option value (optional)
-    pub fn maybe_for(mut self, value: Option<jacquard_common::types::string::AtUri<'a>>) -> Self {
+    pub fn maybe_for(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -276,7 +295,10 @@ where
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn notes(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -316,7 +338,10 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
         self
     }
     /// Set the `paymentNetwork` field to an Option value (optional)
-    pub fn maybe_payment_network(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_payment_network(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -324,12 +349,18 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `paymentRail` field (optional)
-    pub fn payment_rail(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn payment_rail(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `paymentRail` field to an Option value (optional)
-    pub fn maybe_payment_rail(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_payment_rail(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -356,12 +387,18 @@ where
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `transactionId` field (optional)
-    pub fn transaction_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn transaction_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `transactionId` field to an Option value (optional)
-    pub fn maybe_transaction_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_transaction_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -370,11 +407,11 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S> ReceiptBuilder<'a, S>
 where
     S: receipt_state::State,
-    S::From: receipt_state::IsSet,
-    S::Currency: receipt_state::IsSet,
-    S::CreatedAt: receipt_state::IsSet,
-    S::Amount: receipt_state::IsSet,
     S::To: receipt_state::IsSet,
+    S::Amount: receipt_state::IsSet,
+    S::CreatedAt: receipt_state::IsSet,
+    S::Currency: receipt_state::IsSet,
+    S::From: receipt_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Receipt<'a> {
@@ -433,7 +470,13 @@ impl<'a> Receipt<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiptGetRecordOutput<'a> {
@@ -491,7 +534,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("amount"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "amount",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -502,7 +547,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("currency"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "currency",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -512,7 +559,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("notes"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -547,7 +596,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("to"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "to",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -569,8 +620,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_org_hypercerts_funding_receipt() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.funding.receipt"),

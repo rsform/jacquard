@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DenyTeleport<'a> {
-    /// The URI of the teleport record to deny.
+    ///The URI of the teleport record to deny.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod deny_teleport_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,7 +57,9 @@ pub mod deny_teleport_state {
 /// Builder for constructing an instance of this type
 pub struct DenyTeleportBuilder<'a, S: deny_teleport_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -121,11 +129,17 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DenyTeleportOutput<'a> {
-    /// Whether the teleport was successfully denied.
+    ///Whether the teleport was successfully denied.
     pub success: bool,
 }
 
@@ -139,7 +153,7 @@ pub struct DenyTeleportOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -186,8 +200,9 @@ impl jacquard_common::xrpc::XrpcResp for DenyTeleportResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DenyTeleport<'a> {
     const NSID: &'static str = "place.stream.live.denyTeleport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DenyTeleportResponse;
 }
 
@@ -196,8 +211,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DenyTeleport<'a> {
 pub struct DenyTeleportRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DenyTeleportRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.denyTeleport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DenyTeleport<'de>;
     type Response = DenyTeleportResponse;
 }

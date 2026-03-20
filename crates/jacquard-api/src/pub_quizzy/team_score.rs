@@ -8,24 +8,30 @@
 /// A team's scored answers for a quiz
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TeamScore<'a> {
-    /// Scored answers for this team
+    ///Scored answers for this team
     #[serde(borrow)]
     pub answers: Vec<crate::pub_quizzy::team_score::ScoredAnswer<'a>>,
-    /// Reference to the quizBegin record
+    ///Reference to the quizBegin record
     #[serde(borrow)]
     pub quiz_begin: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Reference to the team
+    ///Reference to the team
     #[serde(borrow)]
     pub team: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod team_score_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,51 +39,51 @@ pub mod team_score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Team;
         type Answers;
         type QuizBegin;
+        type Team;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Team = Unset;
         type Answers = Unset;
         type QuizBegin = Unset;
-    }
-    ///State transition - sets the `team` field to Set
-    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeam<S> {}
-    impl<S: State> State for SetTeam<S> {
-        type Team = Set<members::team>;
-        type Answers = S::Answers;
-        type QuizBegin = S::QuizBegin;
+        type Team = Unset;
     }
     ///State transition - sets the `answers` field to Set
     pub struct SetAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswers<S> {}
     impl<S: State> State for SetAnswers<S> {
-        type Team = S::Team;
         type Answers = Set<members::answers>;
         type QuizBegin = S::QuizBegin;
+        type Team = S::Team;
     }
     ///State transition - sets the `quiz_begin` field to Set
     pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
     impl<S: State> State for SetQuizBegin<S> {
-        type Team = S::Team;
         type Answers = S::Answers;
         type QuizBegin = Set<members::quiz_begin>;
+        type Team = S::Team;
+    }
+    ///State transition - sets the `team` field to Set
+    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeam<S> {}
+    impl<S: State> State for SetTeam<S> {
+        type Answers = S::Answers;
+        type QuizBegin = S::QuizBegin;
+        type Team = Set<members::team>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `team` field
-        pub struct team(());
         ///Marker type for the `answers` field
         pub struct answers(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
+        ///Marker type for the `team` field
+        pub struct team(());
     }
 }
 
@@ -170,9 +176,9 @@ where
 impl<'a, S> TeamScoreBuilder<'a, S>
 where
     S: team_score_state::State,
-    S::Team: team_score_state::IsSet,
     S::Answers: team_score_state::IsSet,
     S::QuizBegin: team_score_state::IsSet,
+    S::Team: team_score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeamScore<'a> {
@@ -215,7 +221,13 @@ impl<'a> TeamScore<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TeamScoreGetRecordOutput<'a> {
@@ -273,7 +285,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("answers"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "answers",
+                    ),
                     max: 500usize,
                     actual: value.len(),
                 });
@@ -283,7 +297,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
     }
 }
 
-fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.teamScore"),
@@ -444,24 +460,30 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
 /// An answer with scores for each expected answer
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScoredAnswer<'a> {
-    /// Reference to the answer record
+    ///Reference to the answer record
     #[serde(borrow)]
     pub answer: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Optional commentary from the quiz master
+    ///Optional commentary from the quiz master
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub commentary: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Points awarded for each expected answer in the question
+    ///Points awarded for each expected answer in the question
     pub scores: Vec<i64>,
 }
 
 pub mod scored_answer_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -469,37 +491,37 @@ pub mod scored_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scores;
         type Answer;
+        type Scores;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scores = Unset;
         type Answer = Unset;
-    }
-    ///State transition - sets the `scores` field to Set
-    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScores<S> {}
-    impl<S: State> State for SetScores<S> {
-        type Scores = Set<members::scores>;
-        type Answer = S::Answer;
+        type Scores = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswer<S> {}
     impl<S: State> State for SetAnswer<S> {
-        type Scores = S::Scores;
         type Answer = Set<members::answer>;
+        type Scores = S::Scores;
+    }
+    ///State transition - sets the `scores` field to Set
+    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScores<S> {}
+    impl<S: State> State for SetScores<S> {
+        type Answer = S::Answer;
+        type Scores = Set<members::scores>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scores` field
-        pub struct scores(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `scores` field
+        pub struct scores(());
     }
 }
 
@@ -553,12 +575,18 @@ where
 
 impl<'a, S: scored_answer_state::State> ScoredAnswerBuilder<'a, S> {
     /// Set the `commentary` field (optional)
-    pub fn commentary(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn commentary(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `commentary` field to an Option value (optional)
-    pub fn maybe_commentary(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_commentary(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -586,8 +614,8 @@ where
 impl<'a, S> ScoredAnswerBuilder<'a, S>
 where
     S: scored_answer_state::State,
-    S::Scores: scored_answer_state::IsSet,
     S::Answer: scored_answer_state::IsSet,
+    S::Scores: scored_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScoredAnswer<'a> {
@@ -632,7 +660,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("commentary"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "commentary",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -646,15 +676,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "commentary",
-                            ),
-                            max: 500usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "commentary",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -663,7 +691,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("scores"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scores",
+                    ),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -674,7 +704,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("scores"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scores",
+                    ),
                     min: 1usize,
                     actual: value.len(),
                 });

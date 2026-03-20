@@ -8,7 +8,13 @@
 /// RGB color with 8-bit channels.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Color<'a> {
@@ -19,7 +25,7 @@ pub struct Color<'a> {
 
 pub mod color_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -110,7 +116,10 @@ where
     S::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
-    pub fn blue(mut self, value: impl Into<i64>) -> ColorBuilder<'a, color_state::SetBlue<S>> {
+    pub fn blue(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<'a, color_state::SetBlue<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ColorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -126,7 +135,10 @@ where
     S::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
-    pub fn green(mut self, value: impl Into<i64>) -> ColorBuilder<'a, color_state::SetGreen<S>> {
+    pub fn green(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<'a, color_state::SetGreen<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ColorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -142,7 +154,10 @@ where
     S::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
-    pub fn red(mut self, value: impl Into<i64>) -> ColorBuilder<'a, color_state::SetRed<S>> {
+    pub fn red(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<'a, color_state::SetRed<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         ColorBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -185,7 +200,9 @@ where
     }
 }
 
-fn lexicon_doc_blue_atroom_room_layout() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blue_atroom_room_layout() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.atroom.room.layout"),
@@ -195,165 +212,169 @@ fn lexicon_doc_blue_atroom_room_layout() -> ::jacquard_lexicon::lexicon::Lexicon
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("color"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "RGB color with 8-bit channels.",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("red"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("green"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blue"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("blue"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: Some(255i64),
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("green"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: Some(255i64),
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("red"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: Some(255i64),
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blue")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "blue",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: Some(255i64),
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "green",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: Some(255i64),
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "red",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: Some(255i64),
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("floor"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("surface"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("surface"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#surface"),
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("surface")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "surface",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#surface"),
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("furnishing"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "A placed object in the room.",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("object"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("position"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("rotation"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("object"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("rotation")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "object",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("position"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Position [x, y, z] in millimeters.",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(
-                                            ::jacquard_lexicon::lexicon::LexInteger {
-                                                description: None,
-                                                default: None,
-                                                minimum: None,
-                                                maximum: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                            },
-                                        ),
-                                        min_length: Some(3usize),
-                                        max_length: Some(3usize),
-                                    },
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "position",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Position [x, y, z] in millimeters.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rotation"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Euler rotation [x, y, z] in degrees.",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(
-                                            ::jacquard_lexicon::lexicon::LexInteger {
-                                                description: None,
-                                                default: None,
-                                                minimum: None,
-                                                maximum: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                            },
-                                        ),
-                                        min_length: Some(3usize),
-                                        max_length: Some(3usize),
-                                    },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                                min_length: Some(3usize),
+                                max_length: Some(3usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rotation",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Euler rotation [x, y, z] in degrees.",
+                                    ),
                                 ),
-                            );
-                            map
-                        },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                                min_length: Some(3usize),
+                                max_length: Some(3usize),
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -450,128 +471,126 @@ fn lexicon_doc_blue_atroom_room_layout() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("surface"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("color"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("color"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#color"),
-                                    },
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("color")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "color",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#color"),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "texture",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Texture identifier."),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("texture"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Texture identifier.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "textureTiling",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Texture tiling [u, v].",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "textureTiling",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Texture tiling [u, v].",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(
-                                            ::jacquard_lexicon::lexicon::LexInteger {
-                                                description: None,
-                                                default: None,
-                                                minimum: None,
-                                                maximum: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                            },
-                                        ),
-                                        min_length: Some(2usize),
-                                        max_length: Some(2usize),
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                                min_length: Some(2usize),
+                                max_length: Some(2usize),
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("wall"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "Wall configuration.",
-                        )),
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("Wall configuration."),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("height"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("thickness"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("surface"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("height"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("surface"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#surface"),
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("thickness"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("surface")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "height",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "surface",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#surface"),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "thickness",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -595,7 +614,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.blue;
             if *value > 255i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blue"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blue",
+                    ),
                     max: 255i64,
                     actual: *value,
                 });
@@ -605,7 +626,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.blue;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blue"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blue",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -615,7 +638,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.green;
             if *value > 255i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("green"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "green",
+                    ),
                     max: 255i64,
                     actual: *value,
                 });
@@ -625,7 +650,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.green;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("green"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "green",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -635,7 +662,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.red;
             if *value > 255i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("red"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "red",
+                    ),
                     max: 255i64,
                     actual: *value,
                 });
@@ -645,7 +674,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
             let value = &self.red;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("red"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "red",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -657,7 +688,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Floor<'a> {
@@ -667,7 +704,7 @@ pub struct Floor<'a> {
 
 pub mod floor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -700,7 +737,9 @@ pub mod floor_state {
 /// Builder for constructing an instance of this type
 pub struct FloorBuilder<'a, S: floor_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<crate::blue_atroom::room::layout::Surface<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<crate::blue_atroom::room::layout::Surface<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -788,22 +827,28 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Floor<'a> {
 /// A placed object in the room.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Furnishing<'a> {
-    /// Strong reference to a blue.atroom.room.object record.
+    ///Strong reference to a blue.atroom.room.object record.
     #[serde(borrow)]
     pub object: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Position [x, y, z] in millimeters.
+    ///Position [x, y, z] in millimeters.
     pub position: Vec<i64>,
-    /// Euler rotation [x, y, z] in degrees.
+    ///Euler rotation [x, y, z] in degrees.
     pub rotation: Vec<i64>,
 }
 
 pub mod furnishing_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -811,51 +856,51 @@ pub mod furnishing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rotation;
         type Object;
         type Position;
-        type Rotation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rotation = Unset;
         type Object = Unset;
         type Position = Unset;
-        type Rotation = Unset;
-    }
-    ///State transition - sets the `object` field to Set
-    pub struct SetObject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObject<S> {}
-    impl<S: State> State for SetObject<S> {
-        type Object = Set<members::object>;
-        type Position = S::Position;
-        type Rotation = S::Rotation;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Object = S::Object;
-        type Position = Set<members::position>;
-        type Rotation = S::Rotation;
     }
     ///State transition - sets the `rotation` field to Set
     pub struct SetRotation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRotation<S> {}
     impl<S: State> State for SetRotation<S> {
+        type Rotation = Set<members::rotation>;
         type Object = S::Object;
         type Position = S::Position;
-        type Rotation = Set<members::rotation>;
+    }
+    ///State transition - sets the `object` field to Set
+    pub struct SetObject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObject<S> {}
+    impl<S: State> State for SetObject<S> {
+        type Rotation = S::Rotation;
+        type Object = Set<members::object>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type Rotation = S::Rotation;
+        type Object = S::Object;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rotation` field
+        pub struct rotation(());
         ///Marker type for the `object` field
         pub struct object(());
         ///Marker type for the `position` field
         pub struct position(());
-        ///Marker type for the `rotation` field
-        pub struct rotation(());
     }
 }
 
@@ -948,9 +993,9 @@ where
 impl<'a, S> FurnishingBuilder<'a, S>
 where
     S: furnishing_state::State,
+    S::Rotation: furnishing_state::IsSet,
     S::Object: furnishing_state::IsSet,
     S::Position: furnishing_state::IsSet,
-    S::Rotation: furnishing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Furnishing<'a> {
@@ -996,7 +1041,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("position"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -1007,7 +1054,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("position"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
                     min: 3usize,
                     actual: value.len(),
                 });
@@ -1018,7 +1067,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rotation"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rotation",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -1029,7 +1080,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rotation"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rotation",
+                    ),
                     min: 3usize,
                     actual: value.len(),
                 });
@@ -1042,7 +1095,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
 /// A room layout with placed objects.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Layout<'a> {
@@ -1051,7 +1110,7 @@ pub struct Layout<'a> {
     pub floor: crate::blue_atroom::room::layout::Floor<'a>,
     #[serde(borrow)]
     pub furnishings: Vec<crate::blue_atroom::room::layout::Furnishing<'a>>,
-    /// Room size in millimeters (square room).
+    ///Room size in millimeters (square room).
     pub size: i64,
     #[serde(borrow)]
     pub wall: crate::blue_atroom::room::layout::Wall<'a>,
@@ -1059,7 +1118,7 @@ pub struct Layout<'a> {
 
 pub mod layout_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1067,9 +1126,9 @@ pub mod layout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Floor;
         type Furnishings;
         type CreatedAt;
+        type Floor;
         type Size;
         type Wall;
     }
@@ -1077,29 +1136,19 @@ pub mod layout_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Floor = Unset;
         type Furnishings = Unset;
         type CreatedAt = Unset;
+        type Floor = Unset;
         type Size = Unset;
         type Wall = Unset;
-    }
-    ///State transition - sets the `floor` field to Set
-    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFloor<S> {}
-    impl<S: State> State for SetFloor<S> {
-        type Floor = Set<members::floor>;
-        type Furnishings = S::Furnishings;
-        type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
-        type Wall = S::Wall;
     }
     ///State transition - sets the `furnishings` field to Set
     pub struct SetFurnishings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFurnishings<S> {}
     impl<S: State> State for SetFurnishings<S> {
-        type Floor = S::Floor;
         type Furnishings = Set<members::furnishings>;
         type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
         type Size = S::Size;
         type Wall = S::Wall;
     }
@@ -1107,9 +1156,19 @@ pub mod layout_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Floor = S::Floor;
         type Furnishings = S::Furnishings;
         type CreatedAt = Set<members::created_at>;
+        type Floor = S::Floor;
+        type Size = S::Size;
+        type Wall = S::Wall;
+    }
+    ///State transition - sets the `floor` field to Set
+    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFloor<S> {}
+    impl<S: State> State for SetFloor<S> {
+        type Furnishings = S::Furnishings;
+        type CreatedAt = S::CreatedAt;
+        type Floor = Set<members::floor>;
         type Size = S::Size;
         type Wall = S::Wall;
     }
@@ -1117,9 +1176,9 @@ pub mod layout_state {
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Floor = S::Floor;
         type Furnishings = S::Furnishings;
         type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
         type Size = Set<members::size>;
         type Wall = S::Wall;
     }
@@ -1127,21 +1186,21 @@ pub mod layout_state {
     pub struct SetWall<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWall<S> {}
     impl<S: State> State for SetWall<S> {
-        type Floor = S::Floor;
         type Furnishings = S::Furnishings;
         type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
         type Size = S::Size;
         type Wall = Set<members::wall>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `floor` field
-        pub struct floor(());
         ///Marker type for the `furnishings` field
         pub struct furnishings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `floor` field
+        pub struct floor(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `wall` field
@@ -1243,7 +1302,10 @@ where
     S::Size: layout_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(mut self, value: impl Into<i64>) -> LayoutBuilder<'a, layout_state::SetSize<S>> {
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> LayoutBuilder<'a, layout_state::SetSize<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         LayoutBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1275,9 +1337,9 @@ where
 impl<'a, S> LayoutBuilder<'a, S>
 where
     S: layout_state::State,
-    S::Floor: layout_state::IsSet,
     S::Furnishings: layout_state::IsSet,
     S::CreatedAt: layout_state::IsSet,
+    S::Floor: layout_state::IsSet,
     S::Size: layout_state::IsSet,
     S::Wall: layout_state::IsSet,
 {
@@ -1326,7 +1388,13 @@ impl<'a> Layout<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LayoutGetRecordOutput<'a> {
@@ -1384,7 +1452,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layout<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("furnishings"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "furnishings",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -1394,7 +1464,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layout<'a> {
             let value = &self.size;
             if *value > 20000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("size"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "size",
+                    ),
                     max: 20000i64,
                     actual: *value,
                 });
@@ -1404,7 +1476,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layout<'a> {
             let value = &self.size;
             if *value < 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("size"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "size",
+                    ),
                     min: 1000i64,
                     actual: *value,
                 });
@@ -1416,24 +1490,30 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layout<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Surface<'a> {
     #[serde(borrow)]
     pub color: crate::blue_atroom::room::layout::Color<'a>,
-    /// Texture identifier.
+    ///Texture identifier.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub texture: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Texture tiling [u, v].
+    ///Texture tiling [u, v].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub texture_tiling: std::option::Option<Vec<i64>>,
 }
 
 pub mod surface_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1513,7 +1593,10 @@ where
 
 impl<'a, S: surface_state::State> SurfaceBuilder<'a, S> {
     /// Set the `texture` field (optional)
-    pub fn texture(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn texture(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -1612,21 +1695,27 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Surface<'a> {
 /// Wall configuration.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Wall<'a> {
-    /// Wall height in millimeters.
+    ///Wall height in millimeters.
     pub height: i64,
     #[serde(borrow)]
     pub surface: crate::blue_atroom::room::layout::Surface<'a>,
-    /// Wall thickness in millimeters.
+    ///Wall thickness in millimeters.
     pub thickness: i64,
 }
 
 pub mod wall_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1634,51 +1723,51 @@ pub mod wall_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
-        type Thickness;
         type Surface;
+        type Thickness;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
-        type Thickness = Unset;
         type Surface = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Thickness = S::Thickness;
-        type Surface = S::Surface;
-    }
-    ///State transition - sets the `thickness` field to Set
-    pub struct SetThickness<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThickness<S> {}
-    impl<S: State> State for SetThickness<S> {
-        type Height = S::Height;
-        type Thickness = Set<members::thickness>;
-        type Surface = S::Surface;
+        type Thickness = Unset;
+        type Height = Unset;
     }
     ///State transition - sets the `surface` field to Set
     pub struct SetSurface<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSurface<S> {}
     impl<S: State> State for SetSurface<S> {
-        type Height = S::Height;
-        type Thickness = S::Thickness;
         type Surface = Set<members::surface>;
+        type Thickness = S::Thickness;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `thickness` field to Set
+    pub struct SetThickness<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThickness<S> {}
+    impl<S: State> State for SetThickness<S> {
+        type Surface = S::Surface;
+        type Thickness = Set<members::thickness>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Surface = S::Surface;
+        type Thickness = S::Thickness;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
-        ///Marker type for the `thickness` field
-        pub struct thickness(());
         ///Marker type for the `surface` field
         pub struct surface(());
+        ///Marker type for the `thickness` field
+        pub struct thickness(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -1717,7 +1806,10 @@ where
     S::Height: wall_state::IsUnset,
 {
     /// Set the `height` field (required)
-    pub fn height(mut self, value: impl Into<i64>) -> WallBuilder<'a, wall_state::SetHeight<S>> {
+    pub fn height(
+        mut self,
+        value: impl Into<i64>,
+    ) -> WallBuilder<'a, wall_state::SetHeight<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         WallBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1768,9 +1860,9 @@ where
 impl<'a, S> WallBuilder<'a, S>
 where
     S: wall_state::State,
-    S::Height: wall_state::IsSet,
-    S::Thickness: wall_state::IsSet,
     S::Surface: wall_state::IsSet,
+    S::Thickness: wall_state::IsSet,
+    S::Height: wall_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Wall<'a> {

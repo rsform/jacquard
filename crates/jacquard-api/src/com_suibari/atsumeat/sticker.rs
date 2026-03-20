@@ -8,46 +8,52 @@
 /// Definition of a sticker
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sticker<'a> {
-    /// The image content, either a string URL (for CDN/Blob) or a BlobRef.
+    ///The image content, either a string URL (for CDN/Blob) or a BlobRef.
     #[serde(borrow)]
     pub image: jacquard_common::types::value::Data<'a>,
-    /// Type of the image source.
+    ///Type of the image source.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image_type: std::option::Option<StickerImageType<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
+    ///Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
     #[serde(borrow)]
     pub model: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The timestamp when this sticker was obtained.
+    ///The timestamp when this sticker was obtained.
     pub obtained_at: jacquard_common::types::string::Datetime,
-    /// The DID of the user from whom this sticker was obtained (for provenance).
+    ///The DID of the user from whom this sticker was obtained (for provenance).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub obtained_from: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// The DID of the original creator/minter of this sticker.
+    ///The DID of the original creator/minter of this sticker.
     #[serde(borrow)]
     pub original_owner: jacquard_common::types::string::Did<'a>,
-    /// The shape of the sticker canvas.
+    ///The shape of the sticker canvas.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub shape: std::option::Option<StickerShape<'a>>,
-    /// Cryptographic signature from the server verifying the sticker's authenticity/provenance.
+    ///Cryptographic signature from the server verifying the sticker's authenticity/provenance.
     #[serde(borrow)]
     pub signature: jacquard_common::CowStr<'a>,
-    /// The original JSON payload that was signed by the server.
+    ///The original JSON payload that was signed by the server.
     #[serde(borrow)]
     pub signed_payload: jacquard_common::CowStr<'a>,
-    /// The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
+    ///The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -58,7 +64,7 @@ pub struct Sticker<'a> {
 
 pub mod sticker_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -66,105 +72,105 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
-        type Image;
+        type OriginalOwner;
         type Model;
         type ObtainedAt;
+        type Signature;
+        type Image;
         type SignedPayload;
-        type OriginalOwner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
-        type Image = Unset;
+        type OriginalOwner = Unset;
         type Model = Unset;
         type ObtainedAt = Unset;
+        type Signature = Unset;
+        type Image = Unset;
         type SignedPayload = Unset;
-        type OriginalOwner = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Signature = Set<members::signature>;
-        type Image = S::Image;
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Signature = S::Signature;
-        type Image = Set<members::image>;
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type Signature = S::Signature;
-        type Image = S::Image;
-        type Model = Set<members::model>;
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `obtained_at` field to Set
-    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
-    impl<S: State> State for SetObtainedAt<S> {
-        type Signature = S::Signature;
-        type Image = S::Image;
-        type Model = S::Model;
-        type ObtainedAt = Set<members::obtained_at>;
-        type SignedPayload = S::SignedPayload;
-        type OriginalOwner = S::OriginalOwner;
-    }
-    ///State transition - sets the `signed_payload` field to Set
-    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
-    impl<S: State> State for SetSignedPayload<S> {
-        type Signature = S::Signature;
-        type Image = S::Image;
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = Set<members::signed_payload>;
-        type OriginalOwner = S::OriginalOwner;
     }
     ///State transition - sets the `original_owner` field to Set
     pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
     impl<S: State> State for SetOriginalOwner<S> {
-        type Signature = S::Signature;
-        type Image = S::Image;
+        type OriginalOwner = Set<members::original_owner>;
         type Model = S::Model;
         type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type Image = S::Image;
         type SignedPayload = S::SignedPayload;
-        type OriginalOwner = Set<members::original_owner>;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type Model = Set<members::model>;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `obtained_at` field to Set
+    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
+    impl<S: State> State for SetObtainedAt<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = Set<members::obtained_at>;
+        type Signature = S::Signature;
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = Set<members::signature>;
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type Image = Set<members::image>;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `signed_payload` field to Set
+    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
+    impl<S: State> State for SetSignedPayload<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type Image = S::Image;
+        type SignedPayload = Set<members::signed_payload>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `image` field
-        pub struct image(());
+        ///Marker type for the `original_owner` field
+        pub struct original_owner(());
         ///Marker type for the `model` field
         pub struct model(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `image` field
+        pub struct image(());
         ///Marker type for the `signed_payload` field
         pub struct signed_payload(());
-        ///Marker type for the `original_owner` field
-        pub struct original_owner(());
     }
 }
 
@@ -202,7 +208,19 @@ impl<'a> StickerBuilder<'a, sticker_state::Empty> {
         StickerBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -243,7 +261,10 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -275,7 +296,10 @@ where
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -415,12 +439,18 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -429,12 +459,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::Signature: sticker_state::IsSet,
-    S::Image: sticker_state::IsSet,
+    S::OriginalOwner: sticker_state::IsSet,
     S::Model: sticker_state::IsSet,
     S::ObtainedAt: sticker_state::IsSet,
+    S::Signature: sticker_state::IsSet,
+    S::Image: sticker_state::IsSet,
     S::SignedPayload: sticker_state::IsSet,
-    S::OriginalOwner: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {
@@ -705,7 +735,13 @@ impl jacquard_common::IntoStatic for StickerShape<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StickerGetRecordOutput<'a> {
@@ -762,7 +798,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("image_type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "image_type",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -772,7 +810,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 6400usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("message"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
                     max: 6400usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -786,15 +826,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
                     )
                     .count();
                 if count > 640usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "message",
-                            ),
-                            max: 640usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "message",
+                        ),
+                        max: 640usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -803,7 +841,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("model"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "model",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -813,7 +853,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -827,15 +869,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -843,7 +883,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("shape"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shape",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -854,7 +896,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("signature"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "signature",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -877,7 +921,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 8usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 8usize,
                     actual: value.len(),
                 });
@@ -887,7 +933,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
     }
 }
 
-fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.suibari.atsumeat.sticker"),

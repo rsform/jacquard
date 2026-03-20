@@ -7,11 +7,17 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Intent<'a> {
-    /// indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)
+    ///indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub allow: std::option::Option<bool>,
     ///
@@ -20,7 +26,7 @@ pub struct Intent<'a> {
 
 pub mod intent_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -139,8 +145,9 @@ where
     }
 }
 
-fn lexicon_doc_org_user_intents_demo_declaration()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.user-intents.demo.declaration"),
@@ -150,51 +157,51 @@ fn lexicon_doc_org_user_intents_demo_declaration()
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("intent"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("allow"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "allow",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(""),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -295,29 +302,40 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Intent<'a> {
 /// TODO
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
-    /// Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
+    ///Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub bulk_dataset: std::option::Option<crate::org_user_intents::demo::declaration::Intent<'a>>,
-    /// Bridging account data or interactions into distinct social web protocol ecosystems
+    pub bulk_dataset: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///Bridging account data or interactions into distinct social web protocol ecosystems
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub protocol_bridging:
-        std::option::Option<crate::org_user_intents::demo::declaration::Intent<'a>>,
-    /// Public access to or replay of account data as part of archiving and preservation efforts
+    pub protocol_bridging: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///Public access to or replay of account data as part of archiving and preservation efforts
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub public_access_archive:
-        std::option::Option<crate::org_user_intents::demo::declaration::Intent<'a>>,
-    /// Use of account data as input to machine learning models which could be used to generate synthetic content or interactions
+    pub public_access_archive: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///Use of account data as input to machine learning models which could be used to generate synthetic content or interactions
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub synthetic_content_generation:
-        std::option::Option<crate::org_user_intents::demo::declaration::Intent<'a>>,
+    pub synthetic_content_generation: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
     ///
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -325,7 +343,7 @@ pub struct Declaration<'a> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -517,7 +535,13 @@ impl<'a> Declaration<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {

@@ -8,24 +8,30 @@
 /// Attestation signature proving a score was submitted through ATPlay SDK
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Attestation<'a> {
-    /// Timestamp when the attestation was created (optional)
+    ///Timestamp when the attestation was created (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub attested_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// DID key reference for verifying the signature
+    ///DID key reference for verifying the signature
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
-    /// ES256 signature over the score record CID
+    ///ES256 signature over the score record CID
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub signature: jacquard_common::deps::bytes::Bytes,
 }
 
 pub mod attestation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -185,7 +191,9 @@ where
     }
 }
 
-fn lexicon_doc_blue_atplay_score_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blue_atplay_score_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.atplay.score.defs"),
@@ -292,7 +300,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });

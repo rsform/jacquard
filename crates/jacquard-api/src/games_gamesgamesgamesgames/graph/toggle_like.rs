@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleLike<'a> {
-    /// AT URI of the game record to like/unlike.
+    ///AT URI of the game record to like/unlike.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod toggle_like_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,7 +57,9 @@ pub mod toggle_like_state {
 /// Builder for constructing an instance of this type
 pub struct ToggleLikeBuilder<'a, S: toggle_like_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -128,18 +136,18 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleLikeOutput<'a> {
-    /// Whether the game was liked or unliked.
+    ///Whether the game was liked or unliked.
     #[serde(borrow)]
     pub action: ToggleLikeOutputAction<'a>,
-    /// CID of the created like record. Present when action is 'liked'.
+    ///CID of the created like record. Present when action is 'liked'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT URI of the created like record. Present when action is 'liked'.
+    ///AT URI of the created like record. Present when action is 'liked'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -229,7 +237,9 @@ impl jacquard_common::IntoStatic for ToggleLikeOutputAction<'_> {
         match self {
             ToggleLikeOutputAction::Liked => ToggleLikeOutputAction::Liked,
             ToggleLikeOutputAction::Unliked => ToggleLikeOutputAction::Unliked,
-            ToggleLikeOutputAction::Other(v) => ToggleLikeOutputAction::Other(v.into_static()),
+            ToggleLikeOutputAction::Other(v) => {
+                ToggleLikeOutputAction::Other(v.into_static())
+            }
         }
     }
 }
@@ -246,8 +256,9 @@ impl jacquard_common::xrpc::XrpcResp for ToggleLikeResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ToggleLike<'a> {
     const NSID: &'static str = "games.gamesgamesgamesgames.graph.toggleLike";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ToggleLikeResponse;
 }
 
@@ -256,8 +267,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ToggleLike<'a> {
 pub struct ToggleLikeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ToggleLikeRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.toggleLike";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ToggleLike<'de>;
     type Response = ToggleLikeResponse;
 }

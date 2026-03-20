@@ -14,31 +14,38 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartSync<'a> {
-    /// List of collection NSIDs to sync (primary collections matching slice domain)
+    ///List of collection NSIDs to sync (primary collections matching slice domain)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    /// List of external collection NSIDs to sync (collections outside slice domain)
+    ///List of external collection NSIDs to sync (collections outside slice domain)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    /// Maximum number of records to sync per repository
+    pub external_collections: std::option::Option<
+        Vec<jacquard_common::types::string::Nsid<'a>>,
+    >,
+    ///Maximum number of records to sync per repository
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit_per_repo: std::option::Option<i64>,
-    /// List of specific repository DIDs to sync from
+    ///List of specific repository DIDs to sync from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub repos: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    /// Skip lexicon validation during sync
+    ///Skip lexicon validation during sync Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_skip_validation")]
     pub skip_validation: std::option::Option<bool>,
-    /// AT-URI of the slice to sync data into
+    ///AT-URI of the slice to sync data into
     #[serde(borrow)]
     pub slice: jacquard_common::CowStr<'a>,
+}
+
+fn _default_skip_validation() -> std::option::Option<bool> {
+    Some(false)
 }
 
 #[jacquard_derive::lexicon]
@@ -50,14 +57,14 @@ pub struct StartSync<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartSyncOutput<'a> {
-    /// UUID of the enqueued sync job
+    ///UUID of the enqueued sync job
     #[serde(borrow)]
     pub job_id: jacquard_common::CowStr<'a>,
-    /// Success message confirming job enqueue
+    ///Success message confirming job enqueue
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
 }
@@ -74,8 +81,9 @@ impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
     const NSID: &'static str = "network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StartSyncResponse;
 }
 
@@ -84,8 +92,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
 pub struct StartSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.startSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = StartSync<'de>;
     type Response = StartSyncResponse;
 }

@@ -13,7 +13,13 @@ pub mod update_seen;
 /// A notification for a user.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Notification<'a> {
@@ -25,7 +31,7 @@ pub struct Notification<'a> {
     pub is_read: bool,
     #[serde(borrow)]
     pub reason: crate::sh_weaver::notification::NotificationReason<'a>,
-    /// The subject of the notification (entry, notebook, etc).
+    ///The subject of the notification (entry, notebook, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reason_subject: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -38,7 +44,7 @@ pub struct Notification<'a> {
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,105 +52,105 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
         type Author;
+        type IndexedAt;
         type Uri;
         type Reason;
         type IsRead;
-        type IndexedAt;
-        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
         type Author = Unset;
+        type IndexedAt = Unset;
         type Uri = Unset;
         type Reason = Unset;
         type IsRead = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type Uri = S::Uri;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Author = S::Author;
-        type Uri = Set<members::uri>;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Reason = Set<members::reason>;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `is_read` field to Set
-    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsRead<S> {}
-    impl<S: State> State for SetIsRead<S> {
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Reason = S::Reason;
-        type IsRead = Set<members::is_read>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
         type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
         type Reason = S::Reason;
         type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
         type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Reason = S::Reason;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Reason = S::Reason;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Reason = S::Reason;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Reason = Set<members::reason>;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `is_read` field to Set
+    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsRead<S> {}
+    impl<S: State> State for SetIsRead<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Reason = S::Reason;
+        type IsRead = Set<members::is_read>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
     }
 }
 
@@ -306,7 +312,10 @@ impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
         self
     }
     /// Set the `record` field to an Option value (optional)
-    pub fn maybe_record(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
+    pub fn maybe_record(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -334,12 +343,12 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
+    S::Cid: notification_state::IsSet,
     S::Author: notification_state::IsSet,
+    S::IndexedAt: notification_state::IsSet,
     S::Uri: notification_state::IsSet,
     S::Reason: notification_state::IsSet,
     S::IsRead: notification_state::IsSet,
-    S::IndexedAt: notification_state::IsSet,
-    S::Cid: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
@@ -377,7 +386,9 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.notification.defs"),
@@ -532,233 +543,233 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("notificationGroup"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "notificationGroup",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Grouped notifications (e.g., '5 people liked your entry').",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("count"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("actors"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mostRecentAt"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("actors"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Most recent actors (up to 5).",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.actor.defs#profileViewBasic",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: Some(5usize),
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mostRecentAt")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actors",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Most recent actors (up to 5).",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("count"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.actor.defs#profileViewBasic",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: Some(5usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "count",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "isRead",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "mostRecentAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("isRead"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reason",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#notificationReason",
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mostRecentAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#notificationReason",
-                                        ),
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
-                                    ::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
-                                        refs: vec![
-                                            ::jacquard_common::CowStr::new_static(
-                                                "sh.weaver.notebook.defs#notebookView",
-                                            ),
-                                            ::jacquard_common::CowStr::new_static(
-                                                "sh.weaver.notebook.defs#entryView",
-                                            ),
-                                        ],
-                                        closed: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "subject",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.notebook.defs#entryView")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("notificationReason"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(
-                    ::jacquard_lexicon::lexicon::LexString {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "notificationReason",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Why this notification was generated.",
-                        )),
-                        format: None,
-                        default: None,
-                        min_length: None,
-                        max_length: None,
-                        min_graphemes: None,
-                        max_graphemes: None,
-                        r#enum: None,
-                        r#const: None,
-                        known_values: None,
-                    },
-                ),
+                        ),
+                    ),
+                    format: None,
+                    default: None,
+                    min_length: None,
+                    max_length: None,
+                    min_graphemes: None,
+                    max_graphemes: None,
+                    r#enum: None,
+                    r#const: None,
+                    known_values: None,
+                }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("subscriptionUpdateView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "subscriptionUpdateView",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "New content from a notebook subscription.",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("newEntries"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "newEntries",
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "newEntries",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "New entries since last check.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "New entries since last check.",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.notebook.defs#entryView",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.notebook.defs#entryView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "notebook",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "sh.weaver.notebook.defs#notebookView",
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "sh.weaver.notebook.defs#notebookView",
-                                        ),
-                                    },
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "updatedEntries",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Entries that were updated.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedEntries",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Entries that were updated.",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.notebook.defs#entryView",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.notebook.defs#entryView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -785,11 +796,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
 /// Grouped notifications (e.g., '5 people liked your entry').
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationGroup<'a> {
-    /// Most recent actors (up to 5).
+    ///Most recent actors (up to 5).
     #[serde(borrow)]
     pub actors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
     pub count: i64,
@@ -804,7 +821,7 @@ pub struct NotificationGroup<'a> {
 
 pub mod notification_group_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -812,9 +829,9 @@ pub mod notification_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MostRecentAt;
         type Reason;
         type Subject;
+        type MostRecentAt;
         type Actors;
         type Count;
     }
@@ -822,29 +839,19 @@ pub mod notification_group_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MostRecentAt = Unset;
         type Reason = Unset;
         type Subject = Unset;
+        type MostRecentAt = Unset;
         type Actors = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `most_recent_at` field to Set
-    pub struct SetMostRecentAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMostRecentAt<S> {}
-    impl<S: State> State for SetMostRecentAt<S> {
-        type MostRecentAt = Set<members::most_recent_at>;
-        type Reason = S::Reason;
-        type Subject = S::Subject;
-        type Actors = S::Actors;
-        type Count = S::Count;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type MostRecentAt = S::MostRecentAt;
         type Reason = Set<members::reason>;
         type Subject = S::Subject;
+        type MostRecentAt = S::MostRecentAt;
         type Actors = S::Actors;
         type Count = S::Count;
     }
@@ -852,9 +859,19 @@ pub mod notification_group_state {
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type MostRecentAt = S::MostRecentAt;
         type Reason = S::Reason;
         type Subject = Set<members::subject>;
+        type MostRecentAt = S::MostRecentAt;
+        type Actors = S::Actors;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `most_recent_at` field to Set
+    pub struct SetMostRecentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMostRecentAt<S> {}
+    impl<S: State> State for SetMostRecentAt<S> {
+        type Reason = S::Reason;
+        type Subject = S::Subject;
+        type MostRecentAt = Set<members::most_recent_at>;
         type Actors = S::Actors;
         type Count = S::Count;
     }
@@ -862,9 +879,9 @@ pub mod notification_group_state {
     pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActors<S> {}
     impl<S: State> State for SetActors<S> {
-        type MostRecentAt = S::MostRecentAt;
         type Reason = S::Reason;
         type Subject = S::Subject;
+        type MostRecentAt = S::MostRecentAt;
         type Actors = Set<members::actors>;
         type Count = S::Count;
     }
@@ -872,21 +889,21 @@ pub mod notification_group_state {
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type MostRecentAt = S::MostRecentAt;
         type Reason = S::Reason;
         type Subject = S::Subject;
+        type MostRecentAt = S::MostRecentAt;
         type Actors = S::Actors;
         type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `most_recent_at` field
-        pub struct most_recent_at(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `most_recent_at` field
+        pub struct most_recent_at(());
         ///Marker type for the `actors` field
         pub struct actors(());
         ///Marker type for the `count` field
@@ -1037,9 +1054,9 @@ where
 impl<'a, S> NotificationGroupBuilder<'a, S>
 where
     S: notification_group_state::State,
-    S::MostRecentAt: notification_group_state::IsSet,
     S::Reason: notification_group_state::IsSet,
     S::Subject: notification_group_state::IsSet,
+    S::MostRecentAt: notification_group_state::IsSet,
     S::Actors: notification_group_state::IsSet,
     S::Count: notification_group_state::IsSet,
 {
@@ -1077,7 +1094,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1106,7 +1129,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationGroup<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("actors"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "actors",
+                    ),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -1242,8 +1267,12 @@ impl jacquard_common::IntoStatic for NotificationReason<'_> {
             NotificationReason::FollowAccept => NotificationReason::FollowAccept,
             NotificationReason::Subscribe => NotificationReason::Subscribe,
             NotificationReason::SubscribeAccept => NotificationReason::SubscribeAccept,
-            NotificationReason::CollaborationInvite => NotificationReason::CollaborationInvite,
-            NotificationReason::CollaborationAccept => NotificationReason::CollaborationAccept,
+            NotificationReason::CollaborationInvite => {
+                NotificationReason::CollaborationInvite
+            }
+            NotificationReason::CollaborationAccept => {
+                NotificationReason::CollaborationAccept
+            }
             NotificationReason::NewEntry => NotificationReason::NewEntry,
             NotificationReason::EntryUpdate => NotificationReason::EntryUpdate,
             NotificationReason::Mention => NotificationReason::Mention,
@@ -1257,25 +1286,33 @@ impl jacquard_common::IntoStatic for NotificationReason<'_> {
 /// New content from a notebook subscription.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscriptionUpdateView<'a> {
-    /// New entries since last check.
+    ///New entries since last check.
     #[serde(borrow)]
     pub new_entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
     #[serde(borrow)]
     pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
     pub updated_at: jacquard_common::types::string::Datetime,
-    /// Entries that were updated.
+    ///Entries that were updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub updated_entries: std::option::Option<Vec<crate::sh_weaver::notebook::EntryView<'a>>>,
+    pub updated_entries: std::option::Option<
+        Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+    >,
 }
 
 pub mod subscription_update_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1283,51 +1320,51 @@ pub mod subscription_update_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
-        type NewEntries;
         type UpdatedAt;
+        type NewEntries;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
-        type NewEntries = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type NewEntries = S::NewEntries;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `new_entries` field to Set
-    pub struct SetNewEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNewEntries<S> {}
-    impl<S: State> State for SetNewEntries<S> {
-        type Notebook = S::Notebook;
-        type NewEntries = Set<members::new_entries>;
-        type UpdatedAt = S::UpdatedAt;
+        type NewEntries = Unset;
+        type Notebook = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Notebook = S::Notebook;
-        type NewEntries = S::NewEntries;
         type UpdatedAt = Set<members::updated_at>;
+        type NewEntries = S::NewEntries;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `new_entries` field to Set
+    pub struct SetNewEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNewEntries<S> {}
+    impl<S: State> State for SetNewEntries<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type NewEntries = Set<members::new_entries>;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type NewEntries = S::NewEntries;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
-        ///Marker type for the `new_entries` field
-        pub struct new_entries(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `new_entries` field
+        pub struct new_entries(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
@@ -1345,7 +1382,10 @@ pub struct SubscriptionUpdateViewBuilder<'a, S: subscription_update_view_state::
 
 impl<'a> SubscriptionUpdateView<'a> {
     /// Create a new builder for this type
-    pub fn new() -> SubscriptionUpdateViewBuilder<'a, subscription_update_view_state::Empty> {
+    pub fn new() -> SubscriptionUpdateViewBuilder<
+        'a,
+        subscription_update_view_state::Empty,
+    > {
         SubscriptionUpdateViewBuilder::new()
     }
 }
@@ -1370,7 +1410,10 @@ where
     pub fn new_entries(
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::EntryView<'a>>>,
-    ) -> SubscriptionUpdateViewBuilder<'a, subscription_update_view_state::SetNewEntries<S>> {
+    ) -> SubscriptionUpdateViewBuilder<
+        'a,
+        subscription_update_view_state::SetNewEntries<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1389,7 +1432,10 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<crate::sh_weaver::notebook::NotebookView<'a>>,
-    ) -> SubscriptionUpdateViewBuilder<'a, subscription_update_view_state::SetNotebook<S>> {
+    ) -> SubscriptionUpdateViewBuilder<
+        'a,
+        subscription_update_view_state::SetNotebook<S>,
+    > {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1408,7 +1454,10 @@ where
     pub fn updated_at(
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> SubscriptionUpdateViewBuilder<'a, subscription_update_view_state::SetUpdatedAt<S>> {
+    ) -> SubscriptionUpdateViewBuilder<
+        'a,
+        subscription_update_view_state::SetUpdatedAt<S>,
+    > {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -1440,9 +1489,9 @@ impl<'a, S: subscription_update_view_state::State> SubscriptionUpdateViewBuilder
 impl<'a, S> SubscriptionUpdateViewBuilder<'a, S>
 where
     S: subscription_update_view_state::State,
-    S::Notebook: subscription_update_view_state::IsSet,
-    S::NewEntries: subscription_update_view_state::IsSet,
     S::UpdatedAt: subscription_update_view_state::IsSet,
+    S::NewEntries: subscription_update_view_state::IsSet,
+    S::Notebook: subscription_update_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscriptionUpdateView<'a> {

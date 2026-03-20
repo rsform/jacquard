@@ -7,14 +7,20 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepoOutput<'a> {
-    /// The list of collection NSIDs in the hidden repository.
+    ///The list of collection NSIDs in the hidden repository.
     #[serde(borrow)]
     pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
-    /// The DID of the repository owner.
+    ///The DID of the repository owner.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
 }
@@ -28,7 +34,7 @@ pub struct DescribeRepoOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct DescribeRepo;
 /// Response type for

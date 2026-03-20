@@ -7,35 +7,46 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListScheduledActions<'a> {
-    /// Cursor for pagination
+    ///Cursor for pagination
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Filter actions scheduled to execute before this time
+    ///Filter actions scheduled to execute before this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub ends_before: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Maximum number of results to return
+    ///Maximum number of results to return Defaults to `50`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_limit")]
     pub limit: std::option::Option<i64>,
-    /// Filter actions scheduled to execute after this time
+    ///Filter actions scheduled to execute after this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub starts_after: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Filter actions by status
+    ///Filter actions by status
     #[serde(borrow)]
     pub statuses: Vec<jacquard_common::CowStr<'a>>,
-    /// Filter actions for specific DID subjects
+    ///Filter actions for specific DID subjects
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
 pub mod list_scheduled_actions_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -81,7 +92,10 @@ pub struct ListScheduledActionsBuilder<'a, S: list_scheduled_actions_state::Stat
 
 impl<'a> ListScheduledActions<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::Empty> {
+    pub fn new() -> ListScheduledActionsBuilder<
+        'a,
+        list_scheduled_actions_state::Empty,
+    > {
         ListScheduledActionsBuilder::new()
     }
 }
@@ -99,7 +113,10 @@ impl<'a> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::Empty> {
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -209,7 +226,7 @@ where
         ListScheduledActions {
             cursor: self.__unsafe_private_named.0,
             ends_before: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
+            limit: self.__unsafe_private_named.2.or_else(|| Some(50i64)),
             starts_after: self.__unsafe_private_named.3,
             statuses: self.__unsafe_private_named.4.unwrap(),
             subjects: self.__unsafe_private_named.5,
@@ -227,7 +244,7 @@ where
         ListScheduledActions {
             cursor: self.__unsafe_private_named.0,
             ends_before: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
+            limit: self.__unsafe_private_named.2.or_else(|| Some(50i64)),
             starts_after: self.__unsafe_private_named.3,
             statuses: self.__unsafe_private_named.4.unwrap(),
             subjects: self.__unsafe_private_named.5,
@@ -238,13 +255,19 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListScheduledActionsOutput<'a> {
     #[serde(borrow)]
     pub actions: Vec<crate::tools_ozone::moderation::ScheduledActionView<'a>>,
-    /// Cursor for next page of results
+    ///Cursor for next page of results
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -262,8 +285,9 @@ impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
     const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ListScheduledActionsResponse;
 }
 
@@ -272,8 +296,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
 pub struct ListScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.listScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ListScheduledActions<'de>;
     type Response = ListScheduledActionsResponse;
 }

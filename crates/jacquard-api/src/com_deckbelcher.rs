@@ -14,22 +14,28 @@ pub mod social;
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CardRef<'a> {
-    /** Oracle card URI (oracle:<uuid>) - for external indexing.
-    Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
+    /**Oracle card URI (oracle:<uuid>) - for external indexing.
+Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     #[serde(borrow)]
     pub oracle_uri: jacquard_common::types::string::UriValue<'a>,
-    /// Scryfall printing URI (scry:<uuid>) - authoritative identifier
+    ///Scryfall printing URI (scry:<uuid>) - authoritative identifier
     #[serde(borrow)]
     pub scryfall_uri: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod card_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,7 +173,9 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_com_deckbelcher_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.deckbelcher.defs"),

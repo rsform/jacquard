@@ -7,17 +7,23 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tool<'a> {
-    /// TS/JS source, must export default async function
+    ///TS/JS source, must export default async function
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
-    /// JSON Schema for tool input
+    ///JSON Schema for tool input
     #[serde(borrow)]
     pub input_schema: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -30,7 +36,7 @@ pub struct Tool<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub required_secrets: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Tools this tool chains to (AT URIs or built-in names)
+    ///Tools this tool chains to (AT URIs or built-in names)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub required_tools: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -44,7 +50,7 @@ pub struct Tool<'a> {
 
 pub mod tool_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,84 +59,84 @@ pub mod tool_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Description;
-        type CreatedAt;
-        type InputSchema;
         type Code;
+        type Description;
+        type InputSchema;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Description = Unset;
-        type CreatedAt = Unset;
-        type InputSchema = Unset;
         type Code = Unset;
+        type Description = Unset;
+        type InputSchema = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Code = S::Code;
         type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
         type InputSchema = S::InputSchema;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Name = S::Name;
-        type Description = Set<members::description>;
         type CreatedAt = S::CreatedAt;
-        type InputSchema = S::InputSchema;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
-        type InputSchema = S::InputSchema;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `input_schema` field to Set
-    pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInputSchema<S> {}
-    impl<S: State> State for SetInputSchema<S> {
-        type Name = S::Name;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type InputSchema = Set<members::input_schema>;
-        type Code = S::Code;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
         type Name = S::Name;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type InputSchema = S::InputSchema;
         type Code = Set<members::code>;
+        type Description = S::Description;
+        type InputSchema = S::InputSchema;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Name = S::Name;
+        type Code = S::Code;
+        type Description = Set<members::description>;
+        type InputSchema = S::InputSchema;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `input_schema` field to Set
+    pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInputSchema<S> {}
+    impl<S: State> State for SetInputSchema<S> {
+        type Name = S::Name;
+        type Code = S::Code;
+        type Description = S::Description;
+        type InputSchema = Set<members::input_schema>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Code = S::Code;
+        type Description = S::Description;
+        type InputSchema = S::InputSchema;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `input_schema` field
-        pub struct input_schema(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `input_schema` field
+        pub struct input_schema(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -167,7 +173,18 @@ impl<'a> ToolBuilder<'a, tool_state::Empty> {
         ToolBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -336,7 +353,10 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
         self
     }
     /// Set the `requiredTools` field to an Option value (optional)
-    pub fn maybe_required_tools(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_required_tools(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -385,10 +405,10 @@ impl<'a, S> ToolBuilder<'a, S>
 where
     S: tool_state::State,
     S::Name: tool_state::IsSet,
-    S::Description: tool_state::IsSet,
-    S::CreatedAt: tool_state::IsSet,
-    S::InputSchema: tool_state::IsSet,
     S::Code: tool_state::IsSet,
+    S::Description: tool_state::IsSet,
+    S::InputSchema: tool_state::IsSet,
+    S::CreatedAt: tool_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tool<'a> {
@@ -449,7 +469,13 @@ impl<'a> Tool<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ToolGetRecordOutput<'a> {
@@ -507,7 +533,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("code"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "code",
+                    ),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -518,7 +546,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -529,7 +559,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -539,7 +571,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("diy.razorgirl.winter.tool"),

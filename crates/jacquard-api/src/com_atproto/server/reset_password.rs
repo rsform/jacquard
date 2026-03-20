@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResetPassword<'a> {
@@ -34,7 +34,7 @@ pub struct ResetPassword<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -79,8 +79,9 @@ impl jacquard_common::xrpc::XrpcResp for ResetPasswordResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ResetPassword<'a> {
     const NSID: &'static str = "com.atproto.server.resetPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ResetPasswordResponse;
 }
 
@@ -89,8 +90,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResetPassword<'a> {
 pub struct ResetPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResetPasswordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.resetPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ResetPassword<'de>;
     type Response = ResetPasswordResponse;
 }

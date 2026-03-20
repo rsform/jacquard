@@ -8,29 +8,35 @@
 /// Active real-time collaboration session. Published when joining a collaborative editing session, deleted on disconnect.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Session<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Session TTL. Should be refreshed periodically while active.
+    ///Session TTL. Should be refreshed periodically while active.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// iroh NodeId in z-base32 encoding for P2P connection.
+    ///iroh NodeId in z-base32 encoding for P2P connection.
     #[serde(borrow)]
     pub node_id: jacquard_common::CowStr<'a>,
-    /// DERP relay URL if using relay-only mode (browser clients).
+    ///DERP relay URL if using relay-only mode (browser clients).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub relay_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The resource being collaboratively edited.
+    ///The resource being collaboratively edited.
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod session_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,49 +44,49 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NodeId;
         type Resource;
+        type NodeId;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NodeId = Unset;
         type Resource = Unset;
+        type NodeId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNodeId<S> {}
-    impl<S: State> State for SetNodeId<S> {
-        type NodeId = Set<members::node_id>;
-        type Resource = S::Resource;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type NodeId = S::NodeId;
         type Resource = Set<members::resource>;
+        type NodeId = S::NodeId;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `node_id` field to Set
+    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNodeId<S> {}
+    impl<S: State> State for SetNodeId<S> {
+        type Resource = S::Resource;
+        type NodeId = Set<members::node_id>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type NodeId = S::NodeId;
         type Resource = S::Resource;
+        type NodeId = S::NodeId;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node_id` field
-        pub struct node_id(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `node_id` field
+        pub struct node_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -215,8 +221,8 @@ where
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::NodeId: session_state::IsSet,
     S::Resource: session_state::IsSet,
+    S::NodeId: session_state::IsSet,
     S::CreatedAt: session_state::IsSet,
 {
     /// Build the final struct
@@ -264,7 +270,13 @@ impl<'a> Session<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SessionGetRecordOutput<'a> {
@@ -321,7 +333,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_session() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_weaver_collab_session() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.collab.session"),

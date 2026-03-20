@@ -8,35 +8,41 @@
 /// A connection linking a source to a target, with optional type and note.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Connection<'a> {
-    /// Optional type of connection
+    ///Optional type of connection
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub connection_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Timestamp when this connection was created.
+    ///Timestamp when this connection was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Optional note about the connection
+    ///Optional note about the connection
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Source entity (URL string or AT URI)
+    ///Source entity (URL string or AT URI)
     #[serde(borrow)]
     pub source: jacquard_common::CowStr<'a>,
-    /// Target entity (URL string or AT URI)
+    ///Target entity (URL string or AT URI)
     #[serde(borrow)]
     pub target: jacquard_common::CowStr<'a>,
-    /// Timestamp when this connection was last updated.
+    ///Timestamp when this connection was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod connection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -120,7 +126,10 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
         self
     }
     /// Set the `connectionType` field to an Option value (optional)
-    pub fn maybe_connection_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_connection_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -147,7 +156,10 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -268,7 +280,13 @@ impl<'a> Connection<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConnectionGetRecordOutput<'a> {
@@ -325,7 +343,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("note"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "note",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -335,7 +355,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
     }
 }
 
-fn lexicon_doc_network_cosmik_connection() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_cosmik_connection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.cosmik.connection"),

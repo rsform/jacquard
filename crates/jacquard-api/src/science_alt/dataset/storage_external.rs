@@ -8,18 +8,24 @@
 /// (Deprecated: use storageHttp or storageS3 instead.) External storage via URLs for WebDataset tar archives. URLs support brace notation for sharding (e.g., 'data-{000000..000099}.tar').
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StorageExternal<'a> {
-    /// WebDataset URLs with optional brace notation for sharded tar files
+    ///WebDataset URLs with optional brace notation for sharded tar files
     #[serde(borrow)]
     pub urls: Vec<jacquard_common::types::string::UriValue<'a>>,
 }
 
 pub mod storage_external_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -52,8 +58,9 @@ pub mod storage_external_state {
 /// Builder for constructing an instance of this type
 pub struct StorageExternalBuilder<'a, S: storage_external_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -121,8 +128,9 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_storageExternal()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_science_alt_dataset_storageExternal() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("science.alt.dataset.storageExternal"),
@@ -202,7 +210,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageExternal<'a> {
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("urls"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "urls",
+                    ),
                     min: 1usize,
                     actual: value.len(),
                 });

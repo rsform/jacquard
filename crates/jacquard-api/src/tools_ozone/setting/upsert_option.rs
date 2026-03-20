@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertOption<'a> {
@@ -27,7 +33,7 @@ pub struct UpsertOption<'a> {
 
 pub mod upsert_option_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,49 +41,49 @@ pub mod upsert_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Scope;
+        type Value;
         type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Scope = Unset;
+        type Value = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Scope = S::Scope;
-        type Key = S::Key;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
-        type Value = S::Value;
         type Scope = Set<members::scope>;
+        type Value = S::Value;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Scope = S::Scope;
+        type Value = Set<members::value>;
         type Key = S::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Value = S::Value;
         type Scope = S::Scope;
+        type Value = S::Value;
         type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `scope` field
         pub struct scope(());
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `key` field
         pub struct key(());
     }
@@ -116,12 +122,18 @@ impl<'a> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
 
 impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -148,12 +160,18 @@ where
 
 impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
     /// Set the `managerRole` field (optional)
-    pub fn manager_role(mut self, value: impl Into<Option<UpsertOptionManagerRole<'a>>>) -> Self {
+    pub fn manager_role(
+        mut self,
+        value: impl Into<Option<UpsertOptionManagerRole<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `managerRole` field to an Option value (optional)
-    pub fn maybe_manager_role(mut self, value: Option<UpsertOptionManagerRole<'a>>) -> Self {
+    pub fn maybe_manager_role(
+        mut self,
+        value: Option<UpsertOptionManagerRole<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -200,8 +218,8 @@ where
 impl<'a, S> UpsertOptionBuilder<'a, S>
 where
     S: upsert_option_state::State,
-    S::Value: upsert_option_state::IsSet,
     S::Scope: upsert_option_state::IsSet,
+    S::Value: upsert_option_state::IsSet,
     S::Key: upsert_option_state::IsSet,
 {
     /// Build the final struct
@@ -323,11 +341,17 @@ impl jacquard_common::IntoStatic for UpsertOptionManagerRole<'_> {
     type Output = UpsertOptionManagerRole<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            UpsertOptionManagerRole::RoleModerator => UpsertOptionManagerRole::RoleModerator,
+            UpsertOptionManagerRole::RoleModerator => {
+                UpsertOptionManagerRole::RoleModerator
+            }
             UpsertOptionManagerRole::RoleTriage => UpsertOptionManagerRole::RoleTriage,
-            UpsertOptionManagerRole::RoleVerifier => UpsertOptionManagerRole::RoleVerifier,
+            UpsertOptionManagerRole::RoleVerifier => {
+                UpsertOptionManagerRole::RoleVerifier
+            }
             UpsertOptionManagerRole::RoleAdmin => UpsertOptionManagerRole::RoleAdmin,
-            UpsertOptionManagerRole::Other(v) => UpsertOptionManagerRole::Other(v.into_static()),
+            UpsertOptionManagerRole::Other(v) => {
+                UpsertOptionManagerRole::Other(v.into_static())
+            }
         }
     }
 }
@@ -422,7 +446,13 @@ impl jacquard_common::IntoStatic for UpsertOptionScope<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertOptionOutput<'a> {
@@ -442,8 +472,9 @@ impl jacquard_common::xrpc::XrpcResp for UpsertOptionResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertOption<'a> {
     const NSID: &'static str = "tools.ozone.setting.upsertOption";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpsertOptionResponse;
 }
 
@@ -452,8 +483,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertOption<'a> {
 pub struct UpsertOptionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpsertOptionRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.setting.upsertOption";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpsertOption<'de>;
     type Response = UpsertOptionResponse;
 }

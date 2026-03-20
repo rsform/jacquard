@@ -15,32 +15,34 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CodeReference<'a> {
-    /// Optional branch name (for reference, commit hash is authoritative)
+    ///Optional branch name (for reference, commit hash is authoritative)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub branch: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Git commit hash (ensures immutability)
+    ///Git commit hash (ensures immutability)
     #[serde(borrow)]
     pub commit: jacquard_common::CowStr<'a>,
-    /// Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.
+    ///Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub language: std::option::Option<
         crate::science_alt::dataset::programming_language::ProgrammingLanguage<'a>,
     >,
-    /// Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')
+    ///Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')
     #[serde(borrow)]
     pub path: jacquard_common::CowStr<'a>,
-    /// Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')
+    ///Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("science.alt.dataset.lens"),
@@ -442,7 +444,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("branch"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "branch",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -453,7 +457,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("commit"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "commit",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -464,7 +470,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("path"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "path",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -475,7 +483,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("repository"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -495,7 +505,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LensMetadata<'a> {}
@@ -519,44 +529,52 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensMetadata<'a> {
 /// Bidirectional transformation (Lens) between two sample types, with code stored in external repositories
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lens<'a> {
-    /// Timestamp when this lens was created
+    ///Timestamp when this lens was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// What this transformation does
+    ///What this transformation does
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Code reference for getter function (Source -> Target)
+    ///Code reference for getter function (Source -> Target)
     #[serde(borrow)]
     pub getter_code: crate::science_alt::dataset::lens::CodeReference<'a>,
-    /// (Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')
+    ///(Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub language: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Arbitrary metadata (author, performance notes, etc.)
+    ///Arbitrary metadata (author, performance notes, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<crate::science_alt::dataset::lens::LensMetadata<'a>>,
-    /// Human-readable lens name
+    pub metadata: std::option::Option<
+        crate::science_alt::dataset::lens::LensMetadata<'a>,
+    >,
+    ///Human-readable lens name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Code reference for putter function (Target, Source -> Source)
+    ///Code reference for putter function (Target, Source -> Source)
     #[serde(borrow)]
     pub putter_code: crate::science_alt::dataset::lens::CodeReference<'a>,
-    /// AT-URI reference to source schema
+    ///AT-URI reference to source schema
     #[serde(borrow)]
     pub source_schema: jacquard_common::types::string::AtUri<'a>,
-    /// Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
+    ///Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source_schema_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT-URI reference to target schema
+    ///AT-URI reference to target schema
     #[serde(borrow)]
     pub target_schema: jacquard_common::types::string::AtUri<'a>,
-    /// Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
+    ///Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub target_schema_version: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -564,7 +582,7 @@ pub struct Lens<'a> {
 
 pub mod lens_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -574,10 +592,10 @@ pub mod lens_state {
     pub trait State: sealed::Sealed {
         type SourceSchema;
         type TargetSchema;
-        type GetterCode;
-        type Name;
-        type CreatedAt;
         type PutterCode;
+        type Name;
+        type GetterCode;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -585,10 +603,10 @@ pub mod lens_state {
     impl State for Empty {
         type SourceSchema = Unset;
         type TargetSchema = Unset;
-        type GetterCode = Unset;
-        type Name = Unset;
-        type CreatedAt = Unset;
         type PutterCode = Unset;
+        type Name = Unset;
+        type GetterCode = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `source_schema` field to Set
     pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
@@ -596,10 +614,10 @@ pub mod lens_state {
     impl<S: State> State for SetSourceSchema<S> {
         type SourceSchema = Set<members::source_schema>;
         type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type PutterCode = S::PutterCode;
+        type Name = S::Name;
+        type GetterCode = S::GetterCode;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `target_schema` field to Set
     pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
@@ -607,43 +625,10 @@ pub mod lens_state {
     impl<S: State> State for SetTargetSchema<S> {
         type SourceSchema = S::SourceSchema;
         type TargetSchema = Set<members::target_schema>;
-        type GetterCode = S::GetterCode;
+        type PutterCode = S::PutterCode;
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type PutterCode = S::PutterCode;
-    }
-    ///State transition - sets the `getter_code` field to Set
-    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
-    impl<S: State> State for SetGetterCode<S> {
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
-        type GetterCode = Set<members::getter_code>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type PutterCode = S::PutterCode;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
         type GetterCode = S::GetterCode;
-        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
-        type PutterCode = S::PutterCode;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type PutterCode = S::PutterCode;
     }
     ///State transition - sets the `putter_code` field to Set
     pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
@@ -651,10 +636,43 @@ pub mod lens_state {
     impl<S: State> State for SetPutterCode<S> {
         type SourceSchema = S::SourceSchema;
         type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type PutterCode = Set<members::putter_code>;
+        type Name = S::Name;
+        type GetterCode = S::GetterCode;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type PutterCode = S::PutterCode;
+        type Name = Set<members::name>;
+        type GetterCode = S::GetterCode;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `getter_code` field to Set
+    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
+    impl<S: State> State for SetGetterCode<S> {
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type PutterCode = S::PutterCode;
+        type Name = S::Name;
+        type GetterCode = Set<members::getter_code>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type PutterCode = S::PutterCode;
+        type Name = S::Name;
+        type GetterCode = S::GetterCode;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -663,14 +681,14 @@ pub mod lens_state {
         pub struct source_schema(());
         ///Marker type for the `target_schema` field
         pub struct target_schema(());
-        ///Marker type for the `getter_code` field
-        pub struct getter_code(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `putter_code` field
         pub struct putter_code(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `getter_code` field
+        pub struct getter_code(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -706,7 +724,17 @@ impl<'a> LensBuilder<'a, lens_state::Empty> {
         LensBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -734,12 +762,18 @@ where
 
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -766,7 +800,10 @@ where
 
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn language(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -915,10 +952,10 @@ where
     S: lens_state::State,
     S::SourceSchema: lens_state::IsSet,
     S::TargetSchema: lens_state::IsSet,
-    S::GetterCode: lens_state::IsSet,
-    S::Name: lens_state::IsSet,
-    S::CreatedAt: lens_state::IsSet,
     S::PutterCode: lens_state::IsSet,
+    S::Name: lens_state::IsSet,
+    S::GetterCode: lens_state::IsSet,
+    S::CreatedAt: lens_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lens<'a> {
@@ -977,7 +1014,13 @@ impl<'a> Lens<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LensGetRecordOutput<'a> {
@@ -1034,7 +1077,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1044,7 +1089,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("language"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "language",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1055,7 +1102,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });

@@ -14,26 +14,59 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    Default,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContentTypes<'a> {
-    /// Mute regular posts from accounts on this list
+    ///Mute regular posts from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_posts")]
     pub posts: std::option::Option<bool>,
-    /// Mute quote posts from accounts on this list
+    ///Mute quote posts from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_quotes")]
     pub quotes: std::option::Option<bool>,
-    /// Mute replies from accounts on this list
+    ///Mute replies from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_replies")]
     pub replies: std::option::Option<bool>,
-    /// Mute reposts from accounts on this list
+    ///Mute reposts from accounts on this list Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_reposts")]
     pub reposts: std::option::Option<bool>,
 }
 
-fn lexicon_doc_net_anisota_graph_listMute() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn _default_posts() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_quotes() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_replies() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_reposts() -> std::option::Option<bool> {
+    Some(true)
+}
+
+impl Default for ContentTypes<'_> {
+    fn default() -> Self {
+        Self {
+            posts: Some(true),
+            quotes: Some(true),
+            replies: Some(true),
+            reposts: Some(true),
+            extra_data: Default::default(),
+        }
+    }
+}
+
+fn lexicon_doc_net_anisota_graph_listMute() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.anisota.graph.listMute"),
@@ -43,60 +76,60 @@ fn lexicon_doc_net_anisota_graph_listMute() -> ::jacquard_lexicon::lexicon::Lexi
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("contentTypes"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Configuration for which types of content to mute",
-                        )),
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("posts"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quotes"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("replies"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("reposts"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "posts",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "quotes",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "replies",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reposts",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -278,35 +311,45 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
 /// A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListMute<'a> {
-    /// Types of content to mute from accounts on this list
+    ///Types of content to mute from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_types: std::option::Option<crate::net_anisota::graph::list_mute::ContentTypes<'a>>,
-    /// When the mute was created
+    pub content_types: std::option::Option<
+        crate::net_anisota::graph::list_mute::ContentTypes<'a>,
+    >,
+    ///When the mute was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// When this mute expires. If not set, mute is permanent
+    ///When this mute expires. If not set, mute is permanent
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Optional reason for muting this list
+    ///Optional reason for muting this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT-URI of the list to mute (app.bsky.graph.list record)
+    ///AT-URI of the list to mute (app.bsky.graph.list record)
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
-    /// Specific feeds where this mute should apply. If empty, applies to all feeds
+    ///Specific feeds where this mute should apply. If empty, applies to all feeds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub target_feeds: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub target_feeds: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
 }
 
 pub mod list_mute_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -314,37 +357,37 @@ pub mod list_mute_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -439,7 +482,10 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
 
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -491,8 +537,8 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
 impl<'a, S> ListMuteBuilder<'a, S>
 where
     S: list_mute_state::State,
-    S::Subject: list_mute_state::IsSet,
     S::CreatedAt: list_mute_state::IsSet,
+    S::Subject: list_mute_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListMute<'a> {
@@ -541,7 +587,13 @@ impl<'a> ListMute<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListMuteGetRecordOutput<'a> {
@@ -598,7 +650,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListMute<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("reason"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reason",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });

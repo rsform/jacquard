@@ -8,18 +8,24 @@
 /// Image embed view with CID references. Similar to app.bsky.embed.images#view but includes cid on each image.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageView<'a> {
-    /// List of image views with CID references.
+    ///List of image views with CID references.
     #[serde(borrow)]
     pub images: Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>,
 }
 
 pub mod image_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,7 +59,9 @@ pub mod image_view_state {
 pub struct ImageViewBuilder<'a, S: image_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>>,
+        ::core::option::Option<
+            Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>,
+        >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -84,7 +92,9 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>>,
+        value: impl Into<
+            Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>,
+        >,
     ) -> ImageViewBuilder<'a, image_view_state::SetImages<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ImageViewBuilder {
@@ -122,8 +132,9 @@ where
     }
 }
 
-fn lexicon_doc_app_chronosky_schedule_listPosts() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_app_chronosky_schedule_listPosts() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.chronosky.schedule.listPosts"),
@@ -347,79 +358,77 @@ fn lexicon_doc_app_chronosky_schedule_listPosts() -> ::jacquard_lexicon::lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("pagination"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "Pagination information.",
-                        )),
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("Pagination information."),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("page"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("limit"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("totalPages"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("limit"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(1i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("page"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(1i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "totalPages",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("totalPages")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "limit",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(1i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "page",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(1i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "total",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "totalPages",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduledPost"),
@@ -984,7 +993,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageView<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 4usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
                     max: 4usize,
                     actual: value.len(),
                 });
@@ -1004,21 +1015,21 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageViewImage<'a> {
-    /// Alt text for the image.
+    ///Alt text for the image.
     #[serde(borrow)]
     pub alt: jacquard_common::CowStr<'a>,
-    /// CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.
+    ///CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Full-size URL for the image.
+    ///Full-size URL for the image.
     #[serde(borrow)]
     pub fullsize: jacquard_common::CowStr<'a>,
-    /// Thumbnail URL for the image.
+    ///Thumbnail URL for the image.
     #[serde(borrow)]
     pub thumb: jacquard_common::CowStr<'a>,
 }
@@ -1040,7 +1051,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageViewImage<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("cid"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cid",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1050,15 +1063,31 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageViewImage<'a> {
     }
 }
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
+}
+
+fn _default_page() -> std::option::Option<i64> {
+    Some(1i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListPosts<'a> {
-    ///(default: 20, min: 1, max: 100)
+    ///Defaults to `20`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
-    ///(default: 1, min: 1)
+    ///Defaults to `1`. Min: 1.
+    #[serde(default = "_default_page")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub page: std::option::Option<i64>,
     ///(max length: 20)
@@ -1069,7 +1098,7 @@ pub struct ListPosts<'a> {
 
 pub mod list_posts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1143,7 +1172,10 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
 
 impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -1170,7 +1202,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListPostsOutput<'a> {
@@ -1209,23 +1247,29 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListPostsRequest {
 /// Pagination information.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pagination<'a> {
-    /// Posts per page.
+    ///Posts per page.
     pub limit: i64,
-    /// Current page number.
+    ///Current page number.
     pub page: i64,
-    /// Total number of posts.
+    ///Total number of posts.
     pub total: i64,
-    /// Total number of pages.
+    ///Total number of pages.
     pub total_pages: i64,
 }
 
 pub mod pagination_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1233,67 +1277,67 @@ pub mod pagination_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Total;
-        type Limit;
-        type Page;
         type TotalPages;
+        type Total;
+        type Page;
+        type Limit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Total = Unset;
-        type Limit = Unset;
-        type Page = Unset;
         type TotalPages = Unset;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotal<S> {}
-    impl<S: State> State for SetTotal<S> {
-        type Total = Set<members::total>;
-        type Limit = S::Limit;
-        type Page = S::Page;
-        type TotalPages = S::TotalPages;
-    }
-    ///State transition - sets the `limit` field to Set
-    pub struct SetLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLimit<S> {}
-    impl<S: State> State for SetLimit<S> {
-        type Total = S::Total;
-        type Limit = Set<members::limit>;
-        type Page = S::Page;
-        type TotalPages = S::TotalPages;
-    }
-    ///State transition - sets the `page` field to Set
-    pub struct SetPage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPage<S> {}
-    impl<S: State> State for SetPage<S> {
-        type Total = S::Total;
-        type Limit = S::Limit;
-        type Page = Set<members::page>;
-        type TotalPages = S::TotalPages;
+        type Total = Unset;
+        type Page = Unset;
+        type Limit = Unset;
     }
     ///State transition - sets the `total_pages` field to Set
     pub struct SetTotalPages<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalPages<S> {}
     impl<S: State> State for SetTotalPages<S> {
-        type Total = S::Total;
-        type Limit = S::Limit;
-        type Page = S::Page;
         type TotalPages = Set<members::total_pages>;
+        type Total = S::Total;
+        type Page = S::Page;
+        type Limit = S::Limit;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotal<S> {}
+    impl<S: State> State for SetTotal<S> {
+        type TotalPages = S::TotalPages;
+        type Total = Set<members::total>;
+        type Page = S::Page;
+        type Limit = S::Limit;
+    }
+    ///State transition - sets the `page` field to Set
+    pub struct SetPage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPage<S> {}
+    impl<S: State> State for SetPage<S> {
+        type TotalPages = S::TotalPages;
+        type Total = S::Total;
+        type Page = Set<members::page>;
+        type Limit = S::Limit;
+    }
+    ///State transition - sets the `limit` field to Set
+    pub struct SetLimit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLimit<S> {}
+    impl<S: State> State for SetLimit<S> {
+        type TotalPages = S::TotalPages;
+        type Total = S::Total;
+        type Page = S::Page;
+        type Limit = Set<members::limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total` field
-        pub struct total(());
-        ///Marker type for the `limit` field
-        pub struct limit(());
-        ///Marker type for the `page` field
-        pub struct page(());
         ///Marker type for the `total_pages` field
         pub struct total_pages(());
+        ///Marker type for the `total` field
+        pub struct total(());
+        ///Marker type for the `page` field
+        pub struct page(());
+        ///Marker type for the `limit` field
+        pub struct limit(());
     }
 }
 
@@ -1406,10 +1450,10 @@ where
 impl<'a, S> PaginationBuilder<'a, S>
 where
     S: pagination_state::State,
-    S::Total: pagination_state::IsSet,
-    S::Limit: pagination_state::IsSet,
-    S::Page: pagination_state::IsSet,
     S::TotalPages: pagination_state::IsSet,
+    S::Total: pagination_state::IsSet,
+    S::Page: pagination_state::IsSet,
+    S::Limit: pagination_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pagination<'a> {
@@ -1456,7 +1500,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
             let value = &self.limit;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("limit"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "limit",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1466,7 +1512,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
             let value = &self.page;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("page"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "page",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1476,7 +1524,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
             let value = &self.total;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("total"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1486,7 +1536,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
             let value = &self.total_pages;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("total_pages"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_pages",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1499,102 +1551,109 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
 /// Scheduled post object with AT Protocol standard fields.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduledPost<'a> {
-    /// AT Protocol record key. Present after successful execution.
+    ///AT Protocol record key. Present after successful execution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub at_rkey: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.
+    ///AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub at_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Child posts in thread. Only present for parent posts with children.
+    ///Child posts in thread. Only present for parent posts with children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub children:
-        std::option::Option<Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>>,
-    /// Post creation datetime (ISO 8601).
+    pub children: std::option::Option<
+        Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>,
+    >,
+    ///Post creation datetime (ISO 8601).
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.
+    ///Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embed: std::option::Option<ScheduledPostEmbed<'a>>,
-    /// Error message if execution failed. Present only when status is FAILED.
+    ///Error message if execution failed. Present only when status is FAILED.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error_msg: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.
+    ///Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub executed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).
+    ///Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// Post ID.
+    ///Post ID.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// Self-applied content labels for content warnings (AT Protocol standard).
+    ///Self-applied content labels for content warnings (AT Protocol standard).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    /// Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.
+    ///Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.
     pub langs: Vec<jacquard_common::types::string::Language>,
-    /// Parent post ID for thread posts. Null for root posts.
+    ///Parent post ID for thread posts. Null for root posts.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent_post_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// CID for postgate record. Present after successful execution with postgate settings.
+    ///CID for postgate record. Present after successful execution with postgate settings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub postgate_cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Whether to disable quote posts and embeds for this post (app.bsky.feed.postgate).
+    ///Whether to disable quote posts and embeds for this post (app.bsky.feed.postgate).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub postgate_disable_embedding: std::option::Option<bool>,
-    /// AT Protocol URI for postgate record. Present after successful execution with postgate settings.
+    ///AT Protocol URI for postgate record. Present after successful execution with postgate settings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub postgate_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Number of execution retry attempts.
+    ///Number of execution retry attempts.
     pub retry_count: i64,
-    /// Scheduled publication datetime (ISO 8601).
+    ///Scheduled publication datetime (ISO 8601).
     pub scheduled_at: jacquard_common::types::string::Datetime,
-    /// Post status.
+    ///Post status.
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
-    /// Post content text (app.bsky.feed.post#text). May be empty if embeds are present.
+    ///Post content text (app.bsky.feed.post#text). May be empty if embeds are present.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-    /// Thread depth level (0 for root post, 1 for direct reply, etc.).
+    ///Thread depth level (0 for root post, 1 for direct reply, etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub thread_depth: std::option::Option<i64>,
-    /// Position in thread (0-indexed). 0 for parent post, 1+ for children.
+    ///Position in thread (0-indexed). 0 for parent post, 1+ for children.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub thread_position: std::option::Option<i64>,
-    /// CID for threadgate record. Present after successful execution with threadgate rules.
+    ///CID for threadgate record. Present after successful execution with threadgate rules.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate_cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.
+    ///Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate_rules: std::option::Option<Vec<ScheduledPostThreadgateRulesItem<'a>>>,
-    /// AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.
+    ///AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Post last update datetime (ISO 8601).
+    ///Post last update datetime (ISO 8601).
     pub updated_at: jacquard_common::types::string::Datetime,
-    /// User ID who created this post.
+    ///User ID who created this post.
     #[serde(borrow)]
     pub user_id: jacquard_common::CowStr<'a>,
 }
 
 pub mod scheduled_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1602,177 +1661,177 @@ pub mod scheduled_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type ScheduledAt;
-        type UpdatedAt;
-        type Langs;
-        type RetryCount;
         type UserId;
-        type Text;
         type Status;
+        type UpdatedAt;
+        type Id;
+        type RetryCount;
+        type ScheduledAt;
         type CreatedAt;
+        type Text;
+        type Langs;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type ScheduledAt = Unset;
-        type UpdatedAt = Unset;
-        type Langs = Unset;
-        type RetryCount = Unset;
         type UserId = Unset;
-        type Text = Unset;
         type Status = Unset;
+        type UpdatedAt = Unset;
+        type Id = Unset;
+        type RetryCount = Unset;
+        type ScheduledAt = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
-        type RetryCount = S::RetryCount;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
-    impl<S: State> State for SetScheduledAt<S> {
-        type Id = S::Id;
-        type ScheduledAt = Set<members::scheduled_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
-        type RetryCount = S::RetryCount;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Langs = S::Langs;
-        type RetryCount = S::RetryCount;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `langs` field to Set
-    pub struct SetLangs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLangs<S> {}
-    impl<S: State> State for SetLangs<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = Set<members::langs>;
-        type RetryCount = S::RetryCount;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `retry_count` field to Set
-    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
-    impl<S: State> State for SetRetryCount<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
-        type RetryCount = Set<members::retry_count>;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
+        type Text = Unset;
+        type Langs = Unset;
     }
     ///State transition - sets the `user_id` field to Set
     pub struct SetUserId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserId<S> {}
     impl<S: State> State for SetUserId<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
-        type RetryCount = S::RetryCount;
         type UserId = Set<members::user_id>;
-        type Text = S::Text;
         type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
         type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
+        type Id = S::Id;
         type RetryCount = S::RetryCount;
-        type UserId = S::UserId;
-        type Text = Set<members::text>;
-        type Status = S::Status;
+        type ScheduledAt = S::ScheduledAt;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = S::Langs;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
-        type RetryCount = S::RetryCount;
         type UserId = S::UserId;
-        type Text = S::Text;
         type Status = Set<members::status>;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = S::ScheduledAt;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type UserId = S::UserId;
+        type Status = S::Status;
+        type UpdatedAt = Set<members::updated_at>;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = S::ScheduledAt;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type UserId = S::UserId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = Set<members::id>;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = S::ScheduledAt;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `retry_count` field to Set
+    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
+    impl<S: State> State for SetRetryCount<S> {
+        type UserId = S::UserId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type RetryCount = Set<members::retry_count>;
+        type ScheduledAt = S::ScheduledAt;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `scheduled_at` field to Set
+    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
+    impl<S: State> State for SetScheduledAt<S> {
+        type UserId = S::UserId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = Set<members::scheduled_at>;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = S::Langs;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Id = S::Id;
-        type ScheduledAt = S::ScheduledAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Langs = S::Langs;
-        type RetryCount = S::RetryCount;
         type UserId = S::UserId;
-        type Text = S::Text;
         type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = S::ScheduledAt;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type UserId = S::UserId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = S::ScheduledAt;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `langs` field to Set
+    pub struct SetLangs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLangs<S> {}
+    impl<S: State> State for SetLangs<S> {
+        type UserId = S::UserId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+        type ScheduledAt = S::ScheduledAt;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Langs = Set<members::langs>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `scheduled_at` field
-        pub struct scheduled_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `langs` field
-        pub struct langs(());
-        ///Marker type for the `retry_count` field
-        pub struct retry_count(());
         ///Marker type for the `user_id` field
         pub struct user_id(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `retry_count` field
+        pub struct retry_count(());
+        ///Marker type for the `scheduled_at` field
+        pub struct scheduled_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `langs` field
+        pub struct langs(());
     }
 }
 
@@ -1782,7 +1841,9 @@ pub struct ScheduledPostBuilder<'a, S: scheduled_post_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>>,
+        ::core::option::Option<
+            Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<ScheduledPostEmbed<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -1823,8 +1884,32 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
         ScheduledPostBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -1833,7 +1918,10 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `atRkey` field (optional)
-    pub fn at_rkey(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn at_rkey(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -1846,7 +1934,10 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `atUri` field (optional)
-    pub fn at_uri(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn at_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -1861,7 +1952,9 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
-        value: impl Into<Option<Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1910,12 +2003,18 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `errorMsg` field (optional)
-    pub fn error_msg(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn error_msg(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `errorMsg` field to an Option value (optional)
-    pub fn maybe_error_msg(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_error_msg(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -2018,12 +2117,18 @@ where
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `parentPostId` field (optional)
-    pub fn parent_post_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn parent_post_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `parentPostId` field to an Option value (optional)
-    pub fn maybe_parent_post_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_parent_post_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -2031,12 +2136,18 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateCid` field (optional)
-    pub fn postgate_cid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn postgate_cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `postgateCid` field to an Option value (optional)
-    pub fn maybe_postgate_cid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_postgate_cid(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -2057,12 +2168,18 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateUri` field (optional)
-    pub fn postgate_uri(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn postgate_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `postgateUri` field to an Option value (optional)
-    pub fn maybe_postgate_uri(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_postgate_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.14 = value;
         self
     }
@@ -2172,12 +2289,18 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadgateCid` field (optional)
-    pub fn threadgate_cid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn threadgate_cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `threadgateCid` field to an Option value (optional)
-    pub fn maybe_threadgate_cid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_threadgate_cid(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.21 = value;
         self
     }
@@ -2204,12 +2327,18 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadgateUri` field (optional)
-    pub fn threadgate_uri(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn threadgate_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `threadgateUri` field to an Option value (optional)
-    pub fn maybe_threadgate_uri(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_threadgate_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.23 = value;
         self
     }
@@ -2256,15 +2385,15 @@ where
 impl<'a, S> ScheduledPostBuilder<'a, S>
 where
     S: scheduled_post_state::State,
-    S::Id: scheduled_post_state::IsSet,
-    S::ScheduledAt: scheduled_post_state::IsSet,
-    S::UpdatedAt: scheduled_post_state::IsSet,
-    S::Langs: scheduled_post_state::IsSet,
-    S::RetryCount: scheduled_post_state::IsSet,
     S::UserId: scheduled_post_state::IsSet,
-    S::Text: scheduled_post_state::IsSet,
     S::Status: scheduled_post_state::IsSet,
+    S::UpdatedAt: scheduled_post_state::IsSet,
+    S::Id: scheduled_post_state::IsSet,
+    S::RetryCount: scheduled_post_state::IsSet,
+    S::ScheduledAt: scheduled_post_state::IsSet,
     S::CreatedAt: scheduled_post_state::IsSet,
+    S::Text: scheduled_post_state::IsSet,
+    S::Langs: scheduled_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledPost<'a> {
@@ -2340,7 +2469,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2361,7 +2496,13 @@ pub enum ScheduledPostEmbed<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -2393,7 +2534,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("at_rkey"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "at_rkey",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2403,7 +2546,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("at_uri"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "at_uri",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2413,7 +2558,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("error_msg"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "error_msg",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2424,7 +2571,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("id"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2435,7 +2584,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("langs"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "langs",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -2481,7 +2632,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             let value = &self.retry_count;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("retry_count"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "retry_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2492,7 +2645,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("status"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "status",
+                    ),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2503,7 +2658,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2518,15 +2675,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 300usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -2593,7 +2748,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("user_id"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "user_id",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });

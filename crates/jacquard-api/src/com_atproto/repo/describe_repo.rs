@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepo<'a> {
@@ -16,7 +22,7 @@ pub struct DescribeRepo<'a> {
 
 pub mod describe_repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,8 +55,9 @@ pub mod describe_repo_state {
 /// Builder for constructing an instance of this type
 pub struct DescribeRepoBuilder<'a, S: describe_repo_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -106,21 +113,27 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepoOutput<'a> {
-    /// List of all the collections (NSIDs) for which this repo contains at least one record.
+    ///List of all the collections (NSIDs) for which this repo contains at least one record.
     #[serde(borrow)]
     pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// The complete DID document for this account.
+    ///The complete DID document for this account.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    /// Indicates if handle is currently valid (resolves bi-directionally)
+    ///Indicates if handle is currently valid (resolves bi-directionally)
     pub handle_is_correct: bool,
 }
 

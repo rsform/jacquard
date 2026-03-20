@@ -15,30 +15,31 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationTypeDefinition<'a> {
-    /// The evaluation type identifier (must match an entry in evaluationTypes).
+    ///The evaluation type identifier (must match an entry in evaluationTypes).
     #[serde(borrow)]
     pub identifier: jacquard_common::CowStr<'a>,
-    /// Human-readable names and descriptions in various languages.
+    ///Human-readable names and descriptions in various languages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub locales: std::option::Option<
         Vec<crate::app_gainforest::evaluator::service::EvaluationTypeLocale<'a>>,
     >,
-    /// Default method info for this evaluation type (can be overridden per-evaluation).
+    ///Default method info for this evaluation type (can be overridden per-evaluation).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub method: std::option::Option<crate::app_gainforest::evaluator::MethodInfo<'a>>,
-    /// The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').
+    ///The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').
     #[serde(borrow)]
     pub result_type: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_app_gainforest_evaluator_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_app_gainforest_evaluator_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.evaluator.service"),
@@ -144,84 +145,92 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("evaluationTypeLocale"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "evaluationTypeLocale",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Localized name and description for an evaluation type.",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("description")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Longer description of what this evaluation type does.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Longer description of what this evaluation type does.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: Some(2048usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: Some(2048usize),
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "lang",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Language code (BCP-47, e.g., 'en', 'pt-BR').",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Language code (BCP-47, e.g., 'en', 'pt-BR').",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: Some(16usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: Some(16usize),
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Short human-readable name for this evaluation type.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Short human-readable name for this evaluation type.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: Some(128usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: Some(128usize),
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
@@ -426,15 +435,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "identifier",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identifier",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -442,7 +449,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("locales"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "locales",
+                    ),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -457,15 +466,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "result_type",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "result_type",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -483,17 +490,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationTypeLocale<'a> {
-    /// Longer description of what this evaluation type does.
+    ///Longer description of what this evaluation type does.
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
-    /// Language code (BCP-47, e.g., 'en', 'pt-BR').
+    ///Language code (BCP-47, e.g., 'en', 'pt-BR').
     #[serde(borrow)]
     pub lang: jacquard_common::CowStr<'a>,
-    /// Short human-readable name for this evaluation type.
+    ///Short human-readable name for this evaluation type.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -520,15 +527,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> 
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -541,15 +546,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> 
                     )
                     .count();
                 if count > 16usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "lang",
-                            ),
-                            max: 16usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "lang",
+                        ),
+                        max: 16usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -562,15 +565,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> 
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -581,24 +582,30 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> 
 /// Policies declaring what this evaluator does and how it operates.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluatorPolicies<'a> {
-    /// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
+    ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub access_model: std::option::Option<EvaluatorPoliciesAccessModel<'a>>,
-    /// Detailed definitions for each evaluation type, including human-readable descriptions.
+    ///Detailed definitions for each evaluation type, including human-readable descriptions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub evaluation_type_definitions: std::option::Option<
         Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>,
     >,
-    /// List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
+    ///List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
     #[serde(borrow)]
     pub evaluation_types: Vec<jacquard_common::CowStr<'a>>,
-    /// NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
+    ///NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject_collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -606,7 +613,7 @@ pub struct EvaluatorPolicies<'a> {
 
 pub mod evaluator_policies_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -678,7 +685,10 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
         self
     }
     /// Set the `accessModel` field to an Option value (optional)
-    pub fn maybe_access_model(mut self, value: Option<EvaluatorPoliciesAccessModel<'a>>) -> Self {
+    pub fn maybe_access_model(
+        mut self,
+        value: Option<EvaluatorPoliciesAccessModel<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -689,7 +699,13 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     pub fn evaluation_type_definitions(
         mut self,
         value: impl Into<
-            Option<Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>>,
+            Option<
+                Vec<
+                    crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<
+                        'a,
+                    >,
+                >,
+            >,
         >,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
@@ -698,7 +714,9 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     /// Set the `evaluationTypeDefinitions` field to an Option value (optional)
     pub fn maybe_evaluation_type_definitions(
         mut self,
-        value: Option<Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>>,
+        value: Option<
+            Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -890,15 +908,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluatorPolicies<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "access_model",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "access_model",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -946,20 +962,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluatorPolicies<'a> {
 /// An evaluator service declaration. Publish at /app.gainforest.evaluator.service/self to declare this account as an evaluator.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
-    /// Timestamp of when this evaluator service was declared.
+    ///Timestamp of when this evaluator service was declared.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The evaluator's policies including supported evaluation types and access model.
+    ///The evaluator's policies including supported evaluation types and access model.
     #[serde(borrow)]
     pub policies: crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>,
 }
 
 pub mod service_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1006,7 +1028,9 @@ pub struct ServiceBuilder<'a, S: service_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>>,
+        ::core::option::Option<
+            crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>,
+        >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -1056,7 +1080,9 @@ where
     /// Set the `policies` field (required)
     pub fn policies(
         mut self,
-        value: impl Into<crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>>,
+        value: impl Into<
+            crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>,
+        >,
     ) -> ServiceBuilder<'a, service_state::SetPolicies<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ServiceBuilder {
@@ -1112,7 +1138,13 @@ impl<'a> Service<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {

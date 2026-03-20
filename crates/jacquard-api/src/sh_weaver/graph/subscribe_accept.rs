@@ -8,19 +8,25 @@
 /// Acceptance of a subscription request.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeAccept<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference to the subscribe record being accepted.
+    ///Reference to the subscribe record being accepted.
     #[serde(borrow)]
     pub subscribe: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod subscribe_accept_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -28,37 +34,37 @@ pub mod subscribe_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subscribe;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subscribe = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subscribe = S::Subscribe;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subscribe` field to Set
     pub struct SetSubscribe<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubscribe<S> {}
     impl<S: State> State for SetSubscribe<S> {
-        type CreatedAt = S::CreatedAt;
         type Subscribe = Set<members::subscribe>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subscribe = S::Subscribe;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subscribe` field
         pub struct subscribe(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -131,8 +137,8 @@ where
 impl<'a, S> SubscribeAcceptBuilder<'a, S>
 where
     S: subscribe_accept_state::State,
-    S::CreatedAt: subscribe_accept_state::IsSet,
     S::Subscribe: subscribe_accept_state::IsSet,
+    S::CreatedAt: subscribe_accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscribeAccept<'a> {
@@ -173,7 +179,13 @@ impl<'a> SubscribeAccept<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeAcceptGetRecordOutput<'a> {
@@ -230,8 +242,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscribeAccept<'a> {
     }
 }
 
-fn lexicon_doc_sh_weaver_graph_subscribeAccept() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_sh_weaver_graph_subscribeAccept() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.graph.subscribeAccept"),

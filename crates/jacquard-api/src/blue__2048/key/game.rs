@@ -8,19 +8,25 @@
 /// A record that holds a did:key for verifying a players game. This is intended to be written at a verification authorities repo
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A did:key that is used to verify an at://2048 authority has verified this game to a certain degree
+    ///A did:key that is used to verify an at://2048 authority has verified this game to a certain degree
     #[serde(borrow)]
     pub key: crate::blue__2048::key::Key<'a>,
 }
 
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -173,7 +179,13 @@ impl<'a> Game<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<'a> {

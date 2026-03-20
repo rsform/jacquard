@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Langs<'a> {
@@ -24,7 +30,7 @@ pub struct Langs<'a> {
 
 pub mod langs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,51 +38,51 @@ pub mod langs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Moderation;
-        type Title;
         type Lang;
+        type Title;
+        type Moderation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Moderation = Unset;
-        type Title = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModeration<S> {}
-    impl<S: State> State for SetModeration<S> {
-        type Moderation = Set<members::moderation>;
-        type Title = S::Title;
-        type Lang = S::Lang;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Moderation = S::Moderation;
-        type Title = Set<members::title>;
-        type Lang = S::Lang;
+        type Title = Unset;
+        type Moderation = Unset;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
-        type Moderation = S::Moderation;
-        type Title = S::Title;
         type Lang = Set<members::lang>;
+        type Title = S::Title;
+        type Moderation = S::Moderation;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Lang = S::Lang;
+        type Title = Set<members::title>;
+        type Moderation = S::Moderation;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModeration<S> {}
+    impl<S: State> State for SetModeration<S> {
+        type Lang = S::Lang;
+        type Title = S::Title;
+        type Moderation = Set<members::moderation>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `moderation` field
-        pub struct moderation(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `moderation` field
+        pub struct moderation(());
     }
 }
 
@@ -112,7 +118,10 @@ impl<'a> LangsBuilder<'a, langs_state::Empty> {
 
 impl<'a, S: langs_state::State> LangsBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn comment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -183,9 +192,9 @@ where
 impl<'a, S> LangsBuilder<'a, S>
 where
     S: langs_state::State,
-    S::Moderation: langs_state::IsSet,
-    S::Title: langs_state::IsSet,
     S::Lang: langs_state::IsSet,
+    S::Title: langs_state::IsSet,
+    S::Moderation: langs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Langs<'a> {
@@ -215,7 +224,9 @@ where
     }
 }
 
-fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.rito.service.getSchema"),
@@ -225,149 +236,143 @@ fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::Lex
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("langs"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("moderation"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("comment"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "moderation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: None,
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(
-                                            ::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("moderation")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "comment",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "lang",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "moderation",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "title",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(
-                    ::jacquard_lexicon::lexicon::LexXrpcProcedure {
+                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
+                    description: None,
+                    parameters: None,
+                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        parameters: None,
-                        input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                            description: None,
-                            encoding: ::jacquard_common::CowStr::new_static("application/json"),
-                            schema: Some(::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(
-                                ::jacquard_lexicon::lexicon::LexObject {
-                                    description: None,
-                                    required: Some(vec![
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
+                        schema: Some(
+                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
+                                description: None,
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("nsid")
+                                    ],
+                                ),
+                                nullable: None,
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    map.insert(
                                         ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                             "nsid",
                                         ),
-                                    ]),
-                                    nullable: None,
-                                    properties: {
-                                        #[allow(unused_mut)]
-                                        let mut map = ::alloc::collections::BTreeMap::new();
-                                        map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "nsid",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                                ::jacquard_lexicon::lexicon::LexString {
-                                                    description: None,
-                                                    format: None,
-                                                    default: None,
-                                                    min_length: None,
-                                                    max_length: None,
-                                                    min_graphemes: None,
-                                                    max_graphemes: None,
-                                                    r#enum: None,
-                                                    r#const: None,
-                                                    known_values: None,
-                                                },
-                                            ),
-                                        );
-                                        map
-                                    },
+                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: None,
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                    );
+                                    map
                                 },
-                            )),
-                        }),
-                        output: None,
-                        errors: None,
-                    },
-                ),
+                            }),
+                        ),
+                    }),
+                    output: None,
+                    errors: None,
+                }),
             );
             map
         },
@@ -400,7 +405,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Langs<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSchema<'a> {
@@ -411,39 +416,45 @@ pub struct GetSchema<'a> {
 /// Returns the Bookmark data for the given NSID.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSchemaOutput<'a> {
-    /// Comments with titles, content, and moderation in multiple languages.
+    ///Comments with titles, content, and moderation in multiple languages.
     #[serde(borrow)]
     pub comments: Vec<crate::blue_rito::service::get_schema::Langs<'a>>,
-    /// Moderation result for OGP title and description
+    ///Moderation result for OGP title and description
     #[serde(borrow)]
     pub moderations: Vec<jacquard_common::CowStr<'a>>,
-    /// Namespace ID of the service or application (e.g., 'uk.skyblur.post').
+    ///Namespace ID of the service or application (e.g., 'uk.skyblur.post').
     #[serde(borrow)]
     pub nsid: jacquard_common::CowStr<'a>,
-    /// The Open Graph Protocol (OGP) description for the bookmark.
+    ///The Open Graph Protocol (OGP) description for the bookmark.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ogp_description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Open Graph Protocol (OGP) image URL for the bookmark.
+    ///The Open Graph Protocol (OGP) image URL for the bookmark.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ogp_image: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The Open Graph Protocol (OGP) title for the bookmark.
+    ///The Open Graph Protocol (OGP) title for the bookmark.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ogp_title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The schema URL pattern associated with this NSID (e.g., 'https://skyblur.uk/post/{did}/{rkey}').
+    ///The schema URL pattern associated with this NSID (e.g., 'https://skyblur.uk/post/{did}/{rkey}').
     #[serde(borrow)]
     pub schema: jacquard_common::CowStr<'a>,
-    /// This field contains tags. If registered by the owner, it may include 'Verified'.
+    ///This field contains tags. If registered by the owner, it may include 'Verified'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// If this comment registed by owner, this field should be true.
+    ///If this comment registed by owner, this field should be true.
     pub verified: bool,
 }
 
@@ -459,8 +470,9 @@ impl jacquard_common::xrpc::XrpcResp for GetSchemaResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetSchema<'a> {
     const NSID: &'static str = "blue.rito.service.getSchema";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GetSchemaResponse;
 }
 
@@ -469,8 +481,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSchema<'a> {
 pub struct GetSchemaRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSchemaRequest {
     const PATH: &'static str = "/xrpc/blue.rito.service.getSchema";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = GetSchema<'de>;
     type Response = GetSchemaResponse;
 }

@@ -8,29 +8,37 @@
 /// A record representing the relationship between a card and a collection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLink<'a> {
-    /// Timestamp when the card was added to the collection.
+    ///Timestamp when the card was added to the collection.
     pub added_at: jacquard_common::types::string::Datetime,
-    /// DID of the user who added the card to the collection
+    ///DID of the user who added the card to the collection
     #[serde(borrow)]
     pub added_by: jacquard_common::CowStr<'a>,
-    /// Strong reference to the card record in the users library.
+    ///Strong reference to the card record in the users library.
     #[serde(borrow)]
     pub card: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Strong reference to the collection record.
+    ///Strong reference to the collection record.
     #[serde(borrow)]
     pub collection: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// Timestamp when this link record was created (usually set by PDS).
+    ///Timestamp when this link record was created (usually set by PDS).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Strong reference to the original card record (may be in another library).
+    ///Strong reference to the original card record (may be in another library).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub original_card: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Optional provenance information for this link.
+    pub original_card: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Optional provenance information for this link.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub provenance: std::option::Option<crate::network_cosmik::Provenance<'a>>,
@@ -38,7 +46,7 @@ pub struct CollectionLink<'a> {
 
 pub mod collection_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,67 +54,67 @@ pub mod collection_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
+        type Collection;
         type Card;
         type AddedBy;
-        type Collection;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
+        type Collection = Unset;
         type Card = Unset;
         type AddedBy = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Card = S::Card;
-        type AddedBy = S::AddedBy;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `card` field to Set
-    pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCard<S> {}
-    impl<S: State> State for SetCard<S> {
-        type AddedAt = S::AddedAt;
-        type Card = Set<members::card>;
-        type AddedBy = S::AddedBy;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `added_by` field to Set
-    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
-    impl<S: State> State for SetAddedBy<S> {
-        type AddedAt = S::AddedAt;
-        type Card = S::Card;
-        type AddedBy = Set<members::added_by>;
-        type Collection = S::Collection;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type AddedAt = S::AddedAt;
+        type Collection = Set<members::collection>;
         type Card = S::Card;
         type AddedBy = S::AddedBy;
-        type Collection = Set<members::collection>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `card` field to Set
+    pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCard<S> {}
+    impl<S: State> State for SetCard<S> {
+        type Collection = S::Collection;
+        type Card = Set<members::card>;
+        type AddedBy = S::AddedBy;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_by` field to Set
+    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
+    impl<S: State> State for SetAddedBy<S> {
+        type Collection = S::Collection;
+        type Card = S::Card;
+        type AddedBy = Set<members::added_by>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Collection = S::Collection;
+        type Card = S::Card;
+        type AddedBy = S::AddedBy;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `card` field
         pub struct card(());
         ///Marker type for the `added_by` field
         pub struct added_by(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -279,10 +287,10 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
 impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
-    S::AddedAt: collection_link_state::IsSet,
+    S::Collection: collection_link_state::IsSet,
     S::Card: collection_link_state::IsSet,
     S::AddedBy: collection_link_state::IsSet,
-    S::Collection: collection_link_state::IsSet,
+    S::AddedAt: collection_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLink<'a> {
@@ -333,7 +341,13 @@ impl<'a> CollectionLink<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLinkGetRecordOutput<'a> {
@@ -390,7 +404,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLink<'a> {
     }
 }
 
-fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.cosmik.collectionLink"),

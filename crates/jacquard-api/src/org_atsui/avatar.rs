@@ -7,29 +7,35 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar<'a> {
-    /// DID of the blob owner. Used to resolve blob URLs.
+    ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// Pull the avatar up by half its own height, overlapping the element above.
+    ///Pull the avatar up by half its own height, overlapping the element above.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub lift: std::option::Option<bool>,
-    /// Size token.
+    ///Size token.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub size: std::option::Option<AvatarSize<'a>>,
-    /// Blob ref for the image.
+    ///Blob ref for the image.
     #[serde(borrow)]
     pub src: jacquard_common::types::value::Data<'a>,
 }
 
 pub mod avatar_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,7 +105,10 @@ impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
+    pub fn maybe_did(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -284,7 +293,13 @@ impl jacquard_common::IntoStatic for AvatarSize<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarOutput<'a> {
@@ -305,8 +320,9 @@ impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Avatar<'a> {
     const NSID: &'static str = "org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AvatarResponse;
 }
 
@@ -315,8 +331,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Avatar<'a> {
 pub struct AvatarRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Avatar<'de>;
     type Response = AvatarResponse;
 }

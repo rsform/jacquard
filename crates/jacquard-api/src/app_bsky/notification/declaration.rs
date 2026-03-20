@@ -8,18 +8,24 @@
 /// A declaration of the user's choices related to notifications that can be produced by them.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
-    /// A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
+    ///A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
     #[serde(borrow)]
     pub allow_subscriptions: DeclarationAllowSubscriptions<'a>,
 }
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -219,8 +225,12 @@ impl jacquard_common::IntoStatic for DeclarationAllowSubscriptions<'_> {
     type Output = DeclarationAllowSubscriptions<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            DeclarationAllowSubscriptions::Followers => DeclarationAllowSubscriptions::Followers,
-            DeclarationAllowSubscriptions::Mutuals => DeclarationAllowSubscriptions::Mutuals,
+            DeclarationAllowSubscriptions::Followers => {
+                DeclarationAllowSubscriptions::Followers
+            }
+            DeclarationAllowSubscriptions::Mutuals => {
+                DeclarationAllowSubscriptions::Mutuals
+            }
             DeclarationAllowSubscriptions::None => DeclarationAllowSubscriptions::None,
             DeclarationAllowSubscriptions::Other(v) => {
                 DeclarationAllowSubscriptions::Other(v.into_static())
@@ -231,7 +241,13 @@ impl jacquard_common::IntoStatic for DeclarationAllowSubscriptions<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {
@@ -288,8 +304,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     }
 }
 
-fn lexicon_doc_app_bsky_notification_declaration()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_notification_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.notification.declaration"),

@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InterestedParty<'a> {
@@ -28,13 +28,13 @@ pub struct InterestedParty<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ipi: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Percentage of mechanical royalties allocated to this interested party, 10000 = 100%
+    ///Percentage of mechanical royalties allocated to this interested party, 10000 = 100%
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub mechanical_royalties_percentage: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Percentage of performance royalties allocated to this interested party, 10000 = 100%
+    ///Percentage of performance royalties allocated to this interested party, 10000 = 100%
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub performance_royalties_percentage: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -42,13 +42,15 @@ pub struct InterestedParty<'a> {
     pub publishing_owner: std::option::Option<
         crate::ch_indiemusi::alpha::actor::publishing_owner::PublishingOwner<'a>,
     >,
-    /// Role of the interested party (e.g., 'author', 'composer', 'publisher')
+    ///Role of the interested party (e.g., 'author', 'composer', 'publisher')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ch.indiemusi.alpha.song"),
@@ -321,7 +323,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 11usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ipi"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ipi",
+                    ),
                     max: 11usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -331,7 +335,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -341,7 +347,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("role"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "role",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -354,14 +362,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
 /// A song or musical work: the melody, lyrics, and arrangement created by composers and authors
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Song<'a> {
-    /// List of interested parties (authors, composers, publishers) associated with this song
+    ///List of interested parties (authors, composers, publishers) associated with this song
     #[serde(borrow)]
     pub interested_parties: Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>,
-    /// ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
+    ///ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub iswc: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -371,7 +385,7 @@ pub struct Song<'a> {
 
 pub mod song_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -417,7 +431,9 @@ pub mod song_state {
 pub struct SongBuilder<'a, S: song_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>>,
+        ::core::option::Option<
+            Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -463,7 +479,10 @@ where
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `iswc` field (optional)
-    pub fn iswc(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn iswc(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -540,7 +559,13 @@ impl<'a> Song<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
@@ -610,7 +635,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 13usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("iswc"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "iswc",
+                    ),
                     max: 13usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -621,7 +648,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });

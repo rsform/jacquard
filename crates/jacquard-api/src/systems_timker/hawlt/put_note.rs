@@ -7,21 +7,29 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutNote<'a> {
-    /// The note record to write.
+    ///The note record to write.
     #[serde(borrow)]
     pub record: crate::systems_timker::hawlt::note::Note<'a>,
-    /// The record key (TID) for this note.
+    ///The record key (TID) for this note.
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+    pub rkey: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
 }
 
 pub mod put_note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -69,7 +77,9 @@ pub struct PutNoteBuilder<'a, S: put_note_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<crate::systems_timker::hawlt::note::Note<'a>>,
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -121,7 +131,9 @@ where
     pub fn rkey(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
     ) -> PutNoteBuilder<'a, put_note_state::SetRkey<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
@@ -165,7 +177,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutNoteOutput<'a> {
@@ -187,8 +205,9 @@ impl jacquard_common::xrpc::XrpcResp for PutNoteResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PutNote<'a> {
     const NSID: &'static str = "systems.timker.hawlt.putNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutNoteResponse;
 }
 
@@ -197,8 +216,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutNote<'a> {
 pub struct PutNoteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutNoteRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.putNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = PutNote<'de>;
     type Response = PutNoteResponse;
 }

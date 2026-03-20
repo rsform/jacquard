@@ -8,26 +8,32 @@
 /// A person's answer to a question
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Answer<'a> {
-    /// How certain the person is about this answer
+    ///How certain the person is about this answer
     #[serde(borrow)]
     pub certainty: AnswerCertainty<'a>,
-    /// Reference to the question being answered
+    ///Reference to the question being answered
     #[serde(borrow)]
     pub question: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// The answer text
+    ///The answer text
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-    /// When this answer was submitted
+    ///When this answer was submitted
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
 pub mod answer_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,8 +42,8 @@ pub mod answer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type Certainty;
         type Question;
+        type Certainty;
         type Timestamp;
     }
     /// Empty state - all required fields are unset
@@ -45,8 +51,8 @@ pub mod answer_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type Certainty = Unset;
         type Question = Unset;
+        type Certainty = Unset;
         type Timestamp = Unset;
     }
     ///State transition - sets the `text` field to Set
@@ -54,17 +60,8 @@ pub mod answer_state {
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Text = Set<members::text>;
+        type Question = S::Question;
         type Certainty = S::Certainty;
-        type Question = S::Question;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `certainty` field to Set
-    pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCertainty<S> {}
-    impl<S: State> State for SetCertainty<S> {
-        type Text = S::Text;
-        type Certainty = Set<members::certainty>;
-        type Question = S::Question;
         type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `question` field to Set
@@ -72,8 +69,17 @@ pub mod answer_state {
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
         type Text = S::Text;
-        type Certainty = S::Certainty;
         type Question = Set<members::question>;
+        type Certainty = S::Certainty;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `certainty` field to Set
+    pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCertainty<S> {}
+    impl<S: State> State for SetCertainty<S> {
+        type Text = S::Text;
+        type Question = S::Question;
+        type Certainty = Set<members::certainty>;
         type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
@@ -81,8 +87,8 @@ pub mod answer_state {
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
         type Text = S::Text;
-        type Certainty = S::Certainty;
         type Question = S::Question;
+        type Certainty = S::Certainty;
         type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
@@ -90,10 +96,10 @@ pub mod answer_state {
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `certainty` field
-        pub struct certainty(());
         ///Marker type for the `question` field
         pub struct question(());
+        ///Marker type for the `certainty` field
+        pub struct certainty(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
     }
@@ -209,8 +215,8 @@ impl<'a, S> AnswerBuilder<'a, S>
 where
     S: answer_state::State,
     S::Text: answer_state::IsSet,
-    S::Certainty: answer_state::IsSet,
     S::Question: answer_state::IsSet,
+    S::Certainty: answer_state::IsSet,
     S::Timestamp: answer_state::IsSet,
 {
     /// Build the final struct
@@ -355,7 +361,13 @@ impl jacquard_common::IntoStatic for AnswerCertainty<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AnswerGetRecordOutput<'a> {
@@ -413,7 +425,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Answer<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -428,15 +442,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Answer<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 100usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
                 }
             }
         }

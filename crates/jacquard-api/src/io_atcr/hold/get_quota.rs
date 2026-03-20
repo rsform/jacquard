@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetQuota<'a> {
@@ -16,7 +22,7 @@ pub struct GetQuota<'a> {
 
 pub mod get_quota_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,7 +55,9 @@ pub mod get_quota_state {
 /// Builder for constructing an instance of this type
 pub struct GetQuotaBuilder<'a, S: get_quota_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Did<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -105,22 +113,28 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetQuotaOutput<'a> {
-    /// Storage limit in bytes (absent if unlimited)
+    ///Storage limit in bytes (absent if unlimited)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
-    /// Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')
+    ///Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Total size in bytes of unique blobs
+    ///Total size in bytes of unique blobs
     pub total_size: i64,
-    /// Number of unique blob digests
+    ///Number of unique blob digests
     pub unique_blobs: i64,
-    /// DID of the user
+    ///DID of the user
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
 }
@@ -135,7 +149,7 @@ pub struct GetQuotaOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

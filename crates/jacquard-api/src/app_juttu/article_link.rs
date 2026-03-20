@@ -8,27 +8,33 @@
 /// Maps a unique article ID to its Bluesky comments thread, preserving original creation time.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArticleLink<'a> {
-    /// The site-specific unique identifier for the article (e.g., slug).
+    ///The site-specific unique identifier for the article (e.g., slug).
     #[serde(borrow)]
     pub article_id: jacquard_common::CowStr<'a>,
-    /// The URL of the article.
+    ///The URL of the article.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub article_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// A strong reference to the root post (e.g., app.bsky.feed.post) of the comments thread.
+    ///A strong reference to the root post (e.g., app.bsky.feed.post) of the comments thread.
     #[serde(borrow)]
     pub comments_thread: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// The original publication timestamp of the article.
+    ///The original publication timestamp of the article.
     pub created_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod article_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -240,7 +246,13 @@ impl<'a> ArticleLink<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArticleLinkGetRecordOutput<'a> {
@@ -298,7 +310,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("article_id"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "article_id",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -308,7 +322,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
     }
 }
 
-fn lexicon_doc_app_juttu_articleLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_juttu_articleLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.juttu.articleLink"),

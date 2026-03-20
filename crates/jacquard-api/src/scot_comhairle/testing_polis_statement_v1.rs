@@ -8,23 +8,29 @@
 /// A statement in the Polis-style deliberation system
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestingPolisStatementV1<'a> {
-    /// Timestamp when the statement was created
+    ///Timestamp when the statement was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference to the poll this statement belongs to
+    ///Reference to the poll this statement belongs to
     #[serde(borrow)]
     pub poll: crate::scot_comhairle::testing_polis_statement_v1::PollRef<'a>,
-    /// The text content of the statement
+    ///The text content of the statement
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
 pub mod testing_polis_statement_v1_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,60 +38,65 @@ pub mod testing_polis_statement_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type Poll;
         type CreatedAt;
+        type Poll;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type Poll = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Poll = S::Poll;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type Text = S::Text;
-        type Poll = Set<members::poll>;
-        type CreatedAt = S::CreatedAt;
+        type Poll = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type Poll = S::Poll;
         type CreatedAt = Set<members::created_at>;
+        type Poll = S::Poll;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type CreatedAt = S::CreatedAt;
+        type Poll = Set<members::poll>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Poll = S::Poll;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `poll` field
-        pub struct poll(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
 /// Builder for constructing an instance of this type
-pub struct TestingPolisStatementV1Builder<'a, S: testing_polis_statement_v1_state::State> {
+pub struct TestingPolisStatementV1Builder<
+    'a,
+    S: testing_polis_statement_v1_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::scot_comhairle::testing_polis_statement_v1::PollRef<'a>>,
+        ::core::option::Option<
+            crate::scot_comhairle::testing_polis_statement_v1::PollRef<'a>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -93,7 +104,10 @@ pub struct TestingPolisStatementV1Builder<'a, S: testing_polis_statement_v1_stat
 
 impl<'a> TestingPolisStatementV1<'a> {
     /// Create a new builder for this type
-    pub fn new() -> TestingPolisStatementV1Builder<'a, testing_polis_statement_v1_state::Empty> {
+    pub fn new() -> TestingPolisStatementV1Builder<
+        'a,
+        testing_polis_statement_v1_state::Empty,
+    > {
         TestingPolisStatementV1Builder::new()
     }
 }
@@ -118,7 +132,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> TestingPolisStatementV1Builder<'a, testing_polis_statement_v1_state::SetCreatedAt<S>> {
+    ) -> TestingPolisStatementV1Builder<
+        'a,
+        testing_polis_statement_v1_state::SetCreatedAt<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         TestingPolisStatementV1Builder {
             _phantom_state: ::core::marker::PhantomData,
@@ -137,7 +154,10 @@ where
     pub fn poll(
         mut self,
         value: impl Into<crate::scot_comhairle::testing_polis_statement_v1::PollRef<'a>>,
-    ) -> TestingPolisStatementV1Builder<'a, testing_polis_statement_v1_state::SetPoll<S>> {
+    ) -> TestingPolisStatementV1Builder<
+        'a,
+        testing_polis_statement_v1_state::SetPoll<S>,
+    > {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         TestingPolisStatementV1Builder {
             _phantom_state: ::core::marker::PhantomData,
@@ -156,7 +176,10 @@ where
     pub fn text(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> TestingPolisStatementV1Builder<'a, testing_polis_statement_v1_state::SetText<S>> {
+    ) -> TestingPolisStatementV1Builder<
+        'a,
+        testing_polis_statement_v1_state::SetText<S>,
+    > {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         TestingPolisStatementV1Builder {
             _phantom_state: ::core::marker::PhantomData,
@@ -169,9 +192,9 @@ where
 impl<'a, S> TestingPolisStatementV1Builder<'a, S>
 where
     S: testing_polis_statement_v1_state::State,
-    S::Text: testing_polis_statement_v1_state::IsSet,
-    S::Poll: testing_polis_statement_v1_state::IsSet,
     S::CreatedAt: testing_polis_statement_v1_state::IsSet,
+    S::Poll: testing_polis_statement_v1_state::IsSet,
+    S::Text: testing_polis_statement_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisStatementV1<'a> {
@@ -214,7 +237,13 @@ impl<'a> TestingPolisStatementV1<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestingPolisStatementV1GetRecordOutput<'a> {
@@ -272,7 +301,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestingPolisStatementV1<'
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -282,11 +313,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestingPolisStatementV1<'
     }
 }
 
-fn lexicon_doc_scot_comhairle_testingPolisStatementV1()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_scot_comhairle_testingPolisStatementV1() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("scot.comhairle.testingPolisStatementV1"),
+        id: ::jacquard_common::CowStr::new_static(
+            "scot.comhairle.testingPolisStatementV1",
+        ),
         revision: None,
         description: None,
         defs: {
@@ -373,65 +407,71 @@ fn lexicon_doc_scot_comhairle_testingPolisStatementV1()
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("pollRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Reference to a poll record",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Content identifier of the poll record",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "cid",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Content identifier of the poll record",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "AT-URI of the poll record",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
                                 ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "AT-URI of the poll record",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -441,21 +481,27 @@ fn lexicon_doc_scot_comhairle_testingPolisStatementV1()
 /// Reference to a poll record
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PollRef<'a> {
-    /// Content identifier of the poll record
+    ///Content identifier of the poll record
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    /// AT-URI of the poll record
+    ///AT-URI of the poll record
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod poll_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

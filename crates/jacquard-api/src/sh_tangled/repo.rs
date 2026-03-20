@@ -36,7 +36,13 @@ pub mod tree;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
@@ -44,29 +50,29 @@ pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// knot where the repo was created
+    ///knot where the repo was created
     #[serde(borrow)]
     pub knot: jacquard_common::CowStr<'a>,
-    /// List of labels that this repo subscribes to
+    ///List of labels that this repo subscribes to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    /// name of the repo
+    ///name of the repo
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// source of the repo
+    ///source of the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// CI runner to send jobs to and receive results from
+    ///CI runner to send jobs to and receive results from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub spindle: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Topics related to the repo
+    ///Topics related to the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub topics: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Any URI related to the repo
+    ///Any URI related to the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
@@ -74,7 +80,7 @@ pub struct Repo<'a> {
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -159,7 +165,17 @@ impl<'a> RepoBuilder<'a, repo_state::Empty> {
     pub fn new() -> Self {
         RepoBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -186,12 +202,18 @@ where
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -275,7 +297,10 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `spindle` field (optional)
-    pub fn spindle(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn spindle(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -288,12 +313,18 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `topics` field (optional)
-    pub fn topics(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn topics(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `topics` field to an Option value (optional)
-    pub fn maybe_topics(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_topics(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -378,7 +409,13 @@ impl<'a> Repo<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoGetRecordOutput<'a> {
@@ -439,15 +476,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                     )
                     .count();
                 if count > 140usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 140usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 140usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -459,15 +494,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            min: 1usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        min: 1usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -475,7 +508,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("topics"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "topics",
+                    ),
                     max: 50usize,
                     actual: value.len(),
                 });

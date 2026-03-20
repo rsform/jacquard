@@ -8,37 +8,43 @@
 /// A digital painting created on aesthetic.computer
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Painting<'a> {
-    /// Short alphanumeric code for easy lookup (e.g., 'a3b')
+    ///Short alphanumeric code for easy lookup (e.g., 'a3b')
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
-    /// URL to full resolution PNG
+    ///URL to full resolution PNG
     #[serde(borrow)]
     pub image_url: jacquard_common::types::string::UriValue<'a>,
-    /// URL to .zip recording file (if available)
+    ///URL to .zip recording file (if available)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub recording_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// MongoDB ObjectId reference for bidirectional sync
+    ///MongoDB ObjectId reference for bidirectional sync
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
-    /// Timestamp slug (may include recording: imageSlug:recordingSlug)
+    ///Timestamp slug (may include recording: imageSlug:recordingSlug)
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
-    /// Thumbnail preview (max 1MB)
+    ///Thumbnail preview (max 1MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// Creation timestamp (ISO 8601)
+    ///Creation timestamp (ISO 8601)
     pub when: jacquard_common::types::string::Datetime,
 }
 
 pub mod painting_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,85 +52,85 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
-        type When;
+        type Ref;
         type Code;
         type ImageUrl;
-        type Ref;
+        type Slug;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
-        type When = Unset;
+        type Ref = Unset;
         type Code = Unset;
         type ImageUrl = Unset;
-        type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type When = S::When;
-        type Code = S::Code;
-        type ImageUrl = S::ImageUrl;
-        type Ref = S::Ref;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Slug = S::Slug;
-        type When = Set<members::when>;
-        type Code = S::Code;
-        type ImageUrl = S::ImageUrl;
-        type Ref = S::Ref;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Slug = S::Slug;
-        type When = S::When;
-        type Code = Set<members::code>;
-        type ImageUrl = S::ImageUrl;
-        type Ref = S::Ref;
-    }
-    ///State transition - sets the `image_url` field to Set
-    pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImageUrl<S> {}
-    impl<S: State> State for SetImageUrl<S> {
-        type Slug = S::Slug;
-        type When = S::When;
-        type Code = S::Code;
-        type ImageUrl = Set<members::image_url>;
-        type Ref = S::Ref;
+        type Slug = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Slug = S::Slug;
-        type When = S::When;
+        type Ref = Set<members::r#ref>;
         type Code = S::Code;
         type ImageUrl = S::ImageUrl;
-        type Ref = Set<members::r#ref>;
+        type Slug = S::Slug;
+        type When = S::When;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Ref = S::Ref;
+        type Code = Set<members::code>;
+        type ImageUrl = S::ImageUrl;
+        type Slug = S::Slug;
+        type When = S::When;
+    }
+    ///State transition - sets the `image_url` field to Set
+    pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImageUrl<S> {}
+    impl<S: State> State for SetImageUrl<S> {
+        type Ref = S::Ref;
+        type Code = S::Code;
+        type ImageUrl = Set<members::image_url>;
+        type Slug = S::Slug;
+        type When = S::When;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Ref = S::Ref;
+        type Code = S::Code;
+        type ImageUrl = S::ImageUrl;
+        type Slug = Set<members::slug>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Ref = S::Ref;
+        type Code = S::Code;
+        type ImageUrl = S::ImageUrl;
+        type Slug = S::Slug;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
-        ///Marker type for the `when` field
-        pub struct when(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
         ///Marker type for the `code` field
         pub struct code(());
         ///Marker type for the `image_url` field
         pub struct image_url(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -297,11 +303,11 @@ where
 impl<'a, S> PaintingBuilder<'a, S>
 where
     S: painting_state::State,
-    S::Slug: painting_state::IsSet,
-    S::When: painting_state::IsSet,
+    S::Ref: painting_state::IsSet,
     S::Code: painting_state::IsSet,
     S::ImageUrl: painting_state::IsSet,
-    S::Ref: painting_state::IsSet,
+    S::Slug: painting_state::IsSet,
+    S::When: painting_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Painting<'a> {
@@ -352,7 +358,13 @@ impl<'a> Painting<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PaintingGetRecordOutput<'a> {
@@ -410,7 +422,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("code"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "code",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -421,7 +435,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("image_url"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "image_url",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -444,7 +460,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 24usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ref"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ref",
+                    ),
                     max: 24usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -455,17 +473,65 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("slug"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slug",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(ref value) = self.thumbnail {
+            {
+                let size = value.blob().size;
+                if size > 1048576usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumbnail",
+                        ),
+                        max: 1048576usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.thumbnail {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumbnail",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         Ok(())
     }
 }
 
-fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.painting"),

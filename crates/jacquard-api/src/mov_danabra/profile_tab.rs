@@ -7,11 +7,19 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileTab<'a> {
+    ///Defaults to `10`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_limit")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -20,9 +28,13 @@ pub struct ProfileTab<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
+}
+
 pub mod profile_tab_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -134,7 +146,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileTab<'a> {
         ProfileTab {
-            limit: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.0.or_else(|| Some(10i64)),
             tab: self.__unsafe_private_named.1,
             uri: self.__unsafe_private_named.2.unwrap(),
             extra_data: Default::default(),
@@ -149,7 +161,7 @@ where
         >,
     ) -> ProfileTab<'a> {
         ProfileTab {
-            limit: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.0.or_else(|| Some(10i64)),
             tab: self.__unsafe_private_named.1,
             uri: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
@@ -247,7 +259,13 @@ impl jacquard_common::IntoStatic for ProfileTabTab<'_> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileTabOutput<'a> {
@@ -268,8 +286,9 @@ impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileTab<'a> {
     const NSID: &'static str = "mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ProfileTabResponse;
 }
 
@@ -278,8 +297,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileTab<'a> {
 pub struct ProfileTabRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ProfileTab<'de>;
     type Response = ProfileTabResponse;
 }

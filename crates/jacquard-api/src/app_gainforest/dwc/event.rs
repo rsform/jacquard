@@ -8,108 +8,114 @@
 /// A sampling or collecting event. Multiple dwc.occurrence records can reference the same event via eventRef, sharing location and protocol metadata.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
-    /// Uncertainty radius in meters around the coordinates.
+    ///Uncertainty radius in meters around the coordinates.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub coordinate_uncertainty_in_meters: std::option::Option<i64>,
-    /// The name of the country.
+    ///The name of the country.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub country: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// ISO 3166-1 alpha-2 country code.
+    ///ISO 3166-1 alpha-2 country code.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub country_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Second-level administrative division.
+    ///Second-level administrative division.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub county: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Timestamp of record creation in the ATProto PDS.
+    ///Timestamp of record creation in the ATProto PDS.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.
+    ///Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub decimal_latitude: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.
+    ///Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub decimal_longitude: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').
+    ///The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').
     #[serde(borrow)]
     pub event_date: jacquard_common::CowStr<'a>,
-    /// An identifier for the event. Should be globally unique or unique within the dataset.
+    ///An identifier for the event. Should be globally unique or unique within the dataset.
     #[serde(borrow)]
     pub event_id: jacquard_common::CowStr<'a>,
-    /// Comments or notes about the event.
+    ///Comments or notes about the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub event_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').
+    ///The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub event_time: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Notes or a reference to notes taken in the field about the event.
+    ///Notes or a reference to notes taken in the field about the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub field_notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The spatial reference system. Recommended: 'EPSG:4326'.
+    ///The spatial reference system. Recommended: 'EPSG:4326'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').
+    ///A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub habitat: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Specific locality description.
+    ///Specific locality description.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifier for the location where the event occurred.
+    ///Identifier for the location where the event occurred.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub location_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Comments about the location.
+    ///Comments about the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub location_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Upper limit of elevation range in meters above sea level.
+    ///Upper limit of elevation range in meters above sea level.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub maximum_elevation_in_meters: std::option::Option<i64>,
-    /// Lower limit of elevation range in meters above sea level.
+    ///Lower limit of elevation range in meters above sea level.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub minimum_elevation_in_meters: std::option::Option<i64>,
-    /// Third-level administrative division.
+    ///Third-level administrative division.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub municipality: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).
+    ///An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent_event_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT-URI reference to the parent app.gainforest.dwc.event record.
+    ///AT-URI reference to the parent app.gainforest.dwc.event record.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent_event_ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').
+    ///The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sample_size_unit: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').
+    ///A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sample_size_value: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').
+    ///The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sampling_effort: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').
+    ///The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sampling_protocol: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// First-level administrative division.
+    ///First-level administrative division.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub state_province: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -117,7 +123,7 @@ pub struct Event<'a> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -125,51 +131,51 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type EventId;
         type EventDate;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type EventId = Unset;
         type EventDate = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `event_id` field to Set
-    pub struct SetEventId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventId<S> {}
-    impl<S: State> State for SetEventId<S> {
-        type EventId = Set<members::event_id>;
-        type EventDate = S::EventDate;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
-        type EventId = S::EventId;
-        type EventDate = Set<members::event_date>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type EventId = S::EventId;
         type EventDate = S::EventDate;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `event_id` field to Set
+    pub struct SetEventId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventId<S> {}
+    impl<S: State> State for SetEventId<S> {
+        type CreatedAt = S::CreatedAt;
+        type EventId = Set<members::event_id>;
+        type EventDate = S::EventDate;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventDate<S> {}
+    impl<S: State> State for SetEventDate<S> {
+        type CreatedAt = S::CreatedAt;
+        type EventId = S::EventId;
+        type EventDate = Set<members::event_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `event_id` field
         pub struct event_id(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -221,8 +227,33 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
         EventBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -231,7 +262,10 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `coordinateUncertaintyInMeters` field (optional)
-    pub fn coordinate_uncertainty_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
+    pub fn coordinate_uncertainty_in_meters(
+        mut self,
+        value: impl Into<Option<i64>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -244,7 +278,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `country` field (optional)
-    pub fn country(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn country(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -257,12 +294,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
-    pub fn country_code(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn country_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
-    pub fn maybe_country_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_country_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -270,7 +313,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `county` field (optional)
-    pub fn county(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn county(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -310,7 +356,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
-    pub fn maybe_decimal_latitude(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_latitude(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -326,7 +375,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
-    pub fn maybe_decimal_longitude(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_longitude(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -372,12 +424,18 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `eventRemarks` field (optional)
-    pub fn event_remarks(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn event_remarks(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `eventRemarks` field to an Option value (optional)
-    pub fn maybe_event_remarks(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_event_remarks(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -385,12 +443,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
-    pub fn event_time(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn event_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
-    pub fn maybe_event_time(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_event_time(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -398,12 +462,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
-    pub fn field_notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn field_notes(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
-    pub fn maybe_field_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_field_notes(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -411,12 +481,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
-    pub fn geodetic_datum(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn geodetic_datum(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
-    pub fn maybe_geodetic_datum(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_geodetic_datum(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -424,7 +500,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `habitat` field (optional)
-    pub fn habitat(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn habitat(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
@@ -437,7 +516,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locality` field (optional)
-    pub fn locality(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn locality(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
     }
@@ -450,12 +532,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locationID` field (optional)
-    pub fn location_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn location_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
-    pub fn maybe_location_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_location_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.15 = value;
         self
     }
@@ -471,7 +559,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
-    pub fn maybe_location_remarks(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_location_remarks(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.16 = value;
         self
     }
@@ -505,12 +596,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `municipality` field (optional)
-    pub fn municipality(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn municipality(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
-    pub fn maybe_municipality(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_municipality(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.19 = value;
         self
     }
@@ -526,7 +623,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `parentEventID` field to an Option value (optional)
-    pub fn maybe_parent_event_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_parent_event_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.20 = value;
         self
     }
@@ -561,7 +661,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `sampleSizeUnit` field to an Option value (optional)
-    pub fn maybe_sample_size_unit(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sample_size_unit(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.22 = value;
         self
     }
@@ -577,7 +680,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `sampleSizeValue` field to an Option value (optional)
-    pub fn maybe_sample_size_value(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sample_size_value(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.23 = value;
         self
     }
@@ -593,7 +699,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
-    pub fn maybe_sampling_effort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_effort(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.24 = value;
         self
     }
@@ -609,7 +718,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
-    pub fn maybe_sampling_protocol(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_protocol(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.25 = value;
         self
     }
@@ -617,12 +729,18 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
-    pub fn state_province(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn state_province(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.26 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
-    pub fn maybe_state_province(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_state_province(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.26 = value;
         self
     }
@@ -631,9 +749,9 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::CreatedAt: event_state::IsSet,
     S::EventId: event_state::IsSet,
     S::EventDate: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -724,7 +842,13 @@ impl<'a> Event<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<'a> {
@@ -796,15 +920,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "country",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "country",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -840,15 +962,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "county",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "county",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -860,15 +980,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "decimal_latitude",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "decimal_latitude",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -880,15 +998,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "decimal_longitude",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "decimal_longitude",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -901,15 +1017,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_date",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_date",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -922,15 +1036,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -942,15 +1054,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 5000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_remarks",
-                            ),
-                            max: 5000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_remarks",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -962,15 +1072,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "event_time",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "event_time",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -982,15 +1090,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "field_notes",
-                            ),
-                            max: 10000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "field_notes",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1002,15 +1108,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "geodetic_datum",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "geodetic_datum",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1022,15 +1126,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 512usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "habitat",
-                            ),
-                            max: 512usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "habitat",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1042,15 +1144,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "locality",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "locality",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1062,15 +1162,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "location_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "location_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1082,15 +1180,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "location_remarks",
-                            ),
-                            max: 2048usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "location_remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1102,15 +1198,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "municipality",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "municipality",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1122,15 +1216,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "parent_event_id",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "parent_event_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1142,15 +1234,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 128usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "sample_size_unit",
-                            ),
-                            max: 128usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sample_size_unit",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1162,15 +1252,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "sample_size_value",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sample_size_value",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1182,15 +1270,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "sampling_effort",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sampling_effort",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1202,15 +1288,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 1024usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "sampling_protocol",
-                            ),
-                            max: 1024usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sampling_protocol",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1222,15 +1306,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "state_province",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "state_province",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1238,7 +1320,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_gainforest_dwc_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.dwc.event"),

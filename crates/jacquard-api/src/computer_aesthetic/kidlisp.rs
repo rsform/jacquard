@@ -8,26 +8,32 @@
 /// A KidLisp code snippet from Aesthetic Computer
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Kidlisp<'a> {
-    /// Short alphanumeric code for easy lookup
+    ///Short alphanumeric code for easy lookup
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
-    /// MongoDB ObjectId reference for bidirectional sync
+    ///MongoDB ObjectId reference for bidirectional sync
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
-    /// The KidLisp source code
+    ///The KidLisp source code
     #[serde(borrow)]
     pub source: jacquard_common::CowStr<'a>,
-    /// Creation timestamp (ISO 8601)
+    ///Creation timestamp (ISO 8601)
     pub when: jacquard_common::types::string::Datetime,
 }
 
 pub mod kidlisp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -256,7 +262,13 @@ impl<'a> Kidlisp<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct KidlispGetRecordOutput<'a> {
@@ -314,7 +326,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Kidlisp<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("code"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "code",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -325,7 +339,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Kidlisp<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 24usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ref"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ref",
+                    ),
                     max: 24usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -336,7 +352,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Kidlisp<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("source"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "source",
+                    ),
                     max: 50000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -346,7 +364,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Kidlisp<'a> {
     }
 }
 
-fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_computer_aesthetic_kidlisp() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.kidlisp"),

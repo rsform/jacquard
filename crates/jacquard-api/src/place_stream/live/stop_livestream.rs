@@ -14,20 +14,26 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StopLivestream<'a> {}
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StopLivestreamOutput<'a> {
-    /// The new CID of the stopped livestream record.
+    ///The new CID of the stopped livestream record.
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    /// The URI of the stopped livestream record.
+    ///The URI of the stopped livestream record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::UriValue<'a>,
 }
@@ -44,8 +50,9 @@ impl jacquard_common::xrpc::XrpcResp for StopLivestreamResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for StopLivestream<'a> {
     const NSID: &'static str = "place.stream.live.stopLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StopLivestreamResponse;
 }
 
@@ -54,8 +61,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StopLivestream<'a> {
 pub struct StopLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StopLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.stopLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = StopLivestream<'de>;
     type Response = StopLivestreamResponse;
 }

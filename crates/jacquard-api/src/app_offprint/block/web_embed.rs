@@ -7,44 +7,50 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebEmbed<'a> {
-    /// Horizontal alignment
+    ///Horizontal alignment
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Page description/excerpt
+    ///Page description/excerpt
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Native embed height in pixels
+    ///Native embed height in pixels
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub embed_height: std::option::Option<i64>,
-    /// oEmbed URL for iframe embedding
+    ///oEmbed URL for iframe embedding
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Native embed width in pixels
+    ///Native embed width in pixels
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub embed_width: std::option::Option<i64>,
-    /// The URL of the embedded page
+    ///The URL of the embedded page
     #[serde(borrow)]
     pub href: jacquard_common::types::string::UriValue<'a>,
-    /// Screenshot of the embedded content (1280×720px)
+    ///Screenshot of the embedded content (1280×720px)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub preview: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// Name of the website
+    ///Name of the website
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub site_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Page title
+    ///Page title
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// CSS width value (e.g., "100%", "75%". "50%" minimum)
+    ///CSS width value (e.g., "100%", "75%". "50%" minimum)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub width: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -52,7 +58,7 @@ pub struct WebEmbed<'a> {
 
 pub mod web_embed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,7 +118,18 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
     pub fn new() -> Self {
         WebEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -120,12 +137,18 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn alignment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_alignment(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -133,12 +156,18 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -229,12 +258,18 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `siteName` field (optional)
-    pub fn site_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn site_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `siteName` field to an Option value (optional)
-    pub fn maybe_site_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_site_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -242,7 +277,10 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -255,7 +293,10 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn width(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -311,7 +352,9 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.offprint.block.webEmbed"),
@@ -545,15 +588,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 1000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -571,10 +612,54 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         if let Some(ref value) = self.embed_width {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("embed_width"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "embed_width",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
+            }
+        }
+        if let Some(ref value) = self.preview {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "preview",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.preview {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "preview",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         if let Some(ref value) = self.site_name {
@@ -585,15 +670,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "site_name",
-                            ),
-                            max: 100usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "site_name",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -605,15 +688,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "title",
-                            ),
-                            max: 300usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
                 }
             }
         }

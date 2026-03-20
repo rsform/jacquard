@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PutPreferences<'a> {
-    /// A ref to the user's preferences
+    ///A ref to the user's preferences
     #[serde(borrow)]
     pub preferences: crate::social_clippr::actor::Preferences<'a>,
 }
 
 pub mod put_preferences_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,7 +57,9 @@ pub mod put_preferences_state {
 /// Builder for constructing an instance of this type
 pub struct PutPreferencesBuilder<'a, S: put_preferences_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<crate::social_clippr::actor::Preferences<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<crate::social_clippr::actor::Preferences<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -131,8 +139,9 @@ impl jacquard_common::xrpc::XrpcResp for PutPreferencesResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferences<'a> {
     const NSID: &'static str = "social.clippr.actor.putPreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutPreferencesResponse;
 }
 
@@ -141,8 +150,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferences<'a> {
 pub struct PutPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.putPreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = PutPreferences<'de>;
     type Response = PutPreferencesResponse;
 }

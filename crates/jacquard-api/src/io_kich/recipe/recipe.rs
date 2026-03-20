@@ -7,37 +7,53 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ingredient<'a> {
-    /// Amount needed in grams
+    ///Amount needed in grams
     pub grams: i64,
-    /// Optional group name for organizing ingredients (e.g., 'For the sauce:', 'For the pasta:')
+    ///Optional group name for organizing ingredients (e.g., 'For the sauce:', 'For the pasta:')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub group: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Unique identifier for this ingredient
+    ///Unique identifier for this ingredient
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// Whether this ingredient is detached (doesn't count towards recipe completeness)
+    ///Whether this ingredient is detached (doesn't count towards recipe completeness) Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_is_detached")]
     pub is_detached: std::option::Option<bool>,
-    /// Whether this ingredient is optional
+    ///Whether this ingredient is optional Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_is_optional")]
     pub is_optional: std::option::Option<bool>,
-    /// Ingredient name
+    ///Ingredient name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Optional notes about this ingredient (e.g., original quantity)
+    ///Optional notes about this ingredient (e.g., original quantity)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+fn _default_is_detached() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_is_optional() -> std::option::Option<bool> {
+    Some(false)
+}
+
 pub mod ingredient_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -45,51 +61,51 @@ pub mod ingredient_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Grams;
         type Name;
+        type Grams;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Grams = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Grams = S::Grams;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `grams` field to Set
-    pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGrams<S> {}
-    impl<S: State> State for SetGrams<S> {
-        type Id = S::Id;
-        type Grams = Set<members::grams>;
-        type Name = S::Name;
+        type Grams = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Grams = S::Grams;
         type Name = Set<members::name>;
+        type Grams = S::Grams;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `grams` field to Set
+    pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGrams<S> {}
+    impl<S: State> State for SetGrams<S> {
+        type Name = S::Name;
+        type Grams = Set<members::grams>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Grams = S::Grams;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `grams` field
-        pub struct grams(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `grams` field
+        pub struct grams(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -147,7 +163,10 @@ where
 
 impl<'a, S: ingredient_state::State> IngredientBuilder<'a, S> {
     /// Set the `group` field (optional)
-    pub fn group(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn group(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -224,7 +243,10 @@ where
 
 impl<'a, S: ingredient_state::State> IngredientBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn notes(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
@@ -238,9 +260,9 @@ impl<'a, S: ingredient_state::State> IngredientBuilder<'a, S> {
 impl<'a, S> IngredientBuilder<'a, S>
 where
     S: ingredient_state::State,
-    S::Id: ingredient_state::IsSet,
-    S::Grams: ingredient_state::IsSet,
     S::Name: ingredient_state::IsSet,
+    S::Grams: ingredient_state::IsSet,
+    S::Id: ingredient_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ingredient<'a> {
@@ -248,8 +270,8 @@ where
             grams: self.__unsafe_private_named.0.unwrap(),
             group: self.__unsafe_private_named.1,
             id: self.__unsafe_private_named.2.unwrap(),
-            is_detached: self.__unsafe_private_named.3,
-            is_optional: self.__unsafe_private_named.4,
+            is_detached: self.__unsafe_private_named.3.or_else(|| Some(false)),
+            is_optional: self.__unsafe_private_named.4.or_else(|| Some(false)),
             name: self.__unsafe_private_named.5.unwrap(),
             notes: self.__unsafe_private_named.6,
             extra_data: Default::default(),
@@ -267,8 +289,8 @@ where
             grams: self.__unsafe_private_named.0.unwrap(),
             group: self.__unsafe_private_named.1,
             id: self.__unsafe_private_named.2.unwrap(),
-            is_detached: self.__unsafe_private_named.3,
-            is_optional: self.__unsafe_private_named.4,
+            is_detached: self.__unsafe_private_named.3.or_else(|| Some(false)),
+            is_optional: self.__unsafe_private_named.4.or_else(|| Some(false)),
             name: self.__unsafe_private_named.5.unwrap(),
             notes: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
@@ -276,7 +298,9 @@ where
     }
 }
 
-fn lexicon_doc_io_kich_recipe_recipe() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_kich_recipe_recipe() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.kich.recipe.recipe"),
@@ -417,60 +441,62 @@ fn lexicon_doc_io_kich_recipe_recipe() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("instructionStep"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Unique identifier for this instruction step",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Instruction text",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
-                    },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "instructionStep",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Unique identifier for this instruction step",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Instruction text"),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -773,14 +799,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ingredient<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InstructionStep<'a> {
-    /// Unique identifier for this instruction step
+    ///Unique identifier for this instruction step
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// Instruction text
+    ///Instruction text
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
@@ -804,62 +830,84 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InstructionStep<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Recipe<'a> {
-    /// Cooking time in minutes
+    ///Cooking time in minutes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub cook_time_minutes: std::option::Option<i64>,
-    /// When this recipe was created
+    ///When this recipe was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference to the user who created this recipe
+    ///Reference to the user who created this recipe
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// Recipe description
+    pub created_by: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Recipe description
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Image URL for the recipe
+    ///Image URL for the recipe
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Recipe ingredients
+    ///Recipe ingredients
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ingredients: std::option::Option<Vec<crate::io_kich::recipe::recipe::Ingredient<'a>>>,
-    /// Cooking instructions as an array of steps
+    pub ingredients: std::option::Option<
+        Vec<crate::io_kich::recipe::recipe::Ingredient<'a>>,
+    >,
+    ///Cooking instructions as an array of steps
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub instructions: std::option::Option<Vec<crate::io_kich::recipe::recipe::InstructionStep<'a>>>,
-    /// Whether this recipe is private (only visible to household members)
+    pub instructions: std::option::Option<
+        Vec<crate::io_kich::recipe::recipe::InstructionStep<'a>>,
+    >,
+    ///Whether this recipe is private (only visible to household members) Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_is_private")]
     pub is_private: std::option::Option<bool>,
-    /// Recipe name
+    ///Recipe name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Preparation time in minutes
+    ///Preparation time in minutes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub prep_time_minutes: std::option::Option<i64>,
-    /// Number of servings this recipe makes
+    ///Number of servings this recipe makes Defaults to `1`.
+    #[serde(default = "_default_servings")]
     pub servings: i64,
-    /// Source name (book, magazine, blog)
+    ///Source name (book, magazine, blog)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// When this recipe was last updated
+    ///When this recipe was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Source URL of the recipe
+    ///Source URL of the recipe
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+fn _default_is_private() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_servings() -> i64 {
+    1i64
+}
+
 pub mod recipe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -867,51 +915,51 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Servings;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Servings = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Servings = S::Servings;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `servings` field to Set
     pub struct SetServings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServings<S> {}
     impl<S: State> State for SetServings<S> {
-        type Name = S::Name;
         type Servings = Set<members::servings>;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Servings = S::Servings;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Servings = S::Servings;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `servings` field
         pub struct servings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -950,7 +998,20 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
         RecipeBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -1010,12 +1071,18 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1063,7 +1130,9 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `instructions` field (optional)
     pub fn instructions(
         mut self,
-        value: impl Into<Option<Vec<crate::io_kich::recipe::recipe::InstructionStep<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::io_kich::recipe::recipe::InstructionStep<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -1144,7 +1213,10 @@ where
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
@@ -1196,9 +1268,9 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
-    S::Name: recipe_state::IsSet,
     S::Servings: recipe_state::IsSet,
     S::CreatedAt: recipe_state::IsSet,
+    S::Name: recipe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Recipe<'a> {
@@ -1210,7 +1282,7 @@ where
             image_url: self.__unsafe_private_named.4,
             ingredients: self.__unsafe_private_named.5,
             instructions: self.__unsafe_private_named.6,
-            is_private: self.__unsafe_private_named.7,
+            is_private: self.__unsafe_private_named.7.or_else(|| Some(false)),
             name: self.__unsafe_private_named.8.unwrap(),
             prep_time_minutes: self.__unsafe_private_named.9,
             servings: self.__unsafe_private_named.10.unwrap(),
@@ -1236,7 +1308,7 @@ where
             image_url: self.__unsafe_private_named.4,
             ingredients: self.__unsafe_private_named.5,
             instructions: self.__unsafe_private_named.6,
-            is_private: self.__unsafe_private_named.7,
+            is_private: self.__unsafe_private_named.7.or_else(|| Some(false)),
             name: self.__unsafe_private_named.8.unwrap(),
             prep_time_minutes: self.__unsafe_private_named.9,
             servings: self.__unsafe_private_named.10.unwrap(),
@@ -1263,7 +1335,13 @@ impl<'a> Recipe<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecipeGetRecordOutput<'a> {

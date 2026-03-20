@@ -8,34 +8,47 @@
 /// A request for someone to draw something
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Request<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Whether still accepting responses
+    ///Whether still accepting responses Defaults to `true`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_is_open")]
     pub is_open: std::option::Option<bool>,
-    /// Reference images for the request
+    ///Reference images for the request
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reference_images: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
-    /// Tags for categorization
+    pub reference_images: std::option::Option<
+        Vec<jacquard_common::types::blob::BlobRef<'a>>,
+    >,
+    ///Tags for categorization
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Optional: specific artist to request
+    ///Optional: specific artist to request
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub target_actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    /// Description of what to draw
+    ///Description of what to draw
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
+fn _default_is_open() -> std::option::Option<bool> {
+    Some(true)
+}
+
 pub mod request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,37 +56,37 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -162,12 +175,18 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
 
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -214,14 +233,14 @@ where
 impl<'a, S> RequestBuilder<'a, S>
 where
     S: request_state::State,
-    S::Text: request_state::IsSet,
     S::CreatedAt: request_state::IsSet,
+    S::Text: request_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Request<'a> {
         Request {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            is_open: self.__unsafe_private_named.1,
+            is_open: self.__unsafe_private_named.1.or_else(|| Some(true)),
             reference_images: self.__unsafe_private_named.2,
             tags: self.__unsafe_private_named.3,
             target_actor: self.__unsafe_private_named.4,
@@ -239,7 +258,7 @@ where
     ) -> Request<'a> {
         Request {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            is_open: self.__unsafe_private_named.1,
+            is_open: self.__unsafe_private_named.1.or_else(|| Some(true)),
             reference_images: self.__unsafe_private_named.2,
             tags: self.__unsafe_private_named.3,
             target_actor: self.__unsafe_private_named.4,
@@ -264,7 +283,13 @@ impl<'a> Request<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestGetRecordOutput<'a> {
@@ -333,7 +358,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 8usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 8usize,
                     actual: value.len(),
                 });
@@ -344,7 +371,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -359,15 +388,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 300usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -375,7 +402,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_request() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_tech_tokimeki_kaku_request() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.kaku.request"),

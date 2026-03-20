@@ -7,23 +7,29 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePost<'a> {
-    /// Whether to disable quote posts
+    ///Whether to disable quote posts
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disable_quote_posts: std::option::Option<bool>,
-    /// Chronosky-internal scheduled post ID of the parent post (for scheduling threads or replies). Not an AT Protocol URI or Record Key.
+    ///Chronosky-internal scheduled post ID of the parent post (for scheduling threads or replies). Not an AT Protocol URI or Record Key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent_post_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Array of posts to schedule (1 element = single post, multiple = thread)
+    ///Array of posts to schedule (1 element = single post, multiple = thread)
     #[serde(borrow)]
     pub posts: Vec<crate::app_chronosky::schedule::create_post::ThreadPostInput<'a>>,
-    /// Scheduled publish time
+    ///Scheduled publish time
     pub scheduled_at: jacquard_common::types::string::Datetime,
-    /// Thread gate rules to control who can reply
+    ///Thread gate rules to control who can reply
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate_rules: std::option::Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
@@ -31,7 +37,7 @@ pub struct CreatePost<'a> {
 
 pub mod create_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,12 +127,18 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
 
 impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     /// Set the `parentPostId` field (optional)
-    pub fn parent_post_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn parent_post_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `parentPostId` field to an Option value (optional)
-    pub fn maybe_parent_post_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_parent_post_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -140,7 +152,9 @@ where
     /// Set the `posts` field (required)
     pub fn posts(
         mut self,
-        value: impl Into<Vec<crate::app_chronosky::schedule::create_post::ThreadPostInput<'a>>>,
+        value: impl Into<
+            Vec<crate::app_chronosky::schedule::create_post::ThreadPostInput<'a>>,
+        >,
     ) -> CreatePostBuilder<'a, create_post_state::SetPosts<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         CreatePostBuilder {
@@ -227,7 +241,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -244,14 +264,20 @@ pub enum CreatePostThreadgateRulesItem<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePostOutput<'a> {
-    /// Chronosky schedule ID (parent post ID for threads)
+    ///Chronosky schedule ID (parent post ID for threads)
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// Number of posts created (1 for single post, N for thread)
+    ///Number of posts created (1 for single post, N for thread)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub post_count: std::option::Option<i64>,
     pub scheduled_at: jacquard_common::types::string::Datetime,
@@ -269,8 +295,9 @@ impl jacquard_common::xrpc::XrpcResp for CreatePostResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePost<'a> {
     const NSID: &'static str = "app.chronosky.schedule.createPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreatePostResponse;
 }
 
@@ -279,8 +306,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePost<'a> {
 pub struct CreatePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.createPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreatePost<'de>;
     type Response = CreatePostResponse;
 }
@@ -295,36 +323,42 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadPostInput<'a> {
-    /// Post creation timestamp (optional)
+    ///Post creation timestamp (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Embedded content (images, external links, records).
+    ///Embedded content (images, external links, records).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embed: std::option::Option<ThreadPostInputEmbed<'a>>,
-    /// Rich text facets (mentions, links, tags)
+    ///Rich text facets (mentions, links, tags)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// Self-applied content labels for content warnings (AT Protocol standard).
+    ///Self-applied content labels for content warnings (AT Protocol standard).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    /// Language codes (ISO 639-1)
+    ///Language codes (ISO 639-1)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
-    /// Post text content
+    ///Post text content
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -341,8 +375,9 @@ pub enum ThreadPostInputEmbed<'a> {
     RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
 }
 
-fn lexicon_doc_app_chronosky_schedule_createPost()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_chronosky_schedule_createPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.chronosky.schedule.createPost"),
@@ -646,7 +681,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("facets"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "facets",
+                    ),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -656,7 +693,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("langs"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "langs",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -667,7 +706,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -682,15 +723,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 300usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
                 }
             }
         }

@@ -8,45 +8,51 @@
 /// A verified leaderboard entry stored in the mathr.app official repository
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
-    /// Timestamp when the score was verified and added to the leaderboard
+    ///Timestamp when the score was verified and added to the leaderboard
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The highest level reached by the player
+    ///The highest level reached by the player
     pub level: i64,
-    /// Success rate as a percentage (0-100)
+    ///Success rate as a percentage (0-100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub percentage: std::option::Option<i64>,
-    /// URL to the player's avatar at the time of submission
+    ///URL to the player's avatar at the time of submission
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub player_avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The DID of the player who achieved this score
+    ///The DID of the player who achieved this score
     #[serde(borrow)]
     pub player_did: jacquard_common::types::string::Did<'a>,
-    /// The player's display name at the time of submission
+    ///The player's display name at the time of submission
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub player_display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The player's handle at the time of submission
+    ///The player's handle at the time of submission
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub player_handle: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Optional AT URI to the player's Bluesky post announcing the score
+    ///Optional AT URI to the player's Bluesky post announcing the score
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub post_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// Total number of challenges attempted
+    ///Total number of challenges attempted
     pub total_challenges: i64,
-    /// Total number of correct answers
+    ///Total number of correct answers
     pub total_successes: i64,
 }
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -54,83 +60,83 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalChallenges;
         type TotalSuccesses;
         type PlayerDid;
         type Level;
+        type TotalChallenges;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalChallenges = Unset;
         type TotalSuccesses = Unset;
         type PlayerDid = Unset;
         type Level = Unset;
+        type TotalChallenges = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type TotalChallenges = Set<members::total_challenges>;
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `total_successes` field to Set
     pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
     impl<S: State> State for SetTotalSuccesses<S> {
-        type TotalChallenges = S::TotalChallenges;
         type TotalSuccesses = Set<members::total_successes>;
         type PlayerDid = S::PlayerDid;
         type Level = S::Level;
+        type TotalChallenges = S::TotalChallenges;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `player_did` field to Set
     pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
     impl<S: State> State for SetPlayerDid<S> {
-        type TotalChallenges = S::TotalChallenges;
         type TotalSuccesses = S::TotalSuccesses;
         type PlayerDid = Set<members::player_did>;
         type Level = S::Level;
+        type TotalChallenges = S::TotalChallenges;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type TotalChallenges = S::TotalChallenges;
         type TotalSuccesses = S::TotalSuccesses;
         type PlayerDid = S::PlayerDid;
         type Level = Set<members::level>;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type TotalSuccesses = S::TotalSuccesses;
+        type PlayerDid = S::PlayerDid;
+        type Level = S::Level;
+        type TotalChallenges = Set<members::total_challenges>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type TotalChallenges = S::TotalChallenges;
         type TotalSuccesses = S::TotalSuccesses;
         type PlayerDid = S::PlayerDid;
         type Level = S::Level;
+        type TotalChallenges = S::TotalChallenges;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
         ///Marker type for the `player_did` field
         pub struct player_did(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -166,7 +172,18 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     pub fn new() -> Self {
         EntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -197,7 +214,10 @@ where
     S::Level: entry_state::IsUnset,
 {
     /// Set the `level` field (required)
-    pub fn level(mut self, value: impl Into<i64>) -> EntryBuilder<'a, entry_state::SetLevel<S>> {
+    pub fn level(
+        mut self,
+        value: impl Into<i64>,
+    ) -> EntryBuilder<'a, entry_state::SetLevel<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         EntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -268,7 +288,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
         self
     }
     /// Set the `playerDisplayName` field to an Option value (optional)
-    pub fn maybe_player_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_player_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -276,12 +299,18 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerHandle` field (optional)
-    pub fn player_handle(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn player_handle(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `playerHandle` field to an Option value (optional)
-    pub fn maybe_player_handle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_player_handle(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -347,10 +376,10 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::TotalChallenges: entry_state::IsSet,
     S::TotalSuccesses: entry_state::IsSet,
     S::PlayerDid: entry_state::IsSet,
     S::Level: entry_state::IsSet,
+    S::TotalChallenges: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
 {
     /// Build the final struct
@@ -408,7 +437,13 @@ impl<'a> Entry<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
@@ -465,7 +500,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             let value = &self.level;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("level"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -474,7 +511,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         if let Some(ref value) = self.percentage {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("percentage"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percentage",
+                    ),
                     max: 100i64,
                     actual: *value,
                 });
@@ -483,7 +522,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         if let Some(ref value) = self.percentage {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("percentage"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percentage",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -517,7 +558,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_mathr_leaderboard_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.mathr.leaderboard.entry"),

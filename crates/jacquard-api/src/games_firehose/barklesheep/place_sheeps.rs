@@ -7,19 +7,27 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceSheeps<'a> {
     #[serde(borrow)]
     pub game_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub sheeps: Vec<crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>>,
+    pub sheeps: Vec<
+        crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>,
+    >,
 }
 
 pub mod place_sheeps_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -118,7 +126,9 @@ where
     /// Set the `sheeps` field (required)
     pub fn sheeps(
         mut self,
-        value: impl Into<Vec<crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>>>,
+        value: impl Into<
+            Vec<crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>>,
+        >,
     ) -> PlaceSheepsBuilder<'a, place_sheeps_state::SetSheeps<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         PlaceSheepsBuilder {
@@ -168,7 +178,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceSheepsOutput<'a> {
@@ -188,8 +198,9 @@ impl jacquard_common::xrpc::XrpcResp for PlaceSheepsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<'a> {
     const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PlaceSheepsResponse;
 }
 
@@ -198,15 +209,22 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<'a> {
 pub struct PlaceSheepsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
     const PATH: &'static str = "/xrpc/games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = PlaceSheeps<'de>;
     type Response = PlaceSheepsResponse;
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SheepPlacement<'a> {
@@ -218,7 +236,7 @@ pub struct SheepPlacement<'a> {
 
 pub mod sheep_placement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -227,50 +245,50 @@ pub mod sheep_placement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Start;
-        type Horizontal;
         type Type;
+        type Horizontal;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Start = Unset;
-        type Horizontal = Unset;
         type Type = Unset;
+        type Horizontal = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
         type Start = Set<members::start>;
+        type Type = S::Type;
         type Horizontal = S::Horizontal;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `horizontal` field to Set
-    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
-    impl<S: State> State for SetHorizontal<S> {
-        type Start = S::Start;
-        type Horizontal = Set<members::horizontal>;
-        type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Start = S::Start;
-        type Horizontal = S::Horizontal;
         type Type = Set<members::r#type>;
+        type Horizontal = S::Horizontal;
+    }
+    ///State transition - sets the `horizontal` field to Set
+    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
+    impl<S: State> State for SetHorizontal<S> {
+        type Start = S::Start;
+        type Type = S::Type;
+        type Horizontal = Set<members::horizontal>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `start` field
         pub struct start(());
-        ///Marker type for the `horizontal` field
-        pub struct horizontal(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `horizontal` field
+        pub struct horizontal(());
     }
 }
 
@@ -364,8 +382,8 @@ impl<'a, S> SheepPlacementBuilder<'a, S>
 where
     S: sheep_placement_state::State,
     S::Start: sheep_placement_state::IsSet,
-    S::Horizontal: sheep_placement_state::IsSet,
     S::Type: sheep_placement_state::IsSet,
+    S::Horizontal: sheep_placement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SheepPlacement<'a> {
@@ -393,11 +411,14 @@ where
     }
 }
 
-fn lexicon_doc_games_firehose_barklesheep_placeSheeps()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("games.firehose.barklesheep.placeSheeps"),
+        id: ::jacquard_common::CowStr::new_static(
+            "games.firehose.barklesheep.placeSheeps",
+        ),
         revision: None,
         description: None,
         defs: {
@@ -469,64 +490,62 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps()
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("sheepPlacement"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("start"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("horizontal"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "horizontal",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("start"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("horizontal")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "horizontal",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "start",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },

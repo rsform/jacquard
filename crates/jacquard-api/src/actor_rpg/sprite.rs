@@ -8,54 +8,65 @@
 /// A user's RPG character sprite. One record per user (rkey: self).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sprite<'a> {
-    /// Milliseconds per frame for animation playback
+    ///Milliseconds per frame for animation playback Defaults to `200`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_animation_speed")]
     pub animation_speed: std::option::Option<i64>,
-    /// Number of columns per animation cycle
+    ///Number of columns per animation cycle
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub columns: std::option::Option<i64>,
-    /// When this record was first created
+    ///When this record was first created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The game engine format this sprite is designed for. Determines animation interpretation.
+    ///The game engine format this sprite is designed for. Determines animation interpretation.
     #[serde(borrow)]
     pub engine: SpriteEngine<'a>,
-    /// Height of a single frame in pixels (if not auto-calculated from height/rows)
+    ///Height of a single frame in pixels (if not auto-calculated from height/rows)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub frame_height: std::option::Option<i64>,
-    /// Width of a single frame in pixels (if not auto-calculated from width/columns)
+    ///Width of a single frame in pixels (if not auto-calculated from width/columns)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub frame_width: std::option::Option<i64>,
-    /// Total number of animation frames
+    ///Total number of animation frames
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub frames: std::option::Option<i64>,
-    /// Total height of the sprite sheet in pixels
+    ///Total height of the sprite sheet in pixels
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub height: std::option::Option<i64>,
-    /// Display name for the character (optional, can differ from Bluesky display name)
+    ///Display name for the character (optional, can differ from Bluesky display name)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)
+    ///Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rows: std::option::Option<i64>,
-    /// The sprite sheet image (PNG only). Max 10MB.
+    ///The sprite sheet image (PNG only). Max 10MB.
     #[serde(borrow)]
     pub sprite_sheet: jacquard_common::types::blob::BlobRef<'a>,
-    /// When this record was last modified
+    ///When this record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Total width of the sprite sheet in pixels
+    ///Total width of the sprite sheet in pixels
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub width: std::option::Option<i64>,
 }
 
+fn _default_animation_speed() -> std::option::Option<i64> {
+    Some(200i64)
+}
+
 pub mod sprite_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -63,49 +74,49 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SpriteSheet;
         type Engine;
+        type SpriteSheet;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SpriteSheet = Unset;
         type Engine = Unset;
+        type SpriteSheet = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
-    impl<S: State> State for SetSpriteSheet<S> {
-        type SpriteSheet = Set<members::sprite_sheet>;
-        type Engine = S::Engine;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEngine<S> {}
     impl<S: State> State for SetEngine<S> {
-        type SpriteSheet = S::SpriteSheet;
         type Engine = Set<members::engine>;
+        type SpriteSheet = S::SpriteSheet;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sprite_sheet` field to Set
+    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
+    impl<S: State> State for SetSpriteSheet<S> {
+        type Engine = S::Engine;
+        type SpriteSheet = Set<members::sprite_sheet>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SpriteSheet = S::SpriteSheet;
         type Engine = S::Engine;
+        type SpriteSheet = S::SpriteSheet;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sprite_sheet` field
-        pub struct sprite_sheet(());
         ///Marker type for the `engine` field
         pub struct engine(());
+        ///Marker type for the `sprite_sheet` field
+        pub struct sprite_sheet(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -145,7 +156,19 @@ impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
         SpriteBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -270,7 +293,10 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -348,14 +374,14 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S> SpriteBuilder<'a, S>
 where
     S: sprite_state::State,
-    S::SpriteSheet: sprite_state::IsSet,
     S::Engine: sprite_state::IsSet,
+    S::SpriteSheet: sprite_state::IsSet,
     S::CreatedAt: sprite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sprite<'a> {
         Sprite {
-            animation_speed: self.__unsafe_private_named.0,
+            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
             columns: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2.unwrap(),
             engine: self.__unsafe_private_named.3.unwrap(),
@@ -380,7 +406,7 @@ where
         >,
     ) -> Sprite<'a> {
         Sprite {
-            animation_speed: self.__unsafe_private_named.0,
+            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
             columns: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2.unwrap(),
             engine: self.__unsafe_private_named.3.unwrap(),
@@ -512,7 +538,13 @@ impl jacquard_common::IntoStatic for SpriteEngine<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpriteGetRecordOutput<'a> {
@@ -590,7 +622,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.columns {
             if *value > 16i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("columns"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "columns",
+                    ),
                     max: 16i64,
                     actual: *value,
                 });
@@ -599,7 +633,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.columns {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("columns"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "columns",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -630,7 +666,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frame_width {
             if *value > 512i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frame_width"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "frame_width",
+                    ),
                     max: 512i64,
                     actual: *value,
                 });
@@ -639,7 +677,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frame_width {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frame_width"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "frame_width",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -648,7 +688,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frames {
             if *value > 64i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frames"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "frames",
+                    ),
                     max: 64i64,
                     actual: *value,
                 });
@@ -657,7 +699,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.frames {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("frames"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "frames",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -666,7 +710,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.height {
             if *value > 4096i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
                     max: 4096i64,
                     actual: *value,
                 });
@@ -675,7 +721,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.height {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("height"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -685,7 +733,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -699,22 +749,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
                     )
                     .count();
                 if count > 50usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 50usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 50usize,
+                        actual: count,
+                    });
                 }
             }
         }
         if let Some(ref value) = self.rows {
             if *value > 16i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rows"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rows",
+                    ),
                     max: 16i64,
                     actual: *value,
                 });
@@ -723,16 +773,64 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.rows {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rows"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rows",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
             }
         }
+        {
+            let value = &self.sprite_sheet;
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sprite_sheet",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.sprite_sheet;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sprite_sheet",
+                        ),
+                        accepted: vec!["image/png".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.width {
             if *value > 4096i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("width"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "width",
+                    ),
                     max: 4096i64,
                     actual: *value,
                 });
@@ -741,7 +839,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
         if let Some(ref value) = self.width {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("width"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "width",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });

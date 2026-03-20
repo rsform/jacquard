@@ -6,24 +6,36 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBroadcaster;
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBroadcasterOutput<'a> {
-    /// Array of DIDs authorized as admins
+    ///Array of DIDs authorized as admins
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub admins: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    /// DID of the Streamplace broadcaster to which this server belongs
+    ///DID of the Streamplace broadcaster to which this server belongs
     #[serde(borrow)]
     pub broadcaster: jacquard_common::types::string::Did<'a>,
-    /// DID of this particular Streamplace server
+    ///DID of this particular Streamplace server
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub server: std::option::Option<jacquard_common::types::string::Did<'a>>,

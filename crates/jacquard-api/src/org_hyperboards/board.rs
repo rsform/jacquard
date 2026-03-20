@@ -15,44 +15,46 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardConfig<'a> {
-    /// Display aspect ratio of the board.
+    ///Display aspect ratio of the board.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub aspect_ratio: std::option::Option<BoardConfigAspectRatio<'a>>,
-    /// Background color as a hex string (e.g. '#ffffff').
+    ///Background color as a hex string (e.g. '#ffffff').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Whether the background is rendered in grayscale. Default: true.
+    ///Whether the background is rendered in grayscale. Default: true.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub background_grayscale: std::option::Option<bool>,
-    /// URI of the background iframe.
+    ///URI of the background iframe.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_iframe_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Background image as a URI or image blob.
+    pub background_iframe_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///Background image as a URI or image blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub background_image: std::option::Option<BoardConfigBackgroundImage<'a>>,
-    /// Background opacity as a percentage (0–100).
+    ///Background opacity as a percentage (0–100).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub background_opacity: std::option::Option<i64>,
-    /// Type of background content.
+    ///Type of background content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub background_type: std::option::Option<BoardConfigBackgroundType<'a>>,
-    /// Border color as a hex string (e.g. '#000000').
+    ///Border color as a hex string (e.g. '#000000').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub border_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Whether contributor images are rendered in grayscale. Default: false.
+    ///Whether contributor images are rendered in grayscale. Default: false.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub grayscale_images: std::option::Option<bool>,
-    /// Shape used to crop contributor images on this board.
+    ///Shape used to crop contributor images on this board.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image_shape: std::option::Option<BoardConfigImageShape<'a>>,
@@ -147,14 +149,22 @@ impl jacquard_common::IntoStatic for BoardConfigAspectRatio<'_> {
             BoardConfigAspectRatio::_169 => BoardConfigAspectRatio::_169,
             BoardConfigAspectRatio::_43 => BoardConfigAspectRatio::_43,
             BoardConfigAspectRatio::_11 => BoardConfigAspectRatio::_11,
-            BoardConfigAspectRatio::Other(v) => BoardConfigAspectRatio::Other(v.into_static()),
+            BoardConfigAspectRatio::Other(v) => {
+                BoardConfigAspectRatio::Other(v.into_static())
+            }
         }
     }
 }
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -340,12 +350,16 @@ impl jacquard_common::IntoStatic for BoardConfigImageShape<'_> {
         match self {
             BoardConfigImageShape::Circular => BoardConfigImageShape::Circular,
             BoardConfigImageShape::Square => BoardConfigImageShape::Square,
-            BoardConfigImageShape::Other(v) => BoardConfigImageShape::Other(v.into_static()),
+            BoardConfigImageShape::Other(v) => {
+                BoardConfigImageShape::Other(v.into_static())
+            }
         }
     }
 }
 
-fn lexicon_doc_org_hyperboards_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hyperboards_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hyperboards.board"),
@@ -909,7 +923,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("image_shape"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "image_shape",
+                    ),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -922,37 +938,45 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
 /// Configuration for a specific contributor within a board. Values serve as fallbacks when the contributor has not defined them on their profile. It can also be used to override contributor settings on this board without changing their global profile.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorConfig<'a> {
-    /// Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.
+    ///Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.
     #[serde(borrow)]
     pub contributor: ContributorConfigContributor<'a>,
-    /// Display name for this contributor on this board.
+    ///Display name for this contributor on this board.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Iframe overlay shown when hovering over this contributor.
+    ///Iframe overlay shown when hovering over this contributor.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Image overlay shown when hovering over this contributor, as a URI or image blob.
+    pub hover_iframe_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///Image overlay shown when hovering over this contributor, as a URI or image blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub hover_image: std::option::Option<ContributorConfigHoverImage<'a>>,
-    /// Avatar or face image for this contributor on this board, as a URI or image blob.
+    ///Avatar or face image for this contributor on this board, as a URI or image blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image: std::option::Option<ContributorConfigImage<'a>>,
-    /// When true, these values take precedence over the contributor's own profile and display settings. When false or omitted, they are only used as fallbacks if the contributor has not set their own settings.
+    ///When true, these values take precedence over the contributor's own profile and display settings. When false or omitted, they are only used as fallbacks if the contributor has not set their own settings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub r#override: std::option::Option<bool>,
-    /// Click-through link URL for this contributor.
+    ///Click-through link URL for this contributor.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Video for this contributor, as a URI (embed/direct link) or uploaded video blob.
+    ///Video for this contributor, as a URI (embed/direct link) or uploaded video blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub video: std::option::Option<ContributorConfigVideo<'a>>,
@@ -960,7 +984,7 @@ pub struct ContributorConfig<'a> {
 
 pub mod contributor_config_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1045,12 +1069,18 @@ where
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn display_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1085,7 +1115,10 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
         self
     }
     /// Set the `hoverImage` field to an Option value (optional)
-    pub fn maybe_hover_image(mut self, value: Option<ContributorConfigHoverImage<'a>>) -> Self {
+    pub fn maybe_hover_image(
+        mut self,
+        value: Option<ContributorConfigHoverImage<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1093,7 +1126,10 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<ContributorConfigImage<'a>>>) -> Self {
+    pub fn image(
+        mut self,
+        value: impl Into<Option<ContributorConfigImage<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -1138,7 +1174,10 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(mut self, value: impl Into<Option<ContributorConfigVideo<'a>>>) -> Self {
+    pub fn video(
+        mut self,
+        value: impl Into<Option<ContributorConfigVideo<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -1192,7 +1231,13 @@ where
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1207,7 +1252,13 @@ pub enum ContributorConfigContributor<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1220,7 +1271,13 @@ pub enum ContributorConfigHoverImage<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1233,7 +1290,13 @@ pub enum ContributorConfigImage<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -1277,15 +1340,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "display_name",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -1305,7 +1366,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1318,29 +1381,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
 /// Configuration record for a hyperboard, wrapping an underlying activity or collection with visual presentation settings. Stored in the creator's PDS.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
-    /// Board-level visual configuration (background, colors, aspect ratio).
+    ///Board-level visual configuration (background, colors, aspect ratio).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub config: std::option::Option<crate::org_hyperboards::board::BoardConfig<'a>>,
-    /// Per-contributor configuration entries for this board.
+    ///Per-contributor configuration entries for this board.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub contributor_configs:
-        std::option::Option<Vec<crate::org_hyperboards::board::ContributorConfig<'a>>>,
-    /// Client-declared timestamp when this record was originally created.
+    pub contributor_configs: std::option::Option<
+        Vec<crate::org_hyperboards::board::ContributorConfig<'a>>,
+    >,
+    ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Reference to the org.hypercerts.claim.activity or org.hypercerts.claim.collection this board visualizes.
+    ///Reference to the org.hypercerts.claim.activity or org.hypercerts.claim.collection this board visualizes.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod board_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1348,37 +1418,37 @@ pub mod board_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1387,7 +1457,9 @@ pub struct BoardBuilder<'a, S: board_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<crate::org_hyperboards::board::BoardConfig<'a>>,
-        ::core::option::Option<Vec<crate::org_hyperboards::board::ContributorConfig<'a>>>,
+        ::core::option::Option<
+            Vec<crate::org_hyperboards::board::ContributorConfig<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
@@ -1435,7 +1507,9 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `contributorConfigs` field (optional)
     pub fn contributor_configs(
         mut self,
-        value: impl Into<Option<Vec<crate::org_hyperboards::board::ContributorConfig<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::org_hyperboards::board::ContributorConfig<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -1491,8 +1565,8 @@ where
 impl<'a, S> BoardBuilder<'a, S>
 where
     S: board_state::State,
-    S::CreatedAt: board_state::IsSet,
     S::Subject: board_state::IsSet,
+    S::CreatedAt: board_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Board<'a> {
@@ -1537,7 +1611,13 @@ impl<'a> Board<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGetRecordOutput<'a> {

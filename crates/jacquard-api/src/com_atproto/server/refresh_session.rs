@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshSessionOutput<'a> {
@@ -31,7 +37,7 @@ pub struct RefreshSessionOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
-    /// Hosting status of the account. If not specified, then assume 'active'.
+    ///Hosting status of the account. If not specified, then assume 'active'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<RefreshSessionOutputStatus<'a>>,
@@ -123,9 +129,15 @@ impl jacquard_common::IntoStatic for RefreshSessionOutputStatus<'_> {
     type Output = RefreshSessionOutputStatus<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            RefreshSessionOutputStatus::Takendown => RefreshSessionOutputStatus::Takendown,
-            RefreshSessionOutputStatus::Suspended => RefreshSessionOutputStatus::Suspended,
-            RefreshSessionOutputStatus::Deactivated => RefreshSessionOutputStatus::Deactivated,
+            RefreshSessionOutputStatus::Takendown => {
+                RefreshSessionOutputStatus::Takendown
+            }
+            RefreshSessionOutputStatus::Suspended => {
+                RefreshSessionOutputStatus::Suspended
+            }
+            RefreshSessionOutputStatus::Deactivated => {
+                RefreshSessionOutputStatus::Deactivated
+            }
             RefreshSessionOutputStatus::Other(v) => {
                 RefreshSessionOutputStatus::Other(v.into_static())
             }
@@ -143,7 +155,7 @@ impl jacquard_common::IntoStatic for RefreshSessionOutputStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -194,7 +206,7 @@ impl core::fmt::Display for RefreshSessionError<'_> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct RefreshSession;
 /// Response type for
@@ -209,8 +221,9 @@ impl jacquard_common::xrpc::XrpcResp for RefreshSessionResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
     const NSID: &'static str = "com.atproto.server.refreshSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RefreshSessionResponse;
 }
 
@@ -219,8 +232,9 @@ impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
 pub struct RefreshSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.refreshSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RefreshSession;
     type Response = RefreshSessionResponse;
 }

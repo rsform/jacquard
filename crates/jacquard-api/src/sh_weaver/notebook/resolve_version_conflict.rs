@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveVersionConflict<'a> {
@@ -16,7 +22,7 @@ pub struct ResolveVersionConflict<'a> {
 
 pub mod resolve_version_conflict_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,14 +55,18 @@ pub mod resolve_version_conflict_state {
 /// Builder for constructing an instance of this type
 pub struct ResolveVersionConflictBuilder<'a, S: resolve_version_conflict_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveVersionConflict<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ResolveVersionConflictBuilder<'a, resolve_version_conflict_state::Empty> {
+    pub fn new() -> ResolveVersionConflictBuilder<
+        'a,
+        resolve_version_conflict_state::Empty,
+    > {
         ResolveVersionConflictBuilder::new()
     }
 }
@@ -106,7 +116,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveVersionConflictOutput<'a> {
@@ -114,8 +130,9 @@ pub struct ResolveVersionConflictOutput<'a> {
     pub canonical: crate::sh_weaver::notebook::PublishedVersionView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub collaboration_state:
-        std::option::Option<crate::sh_weaver::collab::CollaborationStateView<'a>>,
+    pub collaboration_state: std::option::Option<
+        crate::sh_weaver::collab::CollaborationStateView<'a>,
+    >,
     #[serde(borrow)]
     pub related: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
 }
@@ -130,7 +147,7 @@ pub struct ResolveVersionConflictOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

@@ -14,14 +14,14 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerifyPhone<'a> {
-    /// The code received via SMS as a result of the call to `app.bsky.contact.startPhoneVerification`.
+    ///The code received via SMS as a result of the call to `app.bsky.contact.startPhoneVerification`.
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
-    /// The phone number to verify. Should be the same as the one passed to `app.bsky.contact.startPhoneVerification`.
+    ///The phone number to verify. Should be the same as the one passed to `app.bsky.contact.startPhoneVerification`.
     #[serde(borrow)]
     pub phone: jacquard_common::CowStr<'a>,
 }
@@ -35,11 +35,11 @@ pub struct VerifyPhone<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerifyPhoneOutput<'a> {
-    /// JWT to be used in a call to `app.bsky.contact.importContacts`. It is only valid for a single call.
+    ///JWT to be used in a call to `app.bsky.contact.importContacts`. It is only valid for a single call.
     #[serde(borrow)]
     pub token: jacquard_common::CowStr<'a>,
 }
@@ -54,7 +54,7 @@ pub struct VerifyPhoneOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -126,8 +126,9 @@ impl jacquard_common::xrpc::XrpcResp for VerifyPhoneResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for VerifyPhone<'a> {
     const NSID: &'static str = "app.bsky.contact.verifyPhone";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = VerifyPhoneResponse;
 }
 
@@ -136,8 +137,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for VerifyPhone<'a> {
 pub struct VerifyPhoneRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for VerifyPhoneRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.verifyPhone";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = VerifyPhone<'de>;
     type Response = VerifyPhoneResponse;
 }

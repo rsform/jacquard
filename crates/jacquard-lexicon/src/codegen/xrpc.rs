@@ -299,7 +299,8 @@ impl<'c> CodeGenerator<'c> {
                 let struct_name = format!("{}Message", type_base);
                 let struct_ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
-                let fields = self.generate_object_fields("", &struct_name, obj, false)?;
+                let (fields, default_fns) =
+                    self.generate_object_fields("", &struct_name, obj, false)?;
                 let doc = self.generate_doc_comment(obj.description.as_ref());
 
                 // Subscription message structs always get a lifetime since they have the #[lexicon] attribute
@@ -312,6 +313,7 @@ impl<'c> CodeGenerator<'c> {
                     pub struct #struct_ident<'a> {
                         #fields
                     }
+                    #(#default_fns)*
                 };
 
                 // Generate union types for this message
@@ -485,13 +487,13 @@ impl<'c> CodeGenerator<'c> {
             (false, false)
         };
 
-        let fields = if let Some(schema) = &body.schema {
+        let (fields, default_fns) = if let Some(schema) = &body.schema {
             self.generate_body_fields(nsid, type_base, schema, has_builder)?
         } else {
             // Binary body: just a bytes field
-            quote! {
+            (quote! {
                 pub body: jacquard_common::deps::bytes::Bytes,
-            }
+            }, Vec::new())
         };
 
         let doc = self.generate_doc_comment(body.description.as_ref());
@@ -515,6 +517,7 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
+                #(#default_fns)*
             }
         } else {
             quote! {
@@ -525,6 +528,7 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
+                #(#default_fns)*
             }
         };
 
@@ -567,18 +571,18 @@ impl<'c> CodeGenerator<'c> {
         let struct_name = format!("{}Output", type_base);
         let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
-        let fields = if let Some(schema) = &body.schema {
+        let (fields, default_fns) = if let Some(schema) = &body.schema {
             self.generate_body_fields(nsid, &struct_name, schema, false)?
         } else {
-            quote! {
+            (quote! {
                 pub body: jacquard_common::deps::bytes::Bytes,
-            }
+            }, Vec::new())
         };
 
         let doc = self.generate_doc_comment(body.description.as_ref());
 
-        // Determine if we should derive Default
-        // Check if schema is an Object and apply heuristics
+        // Determine if we should derive Default.
+        // Check if schema is an Object and apply heuristics.
         let has_default = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema
         {
             super::builder_heuristics::should_generate_builder(&struct_name, obj).has_default
@@ -597,6 +601,7 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
+                #(#default_fns)*
             }
         } else if body.schema.is_none() {
             quote! {
@@ -616,6 +621,7 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
+                #(#default_fns)*
             }
         };
 
@@ -632,14 +638,15 @@ impl<'c> CodeGenerator<'c> {
         })
     }
 
-    /// Generate fields from XRPC body schema
+    /// Generate fields from XRPC body schema.
+    /// Returns (field tokens, companion default functions).
     pub(super) fn generate_body_fields(
         &self,
         nsid: &str,
         parent_type_name: &str,
         schema: &LexXrpcBodySchema<'static>,
         is_builder: bool,
-    ) -> Result<TokenStream> {
+    ) -> Result<(TokenStream, Vec<TokenStream>)> {
         use crate::lexicon::LexXrpcBodySchema;
 
         match schema {
@@ -648,19 +655,19 @@ impl<'c> CodeGenerator<'c> {
             }
             LexXrpcBodySchema::Ref(ref_type) => {
                 let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
-                Ok(quote! {
+                Ok((quote! {
                     #[serde(flatten)]
                     #[serde(borrow)]
                     pub value: #rust_type,
-                })
+                }, Vec::new()))
             }
             LexXrpcBodySchema::Union(_union) => {
                 let rust_type = quote! { jacquard_common::types::value::Data<'a> };
-                Ok(quote! {
+                Ok((quote! {
                     #[serde(flatten)]
                     #[serde(borrow)]
                     pub value: #rust_type,
-                })
+                }, Vec::new()))
             }
         }
     }
@@ -790,48 +797,95 @@ impl<'c> CodeGenerator<'c> {
                 _ => (None, None, None),
             }
         } else {
-            // Optional fields - just doc comments, no serde defaults
-            let doc = match field_type {
+            // Optional fields with defaults get serde(default) returning Option<T>.
+            match field_type {
+                LexXrpcParametersProperty::Boolean(b) if b.default.is_some() => {
+                    let v = b.default.unwrap();
+                    let fn_name = format!("_default_{}", field_name.to_snake_case());
+                    let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    (
+                        Some(format!(" Defaults to `{}`.", v)),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        Some(quote! {
+                            fn #fn_ident() -> std::option::Option<bool> { Some(#v) }
+                        }),
+                    )
+                }
+                LexXrpcParametersProperty::Integer(i) if i.default.is_some() => {
+                    let v = i.default.unwrap();
+                    let mut parts = Vec::new();
+                    parts.push(format!("Defaults to `{}`.", v));
+                    if let Some(min) = i.minimum {
+                        parts.push(format!("Min: {}.", min));
+                    }
+                    if let Some(max) = i.maximum {
+                        parts.push(format!("Max: {}.", max));
+                    }
+                    let fn_name = format!("_default_{}", field_name.to_snake_case());
+                    let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    (
+                        Some(parts.join(" ")),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        Some(quote! {
+                            fn #fn_ident() -> std::option::Option<i64> { Some(#v) }
+                        }),
+                    )
+                }
+                LexXrpcParametersProperty::String(s) if s.default.is_some() => {
+                    let v = s.default.as_ref().unwrap().as_ref();
+                    let mut parts = Vec::new();
+                    parts.push(format!("Defaults to `\"{}\"`.", v));
+                    if let Some(min) = s.min_length {
+                        parts.push(format!("Min length: {}.", min));
+                    }
+                    if let Some(max) = s.max_length {
+                        parts.push(format!("Max length: {}.", max));
+                    }
+                    let fn_name = format!("_default_{}", field_name.to_snake_case());
+                    let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    (
+                        Some(parts.join(" ")),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        Some(quote! {
+                            fn #fn_ident() -> std::option::Option<jacquard_common::CowStr<'static>> {
+                                Some(jacquard_common::CowStr::from(#v))
+                            }
+                        }),
+                    )
+                }
+                // Optional fields without defaults: doc comments only.
                 LexXrpcParametersProperty::Integer(i) => {
                     let mut parts = Vec::new();
-                    if let Some(def) = i.default {
-                        parts.push(format!("default: {}", def));
-                    }
                     if let Some(min) = i.minimum {
                         parts.push(format!("min: {}", min));
                     }
                     if let Some(max) = i.maximum {
                         parts.push(format!("max: {}", max));
                     }
-                    if !parts.is_empty() {
+                    let doc = if !parts.is_empty() {
                         Some(format!("({})", parts.join(", ")))
                     } else {
                         None
-                    }
+                    };
+                    (doc, None, None)
                 }
                 LexXrpcParametersProperty::String(s) => {
                     let mut parts = Vec::new();
-                    if let Some(def) = s.default.as_ref() {
-                        parts.push(format!("default: \"{}\"", def.as_ref()));
-                    }
                     if let Some(min) = s.min_length {
                         parts.push(format!("min length: {}", min));
                     }
                     if let Some(max) = s.max_length {
                         parts.push(format!("max length: {}", max));
                     }
-                    if !parts.is_empty() {
+                    let doc = if !parts.is_empty() {
                         Some(format!("({})", parts.join(", ")))
                     } else {
                         None
-                    }
+                    };
+                    (doc, None, None)
                 }
-                LexXrpcParametersProperty::Boolean(b) => {
-                    b.default.map(|v| format!(" (default: {})", v))
-                }
-                _ => None,
-            };
-            (doc, None, None)
+                _ => (None, None, None),
+            }
         };
 
         let doc = doc_comment.as_ref().map(|d| quote! { #[doc = #d] });

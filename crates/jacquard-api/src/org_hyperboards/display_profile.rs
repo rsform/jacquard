@@ -8,33 +8,41 @@
 /// User-declared visual presentation defaults for how a contributor appears on hyperboards. Stored in the contributor's own PDS and reusable across multiple boards.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisplayProfile<'a> {
-    /// Client-declared timestamp when this record was originally created.
+    ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Display name override for this user on hyperboards.
+    ///Display name override for this user on hyperboards.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Default hover iframe URL for this user across boards.
+    ///Default hover iframe URL for this user across boards.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Default hover image for this user across boards, as a URI or image blob.
+    pub hover_iframe_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///Default hover image for this user across boards, as a URI or image blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub hover_image: std::option::Option<DisplayProfileHoverImage<'a>>,
-    /// Avatar or face image override for this user on hyperboards, as a URI or image blob.
+    ///Avatar or face image override for this user on hyperboards, as a URI or image blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image: std::option::Option<DisplayProfileImage<'a>>,
-    /// Default click-through link URL for this user across boards.
+    ///Default click-through link URL for this user across boards.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// Default video for this user across boards, as a URI (embed/direct link) or uploaded video blob.
+    ///Default video for this user across boards, as a URI (embed/direct link) or uploaded video blob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub video: std::option::Option<DisplayProfileVideo<'a>>,
@@ -42,7 +50,7 @@ pub struct DisplayProfile<'a> {
 
 pub mod display_profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,12 +134,18 @@ where
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn display_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -158,12 +172,18 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `hoverImage` field (optional)
-    pub fn hover_image(mut self, value: impl Into<Option<DisplayProfileHoverImage<'a>>>) -> Self {
+    pub fn hover_image(
+        mut self,
+        value: impl Into<Option<DisplayProfileHoverImage<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `hoverImage` field to an Option value (optional)
-    pub fn maybe_hover_image(mut self, value: Option<DisplayProfileHoverImage<'a>>) -> Self {
+    pub fn maybe_hover_image(
+        mut self,
+        value: Option<DisplayProfileHoverImage<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -268,7 +288,13 @@ impl<'a> DisplayProfile<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -281,7 +307,13 @@ pub enum DisplayProfileHoverImage<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -294,7 +326,13 @@ pub enum DisplayProfileImage<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -307,7 +345,13 @@ pub enum DisplayProfileVideo<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisplayProfileGetRecordOutput<'a> {
@@ -380,15 +424,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplayProfile<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "display_name",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -408,7 +450,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplayProfile<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("url"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -418,8 +462,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplayProfile<'a> {
     }
 }
 
-fn lexicon_doc_org_hyperboards_displayProfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_org_hyperboards_displayProfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hyperboards.displayProfile"),

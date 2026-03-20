@@ -7,14 +7,20 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Thought<'a> {
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Duration for tool_call thoughts
+    ///Duration for tool_call thoughts
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub duration_ms: std::option::Option<i64>,
     #[serde(borrow)]
@@ -22,7 +28,7 @@ pub struct Thought<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// What prompted this thought
+    ///What prompted this thought
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub trigger: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -30,7 +36,7 @@ pub struct Thought<'a> {
 
 pub mod thought_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,49 +44,49 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Kind;
+        type CreatedAt;
         type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Kind = Unset;
+        type CreatedAt = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Kind = S::Kind;
-        type Content = S::Content;
     }
     ///State transition - sets the `kind` field to Set
     pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKind<S> {}
     impl<S: State> State for SetKind<S> {
-        type CreatedAt = S::CreatedAt;
         type Kind = Set<members::kind>;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Kind = S::Kind;
+        type CreatedAt = Set<members::created_at>;
         type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Kind = S::Kind;
+        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `kind` field
         pub struct kind(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
     }
@@ -190,12 +196,18 @@ where
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -203,7 +215,10 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `trigger` field (optional)
-    pub fn trigger(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn trigger(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -217,8 +232,8 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 impl<'a, S> ThoughtBuilder<'a, S>
 where
     S: thought_state::State,
-    S::CreatedAt: thought_state::IsSet,
     S::Kind: thought_state::IsSet,
+    S::CreatedAt: thought_state::IsSet,
     S::Content: thought_state::IsSet,
 {
     /// Build the final struct
@@ -381,7 +396,13 @@ impl jacquard_common::IntoStatic for ThoughtKind<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThoughtGetRecordOutput<'a> {
@@ -439,7 +460,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 50000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -449,7 +472,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -459,7 +484,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_thought() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_diy_razorgirl_winter_thought() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("diy.razorgirl.winter.thought"),

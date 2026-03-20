@@ -203,6 +203,20 @@ pub enum ConstraintError {
         min: i64,
         actual: i64,
     },
+
+    #[error("{path} blob size {actual} exceeds maximum: {max}")]
+    BlobTooLarge {
+        path: ValidationPath,
+        max: usize,
+        actual: usize,
+    },
+
+    #[error("{path} blob MIME type '{actual}' not in accepted types: {accepted:?}")]
+    BlobMimeTypeNotAccepted {
+        path: ValidationPath,
+        accepted: Vec<String>,
+        actual: String,
+    },
 }
 
 /// Unified validation error type

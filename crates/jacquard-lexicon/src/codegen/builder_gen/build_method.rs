@@ -6,6 +6,7 @@
 use crate::codegen::builder_gen::BuilderSchema;
 use crate::codegen::builder_gen::state_mod::RequiredField;
 use crate::codegen::utils::make_ident;
+use crate::lexicon::LexObjectProperty;
 use heck::ToSnakeCase;
 use jacquard_common::deps::smol_str::SmolStr;
 use proc_macro2::TokenStream;
@@ -54,11 +55,21 @@ pub fn generate_build_method(
             let is_required = required_set.contains(&SmolStr::new(field_name.to_snake_case()));
 
             if is_required {
-                // Required field: unwrap from Option (guaranteed Some by IsSet constraint)
+                // Required field: unwrap from Option (guaranteed Some by IsSet constraint).
                 quote! { #field_snake: self.__unsafe_private_named.#index.unwrap(), }
             } else {
-                // Optional field: use directly
-                quote! { #field_snake: self.__unsafe_private_named.#index, }
+                // Optional field: apply schema default if present, otherwise pass through.
+                let field_name_str: &str = field_name.as_ref();
+                match schema.get_object_property(field_name_str).and_then(schema_default_expr) {
+                    Some(default_val) => {
+                        quote! {
+                            #field_snake: self.__unsafe_private_named.#index.or_else(|| Some(#default_val)),
+                        }
+                    }
+                    None => {
+                        quote! { #field_snake: self.__unsafe_private_named.#index, }
+                    }
+                }
             }
         })
         .collect();
@@ -106,5 +117,24 @@ pub fn generate_build_method(
 
             #build_with_data_method
         }
+    }
+}
+
+/// Extract the default value expression for an object property, if one exists.
+fn schema_default_expr(prop: &LexObjectProperty<'static>) -> Option<TokenStream> {
+    match prop {
+        LexObjectProperty::Boolean(b) => {
+            let v = b.default?;
+            Some(quote! { #v })
+        }
+        LexObjectProperty::Integer(i) => {
+            let v = i.default?;
+            Some(quote! { #v })
+        }
+        LexObjectProperty::String(s) if s.known_values.is_none() => {
+            let v = s.default.as_ref()?.as_ref();
+            Some(quote! { jacquard_common::CowStr::from(#v) })
+        }
+        _ => None,
     }
 }

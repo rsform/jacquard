@@ -14,55 +14,61 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSong<'a> {
-    /// The album of the song, if applicable
+    ///The album of the song, if applicable
     #[serde(borrow)]
     pub album: jacquard_common::CowStr<'a>,
-    /// The URL of the album art for the song
+    ///The URL of the album art for the song
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub album_art: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The album artist of the song, if different from the main artist
+    ///The album artist of the song, if different from the main artist
     #[serde(borrow)]
     pub album_artist: jacquard_common::CowStr<'a>,
-    /// The artist of the song
+    ///The artist of the song
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
-    /// The disc number of the song in the album, if applicable
+    ///The disc number of the song in the album, if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disc_number: std::option::Option<i64>,
-    /// The duration of the song in seconds
+    ///The duration of the song in seconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub duration: std::option::Option<i64>,
-    /// The lyrics of the song, if available
+    ///The lyrics of the song, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub lyrics: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The MusicBrainz ID of the song, if available
+    ///The MusicBrainz ID of the song, if available
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The release date of the song, formatted as YYYY-MM-DD
+    ///The release date of the song, formatted as YYYY-MM-DD
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub release_date: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The title of the song
+    ///The title of the song
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    /// The track number of the song in the album, if applicable
+    ///The track number of the song in the album, if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub track_number: std::option::Option<i64>,
-    /// The year the song was released
+    ///The year the song was released
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub year: std::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSongOutput<'a> {
@@ -83,8 +89,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateSongResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSong<'a> {
     const NSID: &'static str = "app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateSongResponse;
 }
 
@@ -93,8 +100,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSong<'a> {
 pub struct CreateSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateSong<'de>;
     type Response = CreateSongResponse;
 }

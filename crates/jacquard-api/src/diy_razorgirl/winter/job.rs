@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IntervalSchedule<'a> {
@@ -18,7 +24,7 @@ pub struct IntervalSchedule<'a> {
 
 pub mod interval_schedule_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -26,37 +32,37 @@ pub mod interval_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Seconds;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Seconds = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Seconds = S::Seconds;
+        type Type = Unset;
     }
     ///State transition - sets the `seconds` field to Set
     pub struct SetSeconds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeconds<S> {}
     impl<S: State> State for SetSeconds<S> {
-        type Type = S::Type;
         type Seconds = Set<members::seconds>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Seconds = S::Seconds;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `seconds` field
         pub struct seconds(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -129,8 +135,8 @@ where
 impl<'a, S> IntervalScheduleBuilder<'a, S>
 where
     S: interval_schedule_state::State,
-    S::Type: interval_schedule_state::IsSet,
     S::Seconds: interval_schedule_state::IsSet,
+    S::Type: interval_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IntervalSchedule<'a> {
@@ -156,7 +162,9 @@ where
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("diy.razorgirl.winter.job"),
@@ -165,52 +173,54 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("intervalSchedule"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("seconds"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("seconds"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
-                    },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "intervalSchedule",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("seconds")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "seconds",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -372,57 +382,57 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("onceSchedule"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("runAt"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("runAt"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("runAt")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "runAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "type",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -448,12 +458,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IntervalSchedule<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Job<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
+    ///Defaults to `0`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_failure_count")]
     pub failure_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub instructions: jacquard_common::CowStr<'a>,
@@ -470,9 +488,13 @@ pub struct Job<'a> {
     pub status: std::option::Option<JobStatus<'a>>,
 }
 
+fn _default_failure_count() -> std::option::Option<i64> {
+    Some(0i64)
+}
+
 pub mod job_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -481,66 +503,66 @@ pub mod job_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type CreatedAt;
-        type Instructions;
         type Schedule;
+        type Instructions;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type CreatedAt = Unset;
-        type Instructions = Unset;
         type Schedule = Unset;
+        type Instructions = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
         type Instructions = S::Instructions;
-        type Schedule = S::Schedule;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Instructions = S::Instructions;
-        type Schedule = S::Schedule;
-    }
-    ///State transition - sets the `instructions` field to Set
-    pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInstructions<S> {}
-    impl<S: State> State for SetInstructions<S> {
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Instructions = Set<members::instructions>;
-        type Schedule = S::Schedule;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Instructions = S::Instructions;
         type Schedule = Set<members::schedule>;
+        type Instructions = S::Instructions;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `instructions` field to Set
+    pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInstructions<S> {}
+    impl<S: State> State for SetInstructions<S> {
+        type Name = S::Name;
+        type Schedule = S::Schedule;
+        type Instructions = Set<members::instructions>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Schedule = S::Schedule;
+        type Instructions = S::Instructions;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `instructions` field
-        pub struct instructions(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
+        ///Marker type for the `instructions` field
+        pub struct instructions(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -722,15 +744,15 @@ impl<'a, S> JobBuilder<'a, S>
 where
     S: job_state::State,
     S::Name: job_state::IsSet,
-    S::CreatedAt: job_state::IsSet,
-    S::Instructions: job_state::IsSet,
     S::Schedule: job_state::IsSet,
+    S::Instructions: job_state::IsSet,
+    S::CreatedAt: job_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Job<'a> {
         Job {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            failure_count: self.__unsafe_private_named.1,
+            failure_count: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
             instructions: self.__unsafe_private_named.2.unwrap(),
             last_run: self.__unsafe_private_named.3,
             name: self.__unsafe_private_named.4.unwrap(),
@@ -750,7 +772,7 @@ where
     ) -> Job<'a> {
         Job {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            failure_count: self.__unsafe_private_named.1,
+            failure_count: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
             instructions: self.__unsafe_private_named.2.unwrap(),
             last_run: self.__unsafe_private_named.3,
             name: self.__unsafe_private_named.4.unwrap(),
@@ -777,7 +799,13 @@ impl<'a> Job<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -888,7 +916,13 @@ impl jacquard_common::IntoStatic for JobStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobGetRecordOutput<'a> {
@@ -959,7 +993,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Job<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -971,7 +1007,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Job<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OnceSchedule<'a> {
@@ -982,7 +1024,7 @@ pub struct OnceSchedule<'a> {
 
 pub mod once_schedule_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -990,37 +1032,37 @@ pub mod once_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RunAt;
         type Type;
+        type RunAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RunAt = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `run_at` field to Set
-    pub struct SetRunAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRunAt<S> {}
-    impl<S: State> State for SetRunAt<S> {
-        type RunAt = Set<members::run_at>;
-        type Type = S::Type;
+        type RunAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type RunAt = S::RunAt;
         type Type = Set<members::r#type>;
+        type RunAt = S::RunAt;
+    }
+    ///State transition - sets the `run_at` field to Set
+    pub struct SetRunAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRunAt<S> {}
+    impl<S: State> State for SetRunAt<S> {
+        type Type = S::Type;
+        type RunAt = Set<members::run_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `run_at` field
-        pub struct run_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `run_at` field
+        pub struct run_at(());
     }
 }
 
@@ -1093,8 +1135,8 @@ where
 impl<'a, S> OnceScheduleBuilder<'a, S>
 where
     S: once_schedule_state::State,
-    S::RunAt: once_schedule_state::IsSet,
     S::Type: once_schedule_state::IsSet,
+    S::RunAt: once_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OnceSchedule<'a> {

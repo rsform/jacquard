@@ -8,7 +8,13 @@
 /// A video
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Videos<'a> {
@@ -22,7 +28,7 @@ pub struct Videos<'a> {
 
 pub mod videos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,51 +36,51 @@ pub mod videos_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Id;
         type Creator;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Id = Unset;
         type Creator = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Id = S::Id;
-        type Creator = S::Creator;
+        type Title = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Title = S::Title;
         type Id = Set<members::id>;
         type Creator = S::Creator;
+        type Title = S::Title;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type Title = S::Title;
         type Id = S::Id;
         type Creator = Set<members::creator>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Id = S::Id;
+        type Creator = S::Creator;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -167,9 +173,9 @@ where
 impl<'a, S> VideosBuilder<'a, S>
 where
     S: videos_state::State,
-    S::Title: videos_state::IsSet,
     S::Id: videos_state::IsSet,
     S::Creator: videos_state::IsSet,
+    S::Title: videos_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Videos<'a> {
@@ -212,7 +218,13 @@ impl<'a> Videos<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VideosGetRecordOutput<'a> {
@@ -274,15 +286,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Videos<'a> {
                     )
                     .count();
                 if count > 150usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "title",
-                            ),
-                            max: 150usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 150usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -290,7 +300,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Videos<'a> {
     }
 }
 
-fn lexicon_doc_com_5jiji_test_videos() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_com_5jiji_test_videos() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.5jiji.test.videos"),

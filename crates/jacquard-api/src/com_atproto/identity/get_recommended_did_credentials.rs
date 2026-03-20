@@ -14,14 +14,14 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecommendedDidCredentialsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub also_known_as: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
+    ///Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rotation_keys: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -30,7 +30,9 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     pub services: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification_methods: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub verification_methods: std::option::Option<
+        jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 /// XRPC request marker type
@@ -42,7 +44,7 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct GetRecommendedDidCredentials;
 /// Response type for

@@ -8,22 +8,28 @@
 /// A single board game play
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGamePlay<'a> {
-    /// corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
+    ///corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
     #[serde(borrow)]
     pub bgg_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// ISO 8601 date string
+    ///ISO 8601 date string
     pub played_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod board_game_play_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,50 +38,50 @@ pub mod board_game_play_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type PlayedAt;
         type BggId;
+        type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type PlayedAt = Unset;
         type BggId = Unset;
+        type PlayedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type BggId = S::BggId;
         type PlayedAt = S::PlayedAt;
-        type BggId = S::BggId;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type Name = S::Name;
-        type PlayedAt = Set<members::played_at>;
-        type BggId = S::BggId;
     }
     ///State transition - sets the `bgg_id` field to Set
     pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBggId<S> {}
     impl<S: State> State for SetBggId<S> {
         type Name = S::Name;
-        type PlayedAt = S::PlayedAt;
         type BggId = Set<members::bgg_id>;
+        type PlayedAt = S::PlayedAt;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type Name = S::Name;
+        type BggId = S::BggId;
+        type PlayedAt = Set<members::played_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
     }
 }
 
@@ -169,8 +175,8 @@ impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
     S::Name: board_game_play_state::IsSet,
-    S::PlayedAt: board_game_play_state::IsSet,
     S::BggId: board_game_play_state::IsSet,
+    S::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BoardGamePlay<'a> {
@@ -213,7 +219,13 @@ impl<'a> BoardGamePlay<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGamePlayGetRecordOutput<'a> {
@@ -270,7 +282,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardGamePlay<'a> {
     }
 }
 
-fn lexicon_doc_ca_jmaingot_boardGamePlay() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_ca_jmaingot_boardGamePlay() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ca.jmaingot.boardGamePlay"),

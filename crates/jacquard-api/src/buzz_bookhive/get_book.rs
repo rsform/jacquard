@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBook<'a> {
@@ -26,7 +32,7 @@ pub struct GetBook<'a> {
 
 pub mod get_book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -75,12 +81,18 @@ impl<'a> GetBookBuilder<'a, get_book_state::Empty> {
 
 impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     /// Set the `goodreadsId` field (optional)
-    pub fn goodreads_id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn goodreads_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `goodreadsId` field to an Option value (optional)
-    pub fn maybe_goodreads_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_goodreads_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -101,7 +113,10 @@ impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
 
 impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     /// Set the `isbn` field (optional)
-    pub fn isbn(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn isbn(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -114,7 +129,10 @@ impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
 
 impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     /// Set the `isbn13` field (optional)
-    pub fn isbn13(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn isbn13(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -142,44 +160,50 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookOutput<'a> {
-    /// Other users' activity on the book
+    ///Other users' activity on the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub activity: std::option::Option<Vec<crate::buzz_bookhive::Activity<'a>>>,
-    /// The hive book's info
+    ///The hive book's info
     #[serde(borrow)]
     pub book: crate::buzz_bookhive::hive_book::HiveBook<'a>,
-    /// Reading progress for the user
+    ///Reading progress for the user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub book_progress: std::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
-    /// Comments on the book
+    ///Comments on the book
     #[serde(borrow)]
     pub comments: Vec<crate::buzz_bookhive::Comment<'a>>,
-    /// Cover image of the book
+    ///Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cover: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The date the user finished reading the book
+    ///The date the user finished reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The book's review
+    ///The book's review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub review: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Reviews of the book
+    ///Reviews of the book
     #[serde(borrow)]
     pub reviews: Vec<crate::buzz_bookhive::Review<'a>>,
-    /// Number of stars given to the book (1-10) which will be mapped to 1-5 stars
+    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stars: std::option::Option<i64>,
-    /// The date the user started reading the book
+    ///The date the user started reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]

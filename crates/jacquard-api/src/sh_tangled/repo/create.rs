@@ -14,18 +14,18 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Create<'a> {
-    /// Default branch to push to
+    ///Default branch to push to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub default_branch: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Rkey of the repository record
+    ///Rkey of the repository record
     #[serde(borrow)]
     pub rkey: jacquard_common::CowStr<'a>,
-    /// A source URL to clone from, populate this when forking or importing a repository.
+    ///A source URL to clone from, populate this when forking or importing a repository.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -43,8 +43,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
     const NSID: &'static str = "sh.tangled.repo.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateResponse;
 }
 
@@ -53,8 +54,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Create<'de>;
     type Response = CreateResponse;
 }

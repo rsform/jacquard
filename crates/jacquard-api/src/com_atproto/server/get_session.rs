@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSessionOutput<'a> {
@@ -27,7 +33,7 @@ pub struct GetSessionOutput<'a> {
     pub email_confirmed: std::option::Option<bool>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<GetSessionOutputStatus<'a>>,
@@ -122,7 +128,9 @@ impl jacquard_common::IntoStatic for GetSessionOutputStatus<'_> {
             GetSessionOutputStatus::Takendown => GetSessionOutputStatus::Takendown,
             GetSessionOutputStatus::Suspended => GetSessionOutputStatus::Suspended,
             GetSessionOutputStatus::Deactivated => GetSessionOutputStatus::Deactivated,
-            GetSessionOutputStatus::Other(v) => GetSessionOutputStatus::Other(v.into_static()),
+            GetSessionOutputStatus::Other(v) => {
+                GetSessionOutputStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -136,7 +144,7 @@ impl jacquard_common::IntoStatic for GetSessionOutputStatus<'_> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct GetSession;
 /// Response type for

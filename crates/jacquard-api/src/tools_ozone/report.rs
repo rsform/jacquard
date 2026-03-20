@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonAppeal;
 impl std::fmt::Display for ReasonAppeal {
@@ -32,7 +32,7 @@ impl std::fmt::Display for ReasonAppeal {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonChildSafetyCsam;
 impl std::fmt::Display for ReasonChildSafetyCsam {
@@ -50,7 +50,7 @@ impl std::fmt::Display for ReasonChildSafetyCsam {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonChildSafetyGroom;
 impl std::fmt::Display for ReasonChildSafetyGroom {
@@ -68,7 +68,7 @@ impl std::fmt::Display for ReasonChildSafetyGroom {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonChildSafetyHarassment;
 impl std::fmt::Display for ReasonChildSafetyHarassment {
@@ -86,7 +86,7 @@ impl std::fmt::Display for ReasonChildSafetyHarassment {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonChildSafetyOther;
 impl std::fmt::Display for ReasonChildSafetyOther {
@@ -104,7 +104,7 @@ impl std::fmt::Display for ReasonChildSafetyOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonChildSafetyPrivacy;
 impl std::fmt::Display for ReasonChildSafetyPrivacy {
@@ -122,7 +122,7 @@ impl std::fmt::Display for ReasonChildSafetyPrivacy {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonHarassmentDoxxing;
 impl std::fmt::Display for ReasonHarassmentDoxxing {
@@ -140,7 +140,7 @@ impl std::fmt::Display for ReasonHarassmentDoxxing {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonHarassmentHateSpeech;
 impl std::fmt::Display for ReasonHarassmentHateSpeech {
@@ -158,7 +158,7 @@ impl std::fmt::Display for ReasonHarassmentHateSpeech {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonHarassmentOther;
 impl std::fmt::Display for ReasonHarassmentOther {
@@ -176,7 +176,7 @@ impl std::fmt::Display for ReasonHarassmentOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonHarassmentTargeted;
 impl std::fmt::Display for ReasonHarassmentTargeted {
@@ -194,7 +194,7 @@ impl std::fmt::Display for ReasonHarassmentTargeted {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonHarassmentTroll;
 impl std::fmt::Display for ReasonHarassmentTroll {
@@ -212,7 +212,7 @@ impl std::fmt::Display for ReasonHarassmentTroll {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleadingBot;
 impl std::fmt::Display for ReasonMisleadingBot {
@@ -230,7 +230,7 @@ impl std::fmt::Display for ReasonMisleadingBot {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleadingElections;
 impl std::fmt::Display for ReasonMisleadingElections {
@@ -248,7 +248,7 @@ impl std::fmt::Display for ReasonMisleadingElections {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleadingImpersonation;
 impl std::fmt::Display for ReasonMisleadingImpersonation {
@@ -266,7 +266,7 @@ impl std::fmt::Display for ReasonMisleadingImpersonation {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleadingOther;
 impl std::fmt::Display for ReasonMisleadingOther {
@@ -284,7 +284,7 @@ impl std::fmt::Display for ReasonMisleadingOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleadingScam;
 impl std::fmt::Display for ReasonMisleadingScam {
@@ -302,7 +302,7 @@ impl std::fmt::Display for ReasonMisleadingScam {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonMisleadingSpam;
 impl std::fmt::Display for ReasonMisleadingSpam {
@@ -320,7 +320,7 @@ impl std::fmt::Display for ReasonMisleadingSpam {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonOther;
 impl std::fmt::Display for ReasonOther {
@@ -338,7 +338,7 @@ impl std::fmt::Display for ReasonOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonRuleBanEvasion;
 impl std::fmt::Display for ReasonRuleBanEvasion {
@@ -356,7 +356,7 @@ impl std::fmt::Display for ReasonRuleBanEvasion {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonRuleOther;
 impl std::fmt::Display for ReasonRuleOther {
@@ -374,7 +374,7 @@ impl std::fmt::Display for ReasonRuleOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonRuleProhibitedSales;
 impl std::fmt::Display for ReasonRuleProhibitedSales {
@@ -392,7 +392,7 @@ impl std::fmt::Display for ReasonRuleProhibitedSales {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonRuleSiteSecurity;
 impl std::fmt::Display for ReasonRuleSiteSecurity {
@@ -410,7 +410,7 @@ impl std::fmt::Display for ReasonRuleSiteSecurity {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSelfHarmContent;
 impl std::fmt::Display for ReasonSelfHarmContent {
@@ -428,7 +428,7 @@ impl std::fmt::Display for ReasonSelfHarmContent {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSelfHarmEd;
 impl std::fmt::Display for ReasonSelfHarmEd {
@@ -446,7 +446,7 @@ impl std::fmt::Display for ReasonSelfHarmEd {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSelfHarmOther;
 impl std::fmt::Display for ReasonSelfHarmOther {
@@ -464,7 +464,7 @@ impl std::fmt::Display for ReasonSelfHarmOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSelfHarmStunts;
 impl std::fmt::Display for ReasonSelfHarmStunts {
@@ -482,7 +482,7 @@ impl std::fmt::Display for ReasonSelfHarmStunts {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSelfHarmSubstances;
 impl std::fmt::Display for ReasonSelfHarmSubstances {
@@ -500,7 +500,7 @@ impl std::fmt::Display for ReasonSelfHarmSubstances {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexualAbuseContent;
 impl std::fmt::Display for ReasonSexualAbuseContent {
@@ -518,7 +518,7 @@ impl std::fmt::Display for ReasonSexualAbuseContent {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexualAnimal;
 impl std::fmt::Display for ReasonSexualAnimal {
@@ -536,7 +536,7 @@ impl std::fmt::Display for ReasonSexualAnimal {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexualDeepfake;
 impl std::fmt::Display for ReasonSexualDeepfake {
@@ -554,7 +554,7 @@ impl std::fmt::Display for ReasonSexualDeepfake {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexualNcii;
 impl std::fmt::Display for ReasonSexualNcii {
@@ -572,7 +572,7 @@ impl std::fmt::Display for ReasonSexualNcii {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexualOther;
 impl std::fmt::Display for ReasonSexualOther {
@@ -590,7 +590,7 @@ impl std::fmt::Display for ReasonSexualOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonSexualUnlabeled;
 impl std::fmt::Display for ReasonSexualUnlabeled {
@@ -647,8 +647,12 @@ pub enum ReasonType<'a> {
 impl<'a> ReasonType<'a> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::ToolsOzoneReportDefsReasonAppeal => "tools.ozone.report.defs#reasonAppeal",
-            Self::ToolsOzoneReportDefsReasonOther => "tools.ozone.report.defs#reasonOther",
+            Self::ToolsOzoneReportDefsReasonAppeal => {
+                "tools.ozone.report.defs#reasonAppeal"
+            }
+            Self::ToolsOzoneReportDefsReasonOther => {
+                "tools.ozone.report.defs#reasonOther"
+            }
             Self::ToolsOzoneReportDefsReasonViolenceAnimal => {
                 "tools.ozone.report.defs#reasonViolenceAnimal"
             }
@@ -745,7 +749,9 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonRuleBanEvasion => {
                 "tools.ozone.report.defs#reasonRuleBanEvasion"
             }
-            Self::ToolsOzoneReportDefsReasonRuleOther => "tools.ozone.report.defs#reasonRuleOther",
+            Self::ToolsOzoneReportDefsReasonRuleOther => {
+                "tools.ozone.report.defs#reasonRuleOther"
+            }
             Self::ToolsOzoneReportDefsReasonSelfHarmContent => {
                 "tools.ozone.report.defs#reasonSelfHarmContent"
             }
@@ -769,8 +775,12 @@ impl<'a> ReasonType<'a> {
 impl<'a> From<&'a str> for ReasonType<'a> {
     fn from(s: &'a str) -> Self {
         match s {
-            "tools.ozone.report.defs#reasonAppeal" => Self::ToolsOzoneReportDefsReasonAppeal,
-            "tools.ozone.report.defs#reasonOther" => Self::ToolsOzoneReportDefsReasonOther,
+            "tools.ozone.report.defs#reasonAppeal" => {
+                Self::ToolsOzoneReportDefsReasonAppeal
+            }
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
             "tools.ozone.report.defs#reasonViolenceAnimal" => {
                 Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
@@ -867,7 +877,9 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonRuleBanEvasion" => {
                 Self::ToolsOzoneReportDefsReasonRuleBanEvasion
             }
-            "tools.ozone.report.defs#reasonRuleOther" => Self::ToolsOzoneReportDefsReasonRuleOther,
+            "tools.ozone.report.defs#reasonRuleOther" => {
+                Self::ToolsOzoneReportDefsReasonRuleOther
+            }
             "tools.ozone.report.defs#reasonSelfHarmContent" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
@@ -891,8 +903,12 @@ impl<'a> From<&'a str> for ReasonType<'a> {
 impl<'a> From<String> for ReasonType<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
-            "tools.ozone.report.defs#reasonAppeal" => Self::ToolsOzoneReportDefsReasonAppeal,
-            "tools.ozone.report.defs#reasonOther" => Self::ToolsOzoneReportDefsReasonOther,
+            "tools.ozone.report.defs#reasonAppeal" => {
+                Self::ToolsOzoneReportDefsReasonAppeal
+            }
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
             "tools.ozone.report.defs#reasonViolenceAnimal" => {
                 Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
@@ -989,7 +1005,9 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonRuleBanEvasion" => {
                 Self::ToolsOzoneReportDefsReasonRuleBanEvasion
             }
-            "tools.ozone.report.defs#reasonRuleOther" => Self::ToolsOzoneReportDefsReasonRuleOther,
+            "tools.ozone.report.defs#reasonRuleOther" => {
+                Self::ToolsOzoneReportDefsReasonRuleOther
+            }
             "tools.ozone.report.defs#reasonSelfHarmContent" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
@@ -1182,7 +1200,7 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceAnimal;
 impl std::fmt::Display for ReasonViolenceAnimal {
@@ -1200,7 +1218,7 @@ impl std::fmt::Display for ReasonViolenceAnimal {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceExtremistContent;
 impl std::fmt::Display for ReasonViolenceExtremistContent {
@@ -1218,7 +1236,7 @@ impl std::fmt::Display for ReasonViolenceExtremistContent {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceGlorification;
 impl std::fmt::Display for ReasonViolenceGlorification {
@@ -1236,7 +1254,7 @@ impl std::fmt::Display for ReasonViolenceGlorification {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceGraphicContent;
 impl std::fmt::Display for ReasonViolenceGraphicContent {
@@ -1254,7 +1272,7 @@ impl std::fmt::Display for ReasonViolenceGraphicContent {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceOther;
 impl std::fmt::Display for ReasonViolenceOther {
@@ -1272,7 +1290,7 @@ impl std::fmt::Display for ReasonViolenceOther {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceThreats;
 impl std::fmt::Display for ReasonViolenceThreats {
@@ -1290,7 +1308,7 @@ impl std::fmt::Display for ReasonViolenceThreats {
     PartialEq,
     Eq,
     Hash,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ReasonViolenceTrafficking;
 impl std::fmt::Display for ReasonViolenceTrafficking {

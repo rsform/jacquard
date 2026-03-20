@@ -14,18 +14,23 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrew<'a> {
-    /// Requested permissions (default: ['blob:read', 'blob:write'])
+    ///Requested permissions (default: ['blob:read', 'blob:write'])
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub permissions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Requested role (default: 'member')
+    ///Requested role (default: 'member') Defaults to `"member"`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_role")]
     #[serde(borrow)]
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+fn _default_role() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("member"))
 }
 
 #[jacquard_derive::lexicon]
@@ -37,22 +42,22 @@ pub struct RequestCrew<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrewOutput<'a> {
-    /// CID of the crew record
+    ///CID of the crew record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    /// Human-readable status message
+    ///Human-readable status message
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Result status
+    ///Result status
     #[serde(borrow)]
     pub status: RequestCrewOutputStatus<'a>,
-    /// AT-URI of the crew record (if created or already exists)
+    ///AT-URI of the crew record (if created or already exists)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -141,8 +146,12 @@ impl jacquard_common::IntoStatic for RequestCrewOutputStatus<'_> {
     fn into_static(self) -> Self::Output {
         match self {
             RequestCrewOutputStatus::Created => RequestCrewOutputStatus::Created,
-            RequestCrewOutputStatus::AlreadyMember => RequestCrewOutputStatus::AlreadyMember,
-            RequestCrewOutputStatus::Other(v) => RequestCrewOutputStatus::Other(v.into_static()),
+            RequestCrewOutputStatus::AlreadyMember => {
+                RequestCrewOutputStatus::AlreadyMember
+            }
+            RequestCrewOutputStatus::Other(v) => {
+                RequestCrewOutputStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -157,7 +166,7 @@ impl jacquard_common::IntoStatic for RequestCrewOutputStatus<'_> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -202,8 +211,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestCrewResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrew<'a> {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestCrewResponse;
 }
 
@@ -212,8 +222,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrew<'a> {
 pub struct RequestCrewRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.requestCrew";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RequestCrew<'de>;
     type Response = RequestCrewResponse;
 }

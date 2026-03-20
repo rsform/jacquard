@@ -7,43 +7,49 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Merge<'a> {
-    /// Author email for the merge commit
+    ///Author email for the merge commit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub author_email: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Author name for the merge commit
+    ///Author name for the merge commit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub author_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Target branch to merge into
+    ///Target branch to merge into
     #[serde(borrow)]
     pub branch: jacquard_common::CowStr<'a>,
-    /// Additional commit message body
+    ///Additional commit message body
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub commit_body: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Merge commit message
+    ///Merge commit message
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub commit_message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// DID of the repository owner
+    ///DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// Name of the repository
+    ///Name of the repository
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Patch content to merge
+    ///Patch content to merge
     #[serde(borrow)]
     pub patch: jacquard_common::CowStr<'a>,
 }
 
 pub mod merge_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,67 +57,67 @@ pub mod merge_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Patch;
-        type Name;
         type Did;
+        type Patch;
         type Branch;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Patch = Unset;
-        type Name = Unset;
         type Did = Unset;
+        type Patch = Unset;
         type Branch = Unset;
-    }
-    ///State transition - sets the `patch` field to Set
-    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatch<S> {}
-    impl<S: State> State for SetPatch<S> {
-        type Patch = Set<members::patch>;
-        type Name = S::Name;
-        type Did = S::Did;
-        type Branch = S::Branch;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Patch = S::Patch;
-        type Name = Set<members::name>;
-        type Did = S::Did;
-        type Branch = S::Branch;
+        type Name = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Patch = S::Patch;
-        type Name = S::Name;
         type Did = Set<members::did>;
+        type Patch = S::Patch;
         type Branch = S::Branch;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `patch` field to Set
+    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatch<S> {}
+    impl<S: State> State for SetPatch<S> {
+        type Did = S::Did;
+        type Patch = Set<members::patch>;
+        type Branch = S::Branch;
+        type Name = S::Name;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBranch<S> {}
     impl<S: State> State for SetBranch<S> {
-        type Patch = S::Patch;
-        type Name = S::Name;
         type Did = S::Did;
+        type Patch = S::Patch;
         type Branch = Set<members::branch>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Patch = S::Patch;
+        type Branch = S::Branch;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `patch` field
-        pub struct patch(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `patch` field
+        pub struct patch(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -151,12 +157,18 @@ impl<'a> MergeBuilder<'a, merge_state::Empty> {
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `authorEmail` field (optional)
-    pub fn author_email(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn author_email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `authorEmail` field to an Option value (optional)
-    pub fn maybe_author_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_author_email(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -164,12 +176,18 @@ impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `authorName` field (optional)
-    pub fn author_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn author_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `authorName` field to an Option value (optional)
-    pub fn maybe_author_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_author_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -196,12 +214,18 @@ where
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `commitBody` field (optional)
-    pub fn commit_body(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn commit_body(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `commitBody` field to an Option value (optional)
-    pub fn maybe_commit_body(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_commit_body(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -209,12 +233,18 @@ impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `commitMessage` field (optional)
-    pub fn commit_message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn commit_message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `commitMessage` field to an Option value (optional)
-    pub fn maybe_commit_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_commit_message(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -280,10 +310,10 @@ where
 impl<'a, S> MergeBuilder<'a, S>
 where
     S: merge_state::State,
-    S::Patch: merge_state::IsSet,
-    S::Name: merge_state::IsSet,
     S::Did: merge_state::IsSet,
+    S::Patch: merge_state::IsSet,
     S::Branch: merge_state::IsSet,
+    S::Name: merge_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Merge<'a> {
@@ -333,8 +363,9 @@ impl jacquard_common::xrpc::XrpcResp for MergeResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Merge<'a> {
     const NSID: &'static str = "sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MergeResponse;
 }
 
@@ -343,8 +374,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Merge<'a> {
 pub struct MergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Merge<'de>;
     type Response = MergeResponse;
 }

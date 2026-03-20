@@ -14,22 +14,28 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeletePost<'a> {
-    /// Post ID to delete.
+    ///Post ID to delete.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeletePostOutput<'a> {
-    /// Deletion success flag.
+    ///Deletion success flag.
     pub success: bool,
 }
 
@@ -43,7 +49,7 @@ pub struct DeletePostOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -88,8 +94,9 @@ impl jacquard_common::xrpc::XrpcResp for DeletePostResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeletePost<'a> {
     const NSID: &'static str = "app.chronosky.schedule.deletePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeletePostResponse;
 }
 
@@ -98,8 +105,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeletePost<'a> {
 pub struct DeletePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.deletePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeletePost<'de>;
     type Response = DeletePostResponse;
 }

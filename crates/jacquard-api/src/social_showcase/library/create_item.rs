@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateItem<'a> {
@@ -35,7 +41,7 @@ pub struct CreateItem<'a> {
 
 pub mod create_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,67 +49,67 @@ pub mod create_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Images;
-        type Tags;
         type Visibility;
+        type Images;
+        type Title;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Images = Unset;
-        type Tags = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Images = S::Images;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Title = S::Title;
-        type Images = Set<members::images>;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Title = S::Title;
-        type Images = S::Images;
-        type Tags = Set<members::tags>;
-        type Visibility = S::Visibility;
+        type Images = Unset;
+        type Title = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Title = S::Title;
-        type Images = S::Images;
-        type Tags = S::Tags;
         type Visibility = Set<members::visibility>;
+        type Images = S::Images;
+        type Title = S::Title;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Visibility = S::Visibility;
+        type Images = Set<members::images>;
+        type Title = S::Title;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Title = Set<members::title>;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Title = S::Title;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `images` field
-        pub struct images(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `images` field
+        pub struct images(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
@@ -143,7 +149,10 @@ impl<'a> CreateItemBuilder<'a, create_item_state::Empty> {
 
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -156,12 +165,18 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
 
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -284,10 +299,10 @@ where
 impl<'a, S> CreateItemBuilder<'a, S>
 where
     S: create_item_state::State,
-    S::Title: create_item_state::IsSet,
-    S::Images: create_item_state::IsSet,
-    S::Tags: create_item_state::IsSet,
     S::Visibility: create_item_state::IsSet,
+    S::Images: create_item_state::IsSet,
+    S::Title: create_item_state::IsSet,
+    S::Tags: create_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateItem<'a> {
@@ -413,14 +428,22 @@ impl jacquard_common::IntoStatic for CreateItemVisibility<'_> {
             CreateItemVisibility::Public => CreateItemVisibility::Public,
             CreateItemVisibility::Unlisted => CreateItemVisibility::Unlisted,
             CreateItemVisibility::Private => CreateItemVisibility::Private,
-            CreateItemVisibility::Other(v) => CreateItemVisibility::Other(v.into_static()),
+            CreateItemVisibility::Other(v) => {
+                CreateItemVisibility::Other(v.into_static())
+            }
         }
     }
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateItemOutput<'a> {
@@ -441,8 +464,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateItem<'a> {
     const NSID: &'static str = "social.showcase.library.createItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateItemResponse;
 }
 
@@ -451,8 +475,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateItem<'a> {
 pub struct CreateItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.createItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateItem<'de>;
     type Response = CreateItemResponse;
 }

@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
@@ -16,7 +22,7 @@ pub struct Status<'a> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,7 +55,9 @@ pub mod status_state {
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Did<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -105,20 +113,26 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusOutput<'a> {
-    /// Authoritative boundaries assigned. Only included when request is authenticated.
+    ///Authoritative boundaries assigned. Only included when request is authenticated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub boundaries: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    /// The DID that was checked.
+    ///The DID that was checked.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// Whether the DID is enrolled in this Stratos service.
+    ///Whether the DID is enrolled in this Stratos service.
     pub enrolled: bool,
-    /// When the DID was enrolled, if enrolled.
+    ///When the DID was enrolled, if enrolled.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub enrolled_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }

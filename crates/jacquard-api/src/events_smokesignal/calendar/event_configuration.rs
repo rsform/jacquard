@@ -8,25 +8,33 @@
 /// Configuration settings for a Smoke Signal event, controlling RSVP behavior and access requirements.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventConfiguration<'a> {
-    /// When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
+    ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disable_direct_rsvp: std::option::Option<bool>,
-    /// When true, RSVPs require a confirmed email address.
+    ///When true, RSVPs require a confirmed email address.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub require_confirmed_email: std::option::Option<bool>,
-    /// URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
+    ///URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rsvp_redirect_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub rsvp_redirect_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
 }
 
 pub mod event_configuration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -162,7 +170,13 @@ impl<'a> EventConfiguration<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventConfigurationGetRecordOutput<'a> {
@@ -231,11 +245,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventConfiguration<'a> {
     }
 }
 
-fn lexicon_doc_events_smokesignal_calendar_eventConfiguration()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_events_smokesignal_calendar_eventConfiguration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("events.smokesignal.calendar.eventConfiguration"),
+        id: ::jacquard_common::CowStr::new_static(
+            "events.smokesignal.calendar.eventConfiguration",
+        ),
         revision: None,
         description: None,
         defs: {

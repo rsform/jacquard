@@ -8,13 +8,19 @@
 /// Hi
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Hello<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Hi
+    ///Hi
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub hello: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -22,7 +28,7 @@ pub struct Hello<'a> {
 
 pub mod hello_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -88,7 +94,10 @@ impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
 
 impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
     /// Set the `hello` field (optional)
-    pub fn hello(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn hello(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -142,7 +151,13 @@ impl<'a> Hello<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HelloGetRecordOutput<'a> {
@@ -199,7 +214,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hello<'a> {
     }
 }
 
-fn lexicon_doc_lol_gayfamicom_hi_hello() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_lol_gayfamicom_hi_hello() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("lol.gayfamicom.hi.hello"),

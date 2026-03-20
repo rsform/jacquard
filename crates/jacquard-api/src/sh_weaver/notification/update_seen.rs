@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSeen<'a> {
@@ -16,7 +22,7 @@ pub struct UpdateSeen<'a> {
 
 pub mod update_seen_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,7 +55,9 @@ pub mod update_seen_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateSeenBuilder<'a, S: update_seen_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::Datetime>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -126,7 +134,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSeenOutput<'a> {}
@@ -142,8 +150,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateSeenResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSeen<'a> {
     const NSID: &'static str = "sh.weaver.notification.updateSeen";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateSeenResponse;
 }
 
@@ -152,8 +161,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSeen<'a> {
 pub struct UpdateSeenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSeenRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notification.updateSeen";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateSeen<'de>;
     type Response = UpdateSeenResponse;
 }

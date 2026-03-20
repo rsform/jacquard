@@ -15,14 +15,14 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WhoamiOutput<'a> {
-    /// The user's DID
+    ///The user's DID
     #[serde(borrow)]
     pub did: jacquard_common::CowStr<'a>,
-    /// The user's ID
+    ///The user's ID
     #[serde(borrow)]
     pub handle: jacquard_common::CowStr<'a>,
 }
@@ -36,7 +36,7 @@ pub struct WhoamiOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct Whoami;
 /// Response type for

@@ -14,11 +14,11 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ClearSliceRecords<'a> {
-    /// AT-URI of the slice to clear
+    ///AT-URI of the slice to clear
     #[serde(borrow)]
     pub slice: jacquard_common::CowStr<'a>,
 }
@@ -32,11 +32,11 @@ pub struct ClearSliceRecords<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ClearSliceRecordsOutput<'a> {
-    /// Success message
+    ///Success message
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
 }
@@ -53,8 +53,9 @@ impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<'a> {
     const NSID: &'static str = "network.slices.slice.clearSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ClearSliceRecordsResponse;
 }
 
@@ -63,8 +64,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<'a> {
 pub struct ClearSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ClearSliceRecordsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.clearSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ClearSliceRecords<'de>;
     type Response = ClearSliceRecordsResponse;
 }

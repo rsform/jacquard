@@ -7,18 +7,24 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tabs<'a> {
-    /// Tabs to display.
+    ///Tabs to display.
     #[serde(borrow)]
     pub items: Vec<crate::org_atsui::tabs::Tab<'a>>,
 }
 
 pub mod tabs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,7 +57,9 @@ pub mod tabs_state {
 /// Builder for constructing an instance of this type
 pub struct TabsBuilder<'a, S: tabs_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<Vec<crate::org_atsui::tabs::Tab<'a>>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::org_atsui::tabs::Tab<'a>>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -121,7 +129,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TabsOutput<'a> {
@@ -142,8 +156,9 @@ impl jacquard_common::xrpc::XrpcResp for TabsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
     const NSID: &'static str = "org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = TabsResponse;
 }
 
@@ -152,32 +167,39 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
 pub struct TabsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Tabs<'de>;
     type Response = TabsResponse;
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tab<'a> {
-    /// Element to render as tab content.
+    ///Element to render as tab content.
     #[serde(borrow)]
     pub content: crate::at_inlay::Element<'a>,
-    /// Stable key that identifies the tab among its siblings.
+    ///Stable key that identifies the tab among its siblings.
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
-    /// Display label for the tab.
+    ///Display label for the tab.
     #[serde(borrow)]
     pub label: jacquard_common::CowStr<'a>,
 }
 
 pub mod tab_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -185,51 +207,51 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
-        type Label;
         type Content;
+        type Label;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
-        type Label = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Label = S::Label;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type Key = S::Key;
-        type Label = Set<members::label>;
-        type Content = S::Content;
+        type Label = Unset;
+        type Key = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Key = S::Key;
-        type Label = S::Label;
         type Content = Set<members::content>;
+        type Label = S::Label;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabel<S> {}
+    impl<S: State> State for SetLabel<S> {
+        type Content = S::Content;
+        type Label = Set<members::label>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Content = S::Content;
+        type Label = S::Label;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
-        ///Marker type for the `label` field
-        pub struct label(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `label` field
+        pub struct label(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -322,9 +344,9 @@ where
 impl<'a, S> TabBuilder<'a, S>
 where
     S: tab_state::State,
-    S::Key: tab_state::IsSet,
-    S::Label: tab_state::IsSet,
     S::Content: tab_state::IsSet,
+    S::Label: tab_state::IsSet,
+    S::Key: tab_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tab<'a> {
@@ -502,7 +524,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tab<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("key"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -513,7 +537,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tab<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("label"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

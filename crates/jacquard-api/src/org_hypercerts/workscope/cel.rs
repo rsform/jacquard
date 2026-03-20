@@ -8,26 +8,32 @@
 /// A structured, machine-evaluable work scope definition using CEL (Common Expression Language). Tags referenced in the expression correspond to org.hypercerts.workscope.tag keys. See https://github.com/google/cel-spec. Note: this is intentionally type 'object' (not 'record') so it can be directly embedded inline in union types (e.g., activity.workScope) without requiring a separate collection or strongRef indirection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cel<'a> {
-    /// Client-declared timestamp when this expression was originally created.
+    ///Client-declared timestamp when this expression was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'
+    ///A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'
     #[serde(borrow)]
     pub expression: jacquard_common::CowStr<'a>,
-    /// Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.
+    ///Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.
     #[serde(borrow)]
     pub used_tags: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// CEL context schema version.
+    ///CEL context schema version.
     #[serde(borrow)]
     pub version: CelVersion<'a>,
 }
 
 pub mod cel_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,66 +42,66 @@ pub mod cel_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Expression;
-        type CreatedAt;
         type Version;
         type UsedTags;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Expression = Unset;
-        type CreatedAt = Unset;
         type Version = Unset;
         type UsedTags = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `expression` field to Set
     pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpression<S> {}
     impl<S: State> State for SetExpression<S> {
         type Expression = Set<members::expression>;
+        type Version = S::Version;
+        type UsedTags = S::UsedTags;
         type CreatedAt = S::CreatedAt;
-        type Version = S::Version;
-        type UsedTags = S::UsedTags;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Expression = S::Expression;
-        type CreatedAt = Set<members::created_at>;
-        type Version = S::Version;
-        type UsedTags = S::UsedTags;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
         type Expression = S::Expression;
-        type CreatedAt = S::CreatedAt;
         type Version = Set<members::version>;
         type UsedTags = S::UsedTags;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `used_tags` field to Set
     pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUsedTags<S> {}
     impl<S: State> State for SetUsedTags<S> {
         type Expression = S::Expression;
-        type CreatedAt = S::CreatedAt;
         type Version = S::Version;
         type UsedTags = Set<members::used_tags>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Expression = S::Expression;
+        type Version = S::Version;
+        type UsedTags = S::UsedTags;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `expression` field
         pub struct expression(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `version` field
         pub struct version(());
         ///Marker type for the `used_tags` field
         pub struct used_tags(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -209,9 +215,9 @@ impl<'a, S> CelBuilder<'a, S>
 where
     S: cel_state::State,
     S::Expression: cel_state::IsSet,
-    S::CreatedAt: cel_state::IsSet,
     S::Version: cel_state::IsSet,
     S::UsedTags: cel_state::IsSet,
+    S::CreatedAt: cel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cel<'a> {
@@ -325,7 +331,9 @@ impl jacquard_common::IntoStatic for CelVersion<'_> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.workscope.cel"),
@@ -465,7 +473,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("expression"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "expression",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -480,15 +490,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
                     )
                     .count();
                 if count > 5000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "expression",
-                            ),
-                            max: 5000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "expression",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -497,7 +505,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("used_tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "used_tags",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -508,7 +518,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 16usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
                     max: 16usize,
                     actual: <str>::len(value.as_ref()),
                 });

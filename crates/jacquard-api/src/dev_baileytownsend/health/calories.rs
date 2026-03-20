@@ -8,7 +8,13 @@
 /// A record of daily intake and burned calories.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Calories<'a> {
@@ -19,7 +25,7 @@ pub struct Calories<'a> {
 
 pub mod calories_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -28,50 +34,50 @@ pub mod calories_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Intake;
         type Burned;
+        type Intake;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Intake = Unset;
         type Burned = Unset;
+        type Intake = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Burned = S::Burned;
         type Intake = S::Intake;
-        type Burned = S::Burned;
-    }
-    ///State transition - sets the `intake` field to Set
-    pub struct SetIntake<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIntake<S> {}
-    impl<S: State> State for SetIntake<S> {
-        type CreatedAt = S::CreatedAt;
-        type Intake = Set<members::intake>;
-        type Burned = S::Burned;
     }
     ///State transition - sets the `burned` field to Set
     pub struct SetBurned<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBurned<S> {}
     impl<S: State> State for SetBurned<S> {
         type CreatedAt = S::CreatedAt;
-        type Intake = S::Intake;
         type Burned = Set<members::burned>;
+        type Intake = S::Intake;
+    }
+    ///State transition - sets the `intake` field to Set
+    pub struct SetIntake<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIntake<S> {}
+    impl<S: State> State for SetIntake<S> {
+        type CreatedAt = S::CreatedAt;
+        type Burned = S::Burned;
+        type Intake = Set<members::intake>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `intake` field
-        pub struct intake(());
         ///Marker type for the `burned` field
         pub struct burned(());
+        ///Marker type for the `intake` field
+        pub struct intake(());
     }
 }
 
@@ -165,8 +171,8 @@ impl<'a, S> CaloriesBuilder<'a, S>
 where
     S: calories_state::State,
     S::CreatedAt: calories_state::IsSet,
-    S::Intake: calories_state::IsSet,
     S::Burned: calories_state::IsSet,
+    S::Intake: calories_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Calories<'a> {
@@ -209,7 +215,13 @@ impl<'a> Calories<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CaloriesGetRecordOutput<'a> {
@@ -266,8 +278,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Calories<'a> {
     }
 }
 
-fn lexicon_doc_dev_baileytownsend_health_calories()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_dev_baileytownsend_health_calories() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.baileytownsend.health.calories"),

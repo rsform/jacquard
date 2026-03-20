@@ -8,24 +8,30 @@
 /// User's current presence status. Lives in their repo, updated by their client. IMPORTANT: visibleTo is intentionally excluded — it is a privacy preference and must remain server-side only. Writing it to the PDS would publicly expose who the user is hiding from.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Presence<'a> {
-    /// Custom away message / status text.
+    ///Custom away message / status text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub away_message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Current presence status.
+    ///Current presence status.
     #[serde(borrow)]
     pub status: PresenceStatus<'a>,
-    /// When presence was last updated.
+    ///When presence was last updated.
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod presence_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -33,37 +39,37 @@ pub mod presence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type UpdatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type UpdatedAt = S::UpdatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Status = S::Status;
         type UpdatedAt = Set<members::updated_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -98,12 +104,18 @@ impl<'a> PresenceBuilder<'a, presence_state::Empty> {
 
 impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
     /// Set the `awayMessage` field (optional)
-    pub fn away_message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn away_message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `awayMessage` field to an Option value (optional)
-    pub fn maybe_away_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_away_message(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -150,8 +162,8 @@ where
 impl<'a, S> PresenceBuilder<'a, S>
 where
     S: presence_state::State,
-    S::Status: presence_state::IsSet,
     S::UpdatedAt: presence_state::IsSet,
+    S::Status: presence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Presence<'a> {
@@ -298,7 +310,13 @@ impl jacquard_common::IntoStatic for PresenceStatus<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PresenceGetRecordOutput<'a> {
@@ -367,7 +385,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Presence<'a> {
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_presence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_protoimsg_chat_presence() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.presence"),

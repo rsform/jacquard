@@ -7,33 +7,39 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SetStats<'a> {
-    /// RFC3339 timestamp of last pull
+    ///RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_pull: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// RFC3339 timestamp of last push
+    ///RFC3339 timestamp of last push
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_push: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// DID of the repository owner
+    ///DID of the repository owner
     #[serde(borrow)]
     pub owner_did: jacquard_common::types::string::Did<'a>,
-    /// Absolute pull count to set
+    ///Absolute pull count to set
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub pull_count: std::option::Option<i64>,
-    /// Absolute push count to set
+    ///Absolute push count to set
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub push_count: std::option::Option<i64>,
-    /// Repository name
+    ///Repository name
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
 }
 
 pub mod set_stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,37 +47,37 @@ pub mod set_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type OwnerDid;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type OwnerDid = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type OwnerDid = S::OwnerDid;
+        type Repository = Unset;
     }
     ///State transition - sets the `owner_did` field to Set
     pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
     impl<S: State> State for SetOwnerDid<S> {
-        type Repository = S::Repository;
         type OwnerDid = Set<members::owner_did>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type OwnerDid = S::OwnerDid;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -212,8 +218,8 @@ where
 impl<'a, S> SetStatsBuilder<'a, S>
 where
     S: set_stats_state::State,
-    S::Repository: set_stats_state::IsSet,
     S::OwnerDid: set_stats_state::IsSet,
+    S::Repository: set_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetStats<'a> {
@@ -249,11 +255,17 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SetStatsOutput<'a> {
-    /// Whether the stats were successfully updated
+    ///Whether the stats were successfully updated
     pub success: bool,
 }
 
@@ -267,7 +279,7 @@ pub struct SetStatsOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -312,8 +324,9 @@ impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for SetStats<'a> {
     const NSID: &'static str = "io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SetStatsResponse;
 }
 
@@ -322,8 +335,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SetStats<'a> {
 pub struct SetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = SetStats<'de>;
     type Response = SetStatsResponse;
 }

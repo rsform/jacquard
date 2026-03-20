@@ -8,34 +8,47 @@
 /// A video game.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: std::option::Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
+    pub age_ratings: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternative_names:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
+    pub alternative_names: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
+    >,
     #[serde(borrow)]
     pub application_type: crate::games_gamesgamesgamesgames::ApplicationType<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Detailed game description in plain text, with formatting expressed via descriptionFacets.
+    ///Detailed game description in plain text, with formatting expressed via descriptionFacets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Rich text facets for the description field.
+    ///Rich text facets for the description field.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub description_facets: std::option::Option<
+        Vec<jacquard_common::types::value::Data<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub engines: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_ids: std::option::Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>,
+    pub external_ids: std::option::Option<
+        crate::games_gamesgamesgamesgames::ExternalIds<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
@@ -44,67 +57,82 @@ pub struct Game<'a> {
     pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub language_supports:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
-    /// Images associated with the game.
+    pub language_supports: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
+    >,
+    ///Images associated with the game.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub modes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub multiplayer_modes:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
+    pub multiplayer_modes: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
+    >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// Platform-specific feature support.
+    ///Platform-specific feature support.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform_features:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>>,
+    pub platform_features: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
-    /// When this record was marked ready for public viewing.
+    pub player_perspectives: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
+    >,
+    ///When this record was marked ready for public viewing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub releases: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>,
+    pub releases: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub storyline: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// System requirements per platform.
+    ///System requirements per platform.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub system_requirements:
-        std::option::Option<Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>>,
+    pub system_requirements: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub time_to_beat: std::option::Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>,
+    pub time_to_beat: std::option::Option<
+        crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub videos: std::option::Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
+    pub videos: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
+    >,
 }
 
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,51 +140,51 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type ApplicationType;
         type CreatedAt;
+        type ApplicationType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type ApplicationType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type ApplicationType = S::ApplicationType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
-    impl<S: State> State for SetApplicationType<S> {
-        type Name = S::Name;
-        type ApplicationType = Set<members::application_type>;
-        type CreatedAt = S::CreatedAt;
+        type ApplicationType = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type ApplicationType = S::ApplicationType;
         type CreatedAt = Set<members::created_at>;
+        type ApplicationType = S::ApplicationType;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `application_type` field to Set
+    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
+    impl<S: State> State for SetApplicationType<S> {
+        type CreatedAt = S::CreatedAt;
+        type ApplicationType = Set<members::application_type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type ApplicationType = S::ApplicationType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `application_type` field
-        pub struct application_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `application_type` field
+        pub struct application_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -165,7 +193,9 @@ pub struct GameBuilder<'a, S: game_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
+        >,
         ::core::option::Option<crate::games_gamesgamesgamesgames::ApplicationType<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -174,22 +204,34 @@ pub struct GameBuilder<'a, S: game_state::State> {
         ::core::option::Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
+        >,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>,
+        >,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>,
+        >,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
         ::core::option::Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
+        >,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -208,8 +250,33 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
         GameBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -239,7 +306,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `alternativeNames` field (optional)
     pub fn alternative_names(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -294,12 +363,18 @@ where
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -383,12 +458,18 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn keywords(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -398,7 +479,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `languageSupports` field (optional)
     pub fn language_supports(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
@@ -455,7 +538,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `multiplayerModes` field (optional)
     pub fn multiplayer_modes(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
@@ -512,7 +597,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `platformFeatures` field (optional)
     pub fn platform_features(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
@@ -531,7 +618,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.17 = value.into();
         self
@@ -586,12 +675,18 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `storyline` field (optional)
-    pub fn storyline(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn storyline(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
-    pub fn maybe_storyline(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_storyline(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.20 = value;
         self
     }
@@ -599,7 +694,10 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn summary(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.21 = value.into();
         self
     }
@@ -614,7 +712,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `systemRequirements` field (optional)
     pub fn system_requirements(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.22 = value.into();
         self
@@ -671,7 +771,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `videos` field (optional)
     pub fn videos(
         mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.25 = value.into();
         self
@@ -708,9 +810,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Name: game_state::IsSet,
-    S::ApplicationType: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
+    S::ApplicationType: game_state::IsSet,
+    S::Name: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -801,7 +903,13 @@ impl<'a> Game<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<'a> {
@@ -858,8 +966,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_games_gamesgamesgamesgames_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("games.gamesgamesgamesgames.game"),

@@ -8,7 +8,13 @@
 ///
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Collectionitem<'a> {
@@ -24,7 +30,7 @@ pub struct Collectionitem<'a> {
 
 pub mod collectionitem_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,51 +38,51 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Work;
         type List;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Work = Unset;
         type List = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Work = S::Work;
-        type List = S::List;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `work` field to Set
     pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWork<S> {}
     impl<S: State> State for SetWork<S> {
-        type CreatedAt = S::CreatedAt;
         type Work = Set<members::work>;
         type List = S::List;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type CreatedAt = S::CreatedAt;
         type Work = S::Work;
         type List = Set<members::list>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Work = S::Work;
+        type List = S::List;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `work` field
         pub struct work(());
         ///Marker type for the `list` field
         pub struct list(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -169,9 +175,9 @@ where
 impl<'a, S> CollectionitemBuilder<'a, S>
 where
     S: collectionitem_state::State,
-    S::CreatedAt: collectionitem_state::IsSet,
     S::Work: collectionitem_state::IsSet,
     S::List: collectionitem_state::IsSet,
+    S::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collectionitem<'a> {
@@ -214,7 +220,13 @@ impl<'a> Collectionitem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionitemGetRecordOutput<'a> {
@@ -271,8 +283,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
     }
 }
 
-fn lexicon_doc_social_lexical_works_collectionitem()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_lexical_works_collectionitem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.lexical.works.collectionitem"),

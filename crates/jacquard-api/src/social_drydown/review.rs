@@ -8,75 +8,83 @@
 /// A single wearing review of a fragrance
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
-    /// Final: Depth and evolution (1-5)
+    ///Final: Depth and evolution (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub complexity: std::option::Option<i64>,
-    /// Timestamp when the review was created
+    ///Timestamp when the review was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Mid-Wear: How it smells after settling (1-5)
+    ///Mid-Wear: How it smells after settling (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub drydown_rating: std::option::Option<i64>,
-    /// Elevation in meters above sea level
+    ///Elevation in meters above sea level
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub elevation: std::option::Option<i64>,
-    /// Final: How it smells at the end (1-5)
+    ///Final: How it smells at the end (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub end_rating: std::option::Option<i64>,
-    /// Reference to the social.drydown.fragrance record
+    ///Reference to the social.drydown.fragrance record
     #[serde(borrow)]
     pub fragrance: jacquard_common::types::string::AtUri<'a>,
-    /// Final: Total duration (1-5)
+    ///Final: Total duration (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub longevity: std::option::Option<i64>,
-    /// Mid-Wear: Scent bubble radius during mid-wear (1-5)
+    ///Mid-Wear: Scent bubble radius during mid-wear (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub mid_projection: std::option::Option<i64>,
-    /// First Impression: Immediate scent bubble radius (1-5)
+    ///First Impression: Immediate scent bubble radius (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub opening_projection: std::option::Option<i64>,
-    /// First Impression: How it smells immediately (1-5)
+    ///First Impression: How it smells immediately (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub opening_rating: std::option::Option<i64>,
-    /// Final: Holistic 'Gut Score' (1-5)
+    ///Final: Holistic 'Gut Score' (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub overall_rating: std::option::Option<i64>,
-    /// Mid-Wear: Trail left behind (1-5)
+    ///Mid-Wear: Trail left behind (1-5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub sillage: std::option::Option<i64>,
-    /// Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)
+    ///Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stage1_temp: std::option::Option<i64>,
-    /// Timestamp when Stage 2 was completed (for accurate temperature)
+    ///Timestamp when Stage 2 was completed (for accurate temperature)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stage2_completed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
+    pub stage2_completed_at: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    ///Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stage2_temp: std::option::Option<i64>,
-    /// Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)
+    ///Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stage3_temp: std::option::Option<i64>,
-    /// Written review (max 255 graphemes)
+    ///Written review (max 255 graphemes)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Daily maximum UV index (0-11+)
+    ///Daily maximum UV index (0-11+)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub uv_index: std::option::Option<i64>,
-    /// User opted in to weather data collection
+    ///User opted in to weather data collection
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub weather_opt_in: std::option::Option<bool>,
-    /// Calculated final score * 1000 (e.g. 4250 = 4.25)
+    ///Calculated final score * 1000 (e.g. 4250 = 4.25)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub weighted_score: std::option::Option<i64>,
 }
 
 pub mod review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -159,8 +167,26 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
         ReviewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -395,7 +421,10 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
     }
@@ -526,7 +555,13 @@ impl<'a> Review<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
@@ -582,7 +617,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.complexity {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("complexity"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "complexity",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -591,7 +628,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.complexity {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("complexity"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "complexity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -622,7 +661,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.end_rating {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("end_rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "end_rating",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -631,7 +672,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.end_rating {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("end_rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "end_rating",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -640,7 +683,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.longevity {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("longevity"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longevity",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -649,7 +694,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.longevity {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("longevity"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longevity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -746,7 +793,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.sillage {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("sillage"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sillage",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -755,7 +804,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.sillage {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("sillage"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sillage",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -765,7 +816,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -779,22 +832,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
                     )
                     .count();
                 if count > 255usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 255usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 255usize,
+                        actual: count,
+                    });
                 }
             }
         }
         if let Some(ref value) = self.uv_index {
             if *value > 11i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("uv_index"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uv_index",
+                    ),
                     max: 11i64,
                     actual: *value,
                 });
@@ -803,7 +856,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.uv_index {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("uv_index"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uv_index",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -813,7 +868,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     }
 }
 
-fn lexicon_doc_social_drydown_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_drydown_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.drydown.review"),

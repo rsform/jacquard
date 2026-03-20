@@ -15,22 +15,24 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DatasetSize<'a> {
-    /// Total size in bytes
+    ///Total size in bytes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub bytes: std::option::Option<i64>,
-    /// Total number of samples in the dataset
+    ///Total number of samples in the dataset
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub samples: std::option::Option<i64>,
-    /// Number of WebDataset shards
+    ///Number of WebDataset shards
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub shards: std::option::Option<i64>,
 }
 
-fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("science.alt.dataset.entry"),
@@ -40,59 +42,59 @@ fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::Lexic
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("datasetSize"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Information about dataset size",
-                        )),
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bytes"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("samples"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("shards"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(1i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "bytes",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "samples",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "shards",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(1i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -410,7 +412,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DatasetSize<'a> {
         if let Some(ref value) = self.bytes {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("bytes"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "bytes",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -419,7 +423,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DatasetSize<'a> {
         if let Some(ref value) = self.samples {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("samples"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "samples",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -428,7 +434,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DatasetSize<'a> {
         if let Some(ref value) = self.shards {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("shards"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shards",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -441,46 +449,54 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DatasetSize<'a> {
 /// Index entry for a WebDataset-backed dataset with references to storage location and sample schema
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
-    /// Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
+    ///Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content_metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// Timestamp when this dataset entry was created
+    ///Timestamp when this dataset entry was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Human-readable description of the dataset
+    ///Human-readable description of the dataset
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.
+    ///License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub license: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
+    ///Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub metadata: std::option::Option<jacquard_common::deps::bytes::Bytes>,
-    /// Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
+    ///Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata_schema_ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// Human-readable dataset name
+    pub metadata_schema_ref: std::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
+    ///Human-readable dataset name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// AT-URI reference to the schema record for this dataset's samples
+    ///AT-URI reference to the schema record for this dataset's samples
     #[serde(borrow)]
     pub schema_ref: jacquard_common::types::string::AtUri<'a>,
-    /// Dataset size information (optional)
+    ///Dataset size information (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub size: std::option::Option<crate::science_alt::dataset::entry::DatasetSize<'a>>,
-    /// Storage location for dataset files (WebDataset tar archives)
+    ///Storage location for dataset files (WebDataset tar archives)
     #[serde(borrow)]
     pub storage: EntryStorage<'a>,
-    /// Searchable tags for dataset discovery. Aligns with Schema.org keywords property.
+    ///Searchable tags for dataset discovery. Aligns with Schema.org keywords property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -488,7 +504,7 @@ pub struct Entry<'a> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -496,67 +512,67 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Storage;
-        type CreatedAt;
+        type Name;
         type SchemaRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Storage = Unset;
-        type CreatedAt = Unset;
+        type Name = Unset;
         type SchemaRef = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Storage = S::Storage;
-        type CreatedAt = S::CreatedAt;
-        type SchemaRef = S::SchemaRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `storage` field to Set
     pub struct SetStorage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStorage<S> {}
     impl<S: State> State for SetStorage<S> {
-        type Name = S::Name;
         type Storage = Set<members::storage>;
-        type CreatedAt = S::CreatedAt;
-        type SchemaRef = S::SchemaRef;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Storage = S::Storage;
-        type CreatedAt = Set<members::created_at>;
         type SchemaRef = S::SchemaRef;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Storage = S::Storage;
+        type Name = Set<members::name>;
+        type SchemaRef = S::SchemaRef;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `schema_ref` field to Set
     pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
     impl<S: State> State for SetSchemaRef<S> {
-        type Name = S::Name;
         type Storage = S::Storage;
-        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type SchemaRef = Set<members::schema_ref>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Storage = S::Storage;
+        type Name = S::Name;
+        type SchemaRef = S::SchemaRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `storage` field
         pub struct storage(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `schema_ref` field
         pub struct schema_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -592,7 +608,17 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
         EntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -639,12 +665,18 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -652,7 +684,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn license(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -673,7 +708,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
+    pub fn maybe_metadata(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -776,12 +814,18 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -790,10 +834,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Name: entry_state::IsSet,
     S::Storage: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
+    S::Name: entry_state::IsSet,
     S::SchemaRef: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -852,7 +896,13 @@ impl<'a> Entry<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -867,7 +917,13 @@ pub enum EntryStorage<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
@@ -924,7 +980,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -934,7 +992,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("license"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "license",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -957,7 +1017,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -968,7 +1030,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("schema_ref"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "schema_ref",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -978,7 +1042,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -998,14 +1064,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShardChecksum<'a> {
-    /// Hash algorithm identifier (e.g., 'sha256', 'blake3')
+    ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
     #[serde(borrow)]
     pub algorithm: jacquard_common::CowStr<'a>,
-    /// Hex-encoded hash digest
+    ///Hex-encoded hash digest
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
 }
@@ -1028,7 +1094,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardChecksum<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("algorithm"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "algorithm",
+                    ),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1039,7 +1107,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardChecksum<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("digest"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

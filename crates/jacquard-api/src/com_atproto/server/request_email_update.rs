@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestEmailUpdateOutput<'a> {
@@ -23,7 +29,7 @@ pub struct RequestEmailUpdateOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct RequestEmailUpdate;
 /// Response type for
@@ -38,8 +44,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestEmailUpdateResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestEmailUpdate {
     const NSID: &'static str = "com.atproto.server.requestEmailUpdate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestEmailUpdateResponse;
 }
 
@@ -48,8 +55,9 @@ impl jacquard_common::xrpc::XrpcRequest for RequestEmailUpdate {
 pub struct RequestEmailUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailUpdateRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestEmailUpdate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RequestEmailUpdate;
     type Response = RequestEmailUpdateResponse;
 }

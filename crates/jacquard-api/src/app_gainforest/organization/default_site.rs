@@ -8,20 +8,26 @@
 /// A declaration of the default site for an organization
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefaultSite<'a> {
-    /// The date and time of the creation of the record
+    ///The date and time of the creation of the record
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The reference to the default site record in the PDS
+    ///The reference to the default site record in the PDS
     #[serde(borrow)]
     pub site: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod default_site_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,7 +180,13 @@ impl<'a> DefaultSite<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefaultSiteGetRecordOutput<'a> {
@@ -231,11 +243,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefaultSite<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_defaultSite()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_gainforest_organization_defaultSite() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.gainforest.organization.defaultSite"),
+        id: ::jacquard_common::CowStr::new_static(
+            "app.gainforest.organization.defaultSite",
+        ),
         revision: None,
         description: None,
         defs: {

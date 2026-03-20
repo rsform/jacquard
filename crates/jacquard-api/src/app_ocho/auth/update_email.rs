@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateEmail<'a> {
@@ -22,7 +22,7 @@ pub struct UpdateEmail<'a> {
     pub email: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub email_auth_factor: std::option::Option<bool>,
-    /// Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
+    ///Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub token: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -38,7 +38,7 @@ pub struct UpdateEmail<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -92,8 +92,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
     const NSID: &'static str = "app.ocho.auth.updateEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateEmailResponse;
 }
 
@@ -102,8 +103,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
 pub struct UpdateEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateEmailRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.updateEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateEmail<'de>;
     type Response = UpdateEmailResponse;
 }

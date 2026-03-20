@@ -8,22 +8,28 @@
 /// This lexicon is in a not officially released state. It is subject to change. | A declaration of the status of the actor. Only one can be shown at a time. If there are multiple, the latest record should be picked and earlier records should be deleted or tombstoned.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
-    /// The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
+    ///The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expiry: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: crate::fm_teal::alpha::feed::PlayView<'a>,
-    /// The unix timestamp of when the item was recorded
+    ///The unix timestamp of when the item was recorded
     pub time: jacquard_common::types::string::Datetime,
 }
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -31,37 +37,37 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Time;
         type Item;
+        type Time;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Time = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Time = Set<members::time>;
-        type Item = S::Item;
+        type Time = Unset;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItem<S> {}
     impl<S: State> State for SetItem<S> {
-        type Time = S::Time;
         type Item = Set<members::item>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Item = S::Item;
+        type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `time` field
-        pub struct time(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `time` field
+        pub struct time(());
     }
 }
 
@@ -104,7 +110,10 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
         self
     }
     /// Set the `expiry` field to an Option value (optional)
-    pub fn maybe_expiry(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
+    pub fn maybe_expiry(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -151,8 +160,8 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Time: status_state::IsSet,
     S::Item: status_state::IsSet,
+    S::Time: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -195,7 +204,13 @@ impl<'a> Status<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusGetRecordOutput<'a> {
@@ -252,7 +267,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
 }
 
-fn lexicon_doc_fm_teal_alpha_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_fm_teal_alpha_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.actor.status"),

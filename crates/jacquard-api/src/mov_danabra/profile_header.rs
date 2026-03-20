@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileHeader<'a> {
@@ -17,7 +23,7 @@ pub struct ProfileHeader<'a> {
 
 pub mod profile_header_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,7 +56,9 @@ pub mod profile_header_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileHeaderBuilder<'a, S: profile_header_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::types::string::AtUri<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -120,7 +128,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileHeaderOutput<'a> {
@@ -141,8 +155,9 @@ impl jacquard_common::xrpc::XrpcResp for ProfileHeaderResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileHeader<'a> {
     const NSID: &'static str = "mov.danabra.ProfileHeader";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ProfileHeaderResponse;
 }
 
@@ -151,8 +166,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileHeader<'a> {
 pub struct ProfileHeaderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileHeaderRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.ProfileHeader";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = ProfileHeader<'de>;
     type Response = ProfileHeaderResponse;
 }

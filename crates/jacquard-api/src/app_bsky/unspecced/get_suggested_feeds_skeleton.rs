@@ -5,12 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFeedsSkeleton<'a> {
-    ///(default: 10, min: 1, max: 25)
+    ///Defaults to `10`. Min: 1. Max: 25.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -20,7 +31,7 @@ pub struct GetSuggestedFeedsSkeleton<'a> {
 
 pub mod get_suggested_feeds_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -38,7 +49,10 @@ pub mod get_suggested_feeds_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct GetSuggestedFeedsSkeletonBuilder<'a, S: get_suggested_feeds_skeleton_state::State> {
+pub struct GetSuggestedFeedsSkeletonBuilder<
+    'a,
+    S: get_suggested_feeds_skeleton_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<i64>,
@@ -49,13 +63,17 @@ pub struct GetSuggestedFeedsSkeletonBuilder<'a, S: get_suggested_feeds_skeleton_
 
 impl<'a> GetSuggestedFeedsSkeleton<'a> {
     /// Create a new builder for this type
-    pub fn new() -> GetSuggestedFeedsSkeletonBuilder<'a, get_suggested_feeds_skeleton_state::Empty>
-    {
+    pub fn new() -> GetSuggestedFeedsSkeletonBuilder<
+        'a,
+        get_suggested_feeds_skeleton_state::Empty,
+    > {
         GetSuggestedFeedsSkeletonBuilder::new()
     }
 }
 
-impl<'a> GetSuggestedFeedsSkeletonBuilder<'a, get_suggested_feeds_skeleton_state::Empty> {
+impl<
+    'a,
+> GetSuggestedFeedsSkeletonBuilder<'a, get_suggested_feeds_skeleton_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedFeedsSkeletonBuilder {
@@ -66,7 +84,10 @@ impl<'a> GetSuggestedFeedsSkeletonBuilder<'a, get_suggested_feeds_skeleton_state
     }
 }
 
-impl<'a, S: get_suggested_feeds_skeleton_state::State> GetSuggestedFeedsSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_feeds_skeleton_state::State,
+> GetSuggestedFeedsSkeletonBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
@@ -79,7 +100,10 @@ impl<'a, S: get_suggested_feeds_skeleton_state::State> GetSuggestedFeedsSkeleton
     }
 }
 
-impl<'a, S: get_suggested_feeds_skeleton_state::State> GetSuggestedFeedsSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: get_suggested_feeds_skeleton_state::State,
+> GetSuggestedFeedsSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
@@ -89,7 +113,10 @@ impl<'a, S: get_suggested_feeds_skeleton_state::State> GetSuggestedFeedsSkeleton
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -110,7 +137,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFeedsSkeletonOutput<'a> {

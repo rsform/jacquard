@@ -8,64 +8,78 @@
 /// Measurement data related to one or more records (e.g. activities, projects, etc.).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Measurement<'a> {
-    /// Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
+    ///Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
+    ///Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// Client-declared timestamp when this record was originally created
+    pub comment_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
+    ///The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
+    ///URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub evidence_uri: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
-    /// Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
+    pub evidence_uri: std::option::Option<
+        Vec<jacquard_common::types::string::UriValue<'a>>,
+    >,
+    ///Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    /// DIDs of the entities that performed this measurement
+    pub locations: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    ///DIDs of the entities that performed this measurement
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub measurers: std::option::Option<Vec<crate::app_certified::Did<'a>>>,
-    /// Short identifier for the measurement methodology
+    ///Short identifier for the measurement methodology
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub method_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URI to methodology documentation, standard protocol, or measurement procedure
+    ///URI to methodology documentation, standard protocol, or measurement procedure
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub method_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The metric being measured, e.g. forest area restored, number of users, etc.
+    ///The metric being measured, e.g. forest area restored, number of users, etc.
     #[serde(borrow)]
     pub metric: jacquard_common::CowStr<'a>,
-    /// The start date and time when the measurement began.
+    ///The start date and time when the measurement began.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
+    ///Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    /// The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
+    pub subjects: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    ///The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
     #[serde(borrow)]
     pub unit: jacquard_common::CowStr<'a>,
-    /// The measured value as a numeric string (e.g. '1234.56')
+    ///The measured value as a numeric string (e.g. '1234.56')
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
 pub mod measurement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -73,67 +87,67 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Metric;
         type Value;
-        type CreatedAt;
         type Unit;
+        type Metric;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Metric = Unset;
         type Value = Unset;
-        type CreatedAt = Unset;
         type Unit = Unset;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type Metric = Set<members::metric>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-        type Unit = S::Unit;
+        type Metric = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Metric = S::Metric;
         type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
         type Unit = S::Unit;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Metric = S::Metric;
-        type Value = S::Value;
-        type CreatedAt = Set<members::created_at>;
-        type Unit = S::Unit;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `unit` field to Set
     pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnit<S> {}
     impl<S: State> State for SetUnit<S> {
-        type Metric = S::Metric;
         type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
         type Unit = Set<members::unit>;
+        type Metric = S::Metric;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetric<S> {}
+    impl<S: State> State for SetMetric<S> {
+        type Value = S::Value;
+        type Unit = S::Unit;
+        type Metric = Set<members::metric>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type Unit = S::Unit;
+        type Metric = S::Metric;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `metric` field
-        pub struct metric(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `unit` field
         pub struct unit(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -172,7 +186,20 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
         MeasurementBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -181,7 +208,10 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn comment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -272,7 +302,9 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(
         mut self,
-        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
@@ -297,7 +329,10 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
         self
     }
     /// Set the `measurers` field to an Option value (optional)
-    pub fn maybe_measurers(mut self, value: Option<Vec<crate::app_certified::Did<'a>>>) -> Self {
+    pub fn maybe_measurers(
+        mut self,
+        value: Option<Vec<crate::app_certified::Did<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -305,12 +340,18 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodType` field (optional)
-    pub fn method_type(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn method_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `methodType` field to an Option value (optional)
-    pub fn maybe_method_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_method_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -377,7 +418,9 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(
         mut self,
-        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
@@ -433,10 +476,10 @@ where
 impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
-    S::Metric: measurement_state::IsSet,
     S::Value: measurement_state::IsSet,
-    S::CreatedAt: measurement_state::IsSet,
     S::Unit: measurement_state::IsSet,
+    S::Metric: measurement_state::IsSet,
+    S::CreatedAt: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
@@ -501,7 +544,13 @@ impl<'a> Measurement<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasurementGetRecordOutput<'a> {
@@ -558,7 +607,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("comment"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "comment",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -572,15 +623,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "comment",
-                            ),
-                            max: 300usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "comment",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -600,7 +649,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("locations"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "locations",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -610,7 +661,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("measurers"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "measurers",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -620,7 +673,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("method_type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "method_type",
+                    ),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -631,7 +686,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("metric"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "metric",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -641,7 +698,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subjects"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subjects",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -652,7 +711,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("unit"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "unit",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -663,7 +724,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("value"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -673,8 +736,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_measurement()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.context.measurement"),

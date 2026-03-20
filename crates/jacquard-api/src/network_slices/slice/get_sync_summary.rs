@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionSummary<'a> {
@@ -19,7 +25,7 @@ pub struct CollectionSummary<'a> {
 
 pub mod collection_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -27,51 +33,51 @@ pub mod collection_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type EstimatedRepos;
         type IsExternal;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type EstimatedRepos = Unset;
         type IsExternal = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type EstimatedRepos = S::EstimatedRepos;
-        type IsExternal = S::IsExternal;
+        type Collection = Unset;
     }
     ///State transition - sets the `estimated_repos` field to Set
     pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
     impl<S: State> State for SetEstimatedRepos<S> {
-        type Collection = S::Collection;
         type EstimatedRepos = Set<members::estimated_repos>;
         type IsExternal = S::IsExternal;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `is_external` field to Set
     pub struct SetIsExternal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsExternal<S> {}
     impl<S: State> State for SetIsExternal<S> {
-        type Collection = S::Collection;
         type EstimatedRepos = S::EstimatedRepos;
         type IsExternal = Set<members::is_external>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type EstimatedRepos = S::EstimatedRepos;
+        type IsExternal = S::IsExternal;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `estimated_repos` field
         pub struct estimated_repos(());
         ///Marker type for the `is_external` field
         pub struct is_external(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -164,9 +170,9 @@ where
 impl<'a, S> CollectionSummaryBuilder<'a, S>
 where
     S: collection_summary_state::State,
-    S::Collection: collection_summary_state::IsSet,
     S::EstimatedRepos: collection_summary_state::IsSet,
     S::IsExternal: collection_summary_state::IsSet,
+    S::Collection: collection_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionSummary<'a> {
@@ -194,8 +200,9 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_getSyncSummary()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.slice.getSyncSummary"),
@@ -204,71 +211,65 @@ fn lexicon_doc_network_slices_slice_getSyncSummary()
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("collectionSummary"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "collectionSummary",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("estimatedRepos"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isExternal")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "collection",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "estimatedRepos",
                             ),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isExternal"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "collection",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "estimatedRepos",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isExternal",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "isExternal",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -403,7 +404,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummary<'a> {
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncSummary<'a> {
@@ -422,7 +429,7 @@ pub struct GetSyncSummary<'a> {
 
 pub mod get_sync_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -492,7 +499,10 @@ impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_collections(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -519,12 +529,18 @@ impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
 
 impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
     /// Set the `repos` field (optional)
-    pub fn repos(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn repos(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `repos` field to an Option value (optional)
-    pub fn maybe_repos(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_repos(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -567,20 +583,27 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncSummaryOutput<'a> {
-    /// The actual limit applied (user-specified or default)
+    ///The actual limit applied (user-specified or default)
     pub applied_limit: i64,
-    /// Number of repositories after applying limit
+    ///Number of repositories after applying limit
     pub capped_repos: i64,
     #[serde(borrow)]
-    pub collections_summary:
-        Vec<crate::network_slices::slice::get_sync_summary::CollectionSummary<'a>>,
-    /// Total number of repositories that would be synced
+    pub collections_summary: Vec<
+        crate::network_slices::slice::get_sync_summary::CollectionSummary<'a>,
+    >,
+    ///Total number of repositories that would be synced
     pub total_repos: i64,
-    /// Whether the sync would be limited by maxRepos
+    ///Whether the sync would be limited by maxRepos
     pub would_be_capped: bool,
 }
 

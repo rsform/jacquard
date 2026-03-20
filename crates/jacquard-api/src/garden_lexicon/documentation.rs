@@ -15,25 +15,30 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionDoc<'a> {
-    /// Localized descriptions for this definition.
+    ///Localized descriptions for this definition.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description:
-        std::option::Option<Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>>,
-    /// The name of the definition being documented (e.g., 'main', 'replyRef').
+    pub description: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
+    >,
+    ///The name of the definition being documented (e.g., 'main', 'replyRef').
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Documentation for properties within this definition.
+    ///Documentation for properties within this definition.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub properties: std::option::Option<Vec<crate::garden_lexicon::documentation::PropertyDoc<'a>>>,
+    pub properties: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::PropertyDoc<'a>>,
+    >,
 }
 
-fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.lexicon.documentation"),
@@ -122,64 +127,72 @@ fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("localizedString"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "A string with an associated language code.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "ISO 639 language code (e.g., 'en', 'es', 'ja').",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Language,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "The localized string value.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(10000usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
-                    },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "localizedString",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A string with an associated language code.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "lang",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "ISO 639 language code (e.g., 'en', 'es', 'ja').",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Language,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "value",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The localized string value.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(10000usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -295,63 +308,65 @@ fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::Le
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("propertyDoc"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Documentation for a specific property within a definition.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Localized descriptions for this property.",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Localized descriptions for this property.",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "#localizedString",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#localizedString",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "name",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The property name being documented.",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "The property name being documented.",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(256usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(256usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -376,7 +391,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -389,20 +406,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
 /// A string with an associated language code.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocalizedString<'a> {
-    /// ISO 639 language code (e.g., 'en', 'es', 'ja').
+    ///ISO 639 language code (e.g., 'en', 'es', 'ja').
     pub lang: jacquard_common::types::string::Language,
-    /// The localized string value.
+    ///The localized string value.
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
 pub mod localized_string_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -410,37 +433,37 @@ pub mod localized_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lang;
         type Value;
+        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lang = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Lang = Set<members::lang>;
-        type Value = S::Value;
+        type Lang = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Lang = S::Lang;
         type Value = Set<members::value>;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Value = S::Value;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lang` field
-        pub struct lang(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `lang` field
+        pub struct lang(());
     }
 }
 
@@ -513,8 +536,8 @@ where
 impl<'a, S> LocalizedStringBuilder<'a, S>
 where
     S: localized_string_state::State,
-    S::Lang: localized_string_state::IsSet,
     S::Value: localized_string_state::IsSet,
+    S::Lang: localized_string_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LocalizedString<'a> {
@@ -558,7 +581,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocalizedString<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("value"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -571,30 +596,38 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocalizedString<'a> {
 /// Auxiliary documentation for a lexicon schema, supporting localized descriptions for the lexicon and its properties.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Documentation<'a> {
-    /// Timestamp when this documentation was created.
+    ///Timestamp when this documentation was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Documentation for specific definitions within the lexicon (e.g., main, replyRef).
+    ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub definitions:
-        std::option::Option<Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>>,
-    /// Localized descriptions for the lexicon.
+    pub definitions: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>,
+    >,
+    ///Localized descriptions for the lexicon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description:
-        std::option::Option<Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>>,
-    /// The NSID of the lexicon being documented.
+    pub description: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
+    >,
+    ///The NSID of the lexicon being documented.
     #[serde(borrow)]
     pub lexicon: jacquard_common::types::string::Nsid<'a>,
 }
 
 pub mod documentation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -602,37 +635,37 @@ pub mod documentation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Lexicon;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Lexicon = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Lexicon = S::Lexicon;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `lexicon` field to Set
     pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLexicon<S> {}
     impl<S: State> State for SetLexicon<S> {
-        type CreatedAt = S::CreatedAt;
         type Lexicon = Set<members::lexicon>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Lexicon = S::Lexicon;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `lexicon` field
         pub struct lexicon(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -641,8 +674,12 @@ pub struct DocumentationBuilder<'a, S: documentation_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>>,
-        ::core::option::Option<Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>>,
+        ::core::option::Option<
+            Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>,
+        >,
+        ::core::option::Option<
+            Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -689,7 +726,9 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     /// Set the `definitions` field (optional)
     pub fn definitions(
         mut self,
-        value: impl Into<Option<Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -708,7 +747,9 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -745,8 +786,8 @@ where
 impl<'a, S> DocumentationBuilder<'a, S>
 where
     S: documentation_state::State,
-    S::CreatedAt: documentation_state::IsSet,
     S::Lexicon: documentation_state::IsSet,
+    S::CreatedAt: documentation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Documentation<'a> {
@@ -791,7 +832,13 @@ impl<'a> Documentation<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentationGetRecordOutput<'a> {
@@ -858,16 +905,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Documentation<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PropertyDoc<'a> {
-    /// Localized descriptions for this property.
+    ///Localized descriptions for this property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description:
-        std::option::Option<Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>>,
-    /// The property name being documented.
+    pub description: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
+    >,
+    ///The property name being documented.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -890,7 +938,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PropertyDoc<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });

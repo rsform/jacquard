@@ -14,23 +14,29 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteUserData<'a> {}
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteUserDataOutput<'a> {
-    /// Whether the user's crew record was deleted (false if user is captain)
+    ///Whether the user's crew record was deleted (false if user is captain)
     pub crew_deleted: bool,
-    /// Number of layer records deleted
+    ///Number of layer records deleted
     pub layers_deleted: i64,
-    /// Number of stats records deleted
+    ///Number of stats records deleted
     pub stats_deleted: i64,
-    /// Whether the deletion completed successfully
+    ///Whether the deletion completed successfully
     pub success: bool,
 }
 
@@ -44,7 +50,7 @@ pub struct DeleteUserDataOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -89,8 +95,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteUserDataResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteUserData<'a> {
     const NSID: &'static str = "io.atcr.hold.deleteUserData";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteUserDataResponse;
 }
 
@@ -99,8 +106,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteUserData<'a> {
 pub struct DeleteUserDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteUserDataRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.deleteUserData";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteUserData<'de>;
     type Response = DeleteUserDataResponse;
 }

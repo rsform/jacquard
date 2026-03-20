@@ -8,20 +8,26 @@
 /// Signals that a participant has finished contributing to answers for this quiz
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizDone<'a> {
-    /// Reference to the quizBegin record
+    ///Reference to the quizBegin record
     #[serde(borrow)]
     pub quiz_begin: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// When this participant finished
+    ///When this participant finished
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
 pub mod quiz_done_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,37 +35,37 @@ pub mod quiz_done_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type QuizBegin;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type QuizBegin = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type QuizBegin = S::QuizBegin;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `quiz_begin` field to Set
     pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
     impl<S: State> State for SetQuizBegin<S> {
-        type Timestamp = S::Timestamp;
         type QuizBegin = Set<members::quiz_begin>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type QuizBegin = S::QuizBegin;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -132,8 +138,8 @@ where
 impl<'a, S> QuizDoneBuilder<'a, S>
 where
     S: quiz_done_state::State,
-    S::Timestamp: quiz_done_state::IsSet,
     S::QuizBegin: quiz_done_state::IsSet,
+    S::Timestamp: quiz_done_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizDone<'a> {
@@ -174,7 +180,13 @@ impl<'a> QuizDone<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizDoneGetRecordOutput<'a> {
@@ -231,7 +243,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizDone<'a> {
     }
 }
 
-fn lexicon_doc_pub_quizzy_quizDone() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_pub_quizzy_quizDone() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.quizDone"),

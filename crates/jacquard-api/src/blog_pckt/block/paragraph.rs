@@ -14,15 +14,15 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Paragraph<'a> {
-    /// Array of inline content nodes (text, hard breaks, and mentions)
+    ///Array of inline content nodes (text, hard breaks, and mentions)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<Vec<ParagraphContentItem<'a>>>,
-    /// Facets for text formatting and features within this paragraph
+    ///Facets for text formatting and features within this paragraph
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
@@ -30,7 +30,13 @@ pub struct Paragraph<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -43,7 +49,9 @@ pub enum ParagraphContentItem<'a> {
     Mention(Box<crate::blog_pckt::block::mention::Mention<'a>>),
 }
 
-fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.block.paragraph"),

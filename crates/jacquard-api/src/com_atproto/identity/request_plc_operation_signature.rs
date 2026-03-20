@@ -14,7 +14,7 @@
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct RequestPlcOperationSignature;
 /// Response type for
@@ -29,8 +29,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestPlcOperationSignatureResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestPlcOperationSignature {
     const NSID: &'static str = "com.atproto.identity.requestPlcOperationSignature";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestPlcOperationSignatureResponse;
 }
 
@@ -39,8 +40,9 @@ impl jacquard_common::xrpc::XrpcRequest for RequestPlcOperationSignature {
 pub struct RequestPlcOperationSignatureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPlcOperationSignatureRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.requestPlcOperationSignature";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RequestPlcOperationSignature;
     type Response = RequestPlcOperationSignatureResponse;
 }

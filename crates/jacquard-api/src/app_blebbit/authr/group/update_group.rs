@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupParams<'a> {
@@ -17,7 +23,7 @@ pub struct UpdateGroupParams<'a> {
 
 pub mod update_group_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -93,7 +99,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroup<'a> {
@@ -118,7 +124,7 @@ pub struct UpdateGroup<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupOutput<'a> {
@@ -150,8 +156,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateGroupResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroup<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateGroupResponse;
 }
 
@@ -160,8 +167,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroup<'a> {
 pub struct UpdateGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.updateGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateGroup<'de>;
     type Response = UpdateGroupResponse;
 }

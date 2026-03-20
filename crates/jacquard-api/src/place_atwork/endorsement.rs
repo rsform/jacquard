@@ -8,30 +8,38 @@
 /// A cryptographically-verified professional endorsement between two identities.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Endorsement<'a> {
-    /// Timestamp when the endorsement was created.
+    ///Timestamp when the endorsement was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The DID of the identity giving the endorsement.
+    ///The DID of the identity giving the endorsement.
     #[serde(borrow)]
     pub giver: jacquard_common::types::string::Did<'a>,
-    /// The DID of the identity receiving the endorsement.
+    ///The DID of the identity receiving the endorsement.
     #[serde(borrow)]
     pub receiver: jacquard_common::types::string::Did<'a>,
-    /// Verified signatures from endorsement proofs (strong references).
+    ///Verified signatures from endorsement proofs (strong references).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub signatures: std::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    /// The endorsement text content.
+    pub signatures: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    ///The endorsement text content.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
 pub mod endorsement_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,8 +49,8 @@ pub mod endorsement_state {
     pub trait State: sealed::Sealed {
         type Receiver;
         type Giver;
-        type Text;
         type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -50,8 +58,8 @@ pub mod endorsement_state {
     impl State for Empty {
         type Receiver = Unset;
         type Giver = Unset;
-        type Text = Unset;
         type CreatedAt = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `receiver` field to Set
     pub struct SetReceiver<S: State = Empty>(PhantomData<fn() -> S>);
@@ -59,8 +67,8 @@ pub mod endorsement_state {
     impl<S: State> State for SetReceiver<S> {
         type Receiver = Set<members::receiver>;
         type Giver = S::Giver;
-        type Text = S::Text;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
     }
     ///State transition - sets the `giver` field to Set
     pub struct SetGiver<S: State = Empty>(PhantomData<fn() -> S>);
@@ -68,17 +76,8 @@ pub mod endorsement_state {
     impl<S: State> State for SetGiver<S> {
         type Receiver = S::Receiver;
         type Giver = Set<members::giver>;
+        type CreatedAt = S::CreatedAt;
         type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Receiver = S::Receiver;
-        type Giver = S::Giver;
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -86,8 +85,17 @@ pub mod endorsement_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Receiver = S::Receiver;
         type Giver = S::Giver;
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Receiver = S::Receiver;
+        type Giver = S::Giver;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -96,10 +104,10 @@ pub mod endorsement_state {
         pub struct receiver(());
         ///Marker type for the `giver` field
         pub struct giver(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -195,7 +203,9 @@ impl<'a, S: endorsement_state::State> EndorsementBuilder<'a, S> {
     /// Set the `signatures` field (optional)
     pub fn signatures(
         mut self,
-        value: impl Into<Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -234,8 +244,8 @@ where
     S: endorsement_state::State,
     S::Receiver: endorsement_state::IsSet,
     S::Giver: endorsement_state::IsSet,
-    S::Text: endorsement_state::IsSet,
     S::CreatedAt: endorsement_state::IsSet,
+    S::Text: endorsement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Endorsement<'a> {
@@ -282,7 +292,13 @@ impl<'a> Endorsement<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EndorsementGetRecordOutput<'a> {
@@ -340,7 +356,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Endorsement<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -355,15 +373,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Endorsement<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 1000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -371,7 +387,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Endorsement<'a> {
     }
 }
 
-fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.endorsement"),

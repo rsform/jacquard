@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateFolderRelationship<'a> {
@@ -38,8 +38,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateFolderRelationshipResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateFolderRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.createFolderRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateFolderRelationshipResponse;
 }
 
@@ -48,8 +49,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateFolderRelationship<'a> {
 pub struct CreateFolderRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateFolderRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.createFolderRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateFolderRelationship<'de>;
     type Response = CreateFolderRelationshipResponse;
 }

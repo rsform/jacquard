@@ -8,33 +8,39 @@
 /// Repository statistics stored in the hold's embedded PDS. Tracks pull/push counts per owner+repository combination. Record key is deterministic: base32(sha256(ownerDID + "/" + repository)[:16]).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
-    /// RFC3339 timestamp of last pull
+    ///RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_pull: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// RFC3339 timestamp of last push
+    ///RFC3339 timestamp of last push
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_push: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// DID of the image owner (e.g., did:plc:xyz123)
+    ///DID of the image owner (e.g., did:plc:xyz123)
     #[serde(borrow)]
     pub owner_did: jacquard_common::types::string::Did<'a>,
-    /// Number of manifest downloads
+    ///Number of manifest downloads
     pub pull_count: i64,
-    /// Number of manifest uploads
+    ///Number of manifest uploads
     pub push_count: i64,
-    /// Repository name (e.g., myapp)
+    ///Repository name (e.g., myapp)
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
-    /// RFC3339 timestamp of when this record was last updated
+    ///RFC3339 timestamp of when this record was last updated
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -42,85 +48,85 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type PushCount;
         type OwnerDid;
+        type PushCount;
         type Repository;
         type PullCount;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type PushCount = Unset;
         type OwnerDid = Unset;
+        type PushCount = Unset;
         type Repository = Unset;
         type PullCount = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type PushCount = S::PushCount;
-        type OwnerDid = S::OwnerDid;
-        type Repository = S::Repository;
-        type PullCount = S::PullCount;
-    }
-    ///State transition - sets the `push_count` field to Set
-    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPushCount<S> {}
-    impl<S: State> State for SetPushCount<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PushCount = Set<members::push_count>;
-        type OwnerDid = S::OwnerDid;
-        type Repository = S::Repository;
-        type PullCount = S::PullCount;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `owner_did` field to Set
     pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
     impl<S: State> State for SetOwnerDid<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PushCount = S::PushCount;
         type OwnerDid = Set<members::owner_did>;
+        type PushCount = S::PushCount;
         type Repository = S::Repository;
         type PullCount = S::PullCount;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `push_count` field to Set
+    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPushCount<S> {}
+    impl<S: State> State for SetPushCount<S> {
+        type OwnerDid = S::OwnerDid;
+        type PushCount = Set<members::push_count>;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PushCount = S::PushCount;
         type OwnerDid = S::OwnerDid;
+        type PushCount = S::PushCount;
         type Repository = Set<members::repository>;
         type PullCount = S::PullCount;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `pull_count` field to Set
     pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPullCount<S> {}
     impl<S: State> State for SetPullCount<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PushCount = S::PushCount;
         type OwnerDid = S::OwnerDid;
+        type PushCount = S::PushCount;
         type Repository = S::Repository;
         type PullCount = Set<members::pull_count>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type OwnerDid = S::OwnerDid;
+        type PushCount = S::PushCount;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `push_count` field
-        pub struct push_count(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
+        ///Marker type for the `push_count` field
+        pub struct push_count(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `pull_count` field
         pub struct pull_count(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -293,11 +299,11 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
-    S::UpdatedAt: stats_state::IsSet,
-    S::PushCount: stats_state::IsSet,
     S::OwnerDid: stats_state::IsSet,
+    S::PushCount: stats_state::IsSet,
     S::Repository: stats_state::IsSet,
     S::PullCount: stats_state::IsSet,
+    S::UpdatedAt: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
@@ -348,7 +354,13 @@ impl<'a> Stats<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatsGetRecordOutput<'a> {
@@ -405,7 +417,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
             let value = &self.pull_count;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("pull_count"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pull_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -415,7 +429,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
             let value = &self.push_count;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("push_count"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "push_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -426,7 +442,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("repository"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });

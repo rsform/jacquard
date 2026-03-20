@@ -14,11 +14,11 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeactivateAccount<'a> {
-    /// A recommendation to server as to how long they should hold onto the deactivated account before deleting.
+    ///A recommendation to server as to how long they should hold onto the deactivated account before deleting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub delete_after: std::option::Option<jacquard_common::types::string::Datetime>,
 }
@@ -35,8 +35,9 @@ impl jacquard_common::xrpc::XrpcResp for DeactivateAccountResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeactivateAccount<'a> {
     const NSID: &'static str = "com.atproto.server.deactivateAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeactivateAccountResponse;
 }
 
@@ -45,8 +46,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeactivateAccount<'a> {
 pub struct DeactivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeactivateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deactivateAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeactivateAccount<'de>;
     type Response = DeactivateAccountResponse;
 }

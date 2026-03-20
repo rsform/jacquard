@@ -7,21 +7,27 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendNotification<'a> {
-    /// The DID of who this notification comes from.
+    ///The DID of who this notification comes from.
     #[serde(borrow)]
     pub from: jacquard_common::types::string::Did<'a>,
-    /// The DID of who this notification should go to.
+    ///The DID of who this notification should go to.
     #[serde(borrow)]
     pub to: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod send_notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,37 +35,37 @@ pub mod send_notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type From;
         type To;
+        type From;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type From = Unset;
         type To = Unset;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
-        type From = Set<members::from>;
-        type To = S::To;
+        type From = Unset;
     }
     ///State transition - sets the `to` field to Set
     pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTo<S> {}
     impl<S: State> State for SetTo<S> {
-        type From = S::From;
         type To = Set<members::to>;
+        type From = S::From;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFrom<S> {}
+    impl<S: State> State for SetFrom<S> {
+        type To = S::To;
+        type From = Set<members::from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `from` field
-        pub struct from(());
         ///Marker type for the `to` field
         pub struct to(());
+        ///Marker type for the `from` field
+        pub struct from(());
     }
 }
 
@@ -132,8 +138,8 @@ where
 impl<'a, S> SendNotificationBuilder<'a, S>
 where
     S: send_notification_state::State,
-    S::From: send_notification_state::IsSet,
     S::To: send_notification_state::IsSet,
+    S::From: send_notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SendNotification<'a> {
@@ -168,7 +174,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendNotificationOutput<'a> {}
@@ -184,8 +190,9 @@ impl jacquard_common::xrpc::XrpcResp for SendNotificationResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for SendNotification<'a> {
     const NSID: &'static str = "app.bsky.contact.sendNotification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SendNotificationResponse;
 }
 
@@ -194,8 +201,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendNotification<'a> {
 pub struct SendNotificationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendNotificationRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.sendNotification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = SendNotification<'de>;
     type Response = SendNotificationResponse;
 }

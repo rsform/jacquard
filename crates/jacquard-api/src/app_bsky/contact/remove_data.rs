@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveData<'a> {}
@@ -27,7 +27,7 @@ pub struct RemoveData<'a> {}
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveDataOutput<'a> {}
@@ -41,7 +41,7 @@ pub struct RemoveDataOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -86,8 +86,9 @@ impl jacquard_common::xrpc::XrpcResp for RemoveDataResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveData<'a> {
     const NSID: &'static str = "app.bsky.contact.removeData";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveDataResponse;
 }
 
@@ -96,8 +97,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveData<'a> {
 pub struct RemoveDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveDataRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.removeData";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RemoveData<'de>;
     type Response = RemoveDataResponse;
 }

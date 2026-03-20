@@ -5,15 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchStarterPacksSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///(default: 25, min: 1, max: 100)
+    ///Defaults to `25`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
@@ -25,7 +36,7 @@ pub struct SearchStarterPacksSkeleton<'a> {
 
 pub mod search_starter_packs_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -56,7 +67,10 @@ pub mod search_starter_packs_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct SearchStarterPacksSkeletonBuilder<'a, S: search_starter_packs_skeleton_state::State> {
+pub struct SearchStarterPacksSkeletonBuilder<
+    'a,
+    S: search_starter_packs_skeleton_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -69,13 +83,17 @@ pub struct SearchStarterPacksSkeletonBuilder<'a, S: search_starter_packs_skeleto
 
 impl<'a> SearchStarterPacksSkeleton<'a> {
     /// Create a new builder for this type
-    pub fn new() -> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::Empty>
-    {
+    pub fn new() -> SearchStarterPacksSkeletonBuilder<
+        'a,
+        search_starter_packs_skeleton_state::Empty,
+    > {
         SearchStarterPacksSkeletonBuilder::new()
     }
 }
 
-impl<'a> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::Empty> {
+impl<
+    'a,
+> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchStarterPacksSkeletonBuilder {
@@ -86,9 +104,15 @@ impl<'a> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_sta
     }
 }
 
-impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: search_starter_packs_skeleton_state::State,
+> SearchStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -99,7 +123,10 @@ impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkelet
     }
 }
 
-impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: search_starter_packs_skeleton_state::State,
+> SearchStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
@@ -121,7 +148,10 @@ where
     pub fn q(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> SearchStarterPacksSkeletonBuilder<'a, search_starter_packs_skeleton_state::SetQ<S>> {
+    ) -> SearchStarterPacksSkeletonBuilder<
+        'a,
+        search_starter_packs_skeleton_state::SetQ<S>,
+    > {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SearchStarterPacksSkeletonBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -131,7 +161,10 @@ where
     }
 }
 
-impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkeletonBuilder<'a, S> {
+impl<
+    'a,
+    S: search_starter_packs_skeleton_state::State,
+> SearchStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
@@ -141,7 +174,10 @@ impl<'a, S: search_starter_packs_skeleton_state::State> SearchStarterPacksSkelet
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<jacquard_common::types::string::Did<'a>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -165,14 +201,20 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchStarterPacksSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
+    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]
@@ -189,7 +231,7 @@ pub struct SearchStarterPacksSkeletonOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

@@ -15,25 +15,26 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageRef<'a> {
-    /// Alt text for the image.
+    ///Alt text for the image.
     #[serde(borrow)]
     pub alt: jacquard_common::CowStr<'a>,
-    /// CID of an image blob. Can reference an existing image in the post or a newly uploaded image via media.uploadBlob.
+    ///CID of an image blob. Can reference an existing image in the post or a newly uploaded image via media.uploadBlob.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// New image blob (for newly uploaded images).
+    ///New image blob (for newly uploaded images).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
-fn lexicon_doc_app_chronosky_schedule_updatePost()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_chronosky_schedule_updatePost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.chronosky.schedule.updatePost"),
@@ -116,40 +117,38 @@ fn lexicon_doc_app_chronosky_schedule_updatePost()
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("imagesEmbed"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Images embed that supports CID references for existing images.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("images"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("images"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: None,
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                                            ::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "#imageRef",
-                                                ),
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: Some(4usize),
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("images")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "images",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static("#imageRef"),
+                                }),
+                                min_length: None,
+                                max_length: Some(4usize),
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -382,7 +381,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("alt"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alt",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -392,10 +393,62 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("cid"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cid",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(ref value) = self.image {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp",
+                    "image/gif",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string(), "image/gif".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         Ok(())
@@ -405,7 +458,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
 /// Images embed that supports CID references for existing images.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImagesEmbed<'a> {
@@ -415,7 +474,7 @@ pub struct ImagesEmbed<'a> {
 
 pub mod images_embed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -448,8 +507,11 @@ pub mod images_embed_state {
 /// Builder for constructing an instance of this type
 pub struct ImagesEmbedBuilder<'a, S: images_embed_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named:
-        (::core::option::Option<Vec<crate::app_chronosky::schedule::update_post::ImageRef<'a>>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::app_chronosky::schedule::update_post::ImageRef<'a>>,
+        >,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -535,7 +597,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImagesEmbed<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 4usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("images"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
                     max: 4usize,
                     actual: value.len(),
                 });
@@ -554,39 +618,39 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImagesEmbed<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePost<'a> {
-    /// Whether to disable quote posts
+    ///Whether to disable quote posts
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disable_quote_posts: std::option::Option<bool>,
-    /// Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.
+    ///Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embed: std::option::Option<UpdatePostEmbed<'a>>,
-    /// Rich text facets (links, mentions, tags).
+    ///Rich text facets (links, mentions, tags).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    /// Post ID to update.
+    ///Post ID to update.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    /// Self-applied content labels for content warnings (AT Protocol standard).
+    ///Self-applied content labels for content warnings (AT Protocol standard).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    /// Language codes (ISO 639-1).
+    ///Language codes (ISO 639-1).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
-    /// New scheduled publication datetime (ISO 8601).
+    ///New scheduled publication datetime (ISO 8601).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub scheduled_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// New post text content.
+    ///New post text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Thread gate rules to control who can reply
+    ///Thread gate rules to control who can reply
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate_rules: std::option::Option<Vec<UpdatePostThreadgateRulesItem<'a>>>,
@@ -594,7 +658,13 @@ pub struct UpdatePost<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -615,7 +685,13 @@ pub enum UpdatePostEmbed<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -632,7 +708,13 @@ pub enum UpdatePostThreadgateRulesItem<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePostOutput<'a> {
@@ -650,7 +732,7 @@ pub struct UpdatePostOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -704,8 +786,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdatePostResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePost<'a> {
     const NSID: &'static str = "app.chronosky.schedule.updatePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdatePostResponse;
 }
 
@@ -714,8 +797,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePost<'a> {
 pub struct UpdatePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdatePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.updatePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdatePost<'de>;
     type Response = UpdatePostResponse;
 }

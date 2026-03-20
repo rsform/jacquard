@@ -14,11 +14,11 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LikeSong<'a> {
-    /// The unique identifier of the song to like
+    ///The unique identifier of the song to like
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -26,7 +26,13 @@ pub struct LikeSong<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LikeSongOutput<'a> {
@@ -47,8 +53,9 @@ impl jacquard_common::xrpc::XrpcResp for LikeSongResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for LikeSong<'a> {
     const NSID: &'static str = "app.rocksky.like.likeSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = LikeSongResponse;
 }
 
@@ -57,8 +64,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for LikeSong<'a> {
 pub struct LikeSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LikeSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.like.likeSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = LikeSong<'de>;
     type Response = LikeSongResponse;
 }

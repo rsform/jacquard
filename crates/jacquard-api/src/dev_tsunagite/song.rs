@@ -8,44 +8,50 @@
 /// A song included in a game hosting leaderboards via Tsunagite.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Song<'a> {
-    /// The name of the composer of this song. Translations will typically be listed alongside the default.
+    ///The name of the composer of this song. Translations will typically be listed alongside the default.
     #[serde(borrow)]
     pub composer: jacquard_common::types::value::Data<'a>,
-    /// The game(s) this song is included in.
+    ///The game(s) this song is included in.
     #[serde(borrow)]
     pub game: Vec<jacquard_common::types::string::AtUri<'a>>,
-    /// The genre this song belongs to.
+    ///The genre this song belongs to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub genre: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The jacket or banner art of this song, for display in UI.
+    ///The jacket or banner art of this song, for display in UI.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub jacket: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// The name of the jacket artist for this song.
+    ///The name of the jacket artist for this song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub jacket_artist: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The source this song is from - an album, competition, other game, etc.
+    ///The source this song is from - an album, competition, other game, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The human-readable subtitle of this song.
+    ///The human-readable subtitle of this song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subtitle: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The human-readable title of this song in UI. Translations will typically be listed alongside the default.
+    ///The human-readable title of this song in UI. Translations will typically be listed alongside the default.
     #[serde(borrow)]
     pub title: jacquard_common::types::value::Data<'a>,
 }
 
 pub mod song_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -53,51 +59,51 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Composer;
         type Game;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Composer = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Composer = S::Composer;
-        type Game = S::Game;
+        type Title = Unset;
     }
     ///State transition - sets the `composer` field to Set
     pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComposer<S> {}
     impl<S: State> State for SetComposer<S> {
-        type Title = S::Title;
         type Composer = Set<members::composer>;
         type Game = S::Game;
+        type Title = S::Title;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Title = S::Title;
         type Composer = S::Composer;
         type Game = Set<members::game>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Composer = S::Composer;
+        type Game = S::Game;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `composer` field
         pub struct composer(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -183,7 +189,10 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
+    pub fn maybe_genre(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -237,7 +246,10 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<jacquard_common::types::value::Data<'a>>) -> Self {
+    pub fn maybe_source(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -284,9 +296,9 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Title: song_state::IsSet,
     S::Composer: song_state::IsSet,
     S::Game: song_state::IsSet,
+    S::Title: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -339,7 +351,13 @@ impl<'a> Song<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
@@ -392,6 +410,56 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.jacket {
+            {
+                let size = value.blob().size;
+                if size > 8000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "jacket",
+                        ),
+                        max: 8000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.jacket {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "jacket",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

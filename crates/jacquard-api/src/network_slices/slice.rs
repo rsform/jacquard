@@ -24,23 +24,29 @@ pub mod update_o_auth_client;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Slice<'a> {
-    /// When the slice was created
+    ///When the slice was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Primary domain namespace for this slice (e.g. social.grain)
+    ///Primary domain namespace for this slice (e.g. social.grain)
     #[serde(borrow)]
     pub domain: jacquard_common::CowStr<'a>,
-    /// Name of the slice
+    ///Name of the slice
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
 pub mod slice_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -48,49 +54,49 @@ pub mod slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Domain;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Domain = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Domain = S::Domain;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
-        type Name = S::Name;
         type Domain = Set<members::domain>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Domain = S::Domain;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Domain = S::Domain;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `domain` field
         pub struct domain(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -185,8 +191,8 @@ where
 impl<'a, S> SliceBuilder<'a, S>
 where
     S: slice_state::State,
-    S::Name: slice_state::IsSet,
     S::Domain: slice_state::IsSet,
+    S::Name: slice_state::IsSet,
     S::CreatedAt: slice_state::IsSet,
 {
     /// Build the final struct
@@ -230,7 +236,13 @@ impl<'a> Slice<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SliceGetRecordOutput<'a> {
@@ -288,7 +300,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("domain"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "domain",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -299,7 +313,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -309,7 +325,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     }
 }
 
-fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.slice"),
@@ -410,48 +428,56 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SliceView<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Profile of the slice creator
+    ///Profile of the slice creator
     #[serde(borrow)]
     pub creator: crate::network_slices::actor::ProfileViewBasic<'a>,
-    /// Primary domain namespace for this slice (e.g. social.grain)
+    ///Primary domain namespace for this slice (e.g. social.grain)
     #[serde(borrow)]
     pub domain: jacquard_common::CowStr<'a>,
-    /// Total number of unique indexed actors in this slice
+    ///Total number of unique indexed actors in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub indexed_actor_count: std::option::Option<i64>,
-    /// Number of collections with indexed records
+    ///Number of collections with indexed records
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub indexed_collection_count: std::option::Option<i64>,
-    /// Total number of indexed records in this slice
+    ///Total number of indexed records in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub indexed_record_count: std::option::Option<i64>,
-    /// Display name of the slice
+    ///Display name of the slice
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Recent activity sparkline data points for the last 24 hours
+    ///Recent activity sparkline data points for the last 24 hours
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sparkline: std::option::Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+    pub sparkline: std::option::Option<
+        Vec<crate::network_slices::slice::SparklinePoint<'a>>,
+    >,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    /// Total number of waitlist invites for this slice
+    ///Total number of waitlist invites for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub waitlist_invite_count: std::option::Option<i64>,
-    /// Total number of waitlist requests for this slice
+    ///Total number of waitlist requests for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub waitlist_request_count: std::option::Option<i64>,
 }
 
 pub mod slice_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -460,9 +486,9 @@ pub mod slice_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Uri;
         type Cid;
         type Domain;
+        type Uri;
         type Creator;
         type CreatedAt;
     }
@@ -471,9 +497,9 @@ pub mod slice_view_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Uri = Unset;
         type Cid = Unset;
         type Domain = Unset;
+        type Uri = Unset;
         type Creator = Unset;
         type CreatedAt = Unset;
     }
@@ -482,20 +508,9 @@ pub mod slice_view_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Cid = S::Cid;
+        type Domain = S::Domain;
         type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Domain = S::Domain;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Domain = S::Domain;
         type Creator = S::Creator;
         type CreatedAt = S::CreatedAt;
     }
@@ -504,9 +519,9 @@ pub mod slice_view_state {
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Name = S::Name;
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
         type Domain = S::Domain;
+        type Uri = S::Uri;
         type Creator = S::Creator;
         type CreatedAt = S::CreatedAt;
     }
@@ -515,9 +530,20 @@ pub mod slice_view_state {
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
         type Name = S::Name;
-        type Uri = S::Uri;
         type Cid = S::Cid;
         type Domain = Set<members::domain>;
+        type Uri = S::Uri;
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Cid = S::Cid;
+        type Domain = S::Domain;
+        type Uri = Set<members::uri>;
         type Creator = S::Creator;
         type CreatedAt = S::CreatedAt;
     }
@@ -526,9 +552,9 @@ pub mod slice_view_state {
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
         type Name = S::Name;
-        type Uri = S::Uri;
         type Cid = S::Cid;
         type Domain = S::Domain;
+        type Uri = S::Uri;
         type Creator = Set<members::creator>;
         type CreatedAt = S::CreatedAt;
     }
@@ -537,9 +563,9 @@ pub mod slice_view_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Uri = S::Uri;
         type Cid = S::Cid;
         type Domain = S::Domain;
+        type Uri = S::Uri;
         type Creator = S::Creator;
         type CreatedAt = Set<members::created_at>;
     }
@@ -548,12 +574,12 @@ pub mod slice_view_state {
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `domain` field
         pub struct domain(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `created_at` field
@@ -594,7 +620,18 @@ impl<'a> SliceViewBuilder<'a, slice_view_state::Empty> {
         SliceViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -803,9 +840,9 @@ impl<'a, S> SliceViewBuilder<'a, S>
 where
     S: slice_view_state::State,
     S::Name: slice_view_state::IsSet,
-    S::Uri: slice_view_state::IsSet,
     S::Cid: slice_view_state::IsSet,
     S::Domain: slice_view_state::IsSet,
+    S::Uri: slice_view_state::IsSet,
     S::Creator: slice_view_state::IsSet,
     S::CreatedAt: slice_view_state::IsSet,
 {
@@ -853,7 +890,9 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.slice.defs"),
@@ -1080,53 +1119,53 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("sparklinePoint"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("count"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("count"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("count")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "count",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "timestamp",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -1152,7 +1191,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SparklinePoint<'a> {
@@ -1162,7 +1207,7 @@ pub struct SparklinePoint<'a> {
 
 pub mod sparkline_point_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1170,37 +1215,37 @@ pub mod sparkline_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type Timestamp;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type Timestamp = S::Timestamp;
+        type Count = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Count = S::Count;
         type Timestamp = Set<members::timestamp>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Timestamp = S::Timestamp;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
@@ -1273,8 +1318,8 @@ where
 impl<'a, S> SparklinePointBuilder<'a, S>
 where
     S: sparkline_point_state::State,
-    S::Count: sparkline_point_state::IsSet,
     S::Timestamp: sparkline_point_state::IsSet,
+    S::Count: sparkline_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparklinePoint<'a> {
@@ -1317,7 +1362,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {
             let value = &self.count;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("count"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

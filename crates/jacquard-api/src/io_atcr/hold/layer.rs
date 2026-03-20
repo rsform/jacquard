@@ -8,31 +8,37 @@
 /// Represents metadata about a container layer stored in the hold. Stored in the hold's embedded PDS for tracking and analytics.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Layer<'a> {
-    /// RFC3339 timestamp of when the layer was uploaded
+    ///RFC3339 timestamp of when the layer was uploaded
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Layer digest (e.g., sha256:abc123...)
+    ///Layer digest (e.g., sha256:abc123...)
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
-    /// AT-URI of the manifest that included this layer (e.g., at://did:plc:xyz/io.atcr.manifest/abc123)
+    ///AT-URI of the manifest that included this layer (e.g., at://did:plc:xyz/io.atcr.manifest/abc123)
     #[serde(borrow)]
     pub manifest: jacquard_common::types::string::AtUri<'a>,
-    /// Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)
+    ///Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)
     #[serde(borrow)]
     pub media_type: jacquard_common::CowStr<'a>,
-    /// Size in bytes
+    ///Size in bytes
     pub size: i64,
-    /// DID of user who uploaded this layer
+    ///DID of user who uploaded this layer
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod layer_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -40,105 +46,105 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
-        type Size;
         type CreatedAt;
-        type UserDid;
-        type Manifest;
+        type Size;
+        type Digest;
         type MediaType;
+        type Manifest;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
-        type Size = Unset;
         type CreatedAt = Unset;
-        type UserDid = Unset;
-        type Manifest = Unset;
+        type Size = Unset;
+        type Digest = Unset;
         type MediaType = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type Size = S::Size;
-        type CreatedAt = S::CreatedAt;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Digest = S::Digest;
-        type Size = Set<members::size>;
-        type CreatedAt = S::CreatedAt;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
+        type Manifest = Unset;
+        type UserDid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Digest = S::Digest;
-        type Size = S::Size;
         type CreatedAt = Set<members::created_at>;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Digest = S::Digest;
         type Size = S::Size;
-        type CreatedAt = S::CreatedAt;
-        type UserDid = Set<members::user_did>;
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `manifest` field to Set
-    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetManifest<S> {}
-    impl<S: State> State for SetManifest<S> {
         type Digest = S::Digest;
-        type Size = S::Size;
-        type CreatedAt = S::CreatedAt;
-        type UserDid = S::UserDid;
-        type Manifest = Set<members::manifest>;
         type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type CreatedAt = S::CreatedAt;
+        type Size = Set<members::size>;
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type CreatedAt = S::CreatedAt;
+        type Size = S::Size;
+        type Digest = Set<members::digest>;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+        type UserDid = S::UserDid;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
-        type Size = S::Size;
         type CreatedAt = S::CreatedAt;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
+        type Size = S::Size;
+        type Digest = S::Digest;
         type MediaType = Set<members::media_type>;
+        type Manifest = S::Manifest;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetManifest<S> {}
+    impl<S: State> State for SetManifest<S> {
+        type CreatedAt = S::CreatedAt;
+        type Size = S::Size;
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Manifest = Set<members::manifest>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Size = S::Size;
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `manifest` field
-        pub struct manifest(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -256,7 +262,10 @@ where
     S::Size: layer_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(mut self, value: impl Into<i64>) -> LayerBuilder<'a, layer_state::SetSize<S>> {
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> LayerBuilder<'a, layer_state::SetSize<S>> {
         self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         LayerBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -288,12 +297,12 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Digest: layer_state::IsSet,
-    S::Size: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
-    S::UserDid: layer_state::IsSet,
-    S::Manifest: layer_state::IsSet,
+    S::Size: layer_state::IsSet,
+    S::Digest: layer_state::IsSet,
     S::MediaType: layer_state::IsSet,
+    S::Manifest: layer_state::IsSet,
+    S::UserDid: layer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layer<'a> {
@@ -342,7 +351,13 @@ impl<'a> Layer<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LayerGetRecordOutput<'a> {
@@ -400,7 +415,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layer<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("digest"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -411,7 +428,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layer<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("media_type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

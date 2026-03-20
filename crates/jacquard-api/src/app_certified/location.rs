@@ -8,37 +8,43 @@
 /// A location reference
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Location<'a> {
-    /// Client-declared timestamp when this record was originally created
+    ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Additional context about this location, such as its significance to the work or specific boundaries
+    ///Additional context about this location, such as its significance to the work or specific boundaries
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The location of where the work was performed as a URI, blob, or inline string.
+    ///The location of where the work was performed as a URI, blob, or inline string.
     #[serde(borrow)]
     pub location: LocationLocation<'a>,
-    /// An identifier for the format of the location data (e.g., coordinate-decimal, geojson-point). See the Location Protocol spec for the full registry: https://spec.decentralizedgeo.org/specification/location-types/#location-type-registry
+    ///An identifier for the format of the location data (e.g., coordinate-decimal, geojson-point). See the Location Protocol spec for the full registry: https://spec.decentralizedgeo.org/specification/location-types/#location-type-registry
     #[serde(borrow)]
     pub location_type: LocationLocationType<'a>,
-    /// The version of the Location Protocol
+    ///The version of the Location Protocol
     #[serde(borrow)]
     pub lp_version: jacquard_common::CowStr<'a>,
-    /// Human-readable name for this location (e.g. 'Golden Gate Park', 'San Francisco Bay Area')
+    ///Human-readable name for this location (e.g. 'Golden Gate Park', 'San Francisco Bay Area')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Spatial Reference System URI (e.g., http://www.opengis.net/def/crs/OGC/1.3/CRS84) that defines the coordinate system.
+    ///The Spatial Reference System URI (e.g., http://www.opengis.net/def/crs/OGC/1.3/CRS84) that defines the coordinate system.
     #[serde(borrow)]
     pub srs: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod location_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,85 +52,85 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type LocationType;
-        type LpVersion;
-        type Location;
         type Srs;
+        type LpVersion;
+        type LocationType;
+        type Location;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type LocationType = Unset;
-        type LpVersion = Unset;
-        type Location = Unset;
         type Srs = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type LocationType = S::LocationType;
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
-        type Srs = S::Srs;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocationType<S> {}
-    impl<S: State> State for SetLocationType<S> {
-        type CreatedAt = S::CreatedAt;
-        type LocationType = Set<members::location_type>;
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
-        type Srs = S::Srs;
-    }
-    ///State transition - sets the `lp_version` field to Set
-    pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLpVersion<S> {}
-    impl<S: State> State for SetLpVersion<S> {
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-        type LpVersion = Set<members::lp_version>;
-        type Location = S::Location;
-        type Srs = S::Srs;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-        type LpVersion = S::LpVersion;
-        type Location = Set<members::location>;
-        type Srs = S::Srs;
+        type LpVersion = Unset;
+        type LocationType = Unset;
+        type Location = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `srs` field to Set
     pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrs<S> {}
     impl<S: State> State for SetSrs<S> {
-        type CreatedAt = S::CreatedAt;
-        type LocationType = S::LocationType;
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
         type Srs = Set<members::srs>;
+        type LpVersion = S::LpVersion;
+        type LocationType = S::LocationType;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `lp_version` field to Set
+    pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLpVersion<S> {}
+    impl<S: State> State for SetLpVersion<S> {
+        type Srs = S::Srs;
+        type LpVersion = Set<members::lp_version>;
+        type LocationType = S::LocationType;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocationType<S> {}
+    impl<S: State> State for SetLocationType<S> {
+        type Srs = S::Srs;
+        type LpVersion = S::LpVersion;
+        type LocationType = Set<members::location_type>;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type Srs = S::Srs;
+        type LpVersion = S::LpVersion;
+        type LocationType = S::LocationType;
+        type Location = Set<members::location>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Srs = S::Srs;
+        type LpVersion = S::LpVersion;
+        type LocationType = S::LocationType;
+        type Location = S::Location;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
-        ///Marker type for the `lp_version` field
-        pub struct lp_version(());
-        ///Marker type for the `location` field
-        pub struct location(());
         ///Marker type for the `srs` field
         pub struct srs(());
+        ///Marker type for the `lp_version` field
+        pub struct lp_version(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
+        ///Marker type for the `location` field
+        pub struct location(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -182,12 +188,18 @@ where
 
 impl<'a, S: location_state::State> LocationBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -252,7 +264,10 @@ where
 
 impl<'a, S: location_state::State> LocationBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -285,11 +300,11 @@ where
 impl<'a, S> LocationBuilder<'a, S>
 where
     S: location_state::State,
-    S::CreatedAt: location_state::IsSet,
-    S::LocationType: location_state::IsSet,
-    S::LpVersion: location_state::IsSet,
-    S::Location: location_state::IsSet,
     S::Srs: location_state::IsSet,
+    S::LpVersion: location_state::IsSet,
+    S::LocationType: location_state::IsSet,
+    S::Location: location_state::IsSet,
+    S::CreatedAt: location_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Location<'a> {
@@ -340,7 +355,13 @@ impl<'a> Location<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -459,22 +480,34 @@ impl jacquard_common::IntoStatic for LocationLocationType<'_> {
     type Output = LocationLocationType<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            LocationLocationType::CoordinateDecimal => LocationLocationType::CoordinateDecimal,
+            LocationLocationType::CoordinateDecimal => {
+                LocationLocationType::CoordinateDecimal
+            }
             LocationLocationType::GeojsonPoint => LocationLocationType::GeojsonPoint,
             LocationLocationType::Geojson => LocationLocationType::Geojson,
             LocationLocationType::H3 => LocationLocationType::H3,
             LocationLocationType::Geohash => LocationLocationType::Geohash,
             LocationLocationType::Wkt => LocationLocationType::Wkt,
             LocationLocationType::Address => LocationLocationType::Address,
-            LocationLocationType::ScaledCoordinates => LocationLocationType::ScaledCoordinates,
-            LocationLocationType::Other(v) => LocationLocationType::Other(v.into_static()),
+            LocationLocationType::ScaledCoordinates => {
+                LocationLocationType::ScaledCoordinates
+            }
+            LocationLocationType::Other(v) => {
+                LocationLocationType::Other(v.into_static())
+            }
         }
     }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocationGetRecordOutput<'a> {
@@ -531,7 +564,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -545,15 +580,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
                     )
                     .count();
                 if count > 500usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "description",
-                            ),
-                            max: 500usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -575,7 +608,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("lp_version"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lp_version",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -585,7 +620,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -599,15 +636,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 100usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -616,7 +651,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("srs"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "srs",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -626,7 +663,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
     }
 }
 
-fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.certified.location"),
@@ -866,11 +905,11 @@ fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconD
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocationString<'a> {
-    /// The location string value
+    ///The location string value
     #[serde(borrow)]
     pub string: jacquard_common::CowStr<'a>,
 }
@@ -893,7 +932,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationString<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("string"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "string",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -908,15 +949,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationString<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "string",
-                            ),
-                            max: 1000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "string",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
                 }
             }
         }

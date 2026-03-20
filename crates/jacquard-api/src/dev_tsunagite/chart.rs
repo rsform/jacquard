@@ -8,38 +8,44 @@
 /// A chart included in a game hosting leaderboards via Tsunagite.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Chart<'a> {
-    /// The difficulty slot this chart is placed in. Can be an inline definition or a reference to a standard-defined difficulty slot.
+    ///The difficulty slot this chart is placed in. Can be an inline definition or a reference to a standard-defined difficulty slot.
     #[serde(borrow)]
     pub difficulty: ChartDifficulty<'a>,
-    /// The game this chart is included in. URI must point to a record of type `dev.tsunagite.game`.
+    ///The game this chart is included in. URI must point to a record of type `dev.tsunagite.game`.
     #[serde(borrow)]
     pub game: jacquard_common::types::string::AtUri<'a>,
-    /// The jacket or banner art of this chart, for display in UI. Will fall back to the song jacket if not present
+    ///The jacket or banner art of this chart, for display in UI. Will fall back to the song jacket if not present
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub jacket: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// The name of the jacket artist for this chart.
+    ///The name of the jacket artist for this chart.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub jacket_artist: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// The md5 hashes of any versions of the chart that are up-to-date enough to be leaderboard-legal. Optional if you will not perform leaderboard resets upon any chart changes.
+    ///The md5 hashes of any versions of the chart that are up-to-date enough to be leaderboard-legal. Optional if you will not perform leaderboard resets upon any chart changes.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub ranked_versions: std::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
-    /// The numeric difficulty rating displayed to players, formatted as a string to support decimal or + difficulties.
+    ///The numeric difficulty rating displayed to players, formatted as a string to support decimal or + difficulties.
     #[serde(borrow)]
     pub rating: jacquard_common::CowStr<'a>,
-    /// The song this chart is for. URI must point to a record of type `dev.tsunagite.song`.
+    ///The song this chart is for. URI must point to a record of type `dev.tsunagite.song`.
     #[serde(borrow)]
     pub song: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod chart_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -47,67 +53,67 @@ pub mod chart_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rating;
-        type Game;
         type Song;
+        type Rating;
         type Difficulty;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rating = Unset;
-        type Game = Unset;
         type Song = Unset;
+        type Rating = Unset;
         type Difficulty = Unset;
-    }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Rating = Set<members::rating>;
-        type Game = S::Game;
-        type Song = S::Song;
-        type Difficulty = S::Difficulty;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Rating = S::Rating;
-        type Game = Set<members::game>;
-        type Song = S::Song;
-        type Difficulty = S::Difficulty;
+        type Game = Unset;
     }
     ///State transition - sets the `song` field to Set
     pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSong<S> {}
     impl<S: State> State for SetSong<S> {
-        type Rating = S::Rating;
-        type Game = S::Game;
         type Song = Set<members::song>;
+        type Rating = S::Rating;
         type Difficulty = S::Difficulty;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Song = S::Song;
+        type Rating = Set<members::rating>;
+        type Difficulty = S::Difficulty;
+        type Game = S::Game;
     }
     ///State transition - sets the `difficulty` field to Set
     pub struct SetDifficulty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDifficulty<S> {}
     impl<S: State> State for SetDifficulty<S> {
-        type Rating = S::Rating;
-        type Game = S::Game;
         type Song = S::Song;
+        type Rating = S::Rating;
         type Difficulty = Set<members::difficulty>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Song = S::Song;
+        type Rating = S::Rating;
+        type Difficulty = S::Difficulty;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rating` field
-        pub struct rating(());
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `song` field
         pub struct song(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
         ///Marker type for the `difficulty` field
         pub struct difficulty(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
@@ -280,10 +286,10 @@ where
 impl<'a, S> ChartBuilder<'a, S>
 where
     S: chart_state::State,
-    S::Rating: chart_state::IsSet,
-    S::Game: chart_state::IsSet,
     S::Song: chart_state::IsSet,
+    S::Rating: chart_state::IsSet,
     S::Difficulty: chart_state::IsSet,
+    S::Game: chart_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chart<'a> {
@@ -334,7 +340,13 @@ impl<'a> Chart<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -347,7 +359,13 @@ pub enum ChartDifficulty<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChartGetRecordOutput<'a> {
@@ -400,11 +418,63 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chart<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.jacket {
+            {
+                let size = value.blob().size;
+                if size > 8000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "jacket",
+                        ),
+                        max: 8000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.jacket {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "jacket",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
 
-fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.chart"),

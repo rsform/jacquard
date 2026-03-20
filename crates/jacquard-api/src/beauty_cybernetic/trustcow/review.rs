@@ -8,34 +8,40 @@
 /// A review connected to a verified transaction, can only be created by one of the transaction parties
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
-    /// When the review was created
+    ///When the review was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The detailed review text
+    ///The detailed review text
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Rating score from 1 to 5
+    ///Rating score from 1 to 5
     pub rating: i64,
-    /// Whether this review is from the service provider or consumer
+    ///Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reviewer_role: std::option::Option<ReviewReviewerRole<'a>>,
-    /// The title of the review
+    ///The title of the review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
+    ///AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
     #[serde(borrow)]
     pub transaction: jacquard_common::CowStr<'a>,
 }
 
 pub mod review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -43,51 +49,51 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Rating;
         type Transaction;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Rating = Unset;
         type Transaction = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Rating = S::Rating;
-        type Transaction = S::Transaction;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
-        type CreatedAt = S::CreatedAt;
         type Rating = Set<members::rating>;
         type Transaction = S::Transaction;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `transaction` field to Set
     pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransaction<S> {}
     impl<S: State> State for SetTransaction<S> {
-        type CreatedAt = S::CreatedAt;
         type Rating = S::Rating;
         type Transaction = Set<members::transaction>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Rating = S::Rating;
+        type Transaction = S::Transaction;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `rating` field
         pub struct rating(());
         ///Marker type for the `transaction` field
         pub struct transaction(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -144,12 +150,18 @@ where
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -176,7 +188,10 @@ where
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `reviewerRole` field (optional)
-    pub fn reviewer_role(mut self, value: impl Into<Option<ReviewReviewerRole<'a>>>) -> Self {
+    pub fn reviewer_role(
+        mut self,
+        value: impl Into<Option<ReviewReviewerRole<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -189,7 +204,10 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -222,9 +240,9 @@ where
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::CreatedAt: review_state::IsSet,
     S::Rating: review_state::IsSet,
     S::Transaction: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -362,7 +380,13 @@ impl jacquard_common::IntoStatic for ReviewReviewerRole<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
@@ -419,7 +443,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -429,7 +455,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             let value = &self.rating;
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -439,7 +467,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             let value = &self.rating;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -449,7 +479,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -459,8 +491,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_review()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("beauty.cybernetic.trustcow.review"),

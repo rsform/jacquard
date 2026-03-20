@@ -8,64 +8,71 @@
 /// Beta version: Record representing an item in a player's game inventory
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory<'a> {
-    /// When the item was acquired
+    ///When the item was acquired
     pub acquired_at: jacquard_common::types::string::Datetime,
-    /// When the record was created
+    ///When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Unique identifier for the item from gameItems.json
+    ///Unique identifier for the item from gameItems.json
     #[serde(borrow)]
     pub item_id: jacquard_common::CowStr<'a>,
-    /// Display name of the item
+    ///Display name of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub item_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Type category of the item (consumable, tool, equipment, etc.)
+    ///Type category of the item (consumable, tool, equipment, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub item_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Base value of the item in game currency
+    ///Base value of the item in game currency
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub item_value: std::option::Option<i64>,
-    /// When the record was last modified
+    ///When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// URI of the game.log record that documents the acquisition of this item
+    ///URI of the game.log record that documents the acquisition of this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Maximum stack size for this item
+    ///Maximum stack size for this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub max_stack: std::option::Option<i64>,
-    /// Additional item-specific data (stats, attributes, enchantments, etc.)
+    ///Additional item-specific data (stats, attributes, enchantments, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    /// Number of items in the stack
+    ///Number of items in the stack
     pub quantity: i64,
-    /// Rarity level of the item
+    ///Rarity level of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// How the item was acquired
+    ///How the item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_details:
-        std::option::Option<crate::net_anisota::beta::game::inventory::SourceDetails<'a>>,
-    /// Whether this item can be stacked with others of the same type
+    pub source_details: std::option::Option<
+        crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
+    >,
+    ///Whether this item can be stacked with others of the same type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stackable: std::option::Option<bool>,
 }
 
 pub mod inventory_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -73,67 +80,67 @@ pub mod inventory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quantity;
-        type CreatedAt;
         type AcquiredAt;
         type ItemId;
+        type Quantity;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quantity = Unset;
-        type CreatedAt = Unset;
         type AcquiredAt = Unset;
         type ItemId = Unset;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuantity<S> {}
-    impl<S: State> State for SetQuantity<S> {
-        type Quantity = Set<members::quantity>;
-        type CreatedAt = S::CreatedAt;
-        type AcquiredAt = S::AcquiredAt;
-        type ItemId = S::ItemId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Quantity = S::Quantity;
-        type CreatedAt = Set<members::created_at>;
-        type AcquiredAt = S::AcquiredAt;
-        type ItemId = S::ItemId;
+        type Quantity = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
     impl<S: State> State for SetAcquiredAt<S> {
-        type Quantity = S::Quantity;
-        type CreatedAt = S::CreatedAt;
         type AcquiredAt = Set<members::acquired_at>;
         type ItemId = S::ItemId;
+        type Quantity = S::Quantity;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `item_id` field to Set
     pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItemId<S> {}
     impl<S: State> State for SetItemId<S> {
-        type Quantity = S::Quantity;
-        type CreatedAt = S::CreatedAt;
         type AcquiredAt = S::AcquiredAt;
         type ItemId = Set<members::item_id>;
+        type Quantity = S::Quantity;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type AcquiredAt = S::AcquiredAt;
+        type ItemId = S::ItemId;
+        type Quantity = Set<members::quantity>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AcquiredAt = S::AcquiredAt;
+        type ItemId = S::ItemId;
+        type Quantity = S::Quantity;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
         ///Marker type for the `item_id` field
         pub struct item_id(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -154,7 +161,9 @@ pub struct InventoryBuilder<'a, S: inventory_state::State> {
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::inventory::SourceDetails<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
+        >,
         ::core::option::Option<bool>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -173,7 +182,20 @@ impl<'a> InventoryBuilder<'a, inventory_state::Empty> {
         InventoryBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _phantom: ::core::marker::PhantomData,
@@ -240,12 +262,18 @@ where
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `itemName` field (optional)
-    pub fn item_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn item_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `itemName` field to an Option value (optional)
-    pub fn maybe_item_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_item_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -253,12 +281,18 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `itemType` field (optional)
-    pub fn item_type(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn item_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `itemType` field to an Option value (optional)
-    pub fn maybe_item_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_item_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -298,12 +332,18 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `logRecordUri` field (optional)
-    pub fn log_record_uri(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn log_record_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `logRecordUri` field to an Option value (optional)
-    pub fn maybe_log_record_uri(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_log_record_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -362,7 +402,10 @@ where
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn rarity(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
@@ -375,7 +418,10 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
@@ -390,7 +436,9 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `sourceDetails` field (optional)
     pub fn source_details(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::inventory::SourceDetails<'a>>>,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::inventory::SourceDetails<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
@@ -421,10 +469,10 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 impl<'a, S> InventoryBuilder<'a, S>
 where
     S: inventory_state::State,
-    S::Quantity: inventory_state::IsSet,
-    S::CreatedAt: inventory_state::IsSet,
     S::AcquiredAt: inventory_state::IsSet,
     S::ItemId: inventory_state::IsSet,
+    S::Quantity: inventory_state::IsSet,
+    S::CreatedAt: inventory_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Inventory<'a> {
@@ -491,7 +539,13 @@ impl<'a> Inventory<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InventoryGetRecordOutput<'a> {
@@ -549,7 +603,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("item_id"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -559,7 +615,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("item_name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -569,7 +627,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("item_type"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_type",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -578,7 +638,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         if let Some(ref value) = self.item_value {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("item_value"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_value",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -587,7 +649,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         if let Some(ref value) = self.max_stack {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("max_stack"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_stack",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -597,7 +661,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
             let value = &self.quantity;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("quantity"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -607,8 +673,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.inventory"),
@@ -909,75 +976,75 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("sourceDetails"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Additional details about how the item was acquired",
-                        )),
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "gameCardUri",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "gameCardUri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the game card that provided this item",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "URI of the game card that provided this item",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "questId",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "ID of the quest that rewarded this item",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("questId"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "ID of the quest that rewarded this item",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rewardStreak",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rewardStreak",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -994,19 +1061,19 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
-    /// URI of the game card that provided this item
+    ///URI of the game card that provided this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// ID of the quest that rewarded this item
+    ///ID of the quest that rewarded this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub quest_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Daily reward streak when item was acquired
+    ///Daily reward streak when item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub reward_streak: std::option::Option<i64>,
 }

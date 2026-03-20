@@ -15,19 +15,19 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
-    /// Reference to external JSON blob containing content (extended mode, used when content > 20KB)
+    ///Reference to external JSON blob containing content (extended mode, used when content > 20KB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// Array of content blocks (inline mode, used when content ≤ 20KB)
+    ///Array of content blocks (inline mode, used when content ≤ 20KB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub items: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    /// Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)
+    ///Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub references: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,

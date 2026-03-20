@@ -4,7 +4,7 @@
 //! but at lexicon codegen time rather than via proc macros. This eliminates proc macro
 //! overhead in the API crate while maintaining identical API surface.
 
-use crate::lexicon::{LexObject, LexXrpcParameters};
+use crate::lexicon::{LexObject, LexObjectProperty, LexXrpcParameters};
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -38,6 +38,15 @@ impl<'a> BuilderSchema<'a> {
         match self {
             BuilderSchema::Object(obj) => obj.properties.keys().collect(),
             BuilderSchema::Parameters(params) => params.properties.keys().collect(),
+        }
+    }
+
+    /// Look up an object property by field name.
+    /// Returns `None` for `Parameters` schemas (XRPC params handle defaults separately).
+    pub fn get_object_property(&self, field_name: &str) -> Option<&LexObjectProperty<'static>> {
+        match self {
+            BuilderSchema::Object(obj) => obj.properties.get(field_name),
+            BuilderSchema::Parameters(_) => None,
         }
     }
 }

@@ -11,40 +11,46 @@ pub mod get_playlists;
 /// A declaration of a playlist.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Playlist<'a> {
-    /// The Apple Music link of the playlist.
+    ///The Apple Music link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub apple_music_link: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The date the playlist was created.
+    ///The date the playlist was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The playlist description.
+    ///The playlist description.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The name of the playlist.
+    ///The name of the playlist.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// The picture of the playlist.
+    ///The picture of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub picture: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// The Spotify link of the playlist.
+    ///The Spotify link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub spotify_link: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The Tidal link of the playlist.
+    ///The Tidal link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tidal_link: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The tracks in the playlist.
+    ///The tracks in the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tracks: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    /// The YouTube link of the playlist.
+    ///The YouTube link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub youtube_link: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -52,7 +58,7 @@ pub struct Playlist<'a> {
 
 pub mod playlist_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -60,37 +66,37 @@ pub mod playlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -123,7 +129,17 @@ impl<'a> PlaylistBuilder<'a, playlist_state::Empty> {
     pub fn new() -> Self {
         PlaylistBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -139,7 +155,10 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
-    pub fn maybe_apple_music_link(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_apple_music_link(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -166,12 +185,18 @@ where
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -217,12 +242,18 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `spotifyLink` field (optional)
-    pub fn spotify_link(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn spotify_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
-    pub fn maybe_spotify_link(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_spotify_link(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -230,12 +261,18 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `tidalLink` field (optional)
-    pub fn tidal_link(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn tidal_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
-    pub fn maybe_tidal_link(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_tidal_link(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -262,12 +299,18 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `youtubeLink` field (optional)
-    pub fn youtube_link(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn youtube_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
-    pub fn maybe_youtube_link(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_youtube_link(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -276,8 +319,8 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S> PlaylistBuilder<'a, S>
 where
     S: playlist_state::State,
-    S::Name: playlist_state::IsSet,
     S::CreatedAt: playlist_state::IsSet,
+    S::Name: playlist_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Playlist<'a> {
@@ -332,7 +375,13 @@ impl<'a> Playlist<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaylistGetRecordOutput<'a> {
@@ -389,7 +438,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Playlist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -399,7 +450,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Playlist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("description"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -410,7 +463,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Playlist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -421,17 +476,65 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Playlist<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(ref value) = self.picture {
+            {
+                let size = value.blob().size;
+                if size > 2000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "picture",
+                        ),
+                        max: 2000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.picture {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "picture",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
             }
         }
         Ok(())
     }
 }
 
-fn lexicon_doc_app_rocksky_playlist() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_rocksky_playlist() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.rocksky.playlist"),
@@ -659,55 +762,65 @@ fn lexicon_doc_app_rocksky_playlist() -> ::jacquard_lexicon::lexicon::LexiconDoc
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaylistViewBasic<'a> {
-    /// The URL of the cover image for the playlist.
+    ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The date and time when the playlist was created.
+    pub cover_image_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The date and time when the playlist was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The URL of the avatar image of the curator.
+    ///The URL of the avatar image of the curator.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub curator_avatar_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The DID of the curator of the playlist.
+    pub curator_avatar_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The DID of the curator of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub curator_did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    /// The handle of the curator of the playlist.
+    pub curator_did: std::option::Option<
+        jacquard_common::types::ident::AtIdentifier<'a>,
+    >,
+    ///The handle of the curator of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub curator_handle: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    /// The name of the curator of the playlist.
+    pub curator_handle: std::option::Option<
+        jacquard_common::types::ident::AtIdentifier<'a>,
+    >,
+    ///The name of the curator of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub curator_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A description of the playlist.
+    ///A description of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The unique identifier of the playlist.
+    ///The unique identifier of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The title of the playlist.
+    ///The title of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The number of tracks in the playlist.
+    ///The number of tracks in the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub track_count: std::option::Option<i64>,
-    /// The URI of the playlist.
+    ///The URI of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-fn lexicon_doc_app_rocksky_playlist_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_rocksky_playlist_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.rocksky.playlist.defs"),
@@ -1247,7 +1360,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlaylistViewBasic<'a> {
         if let Some(ref value) = self.track_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("track_count"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "track_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1267,50 +1382,58 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlaylistViewBasic<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaylistViewDetailed<'a> {
-    /// The URL of the cover image for the playlist.
+    ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The date and time when the playlist was created.
+    pub cover_image_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The date and time when the playlist was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// The URL of the avatar image of the curator.
+    ///The URL of the avatar image of the curator.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub curator_avatar_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    /// The DID of the curator of the playlist.
+    pub curator_avatar_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///The DID of the curator of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub curator_did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    /// The handle of the curator of the playlist.
+    pub curator_did: std::option::Option<
+        jacquard_common::types::ident::AtIdentifier<'a>,
+    >,
+    ///The handle of the curator of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub curator_handle: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    /// The name of the curator of the playlist.
+    pub curator_handle: std::option::Option<
+        jacquard_common::types::ident::AtIdentifier<'a>,
+    >,
+    ///The name of the curator of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub curator_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A description of the playlist.
+    ///A description of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The unique identifier of the playlist.
+    ///The unique identifier of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The title of the playlist.
+    ///The title of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// A list of tracks in the playlist.
+    ///A list of tracks in the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tracks: std::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
-    /// The URI of the playlist.
+    ///The URI of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,

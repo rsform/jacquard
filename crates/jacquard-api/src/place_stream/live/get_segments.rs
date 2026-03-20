@@ -5,14 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegments<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub before: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///(default: 50, min: 1, max: 100)
+    ///Defaults to `50`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
@@ -21,7 +32,7 @@ pub struct GetSegments<'a> {
 
 pub mod get_segments_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -90,7 +101,10 @@ impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
         self
     }
     /// Set the `before` field to an Option value (optional)
-    pub fn maybe_before(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
+    pub fn maybe_before(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -152,13 +166,15 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegmentsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub segments: std::option::Option<Vec<crate::place_stream::segment::SegmentView<'a>>>,
+    pub segments: std::option::Option<
+        Vec<crate::place_stream::segment::SegmentView<'a>>,
+    >,
 }
 
 /// Response type for

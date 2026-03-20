@@ -8,26 +8,32 @@
 /// A comment on a deck, card, or note.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
-    /// The comment text.
+    ///The comment text.
     #[serde(borrow)]
     pub body: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The parent comment if this is a reply.
+    ///The parent comment if this is a reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reply_to: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// The root subject being commented on.
+    ///The root subject being commented on.
     #[serde(borrow)]
     pub subject_ref: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,51 +41,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Body;
         type SubjectRef;
         type CreatedAt;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Body = Unset;
         type SubjectRef = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Body = Set<members::body>;
-        type SubjectRef = S::SubjectRef;
-        type CreatedAt = S::CreatedAt;
+        type Body = Unset;
     }
     ///State transition - sets the `subject_ref` field to Set
     pub struct SetSubjectRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjectRef<S> {}
     impl<S: State> State for SetSubjectRef<S> {
-        type Body = S::Body;
         type SubjectRef = Set<members::subject_ref>;
         type CreatedAt = S::CreatedAt;
+        type Body = S::Body;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Body = S::Body;
         type SubjectRef = S::SubjectRef;
         type CreatedAt = Set<members::created_at>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type SubjectRef = S::SubjectRef;
+        type CreatedAt = S::CreatedAt;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `subject_ref` field
         pub struct subject_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
@@ -192,9 +198,9 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Body: comment_state::IsSet,
     S::SubjectRef: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Body: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -239,7 +245,13 @@ impl<'a> Comment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
@@ -297,7 +309,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("body"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "body",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -307,11 +321,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-fn lexicon_doc_org_stormlightlabs_malfestio_thread_comment()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_stormlightlabs_malfestio_thread_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.stormlightlabs.malfestio.thread.comment"),
+        id: ::jacquard_common::CowStr::new_static(
+            "org.stormlightlabs.malfestio.thread.comment",
+        ),
         revision: None,
         description: None,
         defs: {

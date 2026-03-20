@@ -8,20 +8,26 @@
 /// A declaration of a measured trees cluster for an organization
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasuredTreesCluster<'a> {
-    /// The date and time of the creation of the record
+    ///The date and time of the creation of the record
     pub created_at: jacquard_common::types::string::Datetime,
-    /// A blob pointing to a shapefile of the measured trees cluster
+    ///A blob pointing to a shapefile of the measured trees cluster
     #[serde(borrow)]
     pub shapefile: jacquard_common::types::value::Data<'a>,
 }
 
 pub mod measured_trees_cluster_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -75,7 +81,10 @@ pub struct MeasuredTreesClusterBuilder<'a, S: measured_trees_cluster_state::Stat
 
 impl<'a> MeasuredTreesCluster<'a> {
     /// Create a new builder for this type
-    pub fn new() -> MeasuredTreesClusterBuilder<'a, measured_trees_cluster_state::Empty> {
+    pub fn new() -> MeasuredTreesClusterBuilder<
+        'a,
+        measured_trees_cluster_state::Empty,
+    > {
         MeasuredTreesClusterBuilder::new()
     }
 }
@@ -174,7 +183,13 @@ impl<'a> MeasuredTreesCluster<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasuredTreesClusterGetRecordOutput<'a> {
@@ -231,8 +246,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasuredTreesCluster<'a> 
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static(

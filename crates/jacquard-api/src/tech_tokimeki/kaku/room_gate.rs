@@ -8,23 +8,34 @@
 /// Gate settings for a ROOM post (like threadgate)
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGate<'a> {
-    /// Timestamp when the gate was created
+    ///Timestamp when the gate was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Whether the room is closed for new replies
+    ///Whether the room is closed for new replies Defaults to `false`.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_is_closed")]
     pub is_closed: std::option::Option<bool>,
-    /// Reference to the ROOM post
+    ///Reference to the ROOM post
     #[serde(borrow)]
     pub room: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+fn _default_is_closed() -> std::option::Option<bool> {
+    Some(false)
+}
+
 pub mod room_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -156,7 +167,7 @@ where
     pub fn build(self) -> RoomGate<'a> {
         RoomGate {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            is_closed: self.__unsafe_private_named.1,
+            is_closed: self.__unsafe_private_named.1.or_else(|| Some(false)),
             room: self.__unsafe_private_named.2.unwrap(),
             extra_data: Default::default(),
         }
@@ -171,7 +182,7 @@ where
     ) -> RoomGate<'a> {
         RoomGate {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            is_closed: self.__unsafe_private_named.1,
+            is_closed: self.__unsafe_private_named.1.or_else(|| Some(false)),
             room: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
@@ -193,7 +204,13 @@ impl<'a> RoomGate<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGateGetRecordOutput<'a> {
@@ -250,7 +267,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomGate<'a> {
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_roomGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_tech_tokimeki_kaku_roomGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tech.tokimeki.kaku.roomGate"),

@@ -8,25 +8,31 @@
 /// A single Ko-fi payment event. One record per event, rkey is a TID.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Supporter<'a> {
-    /// Display name from Ko-fi.
+    ///Display name from Ko-fi.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Subscription tier name, if applicable.
+    ///Subscription tier name, if applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Ko-fi event type: Donation, Subscription, Commission, or Shop Order.
+    ///Ko-fi event type: Donation, Subscription, Commission, or Shop Order.
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
 }
 
 pub mod supporter_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,37 +40,37 @@ pub mod supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Type;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Type = S::Type;
+        type Name = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Name = S::Name;
         type Type = Set<members::r#type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Type = S::Type;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -118,7 +124,10 @@ where
 
 impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
     /// Set the `tier` field (optional)
-    pub fn tier(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn tier(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -151,8 +160,8 @@ where
 impl<'a, S> SupporterBuilder<'a, S>
 where
     S: supporter_state::State,
-    S::Name: supporter_state::IsSet,
     S::Type: supporter_state::IsSet,
+    S::Name: supporter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Supporter<'a> {
@@ -195,7 +204,13 @@ impl<'a> Supporter<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SupporterGetRecordOutput<'a> {
@@ -252,7 +267,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Supporter<'a> {
     }
 }
 
-fn lexicon_doc_uk_ewancroft_kofi_supporter() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_uk_ewancroft_kofi_supporter() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("uk.ewancroft.kofi.supporter"),

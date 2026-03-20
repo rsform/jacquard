@@ -8,15 +8,21 @@
 /// defines an item in a gallery group
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GroupItem<'a> {
     pub added_at: jacquard_common::types::string::Datetime,
-    /// uri of the group that the image belongs to
+    ///uri of the group that the image belongs to
     #[serde(borrow)]
     pub group: jacquard_common::types::string::AtUri<'a>,
-    /// uri of the image that this item represents
+    ///uri of the image that this item represents
     #[serde(borrow)]
     pub image: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -26,7 +32,7 @@ pub struct GroupItem<'a> {
 
 pub mod group_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -171,7 +177,10 @@ where
 
 impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -232,7 +241,13 @@ impl<'a> GroupItem<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GroupItemGetRecordOutput<'a> {
@@ -289,7 +304,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GroupItem<'a> {
     }
 }
 
-fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("cat.vt3e.gallery.groupItem"),

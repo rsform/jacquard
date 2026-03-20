@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateBookmark<'a> {
@@ -19,7 +25,7 @@ pub struct CreateBookmark<'a> {
 
 pub mod create_bookmark_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -167,7 +173,7 @@ where
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -204,8 +210,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateBookmarkResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBookmark<'a> {
     const NSID: &'static str = "app.bsky.bookmark.createBookmark";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateBookmarkResponse;
 }
 
@@ -214,8 +221,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBookmark<'a> {
 pub struct CreateBookmarkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateBookmarkRequest {
     const PATH: &'static str = "/xrpc/app.bsky.bookmark.createBookmark";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = CreateBookmark<'de>;
     type Response = CreateBookmarkResponse;
 }

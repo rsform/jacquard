@@ -8,32 +8,40 @@
 /// A declaration of a Germ Network account
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
-    /// Array of opaque values to allow for key rolling
+    ///Array of opaque values to allow for key rolling
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub continuity_proofs: std::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
-    /// Opaque value, an ed25519 public key prefixed with a byte enum
+    ///Opaque value, an ed25519 public key prefixed with a byte enum
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub current_key: jacquard_common::deps::bytes::Bytes,
-    /// Opaque value, contains MLS KeyPackage(s), and other signature data, and is signed by the currentKey
+    ///Opaque value, contains MLS KeyPackage(s), and other signature data, and is signed by the currentKey
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub key_package: std::option::Option<jacquard_common::deps::bytes::Bytes>,
-    /// Controls who can message this account
+    ///Controls who can message this account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub message_me: std::option::Option<crate::com_germnetwork::declaration::MessageMe<'a>>,
-    /// Semver version number, without pre-release or build information, for the format of opaque content
+    pub message_me: std::option::Option<
+        crate::com_germnetwork::declaration::MessageMe<'a>,
+    >,
+    ///Semver version number, without pre-release or build information, for the format of opaque content
     #[serde(borrow)]
     pub version: jacquard_common::CowStr<'a>,
 }
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,7 +162,10 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         self
     }
     /// Set the `keyPackage` field to an Option value (optional)
-    pub fn maybe_key_package(mut self, value: Option<jacquard_common::deps::bytes::Bytes>) -> Self {
+    pub fn maybe_key_package(
+        mut self,
+        value: Option<jacquard_common::deps::bytes::Bytes>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -249,7 +260,13 @@ impl<'a> Declaration<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {
@@ -319,7 +336,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 14usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
                     max: 14usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -330,7 +349,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 5usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("version"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
                     min: 5usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -340,7 +361,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     }
 }
 
-fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.germnetwork.declaration"),
@@ -512,21 +535,27 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageMe<'a> {
-    /// A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
+    ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
     #[serde(borrow)]
     pub message_me_url: jacquard_common::types::string::UriValue<'a>,
-    /// The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
+    ///The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
     #[serde(borrow)]
     pub show_button_to: MessageMeShowButtonTo<'a>,
 }
 
 pub mod message_me_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -753,7 +782,9 @@ impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
             MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
             MessageMeShowButtonTo::UsersIFollow => MessageMeShowButtonTo::UsersIFollow,
             MessageMeShowButtonTo::Everyone => MessageMeShowButtonTo::Everyone,
-            MessageMeShowButtonTo::Other(v) => MessageMeShowButtonTo::Other(v.into_static()),
+            MessageMeShowButtonTo::Other(v) => {
+                MessageMeShowButtonTo::Other(v.into_static())
+            }
         }
     }
 }

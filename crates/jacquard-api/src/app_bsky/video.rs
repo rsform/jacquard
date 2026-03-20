@@ -11,7 +11,13 @@ pub mod upload_video;
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
@@ -28,17 +34,17 @@ pub struct JobStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Progress within the current processing state.
+    ///Progress within the current processing state.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub progress: std::option::Option<i64>,
-    /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
+    ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     #[serde(borrow)]
     pub state: JobStatusState<'a>,
 }
 
 pub mod job_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -46,49 +52,49 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type JobId;
+        type Did;
         type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type JobId = Unset;
+        type Did = Unset;
         type State = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type JobId = S::JobId;
-        type State = S::State;
     }
     ///State transition - sets the `job_id` field to Set
     pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJobId<S> {}
     impl<S: State> State for SetJobId<S> {
-        type Did = S::Did;
         type JobId = Set<members::job_id>;
+        type Did = S::Did;
+        type State = S::State;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type JobId = S::JobId;
+        type Did = Set<members::did>;
         type State = S::State;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
-        type Did = S::Did;
         type JobId = S::JobId;
+        type Did = S::Did;
         type State = Set<members::state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `state` field
         pub struct state(());
     }
@@ -137,7 +143,10 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
         self
     }
     /// Set the `blob` field to an Option value (optional)
-    pub fn maybe_blob(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
+    pub fn maybe_blob(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -164,7 +173,10 @@ where
 
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn error(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -196,7 +208,10 @@ where
 
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -242,8 +257,8 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
-    S::Did: job_status_state::IsSet,
     S::JobId: job_status_state::IsSet,
+    S::Did: job_status_state::IsSet,
     S::State: job_status_state::IsSet,
 {
     /// Build the final struct
@@ -369,7 +384,9 @@ impl jacquard_common::IntoStatic for JobStatusState<'_> {
     }
 }
 
-fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.video.defs"),
@@ -531,7 +548,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
         if let Some(ref value) = self.progress {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("progress"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "progress",
+                    ),
                     max: 100i64,
                     actual: *value,
                 });
@@ -540,7 +559,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
         if let Some(ref value) = self.progress {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("progress"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "progress",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

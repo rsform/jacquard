@@ -14,18 +14,24 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDraft<'a> {
-    /// TID of the draft to delete.
+    ///TID of the draft to delete.
     #[serde(borrow)]
     pub tid: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDraftOutput<'a> {
@@ -42,7 +48,7 @@ pub struct DeleteDraftOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -78,8 +84,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteDraftResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
     const NSID: &'static str = "at.unthread.document.deleteDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteDraftResponse;
 }
 
@@ -88,8 +95,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
 pub struct DeleteDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteDraftRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.deleteDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteDraft<'de>;
     type Response = DeleteDraftResponse;
 }

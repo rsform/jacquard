@@ -8,18 +8,26 @@
 /// Default metadata record for livestream including content warnings, rights, and distribution policy
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rights:
-        std::option::Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+    pub content_rights: std::option::Option<
+        crate::place_stream::metadata::content_rights::ContentRights<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings:
-        std::option::Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
+    pub content_warnings: std::option::Option<
+        crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub distribution_policy: std::option::Option<
@@ -29,7 +37,7 @@ pub struct Configuration<'a> {
 
 pub mod configuration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -50,7 +58,9 @@ pub mod configuration_state {
 pub struct ConfigurationBuilder<'a, S: configuration_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+        ::core::option::Option<
+            crate::place_stream::metadata::content_rights::ContentRights<'a>,
+        >,
         ::core::option::Option<
             crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
         >,
@@ -83,7 +93,9 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `contentRights` field (optional)
     pub fn content_rights(
         mut self,
-        value: impl Into<Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>>,
+        value: impl Into<
+            Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -102,7 +114,9 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
-        value: impl Into<Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>>,
+        value: impl Into<
+            Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -110,7 +124,9 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `contentWarnings` field to an Option value (optional)
     pub fn maybe_content_warnings(
         mut self,
-        value: Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
+        value: Option<
+            crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -122,7 +138,11 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     pub fn distribution_policy(
         mut self,
         value: impl Into<
-            Option<crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>>,
+            Option<
+                crate::place_stream::metadata::distribution_policy::DistributionPolicy<
+                    'a,
+                >,
+            >,
         >,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
@@ -131,7 +151,9 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `distributionPolicy` field to an Option value (optional)
     pub fn maybe_distribution_policy(
         mut self,
-        value: Option<crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>>,
+        value: Option<
+            crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -183,7 +205,13 @@ impl<'a> Configuration<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigurationGetRecordOutput<'a> {
@@ -240,8 +268,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Configuration<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_metadata_configuration()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_metadata_configuration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.metadata.configuration"),

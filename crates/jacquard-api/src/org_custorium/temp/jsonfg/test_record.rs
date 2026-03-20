@@ -8,7 +8,13 @@
 /// A test record type for geometries
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestRecord<'a> {
@@ -20,7 +26,7 @@ pub struct TestRecord<'a> {
 
 pub mod test_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -28,37 +34,37 @@ pub mod test_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Geometry;
         type Text;
+        type Geometry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Geometry = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `geometry` field to Set
-    pub struct SetGeometry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGeometry<S> {}
-    impl<S: State> State for SetGeometry<S> {
-        type Geometry = Set<members::geometry>;
-        type Text = S::Text;
+        type Geometry = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Geometry = S::Geometry;
         type Text = Set<members::text>;
+        type Geometry = S::Geometry;
+    }
+    ///State transition - sets the `geometry` field to Set
+    pub struct SetGeometry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGeometry<S> {}
+    impl<S: State> State for SetGeometry<S> {
+        type Text = S::Text;
+        type Geometry = Set<members::geometry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `geometry` field
-        pub struct geometry(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `geometry` field
+        pub struct geometry(());
     }
 }
 
@@ -131,8 +137,8 @@ where
 impl<'a, S> TestRecordBuilder<'a, S>
 where
     S: test_record_state::State,
-    S::Geometry: test_record_state::IsSet,
     S::Text: test_record_state::IsSet,
+    S::Geometry: test_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestRecord<'a> {
@@ -173,14 +179,26 @@ impl<'a> TestRecord<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TestRecordGeometry<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestRecordGetRecordOutput<'a> {
@@ -238,7 +256,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestRecord<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 1024usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -248,11 +268,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestRecord<'a> {
     }
 }
 
-fn lexicon_doc_org_custorium_temp_jsonfg_testRecord()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_custorium_temp_jsonfg_testRecord() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.custorium.temp.jsonfg.testRecord"),
+        id: ::jacquard_common::CowStr::new_static(
+            "org.custorium.temp.jsonfg.testRecord",
+        ),
         revision: None,
         description: None,
         defs: {

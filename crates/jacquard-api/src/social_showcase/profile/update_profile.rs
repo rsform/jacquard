@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateProfile<'a> {
@@ -30,7 +30,7 @@ pub struct UpdateProfile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Featured showcase items
+    ///Featured showcase items
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub showcase: std::option::Option<Vec<crate::social_showcase::ShowcaseItem<'a>>>,
@@ -44,7 +44,13 @@ pub struct UpdateProfile<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateProfileOutput<'a> {
@@ -65,8 +71,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateProfileResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateProfile<'a> {
     const NSID: &'static str = "social.showcase.profile.updateProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateProfileResponse;
 }
 
@@ -75,8 +82,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateProfile<'a> {
 pub struct UpdateProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateProfileRequest {
     const PATH: &'static str = "/xrpc/social.showcase.profile.updateProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = UpdateProfile<'de>;
     type Response = UpdateProfileResponse;
 }

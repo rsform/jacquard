@@ -8,56 +8,62 @@
 /// A single site section for spores.garden. Each section is a record in a collection.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Section<'a> {
-    /// Collection NSID to display (for type=collection)
+    ///Collection NSID to display (for type=collection)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub collection: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Content for block sections
+    ///Content for block sections
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Content format
+    ///Content format
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub format: std::option::Option<SectionFormat<'a>>,
-    /// If true, hides the section header in display mode
+    ///If true, hides the section header in display mode
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub hide_header: std::option::Option<bool>,
-    /// Layout to use for rendering
+    ///Layout to use for rendering
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub layout: std::option::Option<SectionLayout<'a>>,
-    /// Maximum records to display
+    ///Maximum records to display
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
-    /// Specific record URIs to display (for type=records)
+    ///Specific record URIs to display (for type=records)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub records: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    /// AT-URI of the referenced record (for content/profile sections)
+    ///AT-URI of the referenced record (for content/profile sections)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    /// Record key within the collection to display (e.g. 'self' for profile)
+    ///Record key within the collection to display (e.g. 'self' for profile)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rkey: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Section title
+    ///Section title
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Section type
+    ///Section type
     #[serde(borrow)]
     pub r#type: SectionType<'a>,
 }
 
 pub mod section_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -119,7 +125,17 @@ impl<'a> SectionBuilder<'a, section_state::Empty> {
         SectionBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -128,12 +144,18 @@ impl<'a> SectionBuilder<'a, section_state::Empty> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `collection` field (optional)
-    pub fn collection(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn collection(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `collection` field to an Option value (optional)
-    pub fn maybe_collection(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_collection(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -141,7 +163,10 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn content(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -233,7 +258,10 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<jacquard_common::types::string::AtUri<'a>>) -> Self {
+    pub fn maybe_ref(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -241,7 +269,10 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `rkey` field (optional)
-    pub fn rkey(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn rkey(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
@@ -254,7 +285,10 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -673,7 +707,13 @@ impl jacquard_common::IntoStatic for SectionType<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SectionGetRecordOutput<'a> {
@@ -730,7 +770,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("content"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 500000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -744,22 +786,22 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
                     )
                     .count();
                 if count > 50000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "content",
-                            ),
-                            max: 50000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        max: 50000usize,
+                        actual: count,
+                    });
                 }
             }
         }
         if let Some(ref value) = self.limit {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("limit"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "limit",
+                    ),
                     max: 100i64,
                     actual: *value,
                 });
@@ -768,7 +810,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
         if let Some(ref value) = self.limit {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("limit"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "limit",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -778,7 +822,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("title"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -792,15 +838,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
                     )
                     .count();
                 if count > 200usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "title",
-                            ),
-                            max: 200usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 200usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -808,8 +852,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_site_section() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_coop_hypha_spores_site_section() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("coop.hypha.spores.site.section"),

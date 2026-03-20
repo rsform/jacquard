@@ -8,36 +8,42 @@
 /// User preferences for fragrance review scoring
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
-    /// Preference for fragrance complexity (1=simple, 5=intricate)
+    ///Preference for fragrance complexity (1=simple, 5=intricate)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub complexity_preference: std::option::Option<i64>,
-    /// Timestamp when settings were first created
+    ///Timestamp when settings were first created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// How important all-day longevity is (1=not important, 5=essential)
+    ///How important all-day longevity is (1=not important, 5=essential)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub longevity_priority: std::option::Option<i64>,
-    /// How the user prefers to be noticed (1=skin scent, 5=bold presence)
+    ///How the user prefers to be noticed (1=skin scent, 5=bold presence)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub presence_style: std::option::Option<i64>,
-    /// When viewing others' reviews: show their score or recalculate with your preferences
+    ///When viewing others' reviews: show their score or recalculate with your preferences
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub score_lens: std::option::Option<SettingsScoreLens<'a>>,
-    /// How user evaluates fragrances (1=instinct, 5=analytical)
+    ///How user evaluates fragrances (1=instinct, 5=analytical)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub scoring_approach: std::option::Option<i64>,
-    /// Timestamp when settings were last updated
+    ///Timestamp when settings were last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,7 +166,10 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `scoreLens` field (optional)
-    pub fn score_lens(mut self, value: impl Into<Option<SettingsScoreLens<'a>>>) -> Self {
+    pub fn score_lens(
+        mut self,
+        value: impl Into<Option<SettingsScoreLens<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -346,7 +355,13 @@ impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
@@ -469,7 +484,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("score_lens"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "score_lens",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -501,7 +518,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     }
 }
 
-fn lexicon_doc_social_drydown_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_drydown_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.drydown.settings"),

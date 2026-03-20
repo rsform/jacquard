@@ -8,42 +8,50 @@
 /// A single evaluation produced by an evaluator service. Exactly one of 'subject' (single target) or 'subjects' (batch) must be provided.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Evaluation<'a> {
-    /// Overall confidence in this evaluation (0-1000, where 1000 = 100.0%).
+    ///Overall confidence in this evaluation (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub confidence: std::option::Option<i64>,
-    /// Timestamp of when this evaluation was produced.
+    ///Timestamp of when this evaluation was produced.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Additional structured data as a JSON string. Escape hatch for experimental result types before they are formalized into the union.
+    ///Additional structured data as a JSON string. Escape hatch for experimental result types before they are formalized into the union.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dynamic_properties: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Identifier for the type of evaluation (must match one declared in the evaluator's service record).
+    ///Identifier for the type of evaluation (must match one declared in the evaluator's service record).
     #[serde(borrow)]
     pub evaluation_type: jacquard_common::CowStr<'a>,
-    /// Method/model provenance for this specific evaluation (overrides service-level method if set).
+    ///Method/model provenance for this specific evaluation (overrides service-level method if set).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub method: std::option::Option<crate::app_gainforest::evaluator::MethodInfo<'a>>,
-    /// If true, this is a negation/withdrawal of a previous evaluation (like label negation).
+    ///If true, this is a negation/withdrawal of a previous evaluation (like label negation).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub neg: std::option::Option<bool>,
-    /// The typed evaluation result. The $type field determines which result schema is used.
+    ///The typed evaluation result. The $type field determines which result schema is used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub result: std::option::Option<EvaluationResult<'a>>,
-    /// Single target record being evaluated. Use this OR subjects, not both.
+    ///Single target record being evaluated. Use this OR subjects, not both.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject: std::option::Option<crate::app_gainforest::evaluator::SubjectRef<'a>>,
-    /// Batch evaluation: multiple target records sharing the same result. Use this OR subject, not both.
+    ///Batch evaluation: multiple target records sharing the same result. Use this OR subject, not both.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<Vec<crate::app_gainforest::evaluator::SubjectRef<'a>>>,
-    /// AT-URI of a previous evaluation record that this one supersedes (e.g., model re-run with improved version).
+    pub subjects: std::option::Option<
+        Vec<crate::app_gainforest::evaluator::SubjectRef<'a>>,
+    >,
+    ///AT-URI of a previous evaluation record that this one supersedes (e.g., model re-run with improved version).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub supersedes: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -51,7 +59,7 @@ pub struct Evaluation<'a> {
 
 pub mod evaluation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -59,37 +67,37 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EvaluationType;
         type CreatedAt;
+        type EvaluationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EvaluationType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluation_type` field to Set
-    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
-    impl<S: State> State for SetEvaluationType<S> {
-        type EvaluationType = Set<members::evaluation_type>;
-        type CreatedAt = S::CreatedAt;
+        type EvaluationType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type EvaluationType = S::EvaluationType;
         type CreatedAt = Set<members::created_at>;
+        type EvaluationType = S::EvaluationType;
+    }
+    ///State transition - sets the `evaluation_type` field to Set
+    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
+    impl<S: State> State for SetEvaluationType<S> {
+        type CreatedAt = S::CreatedAt;
+        type EvaluationType = Set<members::evaluation_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluation_type` field
-        pub struct evaluation_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluation_type` field
+        pub struct evaluation_type(());
     }
 }
 
@@ -123,7 +131,18 @@ impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
     pub fn new() -> Self {
         EvaluationBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -171,7 +190,10 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
         self
     }
     /// Set the `dynamicProperties` field to an Option value (optional)
-    pub fn maybe_dynamic_properties(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_dynamic_properties(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -301,8 +323,8 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::EvaluationType: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::EvaluationType: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
@@ -359,7 +381,13 @@ impl<'a> Evaluation<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -371,14 +399,22 @@ pub enum EvaluationResult<'a> {
     #[serde(rename = "app.gainforest.evaluator.defs#verificationResult")]
     VerificationResult(Box<crate::app_gainforest::evaluator::VerificationResult<'a>>),
     #[serde(rename = "app.gainforest.evaluator.defs#classificationResult")]
-    ClassificationResult(Box<crate::app_gainforest::evaluator::ClassificationResult<'a>>),
+    ClassificationResult(
+        Box<crate::app_gainforest::evaluator::ClassificationResult<'a>>,
+    ),
     #[serde(rename = "app.gainforest.evaluator.defs#measurementResult")]
     MeasurementResult(Box<crate::app_gainforest::evaluator::MeasurementResult<'a>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationGetRecordOutput<'a> {
@@ -434,7 +470,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
         if let Some(ref value) = self.confidence {
             if *value > 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("confidence"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "confidence",
+                    ),
                     max: 1000i64,
                     actual: *value,
                 });
@@ -443,7 +481,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
         if let Some(ref value) = self.confidence {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("confidence"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "confidence",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -457,15 +497,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "dynamic_properties",
-                            ),
-                            max: 10000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "dynamic_properties",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -478,15 +516,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "evaluation_type",
-                            ),
-                            max: 64usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "evaluation_type",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -494,7 +530,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("subjects"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subjects",
+                    ),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -504,8 +542,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_evaluation()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_gainforest_evaluator_evaluation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.gainforest.evaluator.evaluation"),

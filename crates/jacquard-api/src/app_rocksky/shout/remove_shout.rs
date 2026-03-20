@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveShoutParams<'a> {
@@ -16,7 +22,7 @@ pub struct RemoveShoutParams<'a> {
 
 pub mod remove_shout_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -105,7 +111,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveShoutOutput<'a> {
@@ -123,7 +135,7 @@ pub struct RemoveShoutOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct RemoveShout;
 /// Response type for
@@ -138,8 +150,9 @@ impl jacquard_common::xrpc::XrpcResp for RemoveShoutResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RemoveShout {
     const NSID: &'static str = "app.rocksky.shout.removeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveShoutResponse;
 }
 
@@ -148,8 +161,9 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveShout {
 pub struct RemoveShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.removeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RemoveShout;
     type Response = RemoveShoutResponse;
 }

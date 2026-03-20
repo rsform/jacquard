@@ -57,6 +57,8 @@ pub enum ConstraintCheck {
     MinGraphemes { min: usize },
     Maximum { max: i64 },
     Minimum { min: i64 },
+    BlobMaxSize { max: usize },
+    BlobAccept { accept: Vec<String> },
 }
 
 /// Parsed lexicon attributes from type

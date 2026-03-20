@@ -7,28 +7,36 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Configure<'a> {
-    /// When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
+    ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disable_direct_rsvp: std::option::Option<bool>,
-    /// AT-URI of the event to configure.
+    ///AT-URI of the event to configure.
     #[serde(borrow)]
     pub event: jacquard_common::types::string::AtUri<'a>,
-    /// When true, RSVPs require a confirmed email address.
+    ///When true, RSVPs require a confirmed email address.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub require_confirmed_email: std::option::Option<bool>,
-    /// URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
+    ///URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rsvp_redirect_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub rsvp_redirect_url: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
 }
 
 pub mod configure_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -194,7 +202,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigureOutput<'a> {}
@@ -208,7 +216,7 @@ pub struct ConfigureOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -265,8 +273,9 @@ impl jacquard_common::xrpc::XrpcResp for ConfigureResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
     const NSID: &'static str = "events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ConfigureResponse;
 }
 
@@ -275,8 +284,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
 pub struct ConfigureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ConfigureRequest {
     const PATH: &'static str = "/xrpc/events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Configure<'de>;
     type Response = ConfigureResponse;
 }

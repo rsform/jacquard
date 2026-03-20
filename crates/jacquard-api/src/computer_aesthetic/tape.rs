@@ -7,35 +7,41 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tape<'a> {
-    /// Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)
+    ///Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub ac_url: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Short alphanumeric code for easy lookup (e.g., 'a3x')
+    ///Short alphanumeric code for easy lookup (e.g., 'a3x')
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
-    /// MongoDB ObjectId reference for bi-directional sync
+    ///MongoDB ObjectId reference for bi-directional sync
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// The unique slug identifier for this tape (e.g., wand-1729177200000)
+    ///The unique slug identifier for this tape (e.g., wand-1729177200000)
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
-    /// Thumbnail image from midpoint frame, 3x scaled with nearest neighbor (max 1MB)
+    ///Thumbnail image from midpoint frame, 3x scaled with nearest neighbor (max 1MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// MP4 video with 3x pixel scaling and audio soundtrack (max 50MB)
+    ///MP4 video with 3x pixel scaling and audio soundtrack (max 50MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub video: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// ISO 8601 timestamp when the tape was created
+    ///ISO 8601 timestamp when the tape was created
     pub when: jacquard_common::types::string::Datetime,
-    /// Direct URL to download the original ZIP file with frames and audio
+    ///Direct URL to download the original ZIP file with frames and audio
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub zip_url: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -43,7 +49,7 @@ pub struct Tape<'a> {
 
 pub mod tape_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -51,51 +57,51 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Code;
         type When;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Code = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Code = S::Code;
-        type When = S::When;
+        type Slug = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Slug = S::Slug;
         type Code = Set<members::code>;
         type When = S::When;
+        type Slug = S::Slug;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Slug = S::Slug;
         type Code = S::Code;
         type When = Set<members::when>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Code = S::Code;
+        type When = S::When;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `code` field
         pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -135,7 +141,10 @@ impl<'a> TapeBuilder<'a, tape_state::Empty> {
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `acUrl` field (optional)
-    pub fn ac_url(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn ac_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -167,7 +176,10 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn r#ref(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
@@ -226,7 +238,10 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<jacquard_common::types::blob::BlobRef<'a>>) -> Self {
+    pub fn maybe_video(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -253,7 +268,10 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `zipUrl` field (optional)
-    pub fn zip_url(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn zip_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
@@ -267,9 +285,9 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::Slug: tape_state::IsSet,
     S::Code: tape_state::IsSet,
     S::When: tape_state::IsSet,
+    S::Slug: tape_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tape<'a> {
@@ -322,7 +340,13 @@ impl<'a> Tape<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TapeGetRecordOutput<'a> {
@@ -375,11 +399,99 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tape<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.thumbnail {
+            {
+                let size = value.blob().size;
+                if size > 1048576usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumbnail",
+                        ),
+                        max: 1048576usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.thumbnail {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/jpeg", "image/png"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumbnail",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.video {
+            {
+                let size = value.blob().size;
+                if size > 52428800usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "video",
+                        ),
+                        max: 52428800usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.video {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["video/mp4"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "video",
+                        ),
+                        accepted: vec!["video/mp4".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
 
-fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.tape"),

@@ -8,15 +8,21 @@
 /// A Picosky room belonging to the user.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
-    /// List of users allowed to send messages in the room.
+    ///List of users allowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub allowlist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
-    /// List of users disallowed to send messages in the room.
+    ///List of users disallowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub denylist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
@@ -27,7 +33,7 @@ pub struct Room<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Topic title of the room.
+    ///Topic title of the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub topic: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -35,7 +41,7 @@ pub struct Room<'a> {
 
 pub mod room_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -175,12 +181,18 @@ where
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>) -> Self {
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -188,7 +200,10 @@ impl<'a, S: room_state::State> RoomBuilder<'a, S> {
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `topic` field (optional)
-    pub fn topic(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn topic(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
@@ -251,7 +266,13 @@ impl<'a> Room<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGetRecordOutput<'a> {
@@ -308,7 +329,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("languages"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "languages",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -319,7 +342,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 320usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 320usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -334,15 +359,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "name",
-                            ),
-                            max: 32usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -350,7 +373,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("tags"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -360,7 +385,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("topic"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "topic",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -374,15 +401,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "topic",
-                            ),
-                            max: 256usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "topic",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -390,7 +415,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     }
 }
 
-fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.psky.chat.room"),
@@ -584,18 +611,30 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModlistRef<'a> {
+    ///Defaults to `false`.
+    #[serde(default = "_default_active")]
     pub active: bool,
     #[serde(borrow)]
     pub users: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+fn _default_active() -> bool {
+    false
+}
+
 pub mod modlist_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -603,37 +642,37 @@ pub mod modlist_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Users;
         type Active;
+        type Users;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Users = Unset;
         type Active = Unset;
-    }
-    ///State transition - sets the `users` field to Set
-    pub struct SetUsers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsers<S> {}
-    impl<S: State> State for SetUsers<S> {
-        type Users = Set<members::users>;
-        type Active = S::Active;
+        type Users = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type Users = S::Users;
         type Active = Set<members::active>;
+        type Users = S::Users;
+    }
+    ///State transition - sets the `users` field to Set
+    pub struct SetUsers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsers<S> {}
+    impl<S: State> State for SetUsers<S> {
+        type Active = S::Active;
+        type Users = Set<members::users>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `users` field
-        pub struct users(());
         ///Marker type for the `active` field
         pub struct active(());
+        ///Marker type for the `users` field
+        pub struct users(());
     }
 }
 
@@ -706,8 +745,8 @@ where
 impl<'a, S> ModlistRefBuilder<'a, S>
 where
     S: modlist_ref_state::State,
-    S::Users: modlist_ref_state::IsSet,
     S::Active: modlist_ref_state::IsSet,
+    S::Users: modlist_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ModlistRef<'a> {

@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestPasswordReset<'a> {
@@ -34,8 +34,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestPasswordResetResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPasswordReset<'a> {
     const NSID: &'static str = "com.atproto.server.requestPasswordReset";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestPasswordResetResponse;
 }
 
@@ -44,8 +45,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPasswordReset<'a> {
 pub struct RequestPasswordResetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPasswordResetRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestPasswordReset";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RequestPasswordReset<'de>;
     type Response = RequestPasswordResetResponse;
 }

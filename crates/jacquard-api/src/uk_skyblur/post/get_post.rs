@@ -7,22 +7,28 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPost<'a> {
-    /// If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
+    ///If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub password: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Skyblur post at-uri. It shoud be uk.skyblur.post collection.
+    ///Skyblur post at-uri. It shoud be uk.skyblur.post collection.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod get_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -82,7 +88,10 @@ impl<'a> GetPostBuilder<'a, get_post_state::Empty> {
 
 impl<'a, S: get_post_state::State> GetPostBuilder<'a, S> {
     /// Set the `password` field (optional)
-    pub fn password(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn password(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -150,7 +159,7 @@ where
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostOutput<'a> {
@@ -162,11 +171,11 @@ pub struct GetPostOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub encrypt_cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
+    ///Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Description of the error code.
+    ///Description of the error code.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error_description: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -192,8 +201,9 @@ impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
     const NSID: &'static str = "uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GetPostResponse;
 }
 
@@ -202,8 +212,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = GetPost<'de>;
     type Response = GetPostResponse;
 }

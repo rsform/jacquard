@@ -7,11 +7,17 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListAssignmentsOutput<'a> {
-    /// List of plan assignments
+    ///List of plan assignments
     #[serde(borrow)]
     pub assignments: Vec<crate::app_chronosky::plan::get_assignment::PlanAssignment<'a>>,
 }
@@ -25,7 +31,7 @@ pub struct ListAssignmentsOutput<'a> {
     Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 pub struct ListAssignments;
 /// Response type for

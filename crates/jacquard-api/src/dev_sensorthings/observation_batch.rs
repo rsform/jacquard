@@ -7,23 +7,29 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BatchEntry<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub q: std::option::Option<BatchEntryQ<'a>>,
-    /// Observation result, same union as dev.sensorthings.observation
+    ///Observation result, same union as dev.sensorthings.observation
     #[serde(borrow)]
     pub result: BatchEntryResult<'a>,
-    /// phenomenonTime
+    ///phenomenonTime
     pub t: jacquard_common::types::string::Datetime,
 }
 
 pub mod batch_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -272,13 +278,20 @@ impl jacquard_common::IntoStatic for BatchEntryQ<'_> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BatchEntryResult<'a> {}
-fn lexicon_doc_dev_sensorthings_observationBatch()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.sensorthings.observationBatch"),
@@ -486,13 +499,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchEntry<'a> {
 /// A batch of observations for a single Datastream, covering a contiguous time window. Trades individual addressability for reduced commit overhead.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ObservationBatch<'a> {
     #[serde(borrow)]
     pub datastream: jacquard_common::types::string::AtUri<'a>,
-    /// Array of observations in chronological order
+    ///Array of observations in chronological order
     #[serde(borrow)]
     pub observations: Vec<crate::dev_sensorthings::observation_batch::BatchEntry<'a>>,
     pub window_end: jacquard_common::types::string::Datetime,
@@ -501,7 +520,7 @@ pub struct ObservationBatch<'a> {
 
 pub mod observation_batch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -509,67 +528,67 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WindowEnd;
-        type Observations;
         type Datastream;
+        type Observations;
         type WindowStart;
+        type WindowEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WindowEnd = Unset;
-        type Observations = Unset;
         type Datastream = Unset;
+        type Observations = Unset;
         type WindowStart = Unset;
-    }
-    ///State transition - sets the `window_end` field to Set
-    pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
-    impl<S: State> State for SetWindowEnd<S> {
-        type WindowEnd = Set<members::window_end>;
-        type Observations = S::Observations;
-        type Datastream = S::Datastream;
-        type WindowStart = S::WindowStart;
-    }
-    ///State transition - sets the `observations` field to Set
-    pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservations<S> {}
-    impl<S: State> State for SetObservations<S> {
-        type WindowEnd = S::WindowEnd;
-        type Observations = Set<members::observations>;
-        type Datastream = S::Datastream;
-        type WindowStart = S::WindowStart;
+        type WindowEnd = Unset;
     }
     ///State transition - sets the `datastream` field to Set
     pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDatastream<S> {}
     impl<S: State> State for SetDatastream<S> {
-        type WindowEnd = S::WindowEnd;
-        type Observations = S::Observations;
         type Datastream = Set<members::datastream>;
+        type Observations = S::Observations;
         type WindowStart = S::WindowStart;
+        type WindowEnd = S::WindowEnd;
+    }
+    ///State transition - sets the `observations` field to Set
+    pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservations<S> {}
+    impl<S: State> State for SetObservations<S> {
+        type Datastream = S::Datastream;
+        type Observations = Set<members::observations>;
+        type WindowStart = S::WindowStart;
+        type WindowEnd = S::WindowEnd;
     }
     ///State transition - sets the `window_start` field to Set
     pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWindowStart<S> {}
     impl<S: State> State for SetWindowStart<S> {
-        type WindowEnd = S::WindowEnd;
-        type Observations = S::Observations;
         type Datastream = S::Datastream;
+        type Observations = S::Observations;
         type WindowStart = Set<members::window_start>;
+        type WindowEnd = S::WindowEnd;
+    }
+    ///State transition - sets the `window_end` field to Set
+    pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
+    impl<S: State> State for SetWindowEnd<S> {
+        type Datastream = S::Datastream;
+        type Observations = S::Observations;
+        type WindowStart = S::WindowStart;
+        type WindowEnd = Set<members::window_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `window_end` field
-        pub struct window_end(());
-        ///Marker type for the `observations` field
-        pub struct observations(());
         ///Marker type for the `datastream` field
         pub struct datastream(());
+        ///Marker type for the `observations` field
+        pub struct observations(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
+        ///Marker type for the `window_end` field
+        pub struct window_end(());
     }
 }
 
@@ -578,7 +597,9 @@ pub struct ObservationBatchBuilder<'a, S: observation_batch_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<Vec<crate::dev_sensorthings::observation_batch::BatchEntry<'a>>>,
+        ::core::option::Option<
+            Vec<crate::dev_sensorthings::observation_batch::BatchEntry<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
@@ -682,10 +703,10 @@ where
 impl<'a, S> ObservationBatchBuilder<'a, S>
 where
     S: observation_batch_state::State,
-    S::WindowEnd: observation_batch_state::IsSet,
-    S::Observations: observation_batch_state::IsSet,
     S::Datastream: observation_batch_state::IsSet,
+    S::Observations: observation_batch_state::IsSet,
     S::WindowStart: observation_batch_state::IsSet,
+    S::WindowEnd: observation_batch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ObservationBatch<'a> {
@@ -730,7 +751,13 @@ impl<'a> ObservationBatch<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ObservationBatchGetRecordOutput<'a> {

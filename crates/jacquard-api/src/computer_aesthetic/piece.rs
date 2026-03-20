@@ -8,23 +8,29 @@
 /// A piece (interactive program) from Aesthetic Computer
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Piece<'a> {
-    /// MongoDB ObjectId reference for bidirectional sync
+    ///MongoDB ObjectId reference for bidirectional sync
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
-    /// The piece identifier (e.g., 'wand')
+    ///The piece identifier (e.g., 'wand')
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
-    /// Creation timestamp (ISO 8601)
+    ///Creation timestamp (ISO 8601)
     pub when: jacquard_common::types::string::Datetime,
 }
 
 pub mod piece_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,51 +38,51 @@ pub mod piece_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Ref;
         type Slug;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Ref = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Ref = S::Ref;
-        type Slug = S::Slug;
+        type When = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type When = S::When;
         type Ref = Set<members::r#ref>;
         type Slug = S::Slug;
+        type When = S::When;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type When = S::When;
         type Ref = S::Ref;
         type Slug = Set<members::slug>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Ref = S::Ref;
+        type Slug = S::Slug;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -169,9 +175,9 @@ where
 impl<'a, S> PieceBuilder<'a, S>
 where
     S: piece_state::State,
-    S::When: piece_state::IsSet,
     S::Ref: piece_state::IsSet,
     S::Slug: piece_state::IsSet,
+    S::When: piece_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Piece<'a> {
@@ -214,7 +220,13 @@ impl<'a> Piece<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PieceGetRecordOutput<'a> {
@@ -272,7 +284,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Piece<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 24usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("ref"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ref",
+                    ),
                     max: 24usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -283,7 +297,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Piece<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("slug"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slug",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -293,7 +309,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Piece<'a> {
     }
 }
 
-fn lexicon_doc_computer_aesthetic_piece() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_computer_aesthetic_piece() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("computer.aesthetic.piece"),

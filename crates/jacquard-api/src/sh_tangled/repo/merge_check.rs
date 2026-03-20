@@ -14,19 +14,21 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConflictInfo<'a> {
-    /// Name of the conflicted file
+    ///Name of the conflicted file
     #[serde(borrow)]
     pub filename: jacquard_common::CowStr<'a>,
-    /// Reason for the conflict
+    ///Reason for the conflict
     #[serde(borrow)]
     pub reason: jacquard_common::CowStr<'a>,
 }
 
-fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.mergeCheck"),
@@ -36,59 +38,63 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("conflictInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec![
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
                             ::jacquard_common::deps::smol_str::SmolStr::new_static("filename"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("filename"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Name of the conflicted file",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "filename",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Name of the conflicted file",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Reason for the conflict",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "reason",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Reason for the conflict",
+                                    ),
                                 ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -234,27 +240,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConflictInfo<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MergeCheck<'a> {
-    /// Target branch to merge into
+    ///Target branch to merge into
     #[serde(borrow)]
     pub branch: jacquard_common::CowStr<'a>,
-    /// DID of the repository owner
+    ///DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /// Name of the repository
+    ///Name of the repository
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    /// Patch or pull request to check for merge conflicts
+    ///Patch or pull request to check for merge conflicts
     #[serde(borrow)]
     pub patch: jacquard_common::CowStr<'a>,
 }
 
 pub mod merge_check_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -262,67 +274,67 @@ pub mod merge_check_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
+        type Patch;
         type Name;
         type Did;
-        type Patch;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
+        type Patch = Unset;
         type Name = Unset;
         type Did = Unset;
-        type Patch = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Name = S::Name;
-        type Did = S::Did;
-        type Patch = S::Patch;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Branch = S::Branch;
-        type Name = Set<members::name>;
-        type Did = S::Did;
-        type Patch = S::Patch;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Branch = S::Branch;
-        type Name = S::Name;
-        type Did = Set<members::did>;
-        type Patch = S::Patch;
+        type Branch = Unset;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
-        type Branch = S::Branch;
+        type Patch = Set<members::patch>;
         type Name = S::Name;
         type Did = S::Did;
-        type Patch = Set<members::patch>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Patch = S::Patch;
+        type Name = Set<members::name>;
+        type Did = S::Did;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Patch = S::Patch;
+        type Name = S::Name;
+        type Did = Set<members::did>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Patch = S::Patch;
+        type Name = S::Name;
+        type Did = S::Did;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
+        ///Marker type for the `patch` field
+        pub struct patch(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `patch` field
-        pub struct patch(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -435,10 +447,10 @@ where
 impl<'a, S> MergeCheckBuilder<'a, S>
 where
     S: merge_check_state::State,
-    S::Branch: merge_check_state::IsSet,
+    S::Patch: merge_check_state::IsSet,
     S::Name: merge_check_state::IsSet,
     S::Did: merge_check_state::IsSet,
-    S::Patch: merge_check_state::IsSet,
+    S::Branch: merge_check_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MergeCheck<'a> {
@@ -470,21 +482,29 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MergeCheckOutput<'a> {
-    /// List of files with merge conflicts
+    ///List of files with merge conflicts
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub conflicts: std::option::Option<Vec<crate::sh_tangled::repo::merge_check::ConflictInfo<'a>>>,
-    /// Error message if check failed
+    pub conflicts: std::option::Option<
+        Vec<crate::sh_tangled::repo::merge_check::ConflictInfo<'a>>,
+    >,
+    ///Error message if check failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Whether the merge has conflicts
+    ///Whether the merge has conflicts
     pub is_conflicted: bool,
-    /// Additional message about the merge check
+    ///Additional message about the merge check
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -502,8 +522,9 @@ impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
     const NSID: &'static str = "sh.tangled.repo.mergeCheck";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MergeCheckResponse;
 }
 
@@ -512,8 +533,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
 pub struct MergeCheckRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.mergeCheck";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = MergeCheck<'de>;
     type Response = MergeCheckResponse;
 }

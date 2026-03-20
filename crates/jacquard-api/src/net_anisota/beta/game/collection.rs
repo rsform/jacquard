@@ -8,66 +8,74 @@
 /// Beta version: Record representing a collected specimen in a player's collection
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Collection<'a> {
-    /// When the specimen was first acquired
+    ///When the specimen was first acquired
     pub acquired_at: jacquard_common::types::string::Datetime,
-    /// Common name of the specimen
+    ///Common name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub common_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// When the record was created
+    ///When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Taxonomic family
+    ///Taxonomic family
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub family: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Taxonomic genus
+    ///Taxonomic genus
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// When the record was last modified
+    ///When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// When the specimen was last encountered
+    ///When the specimen was last encountered
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_seen: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// URI of the game.log record that documents the acquisition of this specimen
+    ///URI of the game.log record that documents the acquisition of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Number of specimens collected
+    ///Number of specimens collected
     pub quantity: i64,
-    /// Rarity level of the specimen
+    ///Rarity level of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Scientific name of the specimen
+    ///Scientific name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub scientific_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// How the specimen was acquired
+    ///How the specimen was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_details:
-        std::option::Option<crate::net_anisota::beta::game::collection::SourceDetails<'a>>,
-    /// Taxonomic species
+    pub source_details: std::option::Option<
+        crate::net_anisota::beta::game::collection::SourceDetails<'a>,
+    >,
+    ///Taxonomic species
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub species: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub specimen_data:
-        std::option::Option<crate::net_anisota::beta::game::collection::SpecimenData<'a>>,
-    /// Unique identifier for the specimen
+    pub specimen_data: std::option::Option<
+        crate::net_anisota::beta::game::collection::SpecimenData<'a>,
+    >,
+    ///Unique identifier for the specimen
     #[serde(borrow)]
     pub specimen_id: jacquard_common::CowStr<'a>,
-    /// Collection status of this specimen
+    ///Collection status of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -75,7 +83,7 @@ pub struct Collection<'a> {
 
 pub mod collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -83,67 +91,67 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Quantity;
+        type AcquiredAt;
         type SpecimenId;
         type CreatedAt;
-        type AcquiredAt;
-        type Quantity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Quantity = Unset;
+        type AcquiredAt = Unset;
         type SpecimenId = Unset;
         type CreatedAt = Unset;
-        type AcquiredAt = Unset;
-        type Quantity = Unset;
-    }
-    ///State transition - sets the `specimen_id` field to Set
-    pub struct SetSpecimenId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpecimenId<S> {}
-    impl<S: State> State for SetSpecimenId<S> {
-        type SpecimenId = Set<members::specimen_id>;
-        type CreatedAt = S::CreatedAt;
-        type AcquiredAt = S::AcquiredAt;
-        type Quantity = S::Quantity;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SpecimenId = S::SpecimenId;
-        type CreatedAt = Set<members::created_at>;
-        type AcquiredAt = S::AcquiredAt;
-        type Quantity = S::Quantity;
-    }
-    ///State transition - sets the `acquired_at` field to Set
-    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
-    impl<S: State> State for SetAcquiredAt<S> {
-        type SpecimenId = S::SpecimenId;
-        type CreatedAt = S::CreatedAt;
-        type AcquiredAt = Set<members::acquired_at>;
-        type Quantity = S::Quantity;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
+        type Quantity = Set<members::quantity>;
+        type AcquiredAt = S::AcquiredAt;
         type SpecimenId = S::SpecimenId;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `acquired_at` field to Set
+    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
+    impl<S: State> State for SetAcquiredAt<S> {
+        type Quantity = S::Quantity;
+        type AcquiredAt = Set<members::acquired_at>;
+        type SpecimenId = S::SpecimenId;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `specimen_id` field to Set
+    pub struct SetSpecimenId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpecimenId<S> {}
+    impl<S: State> State for SetSpecimenId<S> {
+        type Quantity = S::Quantity;
         type AcquiredAt = S::AcquiredAt;
-        type Quantity = Set<members::quantity>;
+        type SpecimenId = Set<members::specimen_id>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type SpecimenId = S::SpecimenId;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
+        ///Marker type for the `acquired_at` field
+        pub struct acquired_at(());
         ///Marker type for the `specimen_id` field
         pub struct specimen_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `acquired_at` field
-        pub struct acquired_at(());
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
     }
 }
 
@@ -163,9 +171,13 @@ pub struct CollectionBuilder<'a, S: collection_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::collection::SourceDetails<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::collection::SourceDetails<'a>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::collection::SpecimenData<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::collection::SpecimenData<'a>,
+        >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -185,8 +197,23 @@ impl<'a> CollectionBuilder<'a, collection_state::Empty> {
         CollectionBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -214,12 +241,18 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `commonName` field (optional)
-    pub fn common_name(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn common_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `commonName` field to an Option value (optional)
-    pub fn maybe_common_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_common_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -246,7 +279,10 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn family(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -259,7 +295,10 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `genus` field (optional)
-    pub fn genus(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn genus(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
@@ -310,12 +349,18 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `logRecordUri` field (optional)
-    pub fn log_record_uri(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn log_record_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `logRecordUri` field to an Option value (optional)
-    pub fn maybe_log_record_uri(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_log_record_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -342,7 +387,10 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn rarity(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
@@ -363,7 +411,10 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
         self
     }
     /// Set the `scientificName` field to an Option value (optional)
-    pub fn maybe_scientific_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_scientific_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -371,7 +422,10 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
@@ -386,7 +440,9 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `sourceDetails` field (optional)
     pub fn source_details(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::collection::SourceDetails<'a>>>,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::collection::SourceDetails<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
@@ -403,7 +459,10 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `species` field (optional)
-    pub fn species(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn species(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
@@ -418,7 +477,9 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `specimenData` field (optional)
     pub fn specimen_data(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::collection::SpecimenData<'a>>>,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::collection::SpecimenData<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
@@ -454,7 +515,10 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
     }
@@ -468,10 +532,10 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S> CollectionBuilder<'a, S>
 where
     S: collection_state::State,
+    S::Quantity: collection_state::IsSet,
+    S::AcquiredAt: collection_state::IsSet,
     S::SpecimenId: collection_state::IsSet,
     S::CreatedAt: collection_state::IsSet,
-    S::AcquiredAt: collection_state::IsSet,
-    S::Quantity: collection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {
@@ -542,7 +606,13 @@ impl<'a> Collection<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionGetRecordOutput<'a> {
@@ -599,7 +669,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("common_name"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "common_name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -609,7 +681,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("family"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "family",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -619,7 +693,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("genus"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "genus",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -629,7 +705,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             let value = &self.quantity;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("quantity"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -651,7 +729,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("species"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "species",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -662,7 +742,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("specimen_id"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "specimen_id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -672,8 +754,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static>
-{
+fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.collection"),
@@ -1135,62 +1218,62 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("specimenData"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Complete specimen information",
-                        )),
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "authorship",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "authorship",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Scientific authorship of the species",
+                                    ),
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Scientific authorship of the species",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Detailed description of the specimen",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Detailed description of the specimen",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -1207,22 +1290,22 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
-    /// Number of attempts before successful capture
+    ///Number of attempts before successful capture
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub attempts: std::option::Option<i64>,
-    /// Probability used when catching this specimen (decimal string, e.g. '0.75')
+    ///Probability used when catching this specimen (decimal string, e.g. '0.75')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URI of the game card that provided this specimen
+    ///URI of the game card that provided this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Location where specimen was found or observed
+    ///Location where specimen was found or observed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub location: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -1255,15 +1338,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpecimenData<'a> {
-    /// Scientific authorship of the species
+    ///Scientific authorship of the species
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub authorship: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Detailed description of the specimen
+    ///Detailed description of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,

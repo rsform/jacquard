@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestPhoneVerification<'a> {
@@ -34,8 +34,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestPhoneVerificationResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPhoneVerification<'a> {
     const NSID: &'static str = "com.atproto.temp.requestPhoneVerification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestPhoneVerificationResponse;
 }
 
@@ -44,8 +45,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPhoneVerification<'a> {
 pub struct RequestPhoneVerificationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPhoneVerificationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.requestPhoneVerification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = RequestPhoneVerification<'de>;
     type Response = RequestPhoneVerificationResponse;
 }

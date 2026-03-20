@@ -8,27 +8,33 @@
 /// A post (response) in a thread
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
-    /// Optional attached media (image or audio)
+    ///Optional attached media (image or audio)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub blobs: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
-    /// Timestamp of post creation
+    ///Timestamp of post creation
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The content of the post
+    ///The content of the post
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-    /// AT URI of the thread this post belongs to
+    ///AT URI of the thread this post belongs to
     #[serde(borrow)]
     pub thread_uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -36,49 +42,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ThreadUri;
         type Text;
+        type ThreadUri;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ThreadUri = Unset;
         type Text = Unset;
+        type ThreadUri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `thread_uri` field to Set
-    pub struct SetThreadUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThreadUri<S> {}
-    impl<S: State> State for SetThreadUri<S> {
-        type ThreadUri = Set<members::thread_uri>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type ThreadUri = S::ThreadUri;
         type Text = Set<members::text>;
+        type ThreadUri = S::ThreadUri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `thread_uri` field to Set
+    pub struct SetThreadUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThreadUri<S> {}
+    impl<S: State> State for SetThreadUri<S> {
+        type Text = S::Text;
+        type ThreadUri = Set<members::thread_uri>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ThreadUri = S::ThreadUri;
         type Text = S::Text;
+        type ThreadUri = S::ThreadUri;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thread_uri` field
-        pub struct thread_uri(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `thread_uri` field
+        pub struct thread_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -193,8 +199,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::ThreadUri: comment_state::IsSet,
     S::Text: comment_state::IsSet,
+    S::ThreadUri: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct
@@ -240,7 +246,13 @@ impl<'a> Comment<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
@@ -297,7 +309,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 1usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("blobs"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blobs",
+                    ),
                     max: 1usize,
                     actual: value.len(),
                 });
@@ -308,7 +322,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("text"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 4000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -323,15 +339,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
                     )
                     .count();
                 if count > 40000usize {
-                    return Err(
-                        ::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                                "text",
-                            ),
-                            max: 40000usize,
-                            actual: count,
-                        },
-                    );
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 40000usize,
+                        actual: count,
+                    });
                 }
             }
         }
@@ -339,7 +353,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-fn lexicon_doc_blue_skytalk_talk_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blue_skytalk_talk_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.skytalk.talk.comment"),

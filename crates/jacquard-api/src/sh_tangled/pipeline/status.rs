@@ -7,33 +7,39 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
-    /// time of creation of this status update
+    ///time of creation of this status update
     pub created_at: jacquard_common::types::string::Datetime,
-    /// error message if failed
+    ///error message if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// exit code if failed
+    ///exit code if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub exit_code: std::option::Option<i64>,
-    /// ATURI of the pipeline
+    ///ATURI of the pipeline
     #[serde(borrow)]
     pub pipeline: jacquard_common::types::string::AtUri<'a>,
-    /// status of the workflow
+    ///status of the workflow
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
-    /// name of the workflow within this pipeline
+    ///name of the workflow within this pipeline
     #[serde(borrow)]
     pub workflow: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -41,67 +47,67 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Workflow;
-        type CreatedAt;
         type Pipeline;
         type Status;
+        type Workflow;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Workflow = Unset;
-        type CreatedAt = Unset;
         type Pipeline = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
-    impl<S: State> State for SetWorkflow<S> {
-        type Workflow = Set<members::workflow>;
-        type CreatedAt = S::CreatedAt;
-        type Pipeline = S::Pipeline;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Workflow = S::Workflow;
-        type CreatedAt = Set<members::created_at>;
-        type Pipeline = S::Pipeline;
-        type Status = S::Status;
+        type Workflow = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `pipeline` field to Set
     pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPipeline<S> {}
     impl<S: State> State for SetPipeline<S> {
-        type Workflow = S::Workflow;
-        type CreatedAt = S::CreatedAt;
         type Pipeline = Set<members::pipeline>;
         type Status = S::Status;
+        type Workflow = S::Workflow;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Workflow = S::Workflow;
-        type CreatedAt = S::CreatedAt;
         type Pipeline = S::Pipeline;
         type Status = Set<members::status>;
+        type Workflow = S::Workflow;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
+    impl<S: State> State for SetWorkflow<S> {
+        type Pipeline = S::Pipeline;
+        type Status = S::Status;
+        type Workflow = Set<members::workflow>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Pipeline = S::Pipeline;
+        type Status = S::Status;
+        type Workflow = S::Workflow;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `workflow` field
-        pub struct workflow(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `pipeline` field
         pub struct pipeline(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `workflow` field
+        pub struct workflow(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -158,7 +164,10 @@ where
 
 impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn error(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
@@ -242,10 +251,10 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Workflow: status_state::IsSet,
-    S::CreatedAt: status_state::IsSet,
     S::Pipeline: status_state::IsSet,
     S::Status: status_state::IsSet,
+    S::Workflow: status_state::IsSet,
+    S::CreatedAt: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -294,7 +303,13 @@ impl<'a> Status<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusGetRecordOutput<'a> {
@@ -351,7 +366,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
 }
 
-fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.pipeline.status"),

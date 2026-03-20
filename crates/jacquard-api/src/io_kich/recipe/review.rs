@@ -8,29 +8,35 @@
 /// Record key is the recipe's rkey for one-review-per-user-per-recipe; pass recipeId as rkey
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
-    /// Optional review comment in GitHub-flavored markdown
+    ///Optional review comment in GitHub-flavored markdown
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// When this review was created
+    ///When this review was created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Star rating as integer 1-5 (1=1 star, 5=5 stars)
+    ///Star rating as integer 1-5 (1=1 star, 5=5 stars)
     pub rating: i64,
-    /// Reference to the recipe being reviewed
+    ///Reference to the recipe being reviewed
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    /// When this review was last updated
+    ///When this review was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -119,7 +125,10 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn comment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
@@ -258,7 +267,13 @@ impl<'a> Review<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
@@ -315,7 +330,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("comment"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "comment",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -325,7 +342,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             let value = &self.rating;
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -335,7 +354,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             let value = &self.rating;
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rating"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -345,7 +366,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     }
 }
 
-fn lexicon_doc_io_kich_recipe_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_kich_recipe_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.kich.recipe.review"),

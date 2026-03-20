@@ -8,28 +8,34 @@
 /// User subscription to an evaluator service. Published by the user (not the evaluator) to declare they want evaluations.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Subscription<'a> {
-    /// Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
+    ///Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// Timestamp of when this subscription was created.
+    ///Timestamp of when this subscription was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.
+    ///Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub evaluation_types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    /// DID of the evaluator service to subscribe to.
+    ///DID of the evaluator service to subscribe to.
     #[serde(borrow)]
     pub evaluator: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod subscription_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -37,37 +43,37 @@ pub mod subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Evaluator;
         type CreatedAt;
+        type Evaluator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Evaluator = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluator` field to Set
-    pub struct SetEvaluator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluator<S> {}
-    impl<S: State> State for SetEvaluator<S> {
-        type Evaluator = Set<members::evaluator>;
-        type CreatedAt = S::CreatedAt;
+        type Evaluator = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Evaluator = S::Evaluator;
         type CreatedAt = Set<members::created_at>;
+        type Evaluator = S::Evaluator;
+    }
+    ///State transition - sets the `evaluator` field to Set
+    pub struct SetEvaluator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluator<S> {}
+    impl<S: State> State for SetEvaluator<S> {
+        type CreatedAt = S::CreatedAt;
+        type Evaluator = Set<members::evaluator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluator` field
-        pub struct evaluator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluator` field
+        pub struct evaluator(());
     }
 }
 
@@ -111,7 +117,10 @@ impl<'a, S: subscription_state::State> SubscriptionBuilder<'a, S> {
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn maybe_collections(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -177,8 +186,8 @@ where
 impl<'a, S> SubscriptionBuilder<'a, S>
 where
     S: subscription_state::State,
-    S::Evaluator: subscription_state::IsSet,
     S::CreatedAt: subscription_state::IsSet,
+    S::Evaluator: subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscription<'a> {
@@ -223,7 +232,13 @@ impl<'a> Subscription<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscriptionGetRecordOutput<'a> {
@@ -280,7 +295,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("collections"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "collections",
+                    ),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -302,11 +319,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_subscription()
--> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_gainforest_evaluator_subscription() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.gainforest.evaluator.subscription"),
+        id: ::jacquard_common::CowStr::new_static(
+            "app.gainforest.evaluator.subscription",
+        ),
         revision: None,
         description: None,
         defs: {

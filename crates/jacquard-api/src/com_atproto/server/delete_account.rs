@@ -7,7 +7,13 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAccount<'a> {
@@ -21,7 +27,7 @@ pub struct DeleteAccount<'a> {
 
 pub mod delete_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -30,50 +36,50 @@ pub mod delete_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Password;
         type Token;
+        type Password;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Password = Unset;
         type Token = Unset;
+        type Password = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Did = Set<members::did>;
+        type Token = S::Token;
         type Password = S::Password;
-        type Token = S::Token;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
-        type Did = S::Did;
-        type Password = Set<members::password>;
-        type Token = S::Token;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
         type Did = S::Did;
-        type Password = S::Password;
         type Token = Set<members::token>;
+        type Password = S::Password;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPassword<S> {}
+    impl<S: State> State for SetPassword<S> {
+        type Did = S::Did;
+        type Token = S::Token;
+        type Password = Set<members::password>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `password` field
-        pub struct password(());
         ///Marker type for the `token` field
         pub struct token(());
+        ///Marker type for the `password` field
+        pub struct password(());
     }
 }
 
@@ -167,8 +173,8 @@ impl<'a, S> DeleteAccountBuilder<'a, S>
 where
     S: delete_account_state::State,
     S::Did: delete_account_state::IsSet,
-    S::Password: delete_account_state::IsSet,
     S::Token: delete_account_state::IsSet,
+    S::Password: delete_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {
@@ -206,7 +212,7 @@ where
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -251,8 +257,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
     const NSID: &'static str = "com.atproto.server.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteAccountResponse;
 }
 
@@ -261,8 +268,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteAccount<'de>;
     type Response = DeleteAccountResponse;
 }

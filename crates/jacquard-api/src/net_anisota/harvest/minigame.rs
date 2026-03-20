@@ -8,64 +8,71 @@
 /// A record of a harvest minigame round played by a user
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Minigame<'a> {
-    /// Version of the Anisota client
+    ///Version of the Anisota client
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// When the record was created
+    ///When the record was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    /// Number of shapes harvested early (during growth phase)
+    ///Number of shapes harvested early (during growth phase)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub early_harvests: std::option::Option<i64>,
-    /// Bonus points awarded for harvest efficiency (percentage of shapes collected)
+    ///Bonus points awarded for harvest efficiency (percentage of shapes collected)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub efficiency_bonus: std::option::Option<i64>,
-    /// Final score achieved in the round
+    ///Final score achieved in the round
     pub final_score: i64,
-    /// Where the game was played: dedicated minigame page or harvest loading screen
+    ///Where the game was played: dedicated minigame page or harvest loading screen
     #[serde(borrow)]
     pub game_context: jacquard_common::CowStr<'a>,
-    /// Number of shapes harvested late (during decay phase)
+    ///Number of shapes harvested late (during decay phase)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub late_harvests: std::option::Option<i64>,
-    /// Percentage indicating how close on average the user harvested at peak timing (scaled by 100, so 9550 = 95.50%)
+    ///Percentage indicating how close on average the user harvested at peak timing (scaled by 100, so 9550 = 95.50%)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub peak_harvest_rate: std::option::Option<i64>,
-    /// Bonus points awarded for achieving high peak harvest rate
+    ///Bonus points awarded for achieving high peak harvest rate
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub peak_rate_bonus: std::option::Option<i64>,
-    /// Number of shapes harvested at perfect (peak) timing
+    ///Number of shapes harvested at perfect (peak) timing
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub perfect_harvests: std::option::Option<i64>,
-    /// When the game round was played (ISO 8601)
+    ///When the game round was played (ISO 8601)
     pub played_at: jacquard_common::types::string::Datetime,
-    /// Average rate of points scored per second (scaled by 100, so 123 = 1.23 points/second)
+    ///Average rate of points scored per second (scaled by 100, so 123 = 1.23 points/second)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub points_per_second: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity_breakdown:
-        std::option::Option<crate::net_anisota::harvest::minigame::RarityBreakdown<'a>>,
-    /// Duration of the round in seconds
+    pub rarity_breakdown: std::option::Option<
+        crate::net_anisota::harvest::minigame::RarityBreakdown<'a>,
+    >,
+    ///Duration of the round in seconds
     pub round_duration: i64,
-    /// Total number of shapes collected/harvested
+    ///Total number of shapes collected/harvested
     pub shapes_collected: i64,
-    /// Total number of shapes that expired without being harvested
+    ///Total number of shapes that expired without being harvested
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub shapes_missed: std::option::Option<i64>,
-    /// Total number of shapes spawned during the round (collected + missed)
+    ///Total number of shapes spawned during the round (collected + missed)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub total_shapes_spawned: std::option::Option<i64>,
 }
 
 pub mod minigame_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -73,85 +80,85 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RoundDuration;
-        type PlayedAt;
-        type GameContext;
         type FinalScore;
+        type GameContext;
         type ShapesCollected;
+        type PlayedAt;
+        type RoundDuration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RoundDuration = Unset;
-        type PlayedAt = Unset;
-        type GameContext = Unset;
         type FinalScore = Unset;
+        type GameContext = Unset;
         type ShapesCollected = Unset;
-    }
-    ///State transition - sets the `round_duration` field to Set
-    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
-    impl<S: State> State for SetRoundDuration<S> {
-        type RoundDuration = Set<members::round_duration>;
-        type PlayedAt = S::PlayedAt;
-        type GameContext = S::GameContext;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type RoundDuration = S::RoundDuration;
-        type PlayedAt = Set<members::played_at>;
-        type GameContext = S::GameContext;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
-    }
-    ///State transition - sets the `game_context` field to Set
-    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameContext<S> {}
-    impl<S: State> State for SetGameContext<S> {
-        type RoundDuration = S::RoundDuration;
-        type PlayedAt = S::PlayedAt;
-        type GameContext = Set<members::game_context>;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
+        type PlayedAt = Unset;
+        type RoundDuration = Unset;
     }
     ///State transition - sets the `final_score` field to Set
     pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFinalScore<S> {}
     impl<S: State> State for SetFinalScore<S> {
-        type RoundDuration = S::RoundDuration;
-        type PlayedAt = S::PlayedAt;
-        type GameContext = S::GameContext;
         type FinalScore = Set<members::final_score>;
+        type GameContext = S::GameContext;
         type ShapesCollected = S::ShapesCollected;
+        type PlayedAt = S::PlayedAt;
+        type RoundDuration = S::RoundDuration;
+    }
+    ///State transition - sets the `game_context` field to Set
+    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGameContext<S> {}
+    impl<S: State> State for SetGameContext<S> {
+        type FinalScore = S::FinalScore;
+        type GameContext = Set<members::game_context>;
+        type ShapesCollected = S::ShapesCollected;
+        type PlayedAt = S::PlayedAt;
+        type RoundDuration = S::RoundDuration;
     }
     ///State transition - sets the `shapes_collected` field to Set
     pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
     impl<S: State> State for SetShapesCollected<S> {
-        type RoundDuration = S::RoundDuration;
-        type PlayedAt = S::PlayedAt;
-        type GameContext = S::GameContext;
         type FinalScore = S::FinalScore;
+        type GameContext = S::GameContext;
         type ShapesCollected = Set<members::shapes_collected>;
+        type PlayedAt = S::PlayedAt;
+        type RoundDuration = S::RoundDuration;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type FinalScore = S::FinalScore;
+        type GameContext = S::GameContext;
+        type ShapesCollected = S::ShapesCollected;
+        type PlayedAt = Set<members::played_at>;
+        type RoundDuration = S::RoundDuration;
+    }
+    ///State transition - sets the `round_duration` field to Set
+    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
+    impl<S: State> State for SetRoundDuration<S> {
+        type FinalScore = S::FinalScore;
+        type GameContext = S::GameContext;
+        type ShapesCollected = S::ShapesCollected;
+        type PlayedAt = S::PlayedAt;
+        type RoundDuration = Set<members::round_duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `round_duration` field
-        pub struct round_duration(());
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
-        ///Marker type for the `game_context` field
-        pub struct game_context(());
         ///Marker type for the `final_score` field
         pub struct final_score(());
+        ///Marker type for the `game_context` field
+        pub struct game_context(());
         ///Marker type for the `shapes_collected` field
         pub struct shapes_collected(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
+        ///Marker type for the `round_duration` field
+        pub struct round_duration(());
     }
 }
 
@@ -171,7 +178,9 @@ pub struct MinigameBuilder<'a, S: minigame_state::State> {
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<i64>,
-        ::core::option::Option<crate::net_anisota::harvest::minigame::RarityBreakdown<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::harvest::minigame::RarityBreakdown<'a>,
+        >,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
@@ -193,8 +202,23 @@ impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
         MinigameBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -203,12 +227,18 @@ impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
 
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `clientVersion` field (optional)
-    pub fn client_version(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn client_version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `clientVersion` field to an Option value (optional)
-    pub fn maybe_client_version(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_client_version(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -385,7 +415,9 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `rarityBreakdown` field (optional)
     pub fn rarity_breakdown(
         mut self,
-        value: impl Into<Option<crate::net_anisota::harvest::minigame::RarityBreakdown<'a>>>,
+        value: impl Into<
+            Option<crate::net_anisota::harvest::minigame::RarityBreakdown<'a>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
@@ -467,11 +499,11 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S> MinigameBuilder<'a, S>
 where
     S: minigame_state::State,
-    S::RoundDuration: minigame_state::IsSet,
-    S::PlayedAt: minigame_state::IsSet,
-    S::GameContext: minigame_state::IsSet,
     S::FinalScore: minigame_state::IsSet,
+    S::GameContext: minigame_state::IsSet,
     S::ShapesCollected: minigame_state::IsSet,
+    S::PlayedAt: minigame_state::IsSet,
+    S::RoundDuration: minigame_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Minigame<'a> {
@@ -542,7 +574,13 @@ impl<'a> Minigame<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MinigameGetRecordOutput<'a> {
@@ -621,7 +659,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Minigame<'a> {
             let value = &self.final_score;
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("final_score"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "final_score",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -743,7 +783,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Minigame<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.anisota.harvest.minigame"),
@@ -1036,88 +1078,88 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("rarityBreakdown"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "Count of each rarity level collected",
-                        )),
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("common"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rare"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uncommon"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "veryCommon",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("veryRare"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: Some(0i64),
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
-                    },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "rarityBreakdown",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Count of each rarity level collected",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "common",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "rare",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uncommon",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "veryCommon",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "veryRare",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: Some(0i64),
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
             );
             map
         },
@@ -1134,23 +1176,23 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RarityBreakdown<'a> {
-    /// Number of common (triangle) shapes collected
+    ///Number of common (triangle) shapes collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub common: std::option::Option<i64>,
-    /// Number of rare (star) shapes collected
+    ///Number of rare (star) shapes collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rare: std::option::Option<i64>,
-    /// Number of uncommon (diamond) shapes collected
+    ///Number of uncommon (diamond) shapes collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub uncommon: std::option::Option<i64>,
-    /// Number of very common (circle) shapes collected
+    ///Number of very common (circle) shapes collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub very_common: std::option::Option<i64>,
-    /// Number of very rare (sparkle) shapes collected
+    ///Number of very rare (sparkle) shapes collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub very_rare: std::option::Option<i64>,
 }
@@ -1171,7 +1213,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
         if let Some(ref value) = self.common {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("common"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "common",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1180,7 +1224,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
         if let Some(ref value) = self.rare {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("rare"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rare",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1189,7 +1235,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
         if let Some(ref value) = self.uncommon {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("uncommon"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uncommon",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1198,7 +1246,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
         if let Some(ref value) = self.very_common {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("very_common"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "very_common",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1207,7 +1257,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
         if let Some(ref value) = self.very_rare {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("very_rare"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "very_rare",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

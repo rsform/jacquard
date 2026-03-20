@@ -7,7 +7,13 @@
 
 /// Raw binary part data
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UploadPart {
@@ -23,11 +29,11 @@ pub struct UploadPart {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UploadPartOutput<'a> {
-    /// ETag of the uploaded part, required for completeUpload
+    ///ETag of the uploaded part, required for completeUpload
     #[serde(borrow)]
     pub etag: jacquard_common::CowStr<'a>,
 }
@@ -42,7 +48,7 @@ pub struct UploadPartOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -96,19 +102,24 @@ impl jacquard_common::xrpc::XrpcResp for UploadPartResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for UploadPart {
     const NSID: &'static str = "io.atcr.hold.uploadPart";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Response = UploadPartResponse;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
         Self: serde::Deserialize<'de>,
     {
-        Ok(Box::new(Self {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        }))
+        Ok(
+            Box::new(Self {
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+            }),
+        )
     }
 }
 
@@ -117,8 +128,9 @@ impl jacquard_common::xrpc::XrpcRequest for UploadPart {
 pub struct UploadPartRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadPartRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.uploadPart";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Request<'de> = UploadPart;
     type Response = UploadPartResponse;
 }

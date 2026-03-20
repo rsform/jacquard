@@ -14,18 +14,24 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Slot<'a> {
-    /// Key into the host's stash map
+    ///Key into the host's stash map
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
 }
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SlotOutput<'a> {
@@ -46,8 +52,9 @@ impl jacquard_common::xrpc::XrpcResp for SlotResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Slot<'a> {
     const NSID: &'static str = "at.inlay.Slot";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SlotResponse;
 }
 
@@ -56,8 +63,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Slot<'a> {
 pub struct SlotRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SlotRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Slot";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = Slot<'de>;
     type Response = SlotResponse;
 }

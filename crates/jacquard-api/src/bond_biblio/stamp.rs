@@ -8,23 +8,29 @@
 /// A completion attestation issued by a librarian
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stamp<'a> {
-    /// AT-URI of the reader's book record. Lexicon-agnostic: works with bond.biblio.book, buzz.bookhive.book, or any future book lexicon.
+    ///AT-URI of the reader's book record. Lexicon-agnostic: works with bond.biblio.book, buzz.bookhive.book, or any future book lexicon.
     #[serde(borrow)]
     pub book: jacquard_common::types::string::AtUri<'a>,
-    /// When this stamp was issued
+    ///When this stamp was issued
     pub created_at: jacquard_common::types::string::Datetime,
-    /// AT-URI of the reading list this stamp is for
+    ///AT-URI of the reading list this stamp is for
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod stamp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -32,51 +38,51 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
-        type List;
         type CreatedAt;
+        type List;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
-        type List = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type List = S::List;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type Book = S::Book;
-        type List = Set<members::list>;
-        type CreatedAt = S::CreatedAt;
+        type List = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Book = S::Book;
-        type List = S::List;
         type CreatedAt = Set<members::created_at>;
+        type List = S::List;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type CreatedAt = S::CreatedAt;
+        type List = Set<members::list>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type CreatedAt = S::CreatedAt;
+        type List = S::List;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
@@ -169,9 +175,9 @@ where
 impl<'a, S> StampBuilder<'a, S>
 where
     S: stamp_state::State,
-    S::Book: stamp_state::IsSet,
-    S::List: stamp_state::IsSet,
     S::CreatedAt: stamp_state::IsSet,
+    S::List: stamp_state::IsSet,
+    S::Book: stamp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stamp<'a> {
@@ -214,7 +220,13 @@ impl<'a> Stamp<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StampGetRecordOutput<'a> {

@@ -268,22 +268,28 @@ impl jacquard_common::IntoStatic for ActivityType<'_> {
 /// A split within an activity, like a mile split or kilometer split.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Split<'a> {
-    /// The distance covered in this split. Follows the units defined in the parent.
+    ///The distance covered in this split. Follows the units defined in the parent.
     #[serde(borrow)]
     pub distance: jacquard_common::CowStr<'a>,
-    /// The duration of the split in seconds.
+    ///The duration of the split in seconds.
     pub duration: i64,
-    /// The order of the split within the activity, starting at 1.
+    ///The order of the split within the activity, starting at 1.
     pub order: i64,
 }
 
 pub mod split_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -412,7 +418,10 @@ where
     S::Order: split_state::IsUnset,
 {
     /// Set the `order` field (required)
-    pub fn order(mut self, value: impl Into<i64>) -> SplitBuilder<'a, split_state::SetOrder<S>> {
+    pub fn order(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SplitBuilder<'a, split_state::SetOrder<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SplitBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -455,7 +464,9 @@ where
     }
 }
 
-fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.pace.feed.defs"),

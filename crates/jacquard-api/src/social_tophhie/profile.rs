@@ -8,17 +8,23 @@
 /// Granular communication consent flags.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommunicationPreferences<'a> {
-    /// True if the user consents to receive marketing communications.
+    ///True if the user consents to receive marketing communications.
     pub marketing: bool,
 }
 
 pub mod communication_preferences_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -49,7 +55,10 @@ pub mod communication_preferences_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct CommunicationPreferencesBuilder<'a, S: communication_preferences_state::State> {
+pub struct CommunicationPreferencesBuilder<
+    'a,
+    S: communication_preferences_state::State,
+> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (::core::option::Option<bool>,),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -57,7 +66,10 @@ pub struct CommunicationPreferencesBuilder<'a, S: communication_preferences_stat
 
 impl<'a> CommunicationPreferences<'a> {
     /// Create a new builder for this type
-    pub fn new() -> CommunicationPreferencesBuilder<'a, communication_preferences_state::Empty> {
+    pub fn new() -> CommunicationPreferencesBuilder<
+        'a,
+        communication_preferences_state::Empty,
+    > {
         CommunicationPreferencesBuilder::new()
     }
 }
@@ -82,7 +94,10 @@ where
     pub fn marketing(
         mut self,
         value: impl Into<bool>,
-    ) -> CommunicationPreferencesBuilder<'a, communication_preferences_state::SetMarketing<S>> {
+    ) -> CommunicationPreferencesBuilder<
+        'a,
+        communication_preferences_state::SetMarketing<S>,
+    > {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         CommunicationPreferencesBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -119,7 +134,9 @@ where
     }
 }
 
-fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.tophhie.profile"),
@@ -128,33 +145,37 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("communicationPreferences"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
-                            "Granular communication consent flags.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("marketing"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("marketing"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
-                    },
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "communicationPreferences",
                 ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Granular communication consent flags.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("marketing")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "marketing",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
@@ -253,51 +274,45 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
             );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static("pdsPreferences"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Granular PDS preference consent flags.",
-                        )),
-                        required: Some(vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showOnHomepage",
-                            ),
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("showOnHomepage"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("accessibilityScoring")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "accessibilityScoring",
                             ),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessibilityScoring",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "showOnHomepage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                                    ::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "showOnHomepage",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -323,26 +338,34 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunicationPreferences<
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    /// User's opt-in/out preferences for communications.
+    ///User's opt-in/out preferences for communications.
     #[serde(borrow)]
-    pub communication_preferences: crate::social_tophhie::profile::CommunicationPreferences<'a>,
-    /// ISO 8601 timestamp when this profile record was created.
+    pub communication_preferences: crate::social_tophhie::profile::CommunicationPreferences<
+        'a,
+    >,
+    ///ISO 8601 timestamp when this profile record was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// User's opt-in/out preferences for PDS features.
+    ///User's opt-in/out preferences for PDS features.
     #[serde(borrow)]
     pub pds_preferences: crate::social_tophhie::profile::PdsPreferences<'a>,
-    /// ISO 8601 timestamp when this profile record was updated.
+    ///ISO 8601 timestamp when this profile record was updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -402,7 +425,9 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::social_tophhie::profile::CommunicationPreferences<'a>>,
+        ::core::option::Option<
+            crate::social_tophhie::profile::CommunicationPreferences<'a>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<crate::social_tophhie::profile::PdsPreferences<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
@@ -554,7 +579,13 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -614,19 +645,25 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
 /// Granular PDS preference consent flags.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PdsPreferences<'a> {
-    /// True if the user participates in accessibility scoring.
+    ///True if the user participates in accessibility scoring.
     pub accessibility_scoring: bool,
-    /// True if the user is shown on the Tophhie Social homepage.
+    ///True if the user is shown on the Tophhie Social homepage.
     pub show_on_homepage: bool,
 }
 
 pub mod pds_preferences_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -7,23 +7,29 @@
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartLivestream<'a> {
-    /// Whether to create a Bluesky post announcing the livestream.
+    ///Whether to create a Bluesky post announcing the livestream.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub create_bluesky_post: std::option::Option<bool>,
     #[serde(borrow)]
     pub livestream: crate::place_stream::livestream::Livestream<'a>,
-    /// The DID of the streamer.
+    ///The DID of the streamer.
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod start_livestream_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,14 +185,20 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartLivestreamOutput<'a> {
-    /// The CID of the livestream record.
+    ///The CID of the livestream record.
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    /// The URI of the livestream record.
+    ///The URI of the livestream record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::UriValue<'a>,
 }
@@ -203,8 +215,9 @@ impl jacquard_common::xrpc::XrpcResp for StartLivestreamResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for StartLivestream<'a> {
     const NSID: &'static str = "place.stream.live.startLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StartLivestreamResponse;
 }
 
@@ -213,8 +226,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartLivestream<'a> {
 pub struct StartLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.startLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = StartLivestream<'de>;
     type Response = StartLivestreamResponse;
 }

@@ -8,20 +8,28 @@
 /// Generic class to represent the code list and code that is used
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CodeType<'a> {
     #[serde(borrow)]
-    pub code: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
-    /// Identifier of the standard code list that contains the allowed codes.
+    pub code: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+    ///Identifier of the standard code list that contains the allowed codes.
     #[serde(borrow)]
     pub list_id: jacquard_common::types::string::Nsid<'a>,
 }
 
 pub mod code_type_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -29,37 +37,37 @@ pub mod code_type_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type ListId;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type ListId = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type ListId = S::ListId;
+        type Code = Unset;
     }
     ///State transition - sets the `list_id` field to Set
     pub struct SetListId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetListId<S> {}
     impl<S: State> State for SetListId<S> {
-        type Code = S::Code;
         type ListId = Set<members::list_id>;
+        type Code = S::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type ListId = S::ListId;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `list_id` field
         pub struct list_id(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
@@ -68,7 +76,9 @@ pub struct CodeTypeBuilder<'a, S: code_type_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
         ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
     ),
@@ -102,7 +112,9 @@ where
     pub fn code(
         mut self,
         value: impl Into<
-            jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
         >,
     ) -> CodeTypeBuilder<'a, code_type_state::SetCode<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
@@ -136,8 +148,8 @@ where
 impl<'a, S> CodeTypeBuilder<'a, S>
 where
     S: code_type_state::State,
-    S::Code: code_type_state::IsSet,
     S::ListId: code_type_state::IsSet,
+    S::Code: code_type_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CodeType<'a> {
@@ -163,7 +175,9 @@ where
     }
 }
 
-fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.farmapps.temp.ecrop.defs"),
